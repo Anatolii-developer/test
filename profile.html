@@ -26,109 +26,136 @@
     <section id="step1" class="profile-card-wrapper profile-step">
       <div class="profile-card">
         <div class="profile-info">
-          <p>Ім’я: <span id="profileFirstName"></span> ✏️</p>
-          <p>Прізвище: <span id="profileLastName"></span> ✏️</p>
-          <p>По-батькові: <span id="profileMiddleName"></span> ✏️</p>
-          <p>Email Address: <span id="profileEmail"></span> ✏️</p>
-          <p>Номер телефону: <span id="profilePhone"></span> ✏️</p>
-          <p>Стать: <span id="profileGender"></span> ✏️</p>
+          <p>Ім’я: <span id="profileFirstName"></span> <img src="assets/edit-icon.svg" class="edit-icon" /></p>
+          <p>Прізвище: <span id="profileLastName"></span> <img src="assets/edit-icon.svg" class="edit-icon" /></p>
+          <p>По-батькові: <span id="profileMiddleName"></span> <img src="assets/edit-icon.svg" class="edit-icon" /></p>
+          <p>Email Address: <span id="profileEmail"></span> <img src="assets/edit-icon.svg" class="edit-icon" /></p>
+          <p>Номер телефону: <span id="profilePhone"></span> <img src="assets/edit-icon.svg" class="edit-icon" /></p>
+          <p>Стать: <span id="profileGender"></span> <img src="assets/edit-icon.svg" class="edit-icon" /></p>
 
-          <p style="margin-top: 20px; opacity: 0.6;">Сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими: ✏️</p>
+          <p style="margin-top: 20px; opacity: 0.6;">Сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими: <img src="assets/edit-icon.svg" class="edit-icon" /></p>
           <p><span id="profileExperience"></span></p>
 
-          <p style="margin-top: 20px; opacity: 0.6;">Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування. ✏️</p>
+          <p style="margin-top: 20px; opacity: 0.6;">Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування: <img src="assets/edit-icon.svg" class="edit-icon" /></p>
           <p><span id="profileEducation"></span></p>
 
-          <p style="margin-top: 20px; opacity: 0.6;">Ваш напрямок роботи: ✏️</p>
+          <p style="margin-top: 20px; opacity: 0.6;">Ваш напрямок роботи: <img src="assets/edit-icon.svg" class="edit-icon" /></p>
           <p><span id="profileDirections"></span></p>
 
-          <p style="margin-top: 20px; opacity: 0.6;">З чим працюєте: ✏️</p>
+          <p style="margin-top: 20px; opacity: 0.6;">З чим працюєте: <img src="assets/edit-icon.svg" class="edit-icon" /></p>
           <p><span id="profileTopics"></span></p>
         </div>
       </div>
     </section>
 
-    <!-- STEP 2 -->
     <section id="step2" class="profile-card-wrapper profile-step" style="display: none;">
       <div class="profile-card">
         <div class="profile-step-two">
-
+    
           <!-- Profile Image -->
           <div class="profile-photo-wrapper">
-            <img src="assets/profile-photo.jpg" alt="Profile" class="profile-photo" />
-            <div class="photo-upload-icon">🔁</div>
+            <label for="upload-photo">
+              <img id="profilePhoto" src="assets/profile-photo.png" alt="Profile" class="profile-photo" />
+              <div class="photo-upload-icon">+</div>
+            </label>
+            <input type="file" id="upload-photo" accept="image/*" style="display: none" onchange="previewPhoto(event)" />
           </div>
-
+          
+    
           <!-- Editable Fields -->
           <div class="editable-field">
-            <label>Про мене:</label>
-            <input type="text" id="profileAbout" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileAbout')" />
-          </div>
-
-          <div class="editable-field">
-            <label>Курси, які були пройдені в компанії:</label>
-            <input type="text" id="profileCourses" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileCourses')" />
-          </div>
-
-          <div class="editable-field">
-            <label>Рейтинг в компанії:</label>
-            <div id="profileRating">
-              ⭐ <span class="star">☆</span> <span class="star">☆</span> <span class="star">☆</span> <span class="star">☆</span> <span class="star">☆</span>
+            <div class="label-row">
+              <label for="profileAbout">Про мене:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileAbout')" />
             </div>
+            <input type="text" id="profileAbout" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Роль в компанії:</label>
+            <div class="label-row">
+              <label for="profileCourses">Курси, які були пройдені в компанії:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileCourses')" />
+            </div>
+            <input type="text" id="profileCourses" />
+          </div>
+    
+          <div class="editable-field">
+            <div class="label-row">
+              <label>Рейтинг в компанії:</label>
+            </div>
+            <div class="rating-stars" id="profileRating">
+              <img src="assets/star.svg" class="star" data-value="1" />
+              <img src="assets/star.svg" class="star" data-value="2" />
+              <img src="assets/star.svg" class="star" data-value="3" />
+              <img src="assets/star.svg" class="star" data-value="4" />
+              <img src="assets/star.svg" class="star" data-value="5" />
+            </div>
+            
+        
+    
+          <div class="editable-field">
+            <div class="label-row">
+              <label for="profileRole">Роль в компанії:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileRole')" />
+            </div>
             <input type="text" id="profileRole" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileRole')" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Вартість роботи:</label>
+            <div class="label-row">
+              <label for="profileCost">Вартість роботи:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileCost')" />
+            </div>
             <input type="text" id="profileCost" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileCost')" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Відеозвернення (посилання):</label>
+            <div class="label-row">
+              <label for="profileVideoLink">Відеозвернення (посилання):</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileVideoLink')" />
+            </div>
             <input type="text" id="profileVideoLink" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileVideoLink')" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Кваліфікаційні курси:</label>
+            <div class="label-row">
+              <label for="profileQualifications">Кваліфікаційні курси:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileQualifications')" />
+            </div>
             <input type="text" id="profileQualifications" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileQualifications')" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Інший релевантний досвід:</label>
+            <div class="label-row">
+              <label for="profileExperienceExtra">Інший релевантний досвід:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileExperienceExtra')" />
+            </div>
             <input type="text" id="profileExperienceExtra" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileExperienceExtra')" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Мова надання сесії:</label>
+            <div class="label-row">
+              <label for="profileLanguage">Мова надання сесії:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileLanguage')" />
+            </div>
             <input type="text" id="profileLanguage" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileLanguage')" />
           </div>
-
+    
           <div class="editable-field">
-            <label>Формат проведення:</label>
+            <div class="label-row">
+              <label for="profileFormat">Формат проведення:</label>
+              <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileFormat')" />
+            </div>
             <input type="text" id="profileFormat" />
-            <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileFormat')" />
           </div>
-
+    
         </div>
       </div>
-    </section>
+    </section>    
 
 
 
-
-    <!-- STEP 3 Placeholder -->
+<!-- STEP 3 -->
 <section id="step3" class="profile-card-wrapper profile-step" style="display: none;">
   <div class="profile-card">
     <div class="profile-step-three">
@@ -136,9 +163,9 @@
         <label>Ваша освіта і навчання з психології (в годинах):</label>
         <img src="assets/edit-icon.svg" class="edit-icon" />
         <table class="custom-table">
-          <tr><td>Лекції</td></tr>
-          <tr><td>Семінари</td></tr>
-          <tr><td>Колоквіуми</td></tr>
+          <tr><td>Лекції</td><td></td></tr>
+          <tr><td>Семінари</td><td></td></tr>
+          <tr><td>Колоквіуми</td><td></td></tr>
         </table>
       </div>
 
@@ -146,13 +173,13 @@
         <label>Ваша освіта і навчання з психології, яку ви мали переважно (в годинах):</label>
         <img src="assets/edit-icon.svg" class="edit-icon" />
         <table class="custom-table">
-          <tr><td>Особистий досвід в групі</td></tr>
-          <tr><td>Особиста терапія</td></tr>
-          <tr><td>Особистий психоаналіз</td></tr>
-          <tr><td>Індивідуальні супервізії</td></tr>
-          <tr><td>Менторський супровід</td></tr>
-          <tr><td>Групові супервізії</td></tr>
-          <tr><td>Психоаналітична психодрама</td></tr>
+          <tr><td>Особистий досвід в групі</td><td></td></tr>
+          <tr><td>Особиста терапія</td><td></td></tr>
+          <tr><td>Особистий психоаналіз</td><td></td></tr>
+          <tr><td>Індивідуальні супервізії</td><td></td></tr>
+          <tr><td>Менторський супровід</td><td></td></tr>
+          <tr><td>Групові супервізії</td><td></td></tr>
+          <tr><td>Психоаналітична психодрама</td><td></td></tr>
         </table>
       </div>
 
@@ -160,46 +187,20 @@
         <label>Чи маєте ви досвід викладання, проведення тренінгів, надання супервізій. Скільки годин:</label>
         <img src="assets/edit-icon.svg" class="edit-icon" />
         <table class="custom-table">
-          <tr><td>Викладання в школі</td></tr>
-          <tr><td>Викладання у виші</td></tr>
-          <tr><td>Інститути професійних асоціацій</td></tr>
-          <tr><td>Суспільні об'єднання</td></tr>
-          <tr><td>Ведення терапевтичних груп</td></tr>
-          <tr><td>Кризові групи</td></tr>
-          <tr><td>Групи психоаналітичної психодрами</td></tr>
+          <tr><td>Викладання в школі</td><td></td></tr>
+          <tr><td>Викладання у виші</td><td></td></tr>
+          <tr><td>Інститути професійних асоціацій</td><td></td></tr>
+          <tr><td>Суспільні об'єднання</td><td></td></tr>
+          <tr><td>Ведення терапевтичних груп</td><td></td></tr>
+          <tr><td>Кризові групи</td><td></td></tr>
+          <tr><td>Групи психоаналітичної психодрами</td><td></td></tr>
         </table>
       </div>
 
-      <div class="editable-field">
-        <label>Які терапевтичні підходи ви застосовуєте зараз:</label>
-        <img src="assets/edit-icon.svg" class="edit-icon" />
-        <table class="custom-table">
-          <tr><td>Психоаналіз</td></tr>
-          <tr><td>Групаналіз</td></tr>
-          <tr><td>Аналітична психологія</td></tr>
-          <tr><td>КПТ</td></tr>
-          <tr><td>Інше</td></tr>
-        </table>
-      </div>
-
-      <div class="editable-field">
-        <label>Оцінка роботи в кризовому консультуванні (від 1 до 5):</label>
-        <p>Оцінка з боку постраждалого:</p>
-        <div class="rating-set">①②③④⑤</div>
-        <p>Оцінка з боку супервізора:</p>
-        <div class="rating-set">①②③④⑤</div>
-        <p>Ваша власна оцінка:</p>
-        <div class="rating-set">①②③④⑤</div>
-      </div>
-
-      <div class="editable-field">
-        <label>Чого потребує кризова допомога як професійна діяльність:</label>
-        <textarea placeholder="Ваша відповідь..." rows="5"></textarea>
-      </div>
+      
     </div>
   </div>
 </section>
-
   </main>
 
   <script src="script.js"></script>

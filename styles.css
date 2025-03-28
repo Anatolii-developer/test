@@ -492,6 +492,54 @@
     border-radius: 24px;
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
   }
+
+
+  #step2 .profile-card {
+    width: 1140px;
+    height: 1440px;
+    border-radius: 24px;
+    padding: 80px 100px;
+    background-color: #FFFFF9;
+    box-shadow: 
+      -5px 0 5px #2F832F,
+       5px 0 5px #2F832F;
+  }
+  
+
+
+  .profile-photo-wrapper {
+    position: relative;
+    width: 208px;
+    height: 226px;
+    margin: 0 auto;
+    border: 2px solid #D9781C;
+    border-radius: 16px;
+    padding: 10px;
+  }
+  
+  .profile-photo {
+    width: 100%;
+    border: 2px dashed #B4CDA5;
+    border-radius: 8px;
+    display: block;
+  }
+  
+  .photo-upload-icon {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #D9781C;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+  }
   
   .profile-info p {
     font-size: 20px;
@@ -514,3 +562,97 @@
     opacity: 1;
   }
   
+
+
+  .editable-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .editable-field .label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .editable-field label {
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .editable-field input {
+    width: 940px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .editable-field .edit-icon {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+  
+  .editable-field .edit-icon:hover {
+    opacity: 1;
+  }
+  
+
+
+  .rating-stars {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .rating-stars .star {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .rating-stars .star:hover {
+    transform: scale(1.1);
+  }
+
+
+  #step3 .profile-card {
+    width: 1140px;
+    min-height: 1500px;
+    border-radius: 24px;
+    padding: 80px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 2px solid #E37009;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-table td {
+  border: 2px solid #E37009;
+  padding: 10px;
+  font-size: 16px;
+  vertical-align: middle;
+  width: 50%;
+}
+
+
+
+

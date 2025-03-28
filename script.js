@@ -148,3 +148,39 @@ function showStep(stepNumber) {
     el.classList.toggle('active', index === stepNumber - 1);
   });
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const stars = document.querySelectorAll("#profileRating .star");
+  let currentRating = parseInt(localStorage.getItem("companyRating")) || 0;
+
+  function updateStarDisplay(rating) {
+    stars.forEach(star => {
+      const value = parseInt(star.getAttribute("data-value"));
+      star.src = value <= rating 
+        ? "assets/star-filled.svg"
+        : "assets/star.svg"; 
+    });
+  }
+
+  updateStarDisplay(currentRating); // set stars on load
+
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      currentRating = parseInt(star.getAttribute("data-value"));
+      localStorage.setItem("companyRating", currentRating);
+      updateStarDisplay(currentRating);
+    });
+  });
+});
+
+
+function previewPhoto(event) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    const img = document.getElementById("profilePhoto");
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}
+

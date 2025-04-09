@@ -8,12 +8,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="profile-background">
-  <header>
-    <img class="logo" src="assets/logo.png" alt="Institute Logo" />
-    <div class="language-select">UA ▼</div>
-  </header>
+  <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+    </div>
+    <img style="margin-right: 200px;"  class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+    <nav>
+      <a href="#"><img src="assets/sidebar/profile.svg" /><span>About me</span></a>
+      <a href="#"><img src="assets/sidebar/news.svg" /><span>My Certificates</span></a>
+      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Career Planning</span></a>
+      <a href="#"><img src="assets/sidebar/4.svg" /><span>Library</span></a>
+      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>My Courses</span></a>
+      <a href="#"><img src="assets/sidebar/6.svg" /><span>Accounting</span></a>
+      <a href="#"><img src="assets/sidebar/7.svg" /><span>Health</span></a>
+      <a href="#"><img src="assets/sidebar/8.svg" /><span>Finance</span></a>
+      <a href="#"><img src="assets/sidebar/9.svg" /><span>Immovables</span></a>
+    </nav>
+    <div class="logout">
+      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+      <span>Logout Account</span>
+    </div>
+  </aside>
 
-  <main>
+
+
+  <main style="margin-left: 80px; transition: margin-left 0.3s ease;" id="mainContent">
     <section class="profile-hero">
       <div class="progress-indicator">
         <span class="step active" onclick="showStep(1)">1</span>

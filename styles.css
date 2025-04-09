@@ -432,10 +432,139 @@
     min-height: 100vh;
   }
   
+
+
+/*Sidebar*/
+.sidebar {
+  background-color: #ECF5EB;
+  position: absolute;
+  border-bottom-right-radius: 12px;
+  border-right: 1px solid #ccc;
+  height: 1024px;
+  padding: 24px;
+  gap: 24px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar.expanded {
+  width: 256px;
+  align-items: flex-start;
+}
+
+.sidebar.collapsed {
+  width: 92px;
+  align-items: center;
+}
+
+.sidebar .toggle-button {
+  cursor: pointer;
+  position: absolute;
+  top: 32px;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  background: #f3f8f1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.sidebar .toggle-button img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+
+.sidebar .logo,
+.sidebar .profile,
+.sidebar nav,
+.sidebar .logout {
+  margin-bottom: 20px;
+}
+
+.sidebar .logo {
+  width: 160px;            /* Fix width so it doesn’t overflow */
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin-left: 12px;       /* Add some spacing inside the sidebar */
+}
+
+.sidebar .logo-collapsed {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
+  display: none;
+}
+
+.sidebar.collapsed .logo {
+  display: none;
+}
+
+.sidebar.collapsed .logo-collapsed {
+  display: block;
+  margin-left: 0; /* optional if you want it centered */
+}
+
+
+
+    .sidebar .line {
+      background-color: #97C194;
+      border-radius: 2px;
+      height: 2px;
+      margin: 12px 0;
+    }
+
+    .sidebar.expanded .line {
+      width: 208px;
+    }
+
+    .sidebar.collapsed .line {
+      width: 44px;
+    }
+    
+
+
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+.sidebar.collapsed nav a span {
+  display: none;
+}
+
+.sidebar .logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  color: #E04343;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sidebar.collapsed .logout span {
+  display: none;
+}
+
   
   /* ========== Profile Layout ========== */
   .profile-container {
-    max-width: 1140px;
+    max-width: 1110px;
     margin: 0 auto;
     padding: 60px 20px;
   }
@@ -495,8 +624,8 @@
 
 
   #step2 .profile-card {
-    width: 1140px;
-    height: 1440px;
+    width: 1110px;
+    height: 1360px;
     border-radius: 24px;
     padding: 80px 100px;
     background-color: #FFFFF9;
@@ -626,7 +755,7 @@
 
 
   #step3 .profile-card {
-    width: 1140px;
+    width: 1110px;
     min-height: 1500px;
     border-radius: 24px;
     padding: 80px 100px;
@@ -656,3 +785,445 @@
 
 
 
+  
+  /* ========== Library Layout ========== */
+
+
+  .library-hero {
+    width: 100%;
+    max-width: 1110px;
+    margin: 80px auto 60px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .hero-img {
+    width: 320px;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .hero-title {
+    font-size: 64px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    padding: 100px;
+  }
+  
+
+  .library-section {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  
+  .library-card {
+    width: 1110px;
+    height: 212px;
+    background-color: #fffef9;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 100px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .library-card .info {
+    width: 428px;
+    height: 105px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  
+  
+  .library-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2D2D2D;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .library-card .info p {
+    font-size: 14px;
+    color: #2D2D2D;
+    opacity: 0.8;
+    font-family: 'Poppins', sans-serif;
+    line-height: 22px;
+    margin: 0;
+    word-break: break-word;
+    max-width: 428px;
+    max-height: 66px;
+    overflow: hidden;
+  }
+  
+
+  
+  .library-card .image {
+    height: 140px;
+  }
+  
+  .library-card .arrow {
+    width: 64px;
+    height: 64px;
+  }
+  
+
+    /* ========== Main Library Layout ========== */
+
+    .main-header {
+      width: 1110px;
+      height: 212px;
+      margin: 160px auto 28px;
+      padding: 0 40px;
+      border-radius: 24px;
+      background-color: #FFFFF9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .main-header h2 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .main-header img {
+      height: 120px;
+    }
+    
+    .nav-buttons {
+      width: 1110px;
+      margin: 0 auto 28px;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
+    
+    .nav-button {
+      width: 296px;
+      height: 48px;
+      border-radius: 24px;
+      padding: 10px 53px;
+      background-color: #275D2B;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .nav-button.secondary {
+      background-color: #3C6E44;
+    }
+    
+    .library-content {
+      width: 1110px;
+      height: 1814px;
+      margin: 28px auto;
+      padding: 40px;
+      border-radius: 24px;
+      background-color: #FFFDF6;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 3px solid #F1E1C0;
+      margin-bottom: 28px;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      font-size: 16px;
+      color: #999;
+      cursor: pointer;
+    }
+    
+    .tab.active {
+      color: #1a1a1a;
+      border-bottom: 3px solid #E37009;
+    }
+    
+    .date-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      position: relative;
+      width: 100%;
+      max-width: 1110px;
+    }
+    
+    .date-label {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      text-align: left;
+    }
+    
+    .date-inputs {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .date-input {
+      width: 236px;
+      height: 48px;
+      border: 1px solid #E37009;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .filter-btn-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+    
+    .filter-btn {
+      width: 113px;
+      height: 32px;
+      padding: 0 20px;
+      border: 1px solid #CFCFCF;
+      border-radius: 24px;
+      background-color: #F4F4F4;
+      color: #aaa;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      cursor: not-allowed;
+    
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: normal;
+    }
+    
+    
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      text-align: left;
+      
+    }
+    
+    .video-item h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #1a1a1a;
+    }
+    
+    .video-item p {
+      font-size: 13px;
+      color: #333;
+      opacity: 0.8;
+      margin-bottom: 12px;
+    }
+    
+    .video-thumb {
+      width: 516px;
+      height: 316px;
+      background: #CFCFCF;
+      border-radius: 8px;
+    }
+    
+
+
+    .materials-library-content {
+      width: 1110px;
+      height: 988px;
+      background-color: #FFFDF6;
+      border-radius: 24px;
+      padding: 60px 100px;
+      margin: 28px auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    
+    /* Date Picker Section */
+    .date-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+    
+    .date-label {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      text-align: left;
+    }
+    
+    .date-inputs {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .date-input {
+      width: 236px;
+      height: 48px;
+      border: 1px solid #E37009;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .filter-btn-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+    
+    .filter-btn {
+      width: 116px;
+      height: 32px;
+      padding: 0 20px;
+      border: 1px solid #CFCFCF;
+      border-radius: 24px;
+      background-color: #F4F4F4;
+      color: #aaa;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      cursor: not-allowed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: normal;
+    }
+
+
+
+    
+    /* Course Material Layout */
+    .course-item {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding-bottom: 60px;
+    }
+    
+    .course-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      color: #2D2D2D;
+    }
+    
+    .course-description {
+      font-size: 14px;
+      color: #2D2D2D;
+      opacity: 0.8;
+      line-height: 1.5;
+    }
+    
+    /* Матеріали до лекції */
+    .lecture-materials-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .view-btn {
+      width: 116px;
+      height: 32px;
+      border-radius: 24px;
+      background-color: #275D2B;
+      color: #fff;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    
+    
+
+     /* ========== My Courses Layout ========== */
+
+
+     .my-courses-section {
+      padding-top: 160px; /* or more, if you need to push it down */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px; /* space between each card */
+    }
+    
+    
+    .my-courses-hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .my-courses-hero-img {
+      width: 200px;
+      margin-bottom: 24px;
+    }
+    
+    .my-courses-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .course-card {
+      width: 1110px;
+      height: 212px;
+      background-color: #fffef9;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 100px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      gap: 28px;
+    }
+    
+    
+    .course-info h3 {
+      font-size: 40px;
+      font-weight: 600;
+      color: #2D2D2D;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .course-illustration {
+      height: 164px; 
+      width: 284px;
+    }
+    
+    
+    .arrow {
+      width: 64px;
+      height: 64px;
+    }
+    

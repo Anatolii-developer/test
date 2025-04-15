@@ -444,7 +444,7 @@
   
   
   .profile-background {
-    background-color: #B4CDA5;
+    background-color: #97C194;
     min-height: 100vh;
     padding-top: 600px;
     position: relative;
@@ -712,7 +712,7 @@
   }
   
   .step-line {
-    width: 140px;
+    width: 92px;
     height: 2px;
     background-color: #275D2B;
   }
@@ -755,21 +755,19 @@
     width: 208px;
     height: 226px;
     margin: 0 auto;
-    border: 2px solid #D9781C;
     border-radius: 16px;
     padding: 10px;
   }
   
   .profile-photo {
     width: 100%;
-    border: 2px dashed #B4CDA5;
     border-radius: 8px;
     display: block;
   }
   
   .photo-upload-icon {
     position: absolute;
-    bottom: -14px;
+    bottom: -1px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #D9781C;

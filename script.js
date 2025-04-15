@@ -197,12 +197,10 @@ function toggleSidebar() {
   sidebar.classList.toggle('collapsed');
 
   if (sidebar.classList.contains('expanded')) {
-    main.style.marginLeft = '256px';
     arrow.style.transform = 'rotate(0deg)';
     logoExpanded.style.display = 'block';
     logoCollapsed.style.display = 'none';
   } else {
-    main.style.marginLeft = '92px';
     arrow.style.transform = 'rotate(180deg)';
     logoExpanded.style.display = 'none';
     logoCollapsed.style.display = 'block';

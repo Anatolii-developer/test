@@ -26,10 +26,10 @@
     line-height: 28px;
     font-weight: 400;
     color: #1a1a1a;
-    background: url('assets/background.png') no-repeat center center fixed;
-    background-size: cover;
+    background-color: #fff; /* fallback color */
     min-height: 100vh;
   }
+  
   
   /* Headings */
   .h1 {
@@ -130,6 +130,13 @@
   }
   
   
+  #mainContent {
+    position: relative;
+    z-index: 1;
+    padding-left: 0; /* no offset from sidebar */
+  }
+
+
   
   .login-card {
     background-color: #FFFFF9;
@@ -423,31 +430,47 @@
     height: 48px;
   }
   
-  
-
-/* ========== Profile Page Background ========== */
-.profile-background {
+  .background-top {
     background: url('assets/pr-back.png') no-repeat center top;
     background-size: cover;
-    min-height: 100vh;
+    height: 600px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
   }
   
-
+  
+  
+  .profile-background {
+    background-color: #B4CDA5;
+    min-height: 100vh;
+    padding-top: 600px;
+    position: relative;
+    z-index: 1; /* keep this */
+  }
+  
+  
+  
 
 /*Sidebar*/
 .sidebar {
+  position: fixed;  /* instead of absolute */
+  left: 0;
+  top: 0;
+  z-index: 100; /* make sure it's above content */
+  height: 100vh;
   background-color: #ECF5EB;
-  position: absolute;
-  border-bottom-right-radius: 12px;
-  border-right: 1px solid #ccc;
-  height: 1024px;
   padding: 24px;
   gap: 24px;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); /* optional shadow */
 }
+
 
 .sidebar.expanded {
   width: 256px;
@@ -460,20 +483,49 @@
 }
 
 .sidebar .toggle-button {
-  cursor: pointer;
   position: absolute;
   top: 32px;
-  right: -12px;
-  width: 24px;
-  height: 24px;
+  right: -12px; /* this makes it "stick out" from the sidebar */
+  width: 32px;
+  height: 32px;
   background: #f3f8f1;
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 4px rgba(0,0,0,0.1);
-  z-index: 1000;
+  z-index: 2000; /* make sure it's above other elements */
+  transition: right 0.3s ease;
 }
+
+
+.sidebar nav a.active {
+  background-color: #FFFFFF;
+}
+
+
+.sidebar.collapsed nav a .tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #2D5C2D;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  margin-left: 8px;
+  z-index: 9999;
+}
+
+.sidebar.collapsed nav a:hover .tooltip {
+  opacity: 1;
+}
+
 
 .sidebar .toggle-button img {
   width: 20px;
@@ -533,14 +585,18 @@
 
 
 
-.sidebar nav a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #333;
-  text-decoration: none;
-  margin-bottom: 12px;
-}
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    
 
 .sidebar.collapsed nav a span {
   display: none;
@@ -574,6 +630,42 @@
     text-align: center;
   }
   
+
+  .progress-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    margin-bottom: 40px;
+  }
+  
+  .step {
+    width: 76px;
+    height: 76px;
+    border: 2px solid #275D2B;
+    border-radius: 50%;
+    font-size: 32px;
+    font-weight: 600;
+    color: #275D2B;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .step.active {
+    background-color: #275D2B;
+    color: #fff;
+  }
+
+  
+  .step:hover {
+    background-color: #e4efe2;
+  }
+  
+
   .profile-card-wrapper {
     margin-top: 80px; /* more space after hero */
     display: flex;
@@ -592,28 +684,50 @@
   
   .progress-indicator {
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 30px;
-    margin-top: 16px;
+    gap: 20px; /* spacing between step and line */
     margin-bottom: 40px;
   }
   
   .step {
-    width: 36px;
-    height: 36px;
+    width: 76px;
+    height: 76px;
     border: 2px solid #275D2B;
     border-radius: 50%;
+    background-color: transparent;
+    color: #275D2B;
+    font-size: 32px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    color: #275D2B;
+    cursor: pointer;
   }
   
   .step.active {
     background-color: #275D2B;
-    color: white;
+    color: #fff;
   }
+  
+  .step-line {
+    width: 140px;
+    height: 2px;
+    background-color: #275D2B;
+  }
+  
+
+
+  #step1 .profile-card {
+    width: 1110px;
+    height: 974px;
+    border-radius: 24px;
+    padding: 80px 100px;
+    background-color: #FFFFF9;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  }
+  
   
   .profile-card {
     background-color: #FFFFF9;

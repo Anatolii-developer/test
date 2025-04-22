@@ -206,3 +206,24 @@ function toggleSidebar() {
     logoCollapsed.style.display = 'block';
   }
 }
+
+
+function setupDateFilterButton() {
+  const inputs = document.querySelectorAll('.date-input');
+  const button = document.querySelector('.filter-btn');
+
+  if (!inputs.length || !button) return; // Don't run if no filter exists on the page
+
+  function toggleButtonState() {
+    const allFilled = Array.from(inputs).every(input => input.value.trim() !== '');
+    button.disabled = !allFilled;
+  }
+
+  inputs.forEach(input => {
+    input.addEventListener('input', toggleButtonState);
+  });
+
+  toggleButtonState();
+}
+
+document.addEventListener('DOMContentLoaded', setupDateFilterButton);

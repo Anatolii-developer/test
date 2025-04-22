@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Courses</title>
+  <title>Пройдені курси</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -33,52 +33,45 @@
   </aside>
 
   <main id="mainContent">
-    <section class="my-courses-section">
-      <div class="my-courses-hero">
-        <img src="assets/library/my-courses.png" alt="Hero" class="my-courses-hero-img" />
-        <h1 class="my-courses-title">MY COURSES</h1>
-      </div>
+    <!-- Header Block -->
+    <div class="main-header">
+      <h2>Пройдені курси</h2>
+      <img src="assets/library/completed.png" alt="Completed Courses" />
+    </div>
 
-      <div class="course-card">
-        <div class="course-info">
-          <h3>Пройдені курси</h3>
-        </div>
-        <img src="assets/library/completed.png" class="course-illustration" alt="Done" />
-        <a href="completed-courses.html" class="arrow-btn">
-          <img src="assets/library/arrow.png" alt="Arrow" class="arrow" />
-        </a>
-      </div>
+    <!-- Navigation Buttons -->
+    <div class="completed-nav-buttons">
+      <a href="my-courses.html" class="completed-nav-button secondary">Головна</a>
+      <a href="current-courses.html" class="completed-nav-button secondary">Поточні курси</a>
+      <a href="planned-courses.html" class="completed-nav-button secondary">Заплановані курси</a>
+      <a href="create-course.html" class="completed-nav-button create">Створити курс</a>
+    </div>
 
-      <div class="course-card">
-        <div class="course-info">
-          <h3>Поточні курси</h3>
-        </div>
-        <img src="assets/library/going.png" class="course-illustration" alt="Current" />
-        <a href="current-courses.html" class="arrow-btn">
-          <img src="assets/library/arrow.png" alt="Arrow" class="arrow" />
-        </a>
-      </div>
 
-      <div class="course-card">
-        <div class="course-info">
-          <h3>Заплановані курси</h3>
-        </div>
-        <img src="assets/library/planned.png" class="course-illustration" alt="Planned" />
-        <a href="completed-courses.html" class="arrow-btn">
-          <img src="assets/library/arrow.png" alt="Arrow" class="arrow" />
-        </a>
-      </div>
 
-      <div class="course-card">
-        <div class="course-info">
-          <h3>Створити курс</h3>
+    <!-- Certificates Content -->
+    <section class="completed-courses-content">
+            <!-- Filter -->
+    <div class="date-section">
+        <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
+        <div class="date-inputs">
+          <input type="date" class="date-input" />
+          <input type="date" class="date-input" />
         </div>
-        <img src="assets/library/create-course.png" class="course-illustration" alt="Create" />
-        <a href="completed-courses.html" class="arrow-btn">
-          <img src="assets/library/arrow.png" alt="Arrow" class="arrow" />
-        </a>
+        <div class="filter-btn-wrapper">
+          <button class="filter-btn" disabled>Фільтрувати</button>
+        </div>
       </div>
-      
+      <div class="certificates-list">
+        <div class="certificate-block">
+          <span class="certificate-dates">16.10.2024 – 23.01.2025</span>
+          <h4>Дослідження воєнного часу – Супервізійний курс – Осінь-2024</h4>
+          <p>Модуль 1 з 2-х річної кваліфікаційної програми з організації консультативної взаємодії психолога з клієнтами.</p>
+          <img src="assets/certificates/certificate-1.png" class="certificate-img" alt="Certificate" />
+        </div>
+
+        <!-- Repeat as needed -->
+      </div>
     </section>
   </main>
 

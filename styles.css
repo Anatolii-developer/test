@@ -25,9 +25,10 @@
     font-size: var(--text-size);
     line-height: 28px;
     font-weight: 400;
-    color: #1a1a1a;
-    background-color: #fff; /* fallback color */
+    background-color: transparent;
     min-height: 100vh;
+    background: #97C194;
+    position: relative;
   }
   
   
@@ -429,26 +430,39 @@
     width: 196px;
     height: 48px;
   }
+
+
+
+  .about-me-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 64px;
+    line-height: 76px;
+    text-align: center;
+    letter-spacing: 0;
+    color: #ffffff; /* or dark if needed */
+    padding-bottom: 100px;
+  }
   
+
   .background-top {
-    background: url('assets/pr-back.png') no-repeat center top;
-    background-size: cover;
-    height: 600px;
-    width: 100%;
-    position: absolute;
+    position: absolute; /* ← makes it scroll with content */
     top: 0;
     left: 0;
-    z-index: 0;
+    height: 600px;
+    width: 100%;
+    background: url('assets/pr-back.png') no-repeat center top;
+    background-size: cover;
+    background-color: #E4EFE2; /* soft green fallback */
+    z-index: -1;
   }
   
   
   
+
   .profile-background {
-    background-color: #97C194;
-    min-height: 100vh;
-    padding-top: 600px;
     position: relative;
-    z-index: 1; /* keep this */
+    z-index: 1;
   }
   
   
@@ -568,7 +582,6 @@
 
 
     .sidebar .line {
-      background-color: #97C194;
       border-radius: 2px;
       height: 2px;
       margin: 12px 0;
@@ -901,6 +914,19 @@
   /* ========== Library Layout ========== */
 
 
+  .library-background-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 600px;
+    background: url('assets/library/library-back.png') no-repeat top center;
+    background-size: cover;
+    z-index: -1;
+  }
+  
+  
+
   .library-hero {
     width: 100%;
     max-width: 1110px;
@@ -909,18 +935,26 @@
     position: relative;
   }
   
-  .hero-img {
-    width: 320px;
-    max-width: 100%;
-    margin-bottom: 20px;
+  .library-background {
+    position: relative;
+    z-index: 1;
   }
+  
+  .hero-img {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px; /* optional spacing */
+  }
+  
   
   .hero-title {
     font-size: 64px;
     font-weight: 600;
     color: #fff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    padding: 100px;
+    padding: 20px;
   }
   
 
@@ -1006,10 +1040,12 @@
       font-size: 36px;
       font-weight: 700;
       color: #333;
+      padding-left: 100px;
     }
     
     .main-header img {
       height: 120px;
+      padding-right: 100px;
     }
     
     .nav-buttons {
@@ -1045,7 +1081,7 @@
       width: 1110px;
       height: 1814px;
       margin: 28px auto;
-      padding: 40px;
+      padding: 100px;
       border-radius: 24px;
       background-color: #FFFDF6;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -1102,7 +1138,6 @@
       padding: 0 12px;
       font-family: 'Poppins', sans-serif;
       font-size: 14px;
-      color: #333;
     }
     
     .filter-btn-wrapper {
@@ -1117,17 +1152,37 @@
       padding: 0 20px;
       border: 1px solid #CFCFCF;
       border-radius: 24px;
-      background-color: #F4F4F4;
-      color: #aaa;
       font-family: 'Poppins', sans-serif;
       font-size: 14px;
-      cursor: not-allowed;
-    
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: normal;
+      color: white;
+      cursor: pointer;
+      background-color: #E37009;
+      transition: background-color 0.2s ease;
     }
+    
+    .filter-btn:hover:not(:disabled) {
+      background-color: #B65600;
+    }
+    
+    .filter-btn:focus:not(:disabled) {
+      background-color: #E37009;
+      outline: none;
+    }
+    
+    .filter-btn:active:not(:disabled) {
+      background-color: #9F4B00;
+    }
+    
+    .filter-btn:disabled {
+      background-color: #F3F2F1;
+      color: white;
+      cursor: not-allowed;
+    }
+    
     
     
     .video-list {
@@ -1297,14 +1352,18 @@
     }
     
     .my-courses-hero-img {
-      width: 200px;
-      margin-bottom: 24px;
+      width: 398px;
+      max-width: none;
+      height: auto;
+      display: block;
+      margin: 0 auto 20px; /* optional spacing */
     }
     
     .my-courses-title {
-      font-size: 32px;
-      font-weight: 700;
+      font-size: 64px;
+      font-weight: 600;
       color: white;
+      padding: 100px;
     }
     
     .course-card {
@@ -1334,8 +1393,132 @@
     }
     
     
+    .arrow-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    
+    .arrow-btn:hover {
+      transform: scale(1.1);
+    }
+    
     .arrow {
       width: 64px;
       height: 64px;
     }
     
+    
+
+    
+
+    /* Completed Courses Content */
+.completed-courses-content {
+  width: 1110px;
+  height: 2344px;
+  margin: 60px auto;
+  padding: 60px 100px;
+  border-radius: 24px;
+  background-color: #FFFDF6;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Navigation Button Container */
+.completed-nav-buttons {
+  display: flex;
+  gap: 50px;
+  margin-top: 30px;
+  margin-bottom: 28px;
+  justify-content: flex-start;
+
+}
+
+/* Base Navigation Button Style */
+.completed-nav-button {
+  width: 224px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: #275D2B;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Highlighted "Створити курс" button */
+.completed-nav-button.create {
+  background-color: #E37009;
+}
+
+.completed-nav-button:hover {
+  opacity: 0.9;
+}
+
+
+.course-entry {
+  background-color: #fffdf6;
+  border-radius: 16px;
+  padding: 40px 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 1110px;
+  margin: 0 auto 40px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.course-date {
+  display: block;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #295F2D;
+  margin-bottom: 20px;
+  border-top: 1px solid #295F2D;
+  padding: 10px 0;
+}
+
+.course-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 20px 0 12px;
+  color: #333;
+}
+
+.course-subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.course-details-btn {
+  width: 136px;
+  display: inline-block;
+  background-color: #295F2D;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.course-details-btn:hover {
+  background-color: #1e4821;
+}

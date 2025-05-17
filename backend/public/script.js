@@ -29,7 +29,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
   };
 
   try {
-    const res = await fetch("/api/users/register", {
+    const res = await fetch("https://psychologist-backend.onrender.com/api/users/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

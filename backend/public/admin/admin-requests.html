@@ -8,66 +8,41 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    
-  <main class="admin-main">
-    <div class="admin-content-wrapper">
-      <!-- Верхнее меню -->
-      <div class="top-nav">
-        <button class="top-btn active">Заявки</button>
-        <button class="top-btn">Учасники</button>
-        <button class="top-btn">Відхилені</button>
-      </div>
-  
-      <!-- Контейнер таблицы -->
-      <div class="table-card">
-        <!-- Поиск -->
-        <div class="search-block">
-          <input type="text" placeholder="Введіть пошту" />
-          <button class="search-btn">Search</button>
-        </div>
-  
-        <!-- Таблица -->
-        <table class="requests-table">
-          <thead>
-            <tr>
-              <th>Created at</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Review</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>23.04.2025 11:57</td>
-              <td>janesmith@gmail.com</td>
-              <td>WAIT FOR REVIEW</td>
-              <td><button class="more-btn">More</button></td>
-            </tr>
-            <tr>
-              <td>23.04.2025 11:57</td>
-              <td>janesmith@gmail.com</td>
-              <td>WAIT FOR REVIEW</td>
-              <td><button class="more-btn">More</button></td>
-            </tr>
-            <tr>
-              <td>23.04.2025 11:57</td>
-              <td>janesmith@gmail.com</td>
-              <td>WAIT FOR REVIEW</td>
-              <td><button class="more-btn">More</button></td>
-            </tr>
-            <tr>
-              <td>23.04.2025 11:57</td>
-              <td>janesmith@gmail.com</td>
-              <td>WAIT FOR REVIEW</td>
-              <td><button class="more-btn">More</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </main>
 
- <!-- Модальное окно -->
+<main class="admin-main">
+  <div class="admin-content-wrapper">
+    <!-- Верхнее меню -->
+    <div class="top-nav">
+      <button class="top-btn active">Заявки</button>
+      <button class="top-btn">Учасники</button>
+      <button class="top-btn">Відхилені</button>
+    </div>
+
+    <!-- Контейнер таблицы -->
+    <div class="table-card">
+      <!-- Поиск -->
+      <div class="search-block">
+        <input type="text" placeholder="Введіть пошту" />
+        <button class="search-btn">Search</button>
+      </div>
+
+      <!-- Таблица -->
+      <table class="requests-table">
+        <thead>
+          <tr>
+            <th>Created at</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Review</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Модальное окно -->
 <div id="userModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="modalClose" class="modal-close">&times;</span>
@@ -79,13 +54,10 @@
   </div>
 </div>
 
-  
 <script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    sidebar.classList.toggle("collapsed");
-    sidebar.classList.toggle("expanded");
-  }
+  const API_BASE = window.location.origin.includes("localhost")
+    ? "http://localhost:5050"
+    : "https://psychologist-backend.onrender.com";
 
   document.addEventListener("DOMContentLoaded", async () => {
     const tableBody = document.querySelector(".requests-table tbody");
@@ -101,7 +73,7 @@
     window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; }
 
     try {
-      const res = await fetch("http://localhost:5050/api/users");
+      const res = await fetch(`${API_BASE}/api/users`);
       const users = await res.json();
 
       tableBody.innerHTML = users.map(user => `
@@ -116,7 +88,7 @@
       document.querySelectorAll(".more-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.dataset.id;
-          const res = await fetch(`http://localhost:5050/api/users/${id}`);
+          const res = await fetch(`${API_BASE}/api/users/${id}`);
           const user = await res.json();
           currentUserId = id;
 
@@ -143,7 +115,7 @@
   });
 
   async function updateStatus(id, status) {
-    await fetch(`http://localhost:5050/api/users/${id}/status`, {
+    await fetch(`${API_BASE}/api/users/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),

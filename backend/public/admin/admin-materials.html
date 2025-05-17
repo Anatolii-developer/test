@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel – Заявки</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <main class="admin-wrapper">
+       
+      
+        <div class="admin-card">
+            <div class="materials-top-buttons">
+                <button class="top-btns active">Додати матеріали до курсів</button>
+                <button class="top-btns inactive">Додати матеріали групі</button>
+              </div>
+          <label for="course-select" class="field-label">Оберіть курс</label>
+          <div class="dropdown-wrapper">
+            <select id="course-select">
+              <option>Курс 1</option>
+              <option>Курс 2</option>
+            </select>
+          </div>
+      
+          <div class="search-bar-wrapper">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Пошук за імʼям або прізвищем"
+              class="search-bar"
+            />
+          </div>
+          
+
+          <table class="materials-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name and surname</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Date of birth</th>
+                <th>Review</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Ivan Ivanov</td>
+                <td>jksncclxxlk@gmail.com</td>
+                <td>Супервізор I категорії</td>
+                <td>11.05.2002</td>
+                <td><img src="images/checkbox.png" alt="Checked" /></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Петро Іванович </td>
+                <td>jksncclxxlk@gmail.com</td>
+                <td>Супервізор I категорії</td>
+                <td>11.05.2002</td>
+                <td><img src="images/checkbox.png" alt="Checked" /></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Андрій Шевченко</td>
+                <td>jksncclxxlk@gmail.com</td>
+                <td>Супервізор I категорії</td>
+                <td>11.05.2002</td>
+                <td><img src="images/checkbox.png" alt="Checked" /></td>
+              </tr>
+              <!-- More rows here -->
+            </tbody>
+          </table>
+      
+          <div class="datetime-row">
+            <div class="input-with-icon">
+              <input type="date" placeholder="Date" />
+              <img src="images/calendar.png" class="calendar-icon" alt="calendar" />
+            </div>
+            <div class="input-with-icon">
+              <input type="time" placeholder="Time" />
+              <img src="images/calendar.png" class="calendar-icon" alt="calendar" />
+            </div>
+          </div>
+        
+      
+          <div class="button-row">
+            <button class="green-btn">Додати відео</button>
+            <button class="green-btn">Додати книгу</button>
+          </div>
+      
+          <button class="submit-btn">Submit</button>
+        </div>
+      </main>
+      
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("collapsed");
+      sidebar.classList.toggle("expanded");
+    }
+
+    
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll(".materials-table tbody tr");
+
+    rows.forEach((row) => {
+      const nameCell = row.cells[1]; // имя и фамилия во второй колонке
+      const name = nameCell.textContent.toLowerCase();
+      row.style.display = name.includes(filter) ? "" : "none";
+    });
+  });
+
+
+  </script>
+</body>
+</html>

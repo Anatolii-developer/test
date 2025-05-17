@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Реєстрація - Psychologist Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <img class="logo" src="assets/logo.png" alt="Institute Logo" />
+      <div class="language-select">UA ▼</div>
+    </header>
+
+    <main>
+      <div class="login-card">
+        <h1 class="h1" style="color: #D97A1C; text-align: center;">Реєстрація</h1>
+
+        <label for="username" class="s1">Username</label>
+        <div class="input-wrapper">
+          <img src="assets/icon-user.png" class="input-icon" alt="user icon" />
+          <input type="text" id="username" placeholder="Enter your username" />
+        </div>
+
+        <label for="password" class="s1">Password</label>
+        <div class="input-wrapper">
+          <img src="assets/icon-lock.png" class="input-icon" alt="lock icon" />
+          <input type="password" id="password" placeholder="Enter your password" />
+          <img src="assets/icon-eye.png" class="toggle-password" alt="toggle visibility" onclick="togglePassword()" />
+        </div>
+
+        <label for="confirm-password" class="s1">Confirm password</label>
+        <div class="input-wrapper">
+          <img src="assets/icon-lock.png" class="input-icon" alt="lock icon" />
+          <input type="password" id="confirm-password" placeholder="Enter your password" />
+          <img src="assets/icon-eye.png" class="toggle-password" alt="toggle visibility" onclick="togglePassword()" />
+        </div>
+
+        <button onclick="window.location.href='registration.html'">Next</button>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

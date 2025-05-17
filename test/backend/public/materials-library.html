@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Матеріали моїх курсів</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar collapsed" id="sidebar">
+        <div class="toggle-button" onclick="toggleSidebar()">
+          <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+        </div>
+        <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+        <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+        <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+        <nav>
+          <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>About me</span></a>
+          <a href="#"><img src="assets/sidebar/news.svg" /><span>My Certificates</span></a>
+          <a href="#"><img src="assets/sidebar/3.svg" /><span>Career Planning</span></a>
+          <a href="library.html" class="active"><img src="assets/sidebar/4.svg" /><span>Library</span></a>
+          <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>My Courses</span></a>
+          <a href="#"><img src="assets/sidebar/6.svg" /><span>Accounting</span></a>
+          <a href="#"><img src="assets/sidebar/7.svg" /><span>Health</span></a>
+          <a href="#"><img src="assets/sidebar/8.svg" /><span>Finance</span></a>
+          <a href="#"><img src="assets/sidebar/9.svg" /><span>Immovables</span></a>
+        </nav>
+        <div class="logout">
+          <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+          <span>Logout Account</span>
+        </div>
+      </aside>
+
+  <main id="mainContent">
+    <!-- Title Block -->
+    <div class="main-header">
+      <h2>Матеріали моїх курсів</h2>
+      <img src="assets/library/courses.png" alt="Courses Image" />
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+    <a href="library.html">
+      <button class="nav-button"><img src="assets/library/arrow-main.svg" alt="Back" />Головна</button>
+    </a>
+    <a href="main-library.html">
+      <button class="nav-button secondary">Загальні матеріали</button>
+    </a>
+      <a href="addons-library.html">
+      <button class="nav-button secondary">Додаткові матеріали</button>
+    </a>
+    </div>
+    
+
+    <!-- Content Block -->
+    <section class="materials-library-content">
+
+      <!-- Filter -->
+      <div class="date-section">
+        <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
+        <div class="date-inputs">
+          <input type="date" class="date-input" />
+          <input type="date" class="date-input" />
+        </div>
+        <div class="filter-btn-wrapper">
+          <button class="filter-btn">Фільтрувати</button>
+        </div>
+      </div>
+
+      <!-- Course Items -->
+      <div class="course-list">
+        <div class="course-item">
+            <h4 class="course-title">«Кризова інтервенція в психоаналітичному підході»</h4>
+            <p class="course-description">
+              Модуль I з 2-х річної кваліфікаційної програми з організації консультативної взаємодії психолога з клієнтами.
+            </p>
+            <div class="lecture-materials-row">
+              <strong>Матеріали до лекції</strong>
+              <button class="view-btn">Переглянути</button>
+            </div>
+          </div>
+        
+
+          <div class="course-item">
+            <h4 class="course-title">«Кризова інтервенція в психоаналітичному підході»</h4>
+            <p class="course-description">Модуль I з 2-х річної кваліфікаційної програми...</p>
+          
+            <div class="week-block">
+              <button class="accordion-toggle">Матеріали до лекції</button>
+              <div class="accordion-content">
+                <div class="lecture-row">
+                  <span>Відео-матеріали до лекції</span>
+                  <button class="view-btn">Переглянути</button>
+                </div>
+                <div class="lecture-row">
+                  <span>Книжкові матеріали до лекції</span>
+                  <button class="view-btn">Переглянути</button>
+                </div>
+              </div>
+            </div>
+          
+            <div class="week-block">
+              <button class="accordion-toggle">Матеріали до супервізії</button>
+              <!-- Empty content for now -->
+            </div>
+          </div>
+        
+
+          <div class="course-item">
+            <h4 class="course-title">«Кризова інтервенція в психоаналітичному підході»</h4>
+            <p class="course-description">Модуль I з 2-х річної кваліфікаційної програми...</p>
+          
+            <div class="week-block">
+              <button class="accordion-toggle">Матеріали до лекції</button>
+              <div class="accordion-content">
+                <div class="lecture-row">
+                  <span>Відео-матеріали до лекції</span>
+                  <button class="view-btn">Переглянути</button>
+                </div>
+                <div class="lecture-row">
+                  <span>Книжкові матеріали до лекції</span>
+                  <button class="view-btn">Переглянути</button>
+                </div>
+              </div>
+            </div>
+          
+            <div class="week-block">
+              <button class="accordion-toggle">Матеріали до супервізії</button>
+              <!-- Empty content for now -->
+            </div>
+          </div>
+        
+      </div>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

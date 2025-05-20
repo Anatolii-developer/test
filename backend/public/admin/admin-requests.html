@@ -64,29 +64,37 @@
     const rejectBtn = document.getElementById("rejectBtn");
     const modalClose = document.getElementById("modalClose");
     const tabs = document.querySelectorAll(".top-btn");
+    const searchBtn = document.querySelector(".search-btn");
+    const searchInput = document.getElementById("searchEmail");
 
-    // Закрытие модалки
     modalClose.onclick = () => modal.style.display = "none";
     window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
-    // Вкладки
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         tabs.forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
         currentStatus = tab.dataset.status;
-        loadUsers();
+        loadUsers(); // без фильтра
       });
     });
 
-    // Принять/отклонить
     approveBtn.onclick = () => updateStatus(currentUserId, "APPROVED");
     rejectBtn.onclick = () => updateStatus(currentUserId, "REJECTED");
 
-    // Загрузка пользователей
-    async function loadUsers() {
+    searchBtn.addEventListener("click", () => {
+      const email = searchInput.value.trim();
+      loadUsers(email); // фильтр по email
+    });
+
+    async function loadUsers(emailFilter = "") {
       try {
-        const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
+        const query = new URLSearchParams({
+          status: currentStatus,
+          ...(emailFilter && { email: emailFilter }),
+        });
+
+        const res = await fetch(`${API_URL}/api/users?${query}`);
         const users = await res.json();
 
         tableBody.innerHTML = users.map(user => `
@@ -130,7 +138,7 @@
         body: JSON.stringify({ status }),
       });
       modal.style.display = "none";
-      loadUsers(); // перезагрузить таблицу
+      loadUsers(); // обновить
     }
 
     loadUsers(); // начальная загрузка

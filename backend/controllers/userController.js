@@ -12,10 +12,20 @@ exports.registerUser = async (req, res) => {
 
 
 
+
 exports.getAllUsers = async (req, res) => {
   try {
-    const { status } = req.query;
-    const filter = status ? { status } : {};
+    const { status, email } = req.query;
+
+    const filter = {};
+
+    if (status) {
+      filter.status = status;
+    }
+
+    if (email) {
+      filter.email = { $regex: email, $options: 'i' }; // регистронезависимый поиск
+    }
 
     const users = await User.find(filter).sort({ createdAt: -1 });
     res.json(users);

@@ -8,25 +8,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
 <main class="admin-main">
   <div class="admin-content-wrapper">
     <!-- Верхнее меню -->
     <div class="top-nav">
-      <button class="top-btn active">Заявки</button>
-      <button class="top-btn">Учасники</button>
-      <button class="top-btn">Відхилені</button>
+      <button class="top-btn active" data-status="WAIT FOR REVIEW">Заявки</button>
+      <button class="top-btn" data-status="APPROVED">Учасники</button>
+      <button class="top-btn" data-status="REJECTED">Відхилені</button>
     </div>
 
     <!-- Контейнер таблицы -->
     <div class="table-card">
-      <!-- Поиск -->
       <div class="search-block">
-        <input type="text" placeholder="Введіть пошту" />
+        <input type="text" id="searchEmail" placeholder="Введіть пошту" />
         <button class="search-btn">Search</button>
       </div>
 
-      <!-- Таблица -->
       <table class="requests-table">
         <thead>
           <tr>
@@ -55,73 +52,89 @@
 </div>
 
 <script>
-  const API_BASE = window.location.origin.includes("localhost")
-    ? "http://localhost:5050"
-    : "https://psychologist-backend.onrender.com";
+  const API_URL = "https://psychologist-backend.onrender.com";
+  let currentUserId = null;
+  let currentStatus = "WAIT FOR REVIEW";
 
-  document.addEventListener("DOMContentLoaded", async () => {
+  document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.querySelector(".requests-table tbody");
     const modal = document.getElementById("userModal");
     const userDetails = document.getElementById("userDetails");
     const approveBtn = document.getElementById("approveBtn");
     const rejectBtn = document.getElementById("rejectBtn");
     const modalClose = document.getElementById("modalClose");
+    const tabs = document.querySelectorAll(".top-btn");
 
-    let currentUserId = null;
-
+    // Закрытие модалки
     modalClose.onclick = () => modal.style.display = "none";
-    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; }
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
-    try {
-      const res = await fetch(`${API_BASE}/api/users`);
-      const users = await res.json();
-
-      tableBody.innerHTML = users.map(user => `
-        <tr>
-          <td>${new Date(user.createdAt).toLocaleString()}</td>
-          <td>${user.email}</td>
-          <td>${user.status}</td>
-          <td><button class="more-btn" data-id="${user._id}">More</button></td>
-        </tr>
-      `).join("");
-
-      document.querySelectorAll(".more-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.dataset.id;
-          const res = await fetch(`${API_BASE}/api/users/${id}`);
-          const user = await res.json();
-          currentUserId = id;
-
-          userDetails.innerHTML = `
-            <p><strong>Ім’я:</strong> ${user.firstName}</p>
-            <p><strong>Прізвище:</strong> ${user.lastName}</p>
-            <p><strong>Телефон:</strong> ${user.phone}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <p><strong>Освіта:</strong> ${user.education}</p>
-            <p><strong>Досвід:</strong> ${user.experience}</p>
-            <p><strong>Напрямки:</strong> ${user.directions.join(', ')}</p>
-            <p><strong>Тематики:</strong> ${user.topics.join(', ')}</p>
-          `;
-          modal.style.display = "block";
-        });
+    // Вкладки
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentStatus = tab.dataset.status;
+        loadUsers();
       });
-
-      approveBtn.onclick = () => updateStatus(currentUserId, "APPROVED");
-      rejectBtn.onclick = () => updateStatus(currentUserId, "REJECTED");
-
-    } catch (err) {
-      console.error("Помилка при завантаженні:", err);
-    }
-  });
-
-  async function updateStatus(id, status) {
-    await fetch(`${API_BASE}/api/users/${id}/status`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
     });
-    location.reload();
-  }
+
+    // Принять/отклонить
+    approveBtn.onclick = () => updateStatus(currentUserId, "APPROVED");
+    rejectBtn.onclick = () => updateStatus(currentUserId, "REJECTED");
+
+    // Загрузка пользователей
+    async function loadUsers() {
+      try {
+        const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
+        const users = await res.json();
+
+        tableBody.innerHTML = users.map(user => `
+          <tr>
+            <td>${new Date(user.createdAt).toLocaleString()}</td>
+            <td>${user.email}</td>
+            <td>${user.status}</td>
+            <td><button class="more-btn" data-id="${user._id}">More</button></td>
+          </tr>
+        `).join("");
+
+        document.querySelectorAll(".more-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const id = btn.dataset.id;
+            const res = await fetch(`${API_URL}/api/users/${id}`);
+            const user = await res.json();
+            currentUserId = id;
+
+            userDetails.innerHTML = `
+              <p><strong>Ім’я:</strong> ${user.firstName}</p>
+              <p><strong>Прізвище:</strong> ${user.lastName}</p>
+              <p><strong>Телефон:</strong> ${user.phone}</p>
+              <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Освіта:</strong> ${user.education}</p>
+              <p><strong>Досвід:</strong> ${user.experience}</p>
+              <p><strong>Напрямки:</strong> ${user.directions.join(', ')}</p>
+              <p><strong>Тематики:</strong> ${user.topics.join(', ')}</p>
+            `;
+            modal.style.display = "block";
+          });
+        });
+      } catch (err) {
+        console.error("Помилка при завантаженні:", err);
+      }
+    }
+
+    async function updateStatus(id, status) {
+      await fetch(`${API_URL}/api/users/${id}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      modal.style.display = "none";
+      loadUsers(); // перезагрузить таблицу
+    }
+
+    loadUsers(); // начальная загрузка
+  });
 </script>
 
 </body>

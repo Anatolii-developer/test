@@ -10,14 +10,12 @@
 <body>
 <main class="admin-main">
   <div class="admin-content-wrapper">
-    <!-- Верхнее меню -->
     <div class="top-nav">
       <button class="top-btn active" data-status="WAIT FOR REVIEW">Заявки</button>
       <button class="top-btn" data-status="APPROVED">Учасники</button>
       <button class="top-btn" data-status="REJECTED">Відхилені</button>
     </div>
 
-    <!-- Контейнер таблицы -->
     <div class="table-card">
       <div class="search-block">
         <input type="text" id="searchEmail" placeholder="Введіть пошту" />
@@ -39,14 +37,23 @@
   </div>
 </main>
 
-<!-- Модальное окно -->
 <div id="userModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="modalClose" class="modal-close">&times;</span>
-    <div id="userDetails"></div>
-    <div id="modalActions" style="margin-top: 1rem;">
-      <button id="approveBtn">✅ Прийняти</button>
-      <button id="rejectBtn">❌ Відхилити</button>
+    <div id="userDetails" class="modal-details"></div>
+    <div style="margin-top: 1rem;">
+      <select id="roleSelect">
+        <option value="">Оберіть роль</option>
+        <option value="Супервізор I категорії">Супервізор I категорії</option>
+        <option value="Супервізор II категорії">Супервізор II категорії</option>
+        <option value="Психолог">Психолог</option>
+      </select>
+      <select id="decisionSelect">
+        <option value="">Оберіть рішення</option>
+        <option value="APPROVED">✅ Прийняти</option>
+        <option value="REJECTED">❌ Відхилити</option>
+      </select>
+      <button id="submitDecision">Submit</button>
     </div>
   </div>
 </div>
@@ -61,10 +68,11 @@
     const tableHead = document.getElementById("table-header");
     const modal = document.getElementById("userModal");
     const userDetails = document.getElementById("userDetails");
-    const approveBtn = document.getElementById("approveBtn");
-    const rejectBtn = document.getElementById("rejectBtn");
     const modalClose = document.getElementById("modalClose");
     const tabs = document.querySelectorAll(".top-btn");
+    const decisionSelect = document.getElementById("decisionSelect");
+    const roleSelect = document.getElementById("roleSelect");
+    const submitDecision = document.getElementById("submitDecision");
 
     modalClose.onclick = () => modal.style.display = "none";
     window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
@@ -78,8 +86,19 @@
       });
     });
 
-    approveBtn.onclick = () => updateStatus(currentUserId, "APPROVED");
-    rejectBtn.onclick = () => updateStatus(currentUserId, "REJECTED");
+    submitDecision.onclick = async () => {
+      const status = decisionSelect.value;
+      const role = roleSelect.value;
+      if (!status || !currentUserId) return;
+
+      await fetch(`${API_URL}/api/users/${currentUserId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, role }),
+      });
+      modal.style.display = "none";
+      loadUsers();
+    };
 
     async function loadUsers() {
       try {
@@ -93,7 +112,7 @@
               <td>${index + 1}</td>
               <td>${user.firstName} ${user.lastName}</td>
               <td>${user.email}</td>
-              <td>Супервізор I категорії</td>
+              <td>${user.role || 'Супервізор I категорії'}</td>
               <td>${user.dateOfBirth || '-'}</td>
               <td><button class="more-btn" data-id="${user._id}">More</button></td>
             </tr>
@@ -120,13 +139,18 @@
             userDetails.innerHTML = `
               <p><strong>Ім’я:</strong> ${user.firstName}</p>
               <p><strong>Прізвище:</strong> ${user.lastName}</p>
-              <p><strong>Телефон:</strong> ${user.phone}</p>
+              <p><strong>По-батькові:</strong> ${user.middleName}</p>
+              <p><strong>Дата народження:</strong> ${user.dateOfBirth}</p>
               <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Телефон:</strong> ${user.phone}</p>
+              <p><strong>Стать:</strong> ${user.gender}</p>
               <p><strong>Освіта:</strong> ${user.education}</p>
               <p><strong>Досвід:</strong> ${user.experience}</p>
               <p><strong>Напрямки:</strong> ${user.directions.join(', ')}</p>
               <p><strong>Тематики:</strong> ${user.topics.join(', ')}</p>
             `;
+            roleSelect.value = user.role || "";
+            decisionSelect.value = "";
             modal.style.display = "block";
           });
         });
@@ -135,18 +159,9 @@
       }
     }
 
-    async function updateStatus(id, status) {
-      await fetch(`${API_URL}/api/users/${id}/status`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      modal.style.display = "none";
-      loadUsers();
-    }
-
     loadUsers();
   });
 </script>
+
 </body>
 </html>

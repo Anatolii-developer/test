@@ -12,20 +12,10 @@ exports.registerUser = async (req, res) => {
 
 
 
-
 exports.getAllUsers = async (req, res) => {
   try {
-    const { status, email } = req.query;
-
-    const filter = {};
-
-    if (status) {
-      filter.status = status;
-    }
-
-    if (email) {
-      filter.email = { $regex: email, $options: 'i' }; // регистронезависимый поиск
-    }
+    const { status } = req.query;
+    const filter = status ? { status } : {};
 
     const users = await User.find(filter).sort({ createdAt: -1 });
     res.json(users);
@@ -47,8 +37,11 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUserStatus = async (req, res) => {
   try {
-    const { status } = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const { status, role } = req.body; // ✅ получаем role тоже
+    const update = { status };
+    if (role) update.role = role;
+
+    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });

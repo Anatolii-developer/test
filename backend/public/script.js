@@ -80,6 +80,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
   };
 
   try {
+    console.log("payload:", payload);
     const res = await fetch("https://psychologist-backend.onrender.com/api/users/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -9,6 +9,23 @@ function login() {
 }
 
 
+
+  function togglePassword() {
+    const passwordInput = document.getElementById("password");
+    const toggleIcon = passwordInput.nextElementSibling;
+
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      toggleIcon.src = "assets/icon-eye-open.svg"; // если хочешь поменять иконку
+    } else {
+      passwordInput.type = "password";
+      toggleIcon.src = "assets/icon-eye-close.svg"; // вернуть обычную
+    }
+  }
+
+
+
+
 document.getElementById("saveBtn").addEventListener("click", async () => {
   const payload = {
     username: document.getElementById("username")?.value || "",

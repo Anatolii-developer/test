@@ -1,11 +1,25 @@
-function login() {
+async function login() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  console.log("Username:", username);
-  console.log("Password:", password);
+  try {
+    const res = await fetch("https://psychologist-backend.onrender.com/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-  alert("Login clicked (this is a placeholder)");
+    const result = await res.json();
+    if (res.ok) {
+      localStorage.setItem("user", JSON.stringify(result.user));
+      window.location.href = "profile.html";
+    } else {
+      alert("Помилка: " + result.message);
+    }
+  } catch (err) {
+    alert("Server error");
+    console.error(err);
+  }
 }
 
 

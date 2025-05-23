@@ -24,6 +24,26 @@ async function login() {
 
 
 
+function saveLoginAndContinue() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirm-password").value;
+
+  if (!username || !password || !confirmPassword) {
+    alert("Будь ласка, заповніть всі поля.");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Паролі не співпадають.");
+    return;
+  }
+
+  localStorage.setItem("registrationUsername", username);
+  localStorage.setItem("registrationPassword", password);
+  window.location.href = "registration.html";
+}
+
   function togglePassword() {
     const passwordInput = document.getElementById("password");
     const toggleIcon = passwordInput.nextElementSibling;
@@ -42,8 +62,8 @@ async function login() {
 
 document.getElementById("saveBtn").addEventListener("click", async () => {
   const payload = {
-    username: document.getElementById("username")?.value || "",
-    password: document.getElementById("password")?.value || "",
+    username: localStorage.getItem("registrationUsername") || "",
+    password: localStorage.getItem("registrationPassword") || "",
     firstName: document.getElementById("firstName").value,
     lastName: document.getElementById("lastName").value,
     middleName: document.getElementById("middleName").value,

@@ -14,8 +14,10 @@ const userSchema = new mongoose.Schema({
   education: String,
   directions: [String],
   topics: [String],
+  role: String, // ✅ добавь это
   status: { type: String, default: "WAIT FOR REVIEW" },
   createdAt: { type: Date, default: Date.now },
 });
+
 
 module.exports = mongoose.model("User", userSchema);

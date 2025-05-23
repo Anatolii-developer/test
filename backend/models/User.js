@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
   username: String,
@@ -14,10 +15,16 @@ const userSchema = new mongoose.Schema({
   education: String,
   directions: [String],
   topics: [String],
-  role: String, // ✅ добавь это
+  role: String, // добавлено
   status: { type: String, default: "WAIT FOR REVIEW" },
   createdAt: { type: Date, default: Date.now },
 });
 
+// хеширование пароля перед сохранением
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 module.exports = mongoose.model("User", userSchema);

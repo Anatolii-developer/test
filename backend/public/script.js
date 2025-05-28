@@ -44,8 +44,9 @@ function saveLoginAndContinue() {
   window.location.href = "registration.html";
 }
 
- function togglePassword(iconElement) {
-  const passwordInput = iconElement.previousElementSibling;
+function togglePassword(iconElement) {
+  const wrapper = iconElement.closest('.input-wrapper');
+  const passwordInput = wrapper.querySelector('input');
 
   if (passwordInput.type === "password") {
     passwordInput.type = "text";

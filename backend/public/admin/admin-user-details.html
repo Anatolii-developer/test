@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Деталі учасника</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+</head>
+<body>
+  <button onclick="window.history.back()">⬅ Назад</button>
+  <div id="userDetails"></div>
+
+  <script>
+    const API_URL = "https://psychologist-backend.onrender.com";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const params = new URLSearchParams(window.location.search);
+      const userId = params.get('id');
+      if (!userId) return document.getElementById("userDetails").textContent = "ID користувача не знайдено.";
+
+      try {
+        const res = await fetch(`${API_URL}/api/users/${userId}`);
+        const user = await res.json();
+
+        document.getElementById("userDetails").innerHTML = `
+          <h1>${user.firstName} ${user.lastName}</h1>
+          <p><strong>По-батькові:</strong> ${user.middleName}</p>
+          <p><strong>Дата народження:</strong> ${user.dateOfBirth}</p>
+          <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>Телефон:</strong> ${user.phone}</p>
+          <p><strong>Стать:</strong> ${user.gender}</p>
+          <p><strong>Освіта:</strong> ${user.education}</p>
+          <p><strong>Досвід:</strong> ${user.experience}</p>
+          <p><strong>Напрямки:</strong> ${user.directions.join(', ')}</p>
+          <p><strong>Тематики:</strong> ${user.topics.join(', ')}</p>
+          <img src="${user.photoUrl || '../assets/profile-photo.png'}" alt="Фото" width="150" />
+        `;
+      } catch (err) {
+        console.error(err);
+        document.getElementById("userDetails").textContent = "Помилка при завантаженні даних.";
+      }
+    });
+  </script>
+</body>
+</html>

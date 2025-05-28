@@ -152,50 +152,80 @@ function logoutUser() {
       loadUsers();
     };
 
-    async function loadUsers() {
-      try {
-        const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
-        const users = await res.json();
+   async function loadUsers() {
+  try {
+    const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
+    const users = await res.json();
 
-        document.querySelectorAll(".more-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.id;
-    window.location.href = `admin-user-details.html?id=${id}`;
-  });
-});
+    if (currentStatus === "APPROVED") {
+      tableHead.innerHTML = "<tr><th>ID</th><th>Name and surname</th><th>Email</th><th>Role</th><th>Date of birth</th><th>Review</th></tr>";
+      tableBody.innerHTML = users.map((user, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${user.firstName} ${user.lastName}</td>
+          <td>${user.email}</td>
+          <td>${user.role || '-'}</td>
+          <td>${user.dateOfBirth || '-'}</td>
+          <td><button class="more-btn" data-id="${user._id}">More</button></td>
+        </tr>
+      `).join("");
 
-        document.querySelectorAll(".more-btn").forEach(btn => {
-          btn.addEventListener("click", async () => {
-            const id = btn.dataset.id;
-            const res = await fetch(`${API_URL}/api/users/${id}`);
-            const user = await res.json();
-            currentUserId = id;
-
-            userDetails.innerHTML = `
-              <p><strong>Ім’я:</strong> ${user.firstName}</p>
-              <p><strong>Прізвище:</strong> ${user.lastName}</p>
-              <p><strong>По-батькові:</strong> ${user.middleName}</p>
-              <p><strong>Дата народження:</strong> ${user.dateOfBirth}</p>
-              <p><strong>Email:</strong> ${user.email}</p>
-              <p><strong>Телефон:</strong> ${user.phone}</p>
-              <p><strong>Стать:</strong> ${user.gender}</p>
-              <p><strong>Освіта:</strong> ${user.education}</p>
-              <p><strong>Досвід:</strong> ${user.experience}</p>
-              <p><strong>Напрямки:</strong> ${user.directions.join(', ')}</p>
-              <p><strong>Тематики:</strong> ${user.topics.join(', ')}</p>
-            `;
-            roleSelect.value = user.role || "";
-            decisionSelect.value = "";
-            modal.style.display = "block";
-          });
+      document.querySelectorAll(".more-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          window.location.href = `admin-user-details.html?id=${id}`;
         });
-      } catch (err) {
-        console.error("Помилка при завантаженні:", err);
-      }
+      });
+
+    } else {
+      tableHead.innerHTML = "<tr><th>Created at</th><th>Email</th><th>Status</th><th>Review</th></tr>";
+      tableBody.innerHTML = users.map(user => `
+        <tr>
+          <td>${new Date(user.createdAt).toLocaleString()}</td>
+          <td>${user.email}</td>
+          <td>${user.status}</td>
+          <td><button class="more-btn" data-id="${user._id}">More</button></td>
+        </tr>
+      `).join("");
+
+      document.querySelectorAll(".more-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          const res = await fetch(`${API_URL}/api/users/${id}`);
+          const user = await res.json();
+          currentUserId = id;
+
+          userDetails.innerHTML = `...`;
+          modal.style.display = "block";
+        });
+      });
     }
+
+  } catch (err) {
+    console.error("Помилка при завантаженні:", err);
+  }
+}
 
     loadUsers();
   });
+
+
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+  const arrow = document.getElementById('toggleArrow');
+  const logoExpanded = document.getElementById('logoExpanded');
+  const logoCollapsed = document.getElementById('logoCollapsed');
+
+  sidebar.classList.toggle('expanded');
+  sidebar.classList.toggle('collapsed');
+  if (sidebar.classList.contains('expanded')) {
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    arrow.style.transform = 'rotate(0deg)';
+  }
+}
 </script>
 
 </body>

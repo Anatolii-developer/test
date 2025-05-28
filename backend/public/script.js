@@ -62,7 +62,7 @@ function togglePassword(iconElement) {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   if (!storedUser) {
     alert("Please log in first.");
-    window.location.href = "login.html";
+    window.location.href = "index.html";
     return;
   }
 

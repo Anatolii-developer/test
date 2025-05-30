@@ -58,7 +58,9 @@ function togglePassword(iconElement) {
 }
 
 
-  window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("DOMContentLoaded", async () => {
+  if (!window.location.pathname.includes("profile.html")) return;
+
   const storedUser = JSON.parse(localStorage.getItem("user"));
   if (!storedUser) {
     alert("Please log in first.");
@@ -70,7 +72,6 @@ function togglePassword(iconElement) {
     const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`);
     const user = await res.json();
 
-    // Заполни поля
     document.getElementById("profileFirstName").textContent = user.firstName || "";
     document.getElementById("profileLastName").textContent = user.lastName || "";
     document.getElementById("profileMiddleName").textContent = user.middleName || "";
@@ -82,7 +83,6 @@ function togglePassword(iconElement) {
     document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
     document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
 
-    // сохрани в JS для дальнейшего использования
     window.currentUser = user;
   } catch (err) {
     console.error("Failed to load user data:", err);
@@ -144,35 +144,38 @@ function editField(fieldId) {
 }
 
 
-document.getElementById("saveProfileChangesBtn").addEventListener("click", async () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (!storedUser) {
-    alert("Please log in first.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedProfileData),
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      alert("Профіль оновлено успішно!");
-      updatedProfileData = {}; // очистить локальные изменения
-
-      // === СКРЫВАЕМ КНОПКУ ===
-      document.getElementById("saveProfileChangesBtn").style.display = "none";
-    } else {
-      alert("Помилка: " + result.message);
+const saveButton = document.getElementById("saveProfileChangesBtn");
+if (saveButton) {
+  saveButton.addEventListener("click", async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Please log in first.");
+      return;
     }
-  } catch (err) {
-    console.error("Error updating profile:", err);
-    alert("Помилка сервера.");
-  }
-});
+
+    try {
+      const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProfileData),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert("Профіль оновлено успішно!");
+        updatedProfileData = {}; // очистить локальные изменения
+
+        // === СКРЫВАЕМ КНОПКУ ===
+        document.getElementById("saveProfileChangesBtn").style.display = "none";
+      } else {
+        alert("Помилка: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      alert("Помилка сервера.");
+    }
+  });
+}
 
 document.getElementById("saveBtn").addEventListener("click", async () => {
   const payload = {

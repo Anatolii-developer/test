@@ -58,9 +58,7 @@ function togglePassword(iconElement) {
 }
 
 
-window.addEventListener("DOMContentLoaded", async () => {
-  if (!window.location.pathname.includes("profile.html")) return;
-
+  window.addEventListener("DOMContentLoaded", async () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   if (!storedUser) {
     alert("Please log in first.");
@@ -72,6 +70,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`);
     const user = await res.json();
 
+    // Заполни поля
     document.getElementById("profileFirstName").textContent = user.firstName || "";
     document.getElementById("profileLastName").textContent = user.lastName || "";
     document.getElementById("profileMiddleName").textContent = user.middleName || "";
@@ -83,6 +82,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
     document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
 
+    // сохрани в JS для дальнейшего использования
     window.currentUser = user;
   } catch (err) {
     console.error("Failed to load user data:", err);
@@ -92,9 +92,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 
 
+
+
+
 let updatedProfileData = {};
 
-function editField(fieldId) {
+function enableEdit(fieldId, mongoKey) {
   const span = document.getElementById(fieldId);
   const currentValue = span.textContent.trim();
 
@@ -103,50 +106,21 @@ function editField(fieldId) {
   input.value = currentValue;
   input.className = "edit-input";
 
+  const checkIcon = document.createElement("img");
+  checkIcon.src = "assets/check-icon.svg"; // 👉 вставь правильный путь к галочке
+  checkIcon.className = "check-icon";
+  checkIcon.style.cursor = "pointer";
+  checkIcon.style.width = "20px";
+  checkIcon.style.marginLeft = "8px";
+
   span.replaceWith(input);
-  input.focus();
+  input.parentNode.appendChild(checkIcon);
 
-  // === ПОЯВЛЕНИЕ КНОПКИ ===
-  const saveButton = document.getElementById("saveProfileChangesBtn");
-  saveButton.style.display = "block";
-
-  input.addEventListener("blur", saveEdit);
-  input.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") input.blur();
+  input.addEventListener("input", () => {
+    updatedProfileData[mongoKey] = input.value.trim();
   });
 
-  function saveEdit() {
-    const newValue = input.value.trim();
-
-    span.textContent = newValue;
-    input.replaceWith(span);
-
-    const keyMap = {
-      profileFirstName: "firstName",
-      profileLastName: "lastName",
-      profileMiddleName: "middleName",
-      profileEmail: "email",
-      profilePhone: "phone",
-      profileGender: "gender",
-      profileExperience: "experience",
-      profileEducation: "education",
-      profileDirections: "directions",
-      profileTopics: "topics"
-    };
-
-    const mongoKey = keyMap[fieldId];
-    if (mongoKey) {
-      updatedProfileData[mongoKey] = newValue;
-    }
-
-    console.log("Updated so far:", updatedProfileData);
-  }
-}
-
-
-const saveButton = document.getElementById("saveProfileChangesBtn");
-if (saveButton) {
-  saveButton.addEventListener("click", async () => {
+  checkIcon.addEventListener("click", async () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) {
       alert("Please log in first.");
@@ -154,28 +128,63 @@ if (saveButton) {
     }
 
     try {
+      const payload = { [mongoKey]: updatedProfileData[mongoKey] };
       const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedProfileData),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
       if (res.ok) {
-        alert("Профіль оновлено успішно!");
-        updatedProfileData = {}; // очистить локальные изменения
-
-        // === СКРЫВАЕМ КНОПКУ ===
-        document.getElementById("saveProfileChangesBtn").style.display = "none";
+        // Обновляем отображение
+        const newSpan = document.createElement("span");
+        newSpan.id = fieldId;
+        newSpan.textContent = updatedProfileData[mongoKey];
+        input.replaceWith(newSpan);
+        checkIcon.remove();
+        updatedProfileData = {};
+        alert("Зміни збережено!");
       } else {
-        alert("Помилка: " + result.message);
+        alert("Помилка при збереженні: " + result.message);
       }
     } catch (err) {
-      console.error("Error updating profile:", err);
-      alert("Помилка сервера.");
+      console.error("Error updating:", err);
+      alert("Серверна помилка.");
     }
   });
 }
+
+
+document.getElementById("saveProfileChangesBtn").addEventListener("click", async () => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (!storedUser) {
+    alert("Please log in first.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedProfileData),
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("Профіль оновлено успішно!");
+      updatedProfileData = {}; // очистить локальные изменения
+
+      // === СКРЫВАЕМ КНОПКУ ===
+      document.getElementById("saveProfileChangesBtn").style.display = "none";
+    } else {
+      alert("Помилка: " + result.message);
+    }
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    alert("Помилка сервера.");
+  }
+});
 
 document.getElementById("saveBtn").addEventListener("click", async () => {
   const payload = {

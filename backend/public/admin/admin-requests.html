@@ -198,9 +198,9 @@ function logoutUser() {
   <p><strong>Email:</strong> ${user.email || '-'}</p>
   <p><strong>Телефон:</strong> ${user.phone || '-'}</p>
   <p><strong>Стать:</strong> ${user.gender || '-'}</p>
-  <p><strong>Сумарний досвід клінічної роботи:</strong> ${user.experience || '-'}</p>
-  <p><strong>Психологічна освіта:</strong> ${user.education || '-'}</p>
-  <p><strong>Тематики:</strong> ${(user.topics || []).join(', ') || '-'}</p>
+  <p><strong>Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими:</strong> ${user.experience || '-'}</p>
+  <p><strong>Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування:</strong> ${user.education || '-'}</p>
+  <p><strong>Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування:</strong> ${(user.topics || []).join(', ') || '-'}</p>
 `;
             roleSelect.value = user.role || "";
             decisionSelect.value = "";

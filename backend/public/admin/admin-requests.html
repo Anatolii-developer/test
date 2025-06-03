@@ -189,18 +189,19 @@ function logoutUser() {
             currentUserId = id;
 
             userDetails.innerHTML = `
-              <p><strong>Ім’я:</strong> ${user.firstName}</p>
-              <p><strong>Прізвище:</strong> ${user.lastName}</p>
-              <p><strong>По-батькові:</strong> ${user.middleName}</p>
-              <p><strong>Дата народження:</strong> ${user.dateOfBirth}</p>
-              <p><strong>Email:</strong> ${user.email}</p>
-              <p><strong>Телефон:</strong> ${user.phone}</p>
-              <p><strong>Стать:</strong> ${user.gender}</p>
-              <p><strong>Освіта:</strong> ${user.education}</p>
-              <p><strong>Досвід:</strong> ${user.experience}</p>
-              <p><strong>Напрямки:</strong> ${user.directions.join(', ')}</p>
-              <p><strong>Тематики:</strong> ${user.topics.join(', ')}</p>
-            `;
+  <p><strong>Ім’я:</strong> ${user.firstName || '-'}</p>
+  <p><strong>Прізвище:</strong> ${user.lastName || '-'}</p>
+  <p><strong>По-батькові:</strong> ${user.middleName || '-'}</p>
+  <p><strong>Дата подання заявки:</strong> ${new Date(user.createdAt).toLocaleDateString() || '-'}</p>
+  <p><strong>Дата підтвердження заявки:</strong> ${user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '-'}</p>
+  <p><strong>Дата народження:</strong> ${user.dateOfBirth || '-'}</p>
+  <p><strong>Email:</strong> ${user.email || '-'}</p>
+  <p><strong>Телефон:</strong> ${user.phone || '-'}</p>
+  <p><strong>Стать:</strong> ${user.gender || '-'}</p>
+  <p><strong>Сумарний досвід клінічної роботи:</strong> ${user.experience || '-'}</p>
+  <p><strong>Психологічна освіта:</strong> ${user.education || '-'}</p>
+  <p><strong>Тематики:</strong> ${(user.topics || []).join(', ') || '-'}</p>
+`;
             roleSelect.value = user.role || "";
             decisionSelect.value = "";
             modal.style.display = "block";

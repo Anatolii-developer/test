@@ -15,16 +15,41 @@ const userSchema = new mongoose.Schema({
   education: String,
   directions: [String],
   topics: [String],
-  role: String, // добавлено
+  about: String,
+  courses: String,
+  cost: String,
+  videoLink: String,
+  qualifications: String,
+  experienceExtra: String,
+  language: String,
+  format: String,
+  lectures: String,                   // ➕ новое
+  seminars: String,                   // ➕ новое
+  colloquiums: String,                // ➕ новое
+  groupExperience: String,            // ➕ новое
+  personalTherapy: String,            // ➕ новое
+  personalAnalysis: String,           // ➕ новое
+  individualSupervision: String,      // ➕ новое
+  mentoring: String,                  // ➕ новое
+  groupSupervision: String,           // ➕ новое
+  psychoanalyticPsychodrama: String,  // ➕ новое
+  teachingSchool: String,             // ➕ новое
+  teachingUniversity: String,         // ➕ новое
+  professionalInstitutes: String,     // ➕ новое
+  communityOrganizations: String,     // ➕ новое
+  therapyGroups: String,              // ➕ новое
+  crisisGroups: String,               // ➕ новое
+  psychoanalyticDramaGroups: String,  // ➕ новое
+  role: String,
   status: { type: String, default: "WAIT FOR REVIEW" },
   createdAt: { type: Date, default: Date.now },
 });
 
 // хеширование пароля перед сохранением
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+if (!this.isModified("password")) return next();
+this.password = await bcrypt.hash(this.password, 10);
+next();
 });
 
 module.exports = mongoose.model("User", userSchema);

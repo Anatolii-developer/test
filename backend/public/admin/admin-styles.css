@@ -337,54 +337,77 @@ body {
   
 
   .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
-  .modal-content {
-    background: white;
-    border-radius: 10px;
-    padding: 30px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    font-family: 'Poppins', sans-serif;
-  }
+.modal-content {
+  background-color: #FFFFF9;
+  border-radius: 24px;
+  padding: 40px 50px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  font-family: 'Poppins', sans-serif;
+}
 
-  .modal-close {
-    font-size: 24px;
-    font-weight: bold;
-    float: right;
-    cursor: pointer;
-  }
+.modal-close {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  cursor: pointer;
+}
 
-  .modal-content p {
-    margin-bottom: 12px;
-  }
+.modal-content p {
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #333;
+}
 
-  .modal-content label {
-    display: block;
-    margin-top: 20px;
-    font-weight: 500;
-  }
+.modal-content strong {
+  color: #A95305;
+}
 
-  .modal-content select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    margin-top: 5px;
-  }
+.modal-content select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #E37009;
+  font-size: 16px;
+  margin-top: 12px;
+  background-color: #FFFFF9;
+}
 
+#submitDecision {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #E37009;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#submitDecision:hover {
+  background-color: #cf6108;
+}
   #modalActions {
     display: flex;
     justify-content: space-between;
@@ -409,3 +432,185 @@ body {
     background-color: #f44336;
     color: white;
   }
+
+
+
+/*Sidebar*/
+.sidebar {
+  position: fixed;  /* instead of absolute */
+  left: 0;
+  top: 0;
+  z-index: 100; /* make sure it's above content */
+  height: 100vh;
+  background-color: #ECF5EB;
+  padding: 24px;
+  gap: 24px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); /* optional shadow */
+}
+
+
+.sidebar.expanded {
+  width: 256px;
+  align-items: flex-start;
+}
+
+.sidebar.collapsed {
+  width: 92px;
+  align-items: center;
+}
+
+.sidebar .toggle-button {
+  position: absolute;
+  top: 32px;
+  right: -12px; /* this makes it "stick out" from the sidebar */
+  width: 32px;
+  height: 32px;
+  background: #f3f8f1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000; /* make sure it's above other elements */
+  transition: right 0.3s ease;
+}
+
+
+.sidebar nav a.active {
+  background-color: #FFFFFF;
+}
+
+
+
+.sidebar nav a span {
+  transition: opacity 0.3s ease, max-width 0.3s ease, margin 0.3s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  opacity: 1;
+  max-width: 200px;
+  margin-left: 10px;
+}
+
+.sidebar.collapsed nav a span {
+  opacity: 0;
+  max-width: 0;
+  margin-left: 0;
+}
+
+
+.sidebar.collapsed nav a .tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #2D5C2D;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+  margin-left: 8px;
+  z-index: 9999;
+}
+
+.sidebar.collapsed nav a:hover .tooltip {
+  opacity: 1;
+}
+
+
+.sidebar .toggle-button img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.5s ease;
+}
+
+
+.sidebar .logo,
+.sidebar .profile,
+.sidebar nav,
+.sidebar .logout {
+  margin-bottom: 20px;
+}
+
+.sidebar .logo {
+  width: 160px;            /* Fix width so it doesn’t overflow */
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin-left: 12px;       /* Add some spacing inside the sidebar */
+}
+
+.sidebar .logo-collapsed {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
+  display: none;
+}
+
+.sidebar.collapsed .logo {
+  display: none;
+}
+
+.sidebar.collapsed .logo-collapsed {
+  display: block;
+  margin-left: 0; /* optional if you want it centered */
+}
+
+
+
+    .sidebar .line {
+      border-radius: 2px;
+      height: 2px;
+      margin: 12px 0;
+    }
+
+    .sidebar.expanded .line {
+      width: 208px;
+    }
+
+    .sidebar.collapsed .line {
+      width: 44px;
+    }
+    
+
+
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    
+
+.sidebar.collapsed nav a span {
+  display: none;
+}
+
+.sidebar .logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  color: #E04343;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sidebar.collapsed .logout span {
+  display: none;
+}

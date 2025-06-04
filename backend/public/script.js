@@ -208,30 +208,31 @@ const topicsOptions = [
 
 
 
-function enableCheckboxEditStyled(fieldId, mongoKey, optionsArray) {
+function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   const container = document.getElementById(fieldId).parentNode;
-  const current = document.getElementById(fieldId);
-  const selected = window.currentUser[mongoKey] || [];
+  const selectedValues = (window.currentUser[mongoKey] || []);
 
-  current.remove();
+  // Удаляем старый span
+  const oldSpan = document.getElementById(fieldId);
+  oldSpan.remove();
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "checkbox-group";
+  // Создаём div с чекбоксами
+  const checkboxContainer = document.createElement("div");
+  checkboxContainer.className = "checkbox-group";
 
   optionsArray.forEach(option => {
     const label = document.createElement("label");
-
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
+    checkbox.checked = selectedValues.includes(option);
     checkbox.value = option;
-    checkbox.checked = selected.includes(option);
 
-    const tag = document.createElement("span");
-    tag.textContent = option;
+    const span = document.createElement("span");
+    span.textContent = option;
 
     label.appendChild(checkbox);
-    label.appendChild(tag);
-    wrapper.appendChild(label);
+    label.appendChild(span);
+    checkboxContainer.appendChild(label);
   });
 
   const checkIcon = document.createElement("img");
@@ -241,30 +242,30 @@ function enableCheckboxEditStyled(fieldId, mongoKey, optionsArray) {
   checkIcon.style.width = "20px";
   checkIcon.style.marginLeft = "8px";
 
-  container.appendChild(wrapper);
+  container.appendChild(checkboxContainer);
   container.appendChild(checkIcon);
 
   checkIcon.addEventListener("click", async () => {
-    const selectedValues = Array.from(wrapper.querySelectorAll("input[type='checkbox']:checked"))
+    const selected = Array.from(checkboxContainer.querySelectorAll("input[type='checkbox']:checked"))
       .map(cb => cb.value);
 
-    updatedProfileData[mongoKey] = selectedValues;
+    updatedProfileData[mongoKey] = selected;
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [mongoKey]: selectedValues }),
+      body: JSON.stringify({ [mongoKey]: selected }),
     });
 
     if (res.ok) {
-      const newSpan = document.createElement("div");
+      const newSpan = document.createElement("span");
       newSpan.id = fieldId;
-      newSpan.className = "checkbox-tags";
-      newSpan.innerHTML = selectedValues.map(tag => `<span class="tag">${tag}</span>`).join(" ");
-      wrapper.remove();
+      newSpan.textContent = selected.join(", ");
+      checkboxContainer.remove();
       checkIcon.remove();
       container.appendChild(newSpan);
+      alert("Збережено!");
     } else {
       alert("Помилка при збереженні");
     }

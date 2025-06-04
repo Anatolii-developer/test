@@ -1,0 +1,42 @@
+<!-- user-profile.html -->
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Профіль користувача</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+</head>
+<body>
+  <main class="admin-main">
+    <div class="admin-content-wrapper">
+      <h2>Профіль учасника</h2>
+      <div id="userDetails"></div>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = "https://psychologist-backend.onrender.com";
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get("id");
+
+    async function loadUser() {
+      const res = await fetch(`${API_URL}/api/users/${userId}`);
+      const user = await res.json();
+
+      const container = document.getElementById("userDetails");
+
+      const fieldsToDisplay = Object.entries(user)
+        .filter(([key]) => !["username", "password", "__v", "_id"].includes(key));
+
+      container.innerHTML = fieldsToDisplay.map(([key, value]) => {
+        const displayKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        const displayValue = Array.isArray(value) ? value.join(", ") : value || "-";
+        return `<p><strong>${displayKey}:</strong> ${displayValue}</p>`;
+      }).join("");
+    }
+
+    loadUser();
+  </script>
+</body>
+</html>

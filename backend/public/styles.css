@@ -1902,11 +1902,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .checkbox-group label {
-  background-color: #f5f5f5;
+  background-color: #F5F5F5;
   padding: 8px 12px;
   border-radius: 20px;
   border: 1px solid #ccc;
@@ -1928,6 +1928,16 @@
   border-color: #1e90ff;
 }
 
-.checkbox-group label span {
-  display: inline-block;
+.checkbox-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkbox-tags .tag {
+  background-color: #eee;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 400;
 }

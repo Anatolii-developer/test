@@ -95,6 +95,7 @@ function togglePassword(iconElement) {
 
 
 
+
 let updatedProfileData = {};
 
 function enableEdit(fieldId, mongoKey) {
@@ -155,6 +156,121 @@ function enableEdit(fieldId, mongoKey) {
   });
 }
 
+
+const directionsOptions = [
+  "Психоаналіз",
+  "Групаналіз",
+  "Індивідуальна психологія (Адлер)",
+  "Аналітична психологія (Юнг)",
+  "Клієнт-центрованa терапія (К. Роджерс)",
+  "Інтерперсональний підхід (Г. Салліван)",
+  "Логотерапія (В. Франкл)",
+  "EMDR – Десенсибілізація та Репроцесуалізація",
+  "Групова психотерапія і психодрама",
+  "Гештальт-терапія",
+  "Когнітивно-поведінкова терапія",
+  "Гіпнотерапія",
+  "Інше"
+];
+
+const topicsOptions = [
+  "Дратівливість",
+  "Депресивні стани",
+  "Тривожні стани",
+  "Психосоматика",
+  "Емоційне вигорання",
+  "Нові умови життя",
+  "Стосунки з собою",
+  "Панічні атаки",
+  "Самотність",
+  "Спроби самогубства",
+  "Втома",
+  "Самооцінка та самоцінність",
+  "Нав’язливі думки та ритуали",
+  "Хімічні залежності",
+  "Ставлення до їжі",
+  "Стосунки з іншими",
+  "Сімейні стосунки",
+  "Інтимність та сексуальність",
+  "Романтичні стосунки",
+  "Співзалежність",
+  "Аб’юз, емоційне насилля",
+  "Діяльність",
+  "Самовизначення та самоідентифікація",
+  "Ставлення до грошей",
+  "Прокрастинація",
+  "Втрата та горе",
+  "Адаптація, еміграція",
+  "Народження дитини",
+  "ПТСР",
+  "Кризи та травми"
+];
+
+
+
+function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
+  const container = document.getElementById(fieldId).parentNode;
+  const selectedValues = (window.currentUser[mongoKey] || []);
+
+  // Удаляем старый span
+  const oldSpan = document.getElementById(fieldId);
+  oldSpan.remove();
+
+  // Создаём div с чекбоксами
+  const checkboxContainer = document.createElement("div");
+  checkboxContainer.className = "checkbox-group";
+
+  optionsArray.forEach(option => {
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = selectedValues.includes(option);
+    checkbox.value = option;
+
+    const span = document.createElement("span");
+    span.textContent = option;
+
+    label.appendChild(checkbox);
+    label.appendChild(span);
+    checkboxContainer.appendChild(label);
+  });
+
+  const checkIcon = document.createElement("img");
+  checkIcon.src = "assets/check-icon.svg";
+  checkIcon.className = "check-icon";
+  checkIcon.style.cursor = "pointer";
+  checkIcon.style.width = "20px";
+  checkIcon.style.marginLeft = "8px";
+
+  container.appendChild(checkboxContainer);
+  container.appendChild(checkIcon);
+
+  checkIcon.addEventListener("click", async () => {
+    const selected = Array.from(checkboxContainer.querySelectorAll("input[type='checkbox']:checked"))
+      .map(cb => cb.value);
+
+    updatedProfileData[mongoKey] = selected;
+
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [mongoKey]: selected }),
+    });
+
+    if (res.ok) {
+      const newSpan = document.createElement("span");
+      newSpan.id = fieldId;
+      newSpan.textContent = selected.join(", ");
+      checkboxContainer.remove();
+      checkIcon.remove();
+      container.appendChild(newSpan);
+      alert("Збережено!");
+    } else {
+      alert("Помилка при збереженні");
+    }
+  });
+}
 
 document.getElementById("saveProfileChangesBtn").addEventListener("click", async () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));

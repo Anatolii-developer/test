@@ -233,25 +233,38 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   const oldSpan = document.getElementById(fieldId);
   oldSpan.remove();
 
-  // Создаём div с чекбоксами
+  // Создаём div с плитками
   const checkboxContainer = document.createElement("div");
   checkboxContainer.className = "checkbox-group";
 
+  const checkboxes = [];
+
   optionsArray.forEach(option => {
-    const label = document.createElement("label");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = selectedValues.includes(option);
-    checkbox.value = option;
+    const tile = document.createElement("div");
+    tile.className = "checkbox-tile";
 
-    const span = document.createElement("span");
-    span.textContent = option;
+    const square = document.createElement("div");
+    square.className = "checkbox-square";
+    if (selectedValues.includes(option)) {
+      square.classList.add("checked");
+    }
 
-    label.appendChild(checkbox);
-    label.appendChild(span);
-    checkboxContainer.appendChild(label);
+    const label = document.createElement("span");
+    label.textContent = option;
+
+    tile.appendChild(square);
+    tile.appendChild(label);
+    checkboxContainer.appendChild(tile);
+
+    // логика переключения
+    square.addEventListener("click", () => {
+      square.classList.toggle("checked");
+    });
+
+    checkboxes.push({ square, value: option });
   });
 
+  // Кнопка сохранить
   const checkIcon = document.createElement("img");
   checkIcon.src = "assets/check-icon.svg";
   checkIcon.className = "check-icon";
@@ -263,8 +276,9 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   container.appendChild(checkIcon);
 
   checkIcon.addEventListener("click", async () => {
-    const selected = Array.from(checkboxContainer.querySelectorAll("input[type='checkbox']:checked"))
-      .map(cb => cb.value);
+    const selected = checkboxes
+      .filter(({ square }) => square.classList.contains("checked"))
+      .map(({ value }) => value);
 
     updatedProfileData[mongoKey] = selected;
 

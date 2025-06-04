@@ -166,7 +166,7 @@ function logoutUser() {
               <td>${user.email}</td>
               <td>${user.role || '-'}</td>
               <td>${user.dateOfBirth || '-'}</td>
-              <td><button class="more-btn" data-id="${user._id}">More</button></td>
+             <td><a href="user-profile.html?id=${user._id}" class="more-btn">More</a></td>
             </tr>
           `).join("");
         } else {
@@ -176,7 +176,7 @@ function logoutUser() {
               <td>${new Date(user.createdAt).toLocaleString()}</td>
               <td>${user.email}</td>
               <td>${user.status}</td>
-              <td><button class="more-btn" data-id="${user._id}">More</button></td>
+              <td><a href="user-profile.html?id=${user._id}" class="more-btn">More</a></td>
             </tr>
           `).join("");
         }

@@ -1,4 +1,3 @@
-<!-- user-profile.html -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -6,12 +5,149 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Профіль користувача</title>
   <link rel="stylesheet" href="admin-styles.css" />
+  <style>
+    .user-profile-container {
+      background: #97C194;
+      padding: 60px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .profile-card {
+      background-color: #FFFFF9;
+      width: 890px;
+      min-height: 1968px;
+      border-radius: 24px;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .profile-photo-section {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      border: 2px dashed #E37009;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile-photo {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .upload-icon {
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #E37009;
+      color: white;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      cursor: pointer;
+    }
+
+    .profile-name-block {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-name-block label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .profile-name-block input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #E5F6E0;
+      font-size: 16px;
+    }
+
+    .profile-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-row.full textarea {
+      height: 120px;
+      resize: none;
+    }
+
+    .field-row input,
+    .field-row textarea {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff;
+    }
+
+    .submit-btn {
+      width: 150px;
+      align-self: center;
+      background-color: #E37009;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <main class="admin-main">
-    <div class="admin-content-wrapper">
-      <h2>Профіль учасника</h2>
-      <div id="userDetails"></div>
+  <main class="user-profile-container">
+    <div class="profile-card" id="userProfileCard">
+      <div class="profile-header">
+        <div class="profile-photo-section">
+          <img id="userPhoto" src="assets/profile-photo.png" alt="Фото учасника" class="profile-photo" />
+          <div class="upload-icon">↻</div>
+        </div>
+        <div class="profile-name-block">
+          <label>Прізвище</label>
+          <input type="text" id="lastName" readonly />
+          <label>Ім’я</label>
+          <input type="text" id="firstName" readonly />
+          <label>По-батькові</label>
+          <input type="text" id="middleName" readonly />
+        </div>
+      </div>
+
+      <div class="profile-form" id="profileForm">
+        <!-- Остальные поля добавятся JS -->
+      </div>
+
+      <button class="submit-btn">Назад</button>
     </div>
   </main>
 
@@ -20,20 +156,80 @@
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get("id");
 
+    const fieldLabels = {
+      createdAt: "Дата подання заявки",
+      updatedAt: "Дата підтвердження заявки",
+      dateOfBirth: "Дата народження",
+      email: "Email Address",
+      phone: "Номер Телефону",
+      gender: "Стать",
+      experience: "Ваш сукупний досвід клінічної роботи",
+      education: "Психологічна освіта",
+      directions: "Напрямки",
+      topics: "Тематики",
+      about: "Про мене",
+      courses: "Курси",
+      cost: "Вартість роботи",
+      videoLink: "Відеозвернення (посилання)",
+      qualifications: "Кваліфікаційні курси",
+      experienceExtra: "Інший релевантний досвід",
+      language: "Мова надання сесії",
+      format: "Формат проведення",
+      lectures: "Лекції",
+      seminars: "Семінари",
+      colloquiums: "Колоквіуми",
+      groupExperience: "Груповий досвід",
+      personalTherapy: "Особиста терапія",
+      personalAnalysis: "Особистий аналіз",
+      individualSupervision: "Індивідуальна супервізія",
+      mentoring: "Менторинг",
+      groupSupervision: "Групова супервізія",
+      psychoanalyticPsychodrama: "Психоаналітична психодрама",
+      teachingSchool: "Навчання у школі",
+      teachingUniversity: "Викладання в університеті",
+      professionalInstitutes: "Професійні інститути",
+      communityOrganizations: "Громадські організації",
+      therapyGroups: "Терапевтичні групи",
+      crisisGroups: "Кризові групи",
+      psychoanalyticDramaGroups: "Групи психоаналітичної драми"
+    };
+
     async function loadUser() {
-      const res = await fetch(`${API_URL}/api/users/${userId}`);
-      const user = await res.json();
+      try {
+        const res = await fetch(`${API_URL}/api/users/${userId}`);
+        const user = await res.json();
 
-      const container = document.getElementById("userDetails");
+        document.getElementById("firstName").value = user.firstName || "";
+        document.getElementById("lastName").value = user.lastName || "";
+        document.getElementById("middleName").value = user.middleName || "";
 
-      const fieldsToDisplay = Object.entries(user)
-        .filter(([key]) => !["username", "password", "__v", "_id"].includes(key));
+        if (user.photoUrl) {
+          document.getElementById("userPhoto").src = user.photoUrl;
+        }
 
-      container.innerHTML = fieldsToDisplay.map(([key, value]) => {
-        const displayKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        const displayValue = Array.isArray(value) ? value.join(", ") : value || "-";
-        return `<p><strong>${displayKey}:</strong> ${displayValue}</p>`;
-      }).join("");
+        const formContainer = document.getElementById("profileForm");
+        const ignoreKeys = ["username", "password", "__v", "_id", "firstName", "lastName", "middleName", "photoUrl", "role", "status"];
+
+        for (const [key, label] of Object.entries(fieldLabels)) {
+          if (ignoreKeys.includes(key)) continue;
+          const value = Array.isArray(user[key]) ? user[key].join(", ") : (user[key] || "-");
+          const isLongText = value.length > 100;
+
+          const fieldHTML = `
+            <div class="field-row ${isLongText ? 'full' : ''}">
+              <label>${label}</label>
+              ${isLongText
+                ? `<textarea readonly>${value}</textarea>`
+                : `<input type="text" value="${value}" readonly />`
+              }
+            </div>
+          `;
+
+          formContainer.insertAdjacentHTML("beforeend", fieldHTML);
+        }
+      } catch (error) {
+        console.error("Помилка при завантаженні профілю:", error);
+      }
     }
 
     loadUser();

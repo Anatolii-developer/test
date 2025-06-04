@@ -102,20 +102,37 @@ function enableEdit(fieldId, mongoKey) {
   const span = document.getElementById(fieldId);
   const currentValue = span.textContent.trim();
 
+  // Создаем контейнер под input + иконку
+  const container = document.createElement("div");
+  container.className = "edit-container";
+  container.style.display = "flex";
+  container.style.alignItems = "center";
+  container.style.gap = "10px";
+  container.style.marginTop = "12px";
+
   const input = document.createElement("input");
   input.type = "text";
   input.value = currentValue;
   input.className = "edit-input";
+  input.style.width = "910px";
+  input.style.height = "28px";
+  input.style.padding = "8px 12px";
+  input.style.fontSize = "16px";
+  input.style.border = "1px solid #ccc";
+  input.style.borderRadius = "8px";
 
   const checkIcon = document.createElement("img");
-  checkIcon.src = "assets/check-icon.svg"; // 👉 вставь правильный путь к галочке
+  checkIcon.src = "assets/check-icon.svg";
   checkIcon.className = "check-icon";
   checkIcon.style.cursor = "pointer";
   checkIcon.style.width = "20px";
-  checkIcon.style.marginLeft = "8px";
+  checkIcon.style.height = "20px";
 
-  span.replaceWith(input);
-  input.parentNode.appendChild(checkIcon);
+  container.appendChild(input);
+  container.appendChild(checkIcon);
+
+  // Вставляем container после span (а не вместо)
+  span.parentNode.insertBefore(container, span.nextSibling);
 
   input.addEventListener("input", () => {
     updatedProfileData[mongoKey] = input.value.trim();
@@ -138,12 +155,8 @@ function enableEdit(fieldId, mongoKey) {
 
       const result = await res.json();
       if (res.ok) {
-        // Обновляем отображение
-        const newSpan = document.createElement("span");
-        newSpan.id = fieldId;
-        newSpan.textContent = updatedProfileData[mongoKey];
-        input.replaceWith(newSpan);
-        checkIcon.remove();
+        span.textContent = updatedProfileData[mongoKey];
+        container.remove();
         updatedProfileData = {};
         alert("Зміни збережено!");
       } else {

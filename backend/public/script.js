@@ -358,7 +358,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
   };
 
   try {
-    console.log("payload:", payload);
+    console.log("📤 Payload:", payload);
     const res = await fetch(`${API_BASE}/api/users/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -372,6 +372,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
       alert("Error: " + result.message);
     }
   } catch (err) {
+    console.error("❌ Server error:", err);
     alert("Server error");
     console.error(err);
   }

@@ -142,7 +142,22 @@
           <input type="text" id="middleName" readonly />
         </div>
       </div>
+      <div class="action-controls">
+  <select id="roleSelect">
+    <option value="">Оберіть роль</option>
+    <option value="Супервізор I категорії">Супервізор I категорії</option>
+    <option value="Супервізор II категорії">Супервізор II категорії</option>
+    <option value="Психолог">Психолог</option>
+  </select>
 
+  <select id="decisionSelect">
+    <option value="">Оберіть рішення</option>
+    <option value="APPROVED">✅ Прийняти</option>
+    <option value="REJECTED">❌ Відхилити</option>
+  </select>
+
+  <button id="submitDecision">Submit</button>
+</div>
       <div class="profile-form" id="profileForm">
         <!-- Остальные поля добавятся JS -->
       </div>
@@ -233,6 +248,35 @@
     }
 
     loadUser();
+
+
+    document.getElementById("submitDecision").addEventListener("click", async () => {
+  const status = document.getElementById("decisionSelect").value;
+  const role = document.getElementById("roleSelect").value;
+
+  if (!status) {
+    alert("Оберіть рішення.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/users/${userId}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, role }),
+    });
+
+    if (res.ok) {
+      alert("Рішення збережено.");
+      window.location.href = "admin-panel.html"; // или куда надо
+    } else {
+      alert("Помилка при збереженні.");
+    }
+  } catch (err) {
+    console.error("Помилка:", err);
+    alert("Серверна помилка.");
+  }
+});
   </script>
 </body>
 </html>

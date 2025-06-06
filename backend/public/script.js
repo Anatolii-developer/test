@@ -61,37 +61,39 @@ function togglePassword(iconElement) {
 }
 
 
-  window.addEventListener("DOMContentLoaded", async () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (!storedUser) {
-    alert("Please log in first.");
-    window.location.href = "index.html";
-    return;
-  }
+window.addEventListener("DOMContentLoaded", async () => {
+  // проверяем, если это profile.html
+  if (window.location.pathname.includes("profile.html")) {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Please log in first.");
+      window.location.href = "index.html";
+      return;
+    }
 
-  try {
-    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`);
-    const user = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`);
+      const user = await res.json();
 
-    // Заполни поля
-    document.getElementById("profileFirstName").textContent = user.firstName || "";
-    document.getElementById("profileLastName").textContent = user.lastName || "";
-    document.getElementById("profileMiddleName").textContent = user.middleName || "";
-    document.getElementById("profileEmail").textContent = user.email || "";
-    document.getElementById("profilePhone").textContent = user.phone || "";
-    document.getElementById("profileGender").textContent = user.gender || "";
-    document.getElementById("profileExperience").textContent = user.experience || "";
-    document.getElementById("profileEducation").textContent = user.education || "";
-    document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
-    document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
-
-    // сохрани в JS для дальнейшего использования
-    window.currentUser = user;
-  } catch (err) {
-    console.error("Failed to load user data:", err);
-    alert("Failed to load user data.");
+      document.getElementById("profileFirstName").textContent = user.firstName || "";
+      document.getElementById("profileLastName").textContent = user.lastName || "";
+      document.getElementById("profileMiddleName").textContent = user.middleName || "";
+      document.getElementById("profileEmail").textContent = user.email || "";
+      document.getElementById("profilePhone").textContent = user.phone || "";
+      document.getElementById("profileGender").textContent = user.gender || "";
+      document.getElementById("profileExperience").textContent = user.experience || "";
+      document.getElementById("profileEducation").textContent = user.education || "";
+      document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
+      document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
+      
+      window.currentUser = user;
+    } catch (err) {
+      console.error("Failed to load user data:", err);
+      alert("Failed to load user data.");
+    }
   }
 });
+
 
 
 

@@ -352,7 +352,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
     experience: document.getElementById("experience").value,
     education: document.getElementById("education").value,
     directions: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
-    topics: [...document.querySelectorAll('#extra-checkboxes input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+    topics: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
     createdAt: new Date(),
     status: "WAIT FOR REVIEW"
   };

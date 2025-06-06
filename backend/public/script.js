@@ -6,7 +6,7 @@ async function login() {
   const password = document.getElementById("password").value;
 
   try {
-    const res = awaitfetch(`${API_BASE}/api/users/login`, {
+    const res = await fetch(`${API_BASE}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -286,7 +286,7 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
     updatedProfileData[mongoKey] = selected;
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    const res = await fetch(`http://157.230.121.24:5050/api/users${storedUser._id}`, {
+    fetch(`${API_BASE}/api/users/${storedUser._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [mongoKey]: selected }),

@@ -1,9 +1,12 @@
+const API_BASE = "http://157.230.121.24:5050";
+
+
 async function login() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
   try {
-    const res = await fetch("https://psychologist-backend.onrender.com/api/users/login", {
+    const res = awaitfetch(`${API_BASE}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -67,7 +70,7 @@ function togglePassword(iconElement) {
   }
 
   try {
-    const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`);
+    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`);
     const user = await res.json();
 
     // Заполни поля
@@ -153,7 +156,7 @@ function enableEdit(fieldId, mongoKey) {
 
     try {
       const payload = { [mongoKey]: updatedProfileData[mongoKey] };
-      const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -283,7 +286,7 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
     updatedProfileData[mongoKey] = selected;
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
+    const res = await fetch(`http://157.230.121.24:5050/api/users${storedUser._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [mongoKey]: selected }),
@@ -311,7 +314,7 @@ document.getElementById("saveProfileChangesBtn").addEventListener("click", async
   }
 
   try {
-    const res = await fetch(`https://psychologist-backend.onrender.com/api/users/${storedUser._id}`, {
+    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedProfileData),
@@ -354,7 +357,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
 
   try {
     console.log("payload:", payload);
-    const res = await fetch("https://psychologist-backend.onrender.com/api/users/register", {
+    const res = await fetch(`${API_BASE}/api/users/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

@@ -339,47 +339,47 @@ if (saveChangesBtn) {
   });
 }
 
-document.getElementById("saveBtn").addEventListener("click", async () => {
-  const payload = {
-    username: localStorage.getItem("registrationUsername") || "",
-    password: localStorage.getItem("registrationPassword") || "",
-    firstName: document.getElementById("firstName").value,
-    lastName: document.getElementById("lastName").value,
-    middleName: document.getElementById("middleName").value,
-    dateOfBirth: document.getElementById("dateOfBirth").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    gender: document.querySelector('input[name="gender"]:checked').value,
-    experience: document.getElementById("experience").value,
-    education: document.getElementById("education").value,
-    directions: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
-    topics: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
-    createdAt: new Date(),
-    status: "WAIT FOR REVIEW"
-  };
+const saveBtn = document.getElementById("saveBtn");
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const payload = {
+      username: localStorage.getItem("registrationUsername") || "",
+      password: localStorage.getItem("registrationPassword") || "",
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      middleName: document.getElementById("middleName").value,
+      dateOfBirth: document.getElementById("dateOfBirth").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      gender: document.querySelector('input[name="gender"]:checked')?.value || "",
+      experience: document.getElementById("experience").value,
+      education: document.getElementById("education").value,
+      directions: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+      topics: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+      createdAt: new Date(),
+      status: "WAIT FOR REVIEW"
+    };
 
-  try {
-    console.log("📤 Payload:", payload);
-    const res = await fetch(`${API_BASE}/api/users/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      console.log("📤 Payload:", payload);
+      const res = await fetch(`${API_BASE}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const result = await res.json();
-    if (res.ok) {
-      window.location.href = "registration-success.html";
-    } else {
-      alert("Error: " + result.message);
+      const result = await res.json();
+      if (res.ok) {
+        window.location.href = "registration-success.html";
+      } else {
+        alert("Error: " + result.message);
+      }
+    } catch (err) {
+      console.error("❌ Server error:", err);
+      alert("Server error");
     }
-  } catch (err) {
-    console.error("❌ Server error:", err);
-    alert("Server error");
-    console.error(err);
-  }
-});
-
-
+  });
+}
 
 function toggleCheckboxes() {
   const extra = document.getElementById("extra-checkboxes");

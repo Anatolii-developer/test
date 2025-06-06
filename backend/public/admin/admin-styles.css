@@ -614,3 +614,42 @@ body {
 .sidebar.collapsed .logout span {
   display: none;
 }
+
+
+
+.action-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.action-controls select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #E5F6E0;
+  font-size: 16px;
+}
+
+.action-controls button {
+  padding: 10px 20px;
+  background-color: #E37009;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-controls button:hover {
+  background-color: #cf6108;
+}
+
+.action-controls {
+  justify-content: center; /* или flex-end */
+}

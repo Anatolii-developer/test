@@ -150,34 +150,44 @@ function enableEdit(fieldId, mongoKey) {
   });
 
   checkIcon.addEventListener("click", async () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
-      alert("Please log in first.");
-      return;
-    }
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (!storedUser) {
+    alert("Please log in first.");
+    return;
+  }
 
-    try {
-      const payload = { [mongoKey]: updatedProfileData[mongoKey] };
-      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+  try {
+    const payload = { [mongoKey]: updatedProfileData[mongoKey] };
+    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      const result = await res.json();
-      if (res.ok) {
-        span.textContent = updatedProfileData[mongoKey];
-        container.remove();
-        updatedProfileData = {};
-        alert("Зміни збережено!");
-      } else {
-        alert("Помилка при збереженні: " + result.message);
-      }
-    } catch (err) {
-      console.error("Error updating:", err);
-      alert("Серверна помилка.");
+    const result = await res.json();
+    if (res.ok) {
+      // Обновляем span с форматированием
+      const newSpan = document.createElement("span");
+      newSpan.id = fieldId;
+      newSpan.textContent = updatedProfileData[mongoKey];
+      newSpan.style.display = "block";
+      newSpan.style.whiteSpace = "pre-wrap";
+      newSpan.style.wordBreak = "break-word";
+      newSpan.style.marginTop = "8px";
+
+      span.parentNode.insertBefore(newSpan, container); // вставить перед input-контейнером
+      span.remove();
+      container.remove();
+      updatedProfileData = {};
+      alert("Зміни збережено!");
+    } else {
+      alert("Помилка при збереженні: " + result.message);
     }
-  });
+  } catch (err) {
+    console.error("Error updating:", err);
+    alert("Серверна помилка.");
+  }
+});
 }
 const directionsOptions = [
   "Психоаналіз",

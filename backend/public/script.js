@@ -51,13 +51,14 @@ function togglePassword(iconElement) {
   const wrapper = iconElement.closest('.input-wrapper');
   const passwordInput = wrapper.querySelector('input');
 
-  if (passwordInput.type === "password") {
-    passwordInput.type = "text";
-    iconElement.src = "assets/icon-eye-open.svg";
-  } else {
-    passwordInput.type = "password";
-    iconElement.src = "assets/icon-eye-close.svg";
+  if (!passwordInput) {
+    console.warn("Input not found");
+    return;
   }
+
+  const isHidden = passwordInput.type === "password";
+  passwordInput.type = isHidden ? "text" : "password";
+  iconElement.src = isHidden ? "assets/icon-eye-open.svg" : "assets/icon-eye-close.svg";
 }
 
 

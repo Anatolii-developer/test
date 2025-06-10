@@ -107,41 +107,43 @@ function enableEdit(fieldId, mongoKey) {
   const span = document.getElementById(fieldId);
   const currentValue = span.textContent.trim();
 
-  // Убираем предыдущий контейнер, если он уже открыт
+  // Удаляем предыдущий контейнер, если есть
   const existing = document.querySelector(`.edit-container[data-key="${mongoKey}"]`);
   if (existing) existing.remove();
 
-  // Создаём input + иконку внутри отдельного блока
+  // Создаем контейнер
   const container = document.createElement("div");
   container.className = "edit-container";
   container.dataset.key = mongoKey;
   container.style.marginTop = "10px";
   container.style.display = "flex";
-  container.style.alignItems = "center";
+  container.style.flexDirection = "column"; // ✅ Чтобы всё шло вниз
   container.style.gap = "10px";
 
- const input = document.createElement("textarea");
+  // Создаем textarea
+  const input = document.createElement("textarea");
   input.value = currentValue;
-  input.rows = 4; // или больше по умолчанию
+  input.rows = 4;
   input.className = "edit-input";
-  input.style.width = "910px";
-  input.style.height = "40px";
+  input.style.width = "100%";
   input.style.padding = "8px 16px";
   input.style.fontSize = "16px";
   input.style.border = "1px solid #ccc";
   input.style.borderRadius = "8px";
 
+  // Кнопка сохранить
   const checkIcon = document.createElement("img");
   checkIcon.src = "assets/check-icon.svg";
   checkIcon.className = "check-icon";
   checkIcon.style.cursor = "pointer";
   checkIcon.style.width = "20px";
   checkIcon.style.height = "20px";
+  checkIcon.style.alignSelf = "flex-start";
 
   container.appendChild(input);
   container.appendChild(checkIcon);
 
-  // Вставляем именно после родительского <p>, а не после span
+  // Вставляем container после <p>
   const parentP = span.closest("p");
   parentP.insertAdjacentElement("afterend", container);
 
@@ -150,44 +152,43 @@ function enableEdit(fieldId, mongoKey) {
   });
 
   checkIcon.addEventListener("click", async () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (!storedUser) {
-    alert("Please log in first.");
-    return;
-  }
-
-  try {
-    const payload = { [mongoKey]: updatedProfileData[mongoKey] };
-    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      // Обновляем span с форматированием
-      const newSpan = document.createElement("span");
-      newSpan.id = fieldId;
-      newSpan.textContent = updatedProfileData[mongoKey];
-      newSpan.style.display = "block";
-      newSpan.style.whiteSpace = "pre-wrap";
-      newSpan.style.wordBreak = "break-word";
-      newSpan.style.marginTop = "8px";
-
-      span.parentNode.insertBefore(newSpan, container); // вставить перед input-контейнером
-      span.remove();
-      container.remove();
-      updatedProfileData = {};
-      alert("Зміни збережено!");
-    } else {
-      alert("Помилка при збереженні: " + result.message);
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Please log in first.");
+      return;
     }
-  } catch (err) {
-    console.error("Error updating:", err);
-    alert("Серверна помилка.");
-  }
-});
+
+    try {
+      const payload = { [mongoKey]: updatedProfileData[mongoKey] };
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        const newSpan = document.createElement("span");
+        newSpan.id = fieldId;
+        newSpan.textContent = updatedProfileData[mongoKey];
+        newSpan.style.display = "block";
+        newSpan.style.whiteSpace = "pre-wrap";
+        newSpan.style.wordBreak = "break-word";
+        newSpan.style.marginTop = "8px";
+
+        parentP.appendChild(newSpan); // ✅ Добавляем в <p>
+        span.remove();               // ❌ Удаляем старый span
+        container.remove();          // ❌ Удаляем textarea
+        updatedProfileData = {};
+        alert("Зміни збережено!");
+      } else {
+        alert("Помилка при збереженні: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error updating:", err);
+      alert("Серверна помилка.");
+    }
+  });
 }
 const directionsOptions = [
   "Психоаналіз",

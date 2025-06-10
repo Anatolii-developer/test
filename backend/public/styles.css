@@ -767,7 +767,6 @@
 
   #step1 .profile-card {
     width: 1110px;
-    height: 974px;
     border-radius: 24px;
     padding: 80px 100px;
     background-color: #FFFFF9;
@@ -825,6 +824,19 @@
   opacity: 1;
 }
 
+
+.edit-input {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
 
   .profile-photo-wrapper {
     position: relative;

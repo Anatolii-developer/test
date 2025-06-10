@@ -50,10 +50,21 @@
             <input type="email" id="email" placeholder="Введіть Вашу пошту" />
           </div>
   
-          <div class="form-group">
-            <label class="s1" for="phone">Номер Телефону</label>
-            <input type="tel" id="phone" placeholder="Введіть Ваш номер телефону" />
-          </div>
+         <div class="form-group">
+  <label class="s1" for="phone">Номер Телефону</label>
+  <div class="phone-input-wrapper">
+    <select id="countryCode" class="country-code-select">
+      <option value="+380" selected>🇺🇦 +380</option>
+      <option value="+1">🇺🇸 +1</option>
+      <option value="+44">🇬🇧 +44</option>
+      <option value="+48">🇵🇱 +48</option>
+      <option value="+49">🇩🇪 +49</option>
+      <option value="+33">🇫🇷 +33</option>
+      <option value="+39">🇮🇹 +39</option>
+    </select>
+    <input type="tel" id="phone" placeholder="123 456 789" />
+  </div>
+</div>
   
           <div class="form-group">
             <label class="s1">Стать, або як до Вас звертатись</label>

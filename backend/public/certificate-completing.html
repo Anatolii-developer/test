@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Підвищення кваліфікації</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+    </div>
+    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+    <nav>
+      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>About me</span></a>
+      <a href="#"><img src="assets/sidebar/news.svg" /><span>My Certificates</span></a>
+      <a href="#"><img src="assets/sidebar/3.svg" /><span>Career Planning</span></a>
+      <a href="library.html"><img src="assets/sidebar/4.svg" /><span>Library</span></a>
+      <a href="my-courses.html" class="active"><img src="assets/sidebar/5.svg" /><span>My Courses</span></a>
+      <a href="#"><img src="assets/sidebar/6.svg" /><span>Accounting</span></a>
+      <a href="#"><img src="assets/sidebar/7.svg" /><span>Health</span></a>
+      <a href="#"><img src="assets/sidebar/8.svg" /><span>Finance</span></a>
+      <a href="#"><img src="assets/sidebar/9.svg" /><span>Immovables</span></a>
+    </nav>
+    <div class="logout">
+      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+      <span>Logout Account</span>
+    </div>
+  </aside>
+  <main class="cert-page">
+
+     <div class="main-header">
+      <h2>Проходження конференцій</h2>
+      <img src="assets/certificates/certificate1.png" alt="Main Image" />
+    </div>
+    <!-- Навигация -->
+    <div class="cert-nav">
+      <a href="./mycertificates.html" class="cert-btn back"><span>&larr;</span> Головна</a>
+      <a href="./certificate-upgrade.html" class="cert-btn active">Підвищення кваліфікації</a>
+      <a href="./certificate-completing.html" class="cert-btn">Проходження курсів</a>
+      <a href="./certificate-conference.html" class="cert-btn">Проходження конференцій</a>
+    </div>
+
+    <!-- Сертификаты -->
+    <div class="cert-grid">
+      <div class="cert-card">
+        <img src="assets/certificates/certificate1.png" alt="Certificate 1" class="cert-image" />
+        <h3 class="cert-title">Дослідження воєнного часу</h3>
+        <p class="cert-dates">16.03.2025 – 24.04.2025</p>
+        <div class="cert-footer">
+          <div class="lang-switch">
+            <span>UA</span>
+            <label class="switch">
+              <input type="checkbox" />
+              <span class="slider round"></span>
+            </label>
+            <span>EN</span>
+          </div>
+          <a href="#" class="view-btn">Переглянути</a>
+        </div>
+      </div>
+
+      <div class="cert-card">
+        <img src="assets/certificates/certificate2.png" alt="Certificate 2" class="cert-image" />
+        <h3 class="cert-title">Дослідження воєнного часу</h3>
+        <p class="cert-dates">16.03.2025 – 24.04.2025</p>
+        <div class="cert-footer">
+          <div class="lang-switch">
+            <span>UA</span>
+            <label class="switch">
+              <input type="checkbox" />
+              <span class="slider round"></span>
+            </label>
+            <span>EN</span>
+          </div>
+          <a href="#" class="view-btn">Переглянути</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

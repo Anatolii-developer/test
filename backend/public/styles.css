@@ -1,1961 +1,615 @@
-/* ========== Typography System ========== */
-:root {
-    --font-family: 'Poppins', sans-serif;
-  
-    --h1-size: 56px;
-    --h2-size: 40px;
-    --h3-size: 32px;
-    --h4-size: 28px;
-    --s1-size: 24px;
-    --s2-size: 20px;
-    --text-size: 20px;
-    --caption-1: 12px;
-    --caption-2: 12px;
-    --caption-3: 10px;
-  }
-  
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    font-family: var(--font-family);
-    font-size: var(--text-size);
-    line-height: 28px;
-    font-weight: 400;
-    background-color: transparent;
-    min-height: 100vh;
-    background: #97C194;
-    position: relative;
-  }
-  
-  
-  /* Headings */
-  .h1 {
-    font-size: var(--h1-size);
-    font-weight: 600;
-    line-height: 68px;
-  }
-  .h2 {
-    font-size: var(--h2-size);
-    font-weight: 600;
-    line-height: 48px;
-  }
-  .h3 {
-    font-size: var(--h3-size);
-    font-weight: 600;
-    line-height: 38px;
-  }
-  .h4 {
-    font-size: var(--h4-size);
-    font-weight: 600;
-    line-height: 34px;
-  }
-  
-  /* Subtitles */
-  .s1 {
-    font-size: var(--s1-size);
-    font-weight: 600;
-    line-height: 36px;
-  }
-  .s2 {
-    font-size: var(--s2-size);
-    font-weight: 600;
-    line-height: 28px;
-  }
-  
-  /* Text */
-  .text-bold {
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 28px;
-  }
-  .text-medium {
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 28px;
-  }
-  .text-regular {
-    font-size: 20px;
-    font-weight: 400;
-    line-height: 28px;
-  }
-  
-  /* Captions */
-  .caption-1 {
-    font-size: var(--caption-1);
-    font-weight: 400;
-    line-height: 16px;
-  }
-  .caption-2 {
-    font-size: var(--caption-2);
-    font-weight: 500;
-    line-height: 16px;
-  }
-  .caption-3 {
-    font-size: var(--caption-3);
-    font-weight: 500;
-    line-height: 14px;
-  }
-  
-  /* Layout */
-  header {
-    background-color: #275D2B;
-    height: 80px;
-    padding: 16px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .logo {
-    width: 156.48px;
-    height: 48px;
-    object-fit: contain;
-    margin-left: 110px;
-  }
-  
-  .language-select {
-    color: white;
-    font-size: 16px;
-    margin-right: 40px;
-  }
-  
-  main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 100px;
-  }
-  
-  
-  #mainContent {
-    position: relative;
-    z-index: 1;
-    padding-left: 0; /* no offset from sidebar */
-  }
+const API_BASE = "http://157.230.121.24:5050";
 
 
-  
-  .login-card {
-    background-color: #FFFFF9;
-    width: 656px;
-    height: 724px;
-    border-radius: 24px;
-    padding: 100px;
-    box-shadow:
-      -5px 0 5px #2F832F,
-       5px 0 5px #2F832F;
-    margin-top: 100px;
-  }
-  
-  /* Inputs with icons */
-  .input-wrapper {
-    position: relative;
-    margin-top: 8px;
-  }
-  
-  .input-wrapper input {
-    width: 100%;
-    padding: 12px 40px 12px 44px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1em;
-    font-family: var(--font-family);
-  }
-  
-  .input-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    opacity: 0.7;
-  }
-  
-  .toggle-password {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    opacity: 0.7;
-  }
-  
-  .actions {
-    text-align: right;
-    margin-top: 5px;
-  }
-  
-  .actions a {
-    font-size: 16px;
-    font-weight: 500;
-    color: #275D2B;
-    text-decoration: none;
-  }
-  
-  button {
-    width: 100%;
-    background-color: #E37009;
-    color: white;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    margin-top: 25px;
-    cursor: pointer;
-    font-size: 20px;
-    font-weight: 500;
-  }
-  
-  .register {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 20px;
-    font-weight: 400;
-  }
-  
-  .register a {
-    color: #E37009;
-    text-decoration: none;
-    padding-left: 20px;
-    font-size: 20px;
-    font-weight: 500;
-  }
-  
-/* ========== Registration Page Card Layout ========== */
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-  
-.registration-card {
-    background-color: #FFFFF9;
-    width: 1140px;
-    min-height: 1000px;
-    border-radius: 24px;
-    padding: 60px 100px;
-    margin-top: 140px;
-    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
-  }
-  
-  /* Two-column layout */
-  .form-section {
-    display: flex;
-    justify-content: space-between;
-    gap: 60px;
-  }
-  
-  .form-left {
-    flex: 1;
-  }
-  
-  .form-right img {
-    width: 300px;
-    height: auto;
-  }
-  
-  /* Form Groups */
-  .form-group {
-    margin-bottom: 30px;
-    display: flex;
-    flex-direction: column;
-  }
+  try {
+    const res = await fetch(`${API_BASE}/api/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-  .form-group label{
-    padding-bottom: 15px;
+    const result = await res.json();
+    if (res.ok) {
+      localStorage.setItem("user", JSON.stringify(result.user));
+      window.location.href = "profile.html";
+    } else {
+      alert("Помилка: " + result.message);
+    }
+  } catch (err) {
+    alert("Server error");
+    console.error(err);
   }
-  
-
-  .bottom-row {
-    display: block;
-  }
-
-  .bottom-row textarea {
-    width: 940px;
-    height: 105px;
-    border-radius: 8px;
-    padding: 12px;
-    border: 1px solid #ccc;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.13);
-    resize: vertical;
-  }
-  
-  .registration-card input[type="text"],
-  .registration-card input[type="email"],
-  .registration-card input[type="tel"],
-  .registration-card textarea {
-    width: 456px;
-    height: 48px;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-  }
-  
-  /* Radio Buttons */
-  .radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .radio-group label {
-    font-size: 20px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-  }
-  
-  .radio-group input[type="radio"] {
-    accent-color: #E37009;
-    margin-right: 8px;
-    width: 18px;
-    height: 18px;
-  }
-
-
-  .bottom-row textarea {
-    width: 940px;
-    height: 105px;
-    border-radius: 8px;
-    padding: 12px;
-    border: 1px solid #ccc;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.13);
-    resize: vertical;
-  }
-  
-  
-
-
-  .checkbox-section {
-    margin-top: 60px;
-  }
-  
-  .checkbox-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 15px;
-  }
-  
-  .checkbox-group label {
-    font-size: 16px;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-  }
-  
-  .checkbox-group input[type="checkbox"] {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #E37009;
-    border-radius: 4px;
-    margin-right: 10px;
-    cursor: pointer;
-    position: relative;
-  }
-  
-  .checkbox-group input[type="checkbox"]:checked {
-    background-color: #E37009;
-  }
-  
-  .checkbox-group input[type="checkbox"]:checked::after {
-    content: "";
-    position: absolute;
-    left: 5px;
-    top: 1px;
-    width: 6px;
-    height: 11px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  
-  .checkbox-group input[type="checkbox"]:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-
-  .toggle-btn {
-    margin-top: 20px;
-    background-color: #D97A1C;
-    color: white;
-    border: none;
-    padding: 10px 28px;
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
-    border-radius: 30px;
-    cursor: pointer;
-  }
-  
-
-  .toggle-btn {
-    background-color: #E37009;
-    color: white;
-    border: none;
-    padding: 6px 20px;
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
-    border-radius: 24px;
-    cursor: pointer;
-    height: 32px;
-    width: fit-content; /* prevents full width */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  
-  
-  .save-btn {
-    background-color: #275D2B;
-    color: white;
-    border: none;
-    padding: 10px 53px;
-    font-size: 18px;
-    font-family: 'Poppins', sans-serif;
-    border-radius: 24px;
-    cursor: pointer;
-    width: 196px;
-    height: 48px;
-  }
-
-
-
-  .about-me-title {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 64px;
-    line-height: 76px;
-    text-align: center;
-    letter-spacing: 0;
-    color: #ffffff; /* or dark if needed */
-    padding-bottom: 100px;
-  }
-  
-
-  .background-top {
-    position: absolute; /* ← makes it scroll with content */
-    top: 0;
-    left: 0;
-    height: 600px;
-    width: 100%;
-    background: url('assets/pr-back.png') no-repeat center top;
-    background-size: cover;
-    background-color: #E4EFE2; /* soft green fallback */
-    z-index: -1;
-  }
-  
-  
-  
-
-  .profile-background {
-    position: relative;
-    z-index: 1;
-  }
-  
-  
-/*Registration Success*/
-
-.success-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100vh - 80px); /* subtract header height */
-  background-color: #D8E8D0; /* match your screenshot */
-}
-
-.success-image {
-  max-width: 100%;
-  height: auto;
 }
 
 
 
-/*Sidebar*/
-.sidebar {
-  position: fixed;  /* instead of absolute */
-  left: 0;
-  top: 0;
-  z-index: 100; /* make sure it's above content */
-  height: 100vh;
-  background-color: #ECF5EB;
-  padding: 24px;
-  gap: 24px;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); /* optional shadow */
+function saveLoginAndContinue() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirm-password").value;
+
+  if (!username || !password || !confirmPassword) {
+    alert("Будь ласка, заповніть всі поля.");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Паролі не співпадають.");
+    return;
+  }
+
+  localStorage.setItem("registrationUsername", username);
+  localStorage.setItem("registrationPassword", password);
+  window.location.href = "registration.html";
+}
+
+function togglePassword(iconElement) {
+  const wrapper = iconElement.closest('.input-wrapper');
+  const passwordInput = wrapper.querySelector('input');
+
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    iconElement.src = "assets/icon-eye-open.svg";
+  } else {
+    passwordInput.type = "password";
+    iconElement.src = "assets/icon-eye-close.svg";
+  }
 }
 
 
-.sidebar.expanded {
-  width: 256px;
-  align-items: flex-start;
-}
-
-.sidebar.collapsed {
-  width: 92px;
-  align-items: center;
-}
-
-.sidebar .toggle-button {
-  position: absolute;
-  top: 32px;
-  right: -12px; /* this makes it "stick out" from the sidebar */
-  width: 32px;
-  height: 32px;
-  background: #f3f8f1;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000; /* make sure it's above other elements */
-  transition: right 0.3s ease;
-}
-
-
-.sidebar nav a.active {
-  background-color: #FFFFFF;
-}
-
-
-
-.sidebar nav a span {
-  transition: opacity 0.3s ease, max-width 0.3s ease, margin 0.3s ease;
-  overflow: hidden;
-  white-space: nowrap;
-  display: inline-block;
-  opacity: 1;
-  max-width: 200px;
-  margin-left: 10px;
-}
-
-.sidebar.collapsed nav a span {
-  opacity: 0;
-  max-width: 0;
-  margin-left: 0;
-}
-
-
-.sidebar.collapsed nav a .tooltip {
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: #2D5C2D;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  white-space: nowrap;
-  font-size: 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.1s ease;
-  margin-left: 8px;
-  z-index: 9999;
-}
-
-.sidebar.collapsed nav a:hover .tooltip {
-  opacity: 1;
-}
-
-
-.sidebar .toggle-button img {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.5s ease;
-}
-
-
-.sidebar .logo,
-.sidebar .profile,
-.sidebar nav,
-.sidebar .logout {
-  margin-bottom: 20px;
-}
-
-.sidebar .logo {
-  width: 160px;            /* Fix width so it doesn’t overflow */
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin-left: 12px;       /* Add some spacing inside the sidebar */
-}
-
-.sidebar .logo-collapsed {
-  width: 40px;
-  height: auto;
-  object-fit: contain;
-  display: none;
-}
-
-.sidebar.collapsed .logo {
-  display: none;
-}
-
-.sidebar.collapsed .logo-collapsed {
-  display: block;
-  margin-left: 0; /* optional if you want it centered */
-}
-
-
-
-    .sidebar .line {
-      border-radius: 2px;
-      height: 2px;
-      margin: 12px 0;
+window.addEventListener("DOMContentLoaded", async () => {
+  // проверяем, если это profile.html
+  if (window.location.pathname.includes("profile.html")) {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Please log in first.");
+      window.location.href = "index.html";
+      return;
     }
 
-    .sidebar.expanded .line {
-      width: 208px;
-    }
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`);
+      const user = await res.json();
 
-    .sidebar.collapsed .line {
-      width: 44px;
-    }
-    
-
-
-
-    .sidebar nav a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 5px;
-      border-radius: 8px;
-      color: #333;
-      text-decoration: none;
-      margin-bottom: 12px;
-      position: relative;
-    }
-    
-
-.sidebar.collapsed nav a span {
-  display: none;
-}
-
-.sidebar .logout {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  color: #E04343;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.sidebar.collapsed .logout span {
-  display: none;
-}
-
-  
-  /* ========== Profile Layout ========== */
-  .profile-container {
-    max-width: 1110px;
-    margin: 0 auto;
-    padding: 60px 20px;
-  }
-  
-  .profile-hero {
-    padding-top: 600px; /* push it down */
-    text-align: center;
-  }
-  
-
-  .progress-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 60px;
-    margin-bottom: 40px;
-  }
-  
-  .step {
-    width: 76px;
-    height: 76px;
-    border: 2px solid #275D2B;
-    border-radius: 50%;
-    font-size: 32px;
-    font-weight: 600;
-    color: #275D2B;
-    background-color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .step.active {
-    background-color: #275D2B;
-    color: #fff;
-  }
-
-  
-  .step:hover {
-    background-color: #e4efe2;
-  }
-  
-
-  .profile-card-wrapper {
-    margin-top: 80px; /* more space after hero */
-    display: flex;
-    justify-content: center;
-    padding-bottom: 100px;
-  }
-
-  .profile-top {
-    text-align: center;
-  }
-  
-  .profile-illustration {
-    width: 220px;
-    margin-bottom: 20px;
-  }
-  
-  .progress-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px; /* spacing between step and line */
-    margin-bottom: 40px;
-  }
-  
-  .step {
-    width: 76px;
-    height: 76px;
-    border: 2px solid #275D2B;
-    border-radius: 50%;
-    background-color: transparent;
-    color: #275D2B;
-    font-size: 32px;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-  
-  .step.active {
-    background-color: #275D2B;
-    color: #fff;
-  }
-  
-  .step-line {
-    width: 92px;
-    height: 2px;
-    background-color: #275D2B;
-  }
-  
-
-
-  #step1 .profile-card {
-    width: 1110px;
-    border-radius: 24px;
-    padding: 80px 100px;
-    background-color: #FFFFF9;
-    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
-  }
-  
-  
-  .profile-card {
-    background-color: #FFFFF9;
-    padding: 40px;
-    border-radius: 24px;
-    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
-  }
-
-/* Step 2 Card Styling */
-#step2 .profile-card {
-  width: 1110px;
-  min-height: 1400px;
-  border-radius: 24px;
-  padding: 80px 100px;
-  background-color: #FFFFF9;
-  box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-#step2 p {
-  font-size: 20px;
-  font-family: 'Poppins', sans-serif;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 8px;
-}
-
-#step2 span,
-#step3 span {
-  display: block;
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.5;
-  margin-top: 8px;
-}
-
-#step2 .edit-icon {
-  width: 18px;
-  height: 18px;
-  margin-left: 12px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-
-#step2 .edit-icon:hover {
-  opacity: 1;
-}
-
-
-.edit-input {
-  width: 100%;
-  min-height: 80px;
-  resize: vertical;
-  padding: 12px 16px;
-  font-size: 16px;
-  font-family: 'Poppins', sans-serif;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  line-height: 1.4;
-  box-sizing: border-box;
-}
-
-  .profile-photo-wrapper {
-    position: relative;
-    width: 208px;
-    height: 226px;
-    margin: 0 auto;
-    border-radius: 16px;
-    padding: 10px;
-  }
-  
-  .profile-photo {
-    width: 100%;
-    border-radius: 8px;
-    display: block;
-  }
-  
-  .photo-upload-icon {
-    position: absolute;
-    bottom: -1px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #D9781C;
-    color: white;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .profile-info p {
-    font-size: 20px;
-    margin-bottom: 20px;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-
-  .edit-icon {
-    width: 16px;
-    height: 16px;
-    margin-left: 8px;
-    cursor: pointer;
-    opacity: 0.6;
-    vertical-align: middle;
-    transition: opacity 0.2s ease;
-  }
-  
-  .edit-icon:hover {
-    opacity: 1;
-  }
-  
-
-
-  .editable-field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .editable-field .label-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .editable-field label {
-    font-size: 16px;
-    font-weight: 500;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .editable-field input {
-    width: 940px;
-    height: 28px;
-    padding: 0 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .editable-field .edit-icon {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s ease;
-  }
-  
-  .editable-field .edit-icon:hover {
-    opacity: 1;
-  }
-  
-
-
-  .rating-stars {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  
-  .rating-stars .star {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  
-  .rating-stars .star:hover {
-    transform: scale(1.1);
-  }
-
-
-/* Step 3 Card Styling */
-#step3 .profile-card {
-  width: 1110px;
-  min-height: 1600px;
-  border-radius: 24px;
-  padding: 80px 100px;
-  background-color: #FFFFF9;
-  box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-#step3 .editable-field {
-  background-color: #ffffff;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-#step3 .editable-field label {
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 12px;
-  display: block;
-  color: #275D2B;
-}
-
-#step3 p {
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ddd;
-}
-
-
-#step3 .edit-icon {
-  width: 18px;
-  height: 18px;
-  margin-left: 12px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-
-#step3 .edit-icon:hover {
-  opacity: 1;
-}
-
-.profile-step span {
-  white-space: pre-wrap;
-  word-break: break-word;
-  display: block;
-  margin-top: 8px;
-}
-
-.custom-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 2px solid #E37009;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.custom-table td {
-  border: 2px solid #E37009;
-  padding: 10px;
-  font-size: 16px;
-  vertical-align: middle;
-  width: 50%;
-}
-
-
-
-
-  
-  /* ========== Library Layout ========== */
-
-
-  .library-background-top {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 600px;
-    background: url('assets/library/library-back.png') no-repeat top center;
-    background-size: cover;
-    z-index: -1;
-  }
-  
-  
-
-  .library-hero {
-    width: 100%;
-    max-width: 1110px;
-    margin: 80px auto 60px;
-    text-align: center;
-    position: relative;
-  }
-  
-  .library-background {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .hero-img {
-    width: 100%;
-    max-width: none;
-    height: auto;
-    display: block;
-    margin: 0 auto 20px; /* optional spacing */
-  }
-  
-  
-  .hero-title {
-    font-size: 64px;
-    font-weight: 600;
-    color: #fff;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    padding: 20px;
-  }
-  
-
-  .library-section {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-  
-  .library-card {
-    width: 1110px;
-    height: 212px;
-    background-color: #fffef9;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 100px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  
-  .library-card .info {
-    width: 428px;
-    height: 105px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: left;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  
-  
-  .library-card h3 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #2D2D2D;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .library-card .info p {
-    font-size: 14px;
-    color: #2D2D2D;
-    opacity: 0.8;
-    font-family: 'Poppins', sans-serif;
-    line-height: 22px;
-    margin: 0;
-    word-break: break-word;
-    max-width: 428px;
-    max-height: 66px;
-    overflow: hidden;
-  }
-  
-
-  
-  .library-card .image {
-    height: 140px;
-  }
-  
-  .library-card .arrow {
-    width: 64px;
-    height: 64px;
-  }
-  
-
-    /* ========== Main Library Layout ========== */
-
-    .main-header {
-      width: 1110px;
-      height: 212px;
-      margin: 160px auto 28px;
-      padding: 0 40px;
-      border-radius: 24px;
-      background-color: #FFFFF9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .main-header h2 {
-      font-size: 36px;
-      font-weight: 700;
-      color: #333;
-      padding-left: 100px;
-    }
-    
-    .main-header img {
-      height: 120px;
-      padding-right: 100px;
-    }
-    
-    .nav-buttons {
-      width: 1110px;
-      margin: 0 auto 28px;
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-    }
-    
-    .nav-buttons a {
-      text-decoration: none; /* remove link underline */
-    }
-    
-    .nav-button {
-      width: 296px;
-      height: 48px;
-      border-radius: 24px;
-      padding: 10px 53px;
-      background-color: #275D2B; /* Default */
-      color: #fff;
-      font-size: 16px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    
-    /* Hover */
-    .nav-button:hover {
-      background-color: #2F8B35;
-    }
-    
-    /* Focus */
-    .nav-button:focus {
-      background-color: #275D2B;
-      outline: none;
-    }
-    
-    /* Pressed */
-    .nav-button:active {
-      background-color: #3BBA44;
-    }
-    
-    .nav-button.secondary {
-      background-color: #3C6E44;
-    }
-    
-    /* Optional: Add hover/active for secondary too if needed */
-    .nav-button.secondary:hover {
-      background-color: #2F8B35;
-    }
-    .nav-button.secondary:active {
-      background-color: #3BBA44;
-    }
-    
-    
-    .library-content {
-      width: 1110px;
-      height: 1814px;
-      margin: 28px auto;
-      padding: 10px 100px;
-      border-radius: 24px;
-      background-color: #FFFDF6;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    
-    .tabs {
-      display: flex;
-      border-bottom: 3px solid #F1E1C0;
-      margin-bottom: 28px;
-    }
-    
-    .tab {
-      border: none;
-      background: transparent;
-      font-weight: 600;
-      font-size: 16px;
-      color: #999;
-      cursor: pointer;
-    }
-    
-    .tab.active {
-      color: #1a1a1a;
-      border-bottom: 3px solid #E37009;
-    }
-    
-    .date-section {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 20px;
-      position: relative;
-      width: 100%;
-      max-width: 1110px;
-    }
-    
-    .date-label {
-      font-weight: 600;
-      font-size: 16px;
-      color: #333;
-      text-align: left;
-    }
-    
-    .date-inputs {
-      display: flex;
-      gap: 12px;
-    }
-    
-    .date-input {
-      width: 236px;
-      height: 48px;
-      border: 1px solid #E37009;
-      border-radius: 8px;
-      padding: 0 12px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-    }
-    
-    .filter-btn-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 12px;
-    }
-    
-    .filter-btn {
-      width: 113px;
-      height: 32px;
-      padding: 0 20px;
-      border: 1px solid #CFCFCF;
-      border-radius: 24px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: normal;
-      color: white;
-      cursor: pointer;
-      background-color: #E37009;
-      transition: background-color 0.2s ease;
-    }
-    
-    .filter-btn:hover:not(:disabled) {
-      background-color: #B65600;
-    }
-    
-    .filter-btn:focus:not(:disabled) {
-      background-color: #E37009;
-      outline: none;
-    }
-    
-    .filter-btn:active:not(:disabled) {
-      background-color: #9F4B00;
-    }
-    
-    .filter-btn:disabled {
-      background-color: #F3F2F1;
-      color: white;
-      cursor: not-allowed;
-    }
-    
-    
-    
-    .video-list {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-      text-align: left;
+      document.getElementById("profileFirstName").textContent = user.firstName || "";
+      document.getElementById("profileLastName").textContent = user.lastName || "";
+      document.getElementById("profileMiddleName").textContent = user.middleName || "";
+      document.getElementById("profileEmail").textContent = user.email || "";
+      document.getElementById("profilePhone").textContent = user.phone || "";
+      document.getElementById("profileGender").textContent = user.gender || "";
+      document.getElementById("profileExperience").textContent = user.experience || "";
+      document.getElementById("profileEducation").textContent = user.education || "";
+      document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
+      document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
       
+      window.currentUser = user;
+    } catch (err) {
+      console.error("Failed to load user data:", err);
+      alert("Failed to load user data.");
     }
-    
-    .video-item h4 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #1a1a1a;
-    }
-    
-    .video-item p {
-      font-size: 13px;
-      color: #333;
-      opacity: 0.8;
-      margin-bottom: 12px;
-    }
-    
-    .video-thumb {
-      width: 516px;
-      height: 316px;
-      background: #CFCFCF;
-      border-radius: 8px;
-    }
-    
-
-    .book-list {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-      text-align: left;
-    }
-    
-    .book-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #fffdf6;
-      border-radius: 16px;
-      padding: 32px 40px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      font-family: 'Poppins', sans-serif;
-    }
-    
-    .book-info h4 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: #1a1a1a;
-    }
-    
-    .book-info p {
-      font-size: 13px;
-      color: #333;
-      opacity: 0.8;
-      margin-bottom: 0;
-    }
-    
-    .book-download-btn {
-      background-color: #295F2D;
-      color: white;
-      padding: 10px 24px;
-      border: none;
-      border-radius: 24px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    
-    .book-download-btn:hover {
-      background-color: #1e4821;
-    }
-    
-
-
-    
-
-    .materials-library-content {
-      width: 1110px;
-      height: 1533px;
-      background-color: #FFFDF6;
-      border-radius: 24px;
-      padding: 60px 100px;
-      margin: 28px auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-    
-    /* Date Picker Section */
-    .date-section {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-    }
-    
-    .date-label {
-      font-weight: 600;
-      font-size: 16px;
-      color: #333;
-      text-align: left;
-    }
-    
-    .date-inputs {
-      display: flex;
-      gap: 12px;
-    }
-    
-    .date-input {
-      width: 236px;
-      height: 48px;
-      border: 1px solid #E37009;
-      border-radius: 8px;
-      padding: 0 12px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      color: #333;
-    }
-    
-    .filter-btn-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 12px;
-    }
-    
-    .filter-btn {
-      width: 116px;
-      height: 32px;
-      padding: 0 20px;
-      border: 1px solid #CFCFCF;
-      border-radius: 24px;
-      background-color: #F4F4F4;
-      color: #aaa;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      cursor: not-allowed;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: normal;
-    }
+  }
+});
 
 
 
-    
-    /* Course Material Layout */
-    .course-item {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      padding-bottom: 60px;
-    }
-    
-    .course-title {
-      font-size: 20px;
-      font-weight: 700;
-      text-align: center;
-      color: #2D2D2D;
-    }
-    
-    .course-description {
-      font-size: 14px;
-      color: #2D2D2D;
-      opacity: 0.8;
-      line-height: 1.5;
-    }
-    
-    /* Матеріали до лекції */
-    .lecture-materials-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .view-btn {
-      width: 116px;
-      height: 32px;
-      border-radius: 24px;
-      background-color: #275D2B;
-      color: #fff;
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-
-    .week-block {
-      margin-bottom: 20px;
-    }
-    
-    .accordion-toggle {
-      width: 100%;
-      text-align: left;
-      padding: 12px 20px;
-      font-size: 16px;
-      font-weight: 500;
-      background-color: #F5E2CC;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    
-    .accordion-toggle:hover {
-      background-color: #efd4b3;
-    }
-    
-    .accordion-content {
-      display: none;
-      background: #fff;
-      border-radius: 0 0 8px 8px;
-      padding: 16px;
-      box-shadow: inset 0 1px 0 #ddd;
-      margin-top: -8px;
-    }
-    
-    .lecture-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-    }
-    
-    
-
-     /* ========== My Courses Layout ========== */
 
 
-     .my-courses-section {
-      padding-top: 160px; /* or more, if you need to push it down */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 28px; /* space between each card */
-    }
-    
-    
-    .my-courses-hero {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    
-    .my-courses-hero-img {
-      width: 398px;
-      max-width: none;
-      height: auto;
-      display: block;
-      margin: 0 auto 20px; /* optional spacing */
-    }
-    
-    .my-courses-title {
-      font-size: 64px;
-      font-weight: 600;
-      color: white;
-      padding: 100px;
-    }
-    
-    .course-card {
-      width: 1110px;
-      height: 212px;
-      background-color: #fffef9;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 100px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      gap: 28px;
-    }
-    
-    
-    .course-info h3 {
-      font-size: 40px;
-      font-weight: 600;
-      color: #2D2D2D;
-      font-family: 'Poppins', sans-serif;
-    }
-    
-    .course-illustration {
-      height: 164px; 
-      width: 284px;
-    }
-    
-    
-    .arrow-btn {
-      background: none;
-      border: none;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    
-    
-    .arrow-btn:hover {
-      transform: scale(1.1);
-    }
-    
-    .arrow {
-      width: 64px;
-      height: 64px;
-    }
-    
-    
 
-    
 
-    /* Completed Courses Content */
-.completed-courses-content {
-  width: 1110px;
-  height: 2344px;
-  margin: 60px auto;
-  padding: 60px 100px;
-  border-radius: 24px;
-  background-color: #FFFDF6;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+let updatedProfileData = {};
+
+function enableEdit(fieldId, mongoKey) {
+  const span = document.getElementById(fieldId);
+  const currentValue = span.textContent.trim();
+
+  // Удаляем предыдущий контейнер, если есть
+  const existing = document.querySelector(`.edit-container[data-key="${mongoKey}"]`);
+  if (existing) existing.remove();
+
+  // Создаем контейнер
+  const container = document.createElement("div");
+  container.className = "edit-container";
+  container.dataset.key = mongoKey;
+  container.style.marginTop = "10px";
+  container.style.display = "flex";
+  container.style.flexDirection = "column"; // ✅ Чтобы всё шло вниз
+  container.style.gap = "10px";
+
+  // Создаем textarea
+  const input = document.createElement("textarea");
+  input.value = currentValue;
+  input.rows = 4;
+  input.className = "edit-input";
+  input.style.width = "100%";
+  input.style.padding = "8px 16px";
+  input.style.fontSize = "16px";
+  input.style.border = "1px solid #ccc";
+  input.style.borderRadius = "8px";
+
+  // Кнопка сохранить
+  const checkIcon = document.createElement("img");
+  checkIcon.src = "assets/check-icon.svg";
+  checkIcon.className = "check-icon";
+  checkIcon.style.cursor = "pointer";
+  checkIcon.style.width = "20px";
+  checkIcon.style.height = "20px";
+  checkIcon.style.alignSelf = "flex-start";
+
+  container.appendChild(input);
+  container.appendChild(checkIcon);
+
+  // Вставляем container после <p>
+  const parentP = span.closest("p");
+  parentP.insertAdjacentElement("afterend", container);
+
+  input.addEventListener("input", () => {
+    updatedProfileData[mongoKey] = input.value.trim();
+  });
+
+  checkIcon.addEventListener("click", async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Please log in first.");
+      return;
+    }
+
+    try {
+      const payload = { [mongoKey]: updatedProfileData[mongoKey] };
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        const newSpan = document.createElement("span");
+        newSpan.id = fieldId;
+        newSpan.textContent = updatedProfileData[mongoKey];
+        newSpan.style.display = "block";
+        newSpan.style.whiteSpace = "pre-wrap";
+        newSpan.style.wordBreak = "break-word";
+        newSpan.style.marginTop = "8px";
+
+        parentP.appendChild(newSpan); // ✅ Добавляем в <p>
+        span.remove();               // ❌ Удаляем старый span
+        container.remove();          // ❌ Удаляем textarea
+        updatedProfileData = {};
+        alert("Зміни збережено!");
+      } else {
+        alert("Помилка при збереженні: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error updating:", err);
+      alert("Серверна помилка.");
+    }
+  });
+}
+const directionsOptions = [
+  "Психоаналіз",
+  "Групаналіз",
+  "Індивідуальна психологія (Адлер)",
+  "Аналітична психологія (Юнг)",
+  "Клієнт-центрованa терапія (К. Роджерс)",
+  "Інтерперсональний підхід (Г. Салліван)",
+  "Логотерапія (В. Франкл)",
+  "EMDR – Десенсибілізація та Репроцесуалізація",
+  "Групова психотерапія і психодрама",
+  "Гештальт-терапія",
+  "Когнітивно-поведінкова терапія",
+  "Гіпнотерапія",
+  "Інше"
+];
+
+const topicsOptions = [
+  "Дратівливість",
+  "Депресивні стани",
+  "Тривожні стани",
+  "Психосоматика",
+  "Емоційне вигорання",
+  "Нові умови життя",
+  "Стосунки з собою",
+  "Панічні атаки",
+  "Самотність",
+  "Спроби самогубства",
+  "Втома",
+  "Самооцінка та самоцінність",
+  "Нав’язливі думки та ритуали",
+  "Хімічні залежності",
+  "Ставлення до їжі",
+  "Стосунки з іншими",
+  "Сімейні стосунки",
+  "Інтимність та сексуальність",
+  "Романтичні стосунки",
+  "Співзалежність",
+  "Аб’юз, емоційне насилля",
+  "Діяльність",
+  "Самовизначення та самоідентифікація",
+  "Ставлення до грошей",
+  "Прокрастинація",
+  "Втрата та горе",
+  "Адаптація, еміграція",
+  "Народження дитини",
+  "ПТСР",
+  "Кризи та травми"
+];
+
+
+
+function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
+  const container = document.getElementById(fieldId).parentNode;
+  const selectedValues = (window.currentUser[mongoKey] || []);
+
+  // Удаляем старый span
+  const oldSpan = document.getElementById(fieldId);
+  oldSpan.remove();
+
+  // Создаём div с плитками
+  const checkboxContainer = document.createElement("div");
+  checkboxContainer.className = "checkbox-group";
+
+  const checkboxes = [];
+
+  optionsArray.forEach(option => {
+    const tile = document.createElement("div");
+    tile.className = "checkbox-tile";
+
+    const square = document.createElement("div");
+    square.className = "checkbox-square";
+    if (selectedValues.includes(option)) {
+      square.classList.add("checked");
+    }
+
+    const label = document.createElement("span");
+    label.textContent = option;
+
+    tile.appendChild(square);
+    tile.appendChild(label);
+    checkboxContainer.appendChild(tile);
+
+    // логика переключения
+    square.addEventListener("click", () => {
+      square.classList.toggle("checked");
+    });
+
+    checkboxes.push({ square, value: option });
+  });
+
+  // Кнопка сохранить
+  const checkIcon = document.createElement("img");
+  checkIcon.src = "assets/check-icon.svg";
+  checkIcon.className = "check-icon";
+  checkIcon.style.cursor = "pointer";
+  checkIcon.style.width = "20px";
+  checkIcon.style.marginLeft = "8px";
+
+  container.appendChild(checkboxContainer);
+  container.appendChild(checkIcon);
+
+  checkIcon.addEventListener("click", async () => {
+    const selected = checkboxes
+      .filter(({ square }) => square.classList.contains("checked"))
+      .map(({ value }) => value);
+
+    updatedProfileData[mongoKey] = selected;
+
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [mongoKey]: selected }),
+    });
+
+    if (res.ok) {
+      const newSpan = document.createElement("span");
+      newSpan.id = fieldId;
+      newSpan.textContent = selected.join(", ");
+      checkboxContainer.remove();
+      checkIcon.remove();
+      container.appendChild(newSpan);
+      alert("Збережено!");
+    } else {
+      alert("Помилка при збереженні");
+    }
+  });
 }
 
-/* Navigation Button Container */
-.completed-nav-buttons {
-  display: flex;
-  gap: 50px;
-  margin-top: 30px;
-  margin-bottom: 28px;
-  justify-content: flex-start;
+const saveChangesBtn = document.getElementById("saveProfileChangesBtn");
+if (saveChangesBtn) {
+  saveChangesBtn.addEventListener("click", async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Please log in first.");
+      return;
+    }
 
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProfileData),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert("Профіль оновлено успішно!");
+        updatedProfileData = {};
+        saveChangesBtn.style.display = "none";
+      } else {
+        alert("Помилка: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      alert("Помилка сервера.");
+    }
+  });
 }
 
-/* Base Navigation Button Style */
-.completed-nav-button {
-  width: 224px;
-  height: 48px;
-  border-radius: 24px;
-  background-color: #275D2B; /* Default */
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 20px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  gap: 10px;
+const saveBtn = document.getElementById("saveBtn");
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const payload = {
+      username: localStorage.getItem("registrationUsername") || "",
+      password: localStorage.getItem("registrationPassword") || "",
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      middleName: document.getElementById("middleName").value,
+      dateOfBirth: document.getElementById("dateOfBirth").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      gender: document.querySelector('input[name="gender"]:checked')?.value || "",
+      experience: document.getElementById("experience").value,
+      education: document.getElementById("education").value,
+      directions: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+      topics: [...document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+      createdAt: new Date(),
+      status: "WAIT FOR REVIEW"
+    };
+
+    try {
+      console.log("📤 Payload:", payload);
+      const res = await fetch(`${API_BASE}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        window.location.href = "registration-success.html";
+      } else {
+        alert("Error: " + result.message);
+      }
+    } catch (err) {
+      console.error("❌ Server error:", err);
+      alert("Server error");
+    }
+  });
 }
 
-/* Hover */
-.completed-nav-button:hover {
-  background-color: #2F8B35;
+function toggleCheckboxes() {
+  const extra = document.getElementById("extra-checkboxes");
+  const trigger = document.querySelector(".toggle-btn");
+  const checkbox = document.getElementById("extra-checkbox");
+
+  const isHidden = extra.style.display === "none";
+
+  // Toggle visibility
+  extra.style.display = isHidden ? "block" : "none";
+
+  // Update button text
+  trigger.textContent = isHidden ? "Приховати" : "Показати ще";
+
+  // Enable/disable the main checkbox
+  checkbox.disabled = !isHidden;
 }
 
-/* Focus */
-.completed-nav-button:focus {
-  background-color: #275D2B;
-  outline: none;
+function handleSubmit() {
+  const data = {
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    middleName: document.getElementById("middleName").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    gender: document.querySelector('input[name="gender"]:checked')?.value || "",
+    experience: document.getElementById("experience").value,
+    education: document.getElementById("education").value,
+    directions: Array.from(document.querySelectorAll('.work-direction input[type="checkbox"]:checked')).map(cb => cb.parentElement.textContent.trim()),
+    directionOther: document.getElementById("directionOther")?.value || "",
+    topics: Array.from(document.querySelectorAll('.work-topics input[type="checkbox"]:checked')).map(cb => cb.parentElement.textContent.trim()),
+  };
+
+  localStorage.setItem("userProfile", JSON.stringify(data));
+  window.location.href = "profile.html";
 }
 
-/* Pressed (active) */
-.completed-nav-button:active {
-  background-color: #3BBA44;
-}
+window.addEventListener("DOMContentLoaded", () => {
+  const profileData = JSON.parse(localStorage.getItem("userProfile"));
+  if (profileData) {
+    document.getElementById("profileFirstName").textContent = profileData.firstName || "";
+    document.getElementById("profileLastName").textContent = profileData.lastName || "";
+    document.getElementById("profileMiddleName").textContent = profileData.middleName || "";
+    document.getElementById("profileEmail").textContent = profileData.email || "";
+    document.getElementById("profilePhone").textContent = profileData.phone || "";
+    document.getElementById("profileGender").textContent = profileData.gender || "";
+    document.getElementById("profileExperience").textContent = profileData.experience || "";
+    document.getElementById("profileEducation").textContent = profileData.education || "";
+    document.getElementById("profileDirections").textContent = (profileData.directions || []).join(", ") + (profileData.directionOther ? ", " + profileData.directionOther : "");
+    document.getElementById("profileTopics").textContent = (profileData.topics || []).join(", ");
+  }
+});
 
 
-.course-date-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 32px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #295F2D;
-}
-
-.course-date-line hr {
-  flex: 1;
-  height: 1px;
-  border: none;
-  background-color: #295F2D;
-}
 
 
-.course-entry {
-  background-color: #fffdf6;
-  border-radius: 16px;
-  padding: 40px 60px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  max-width: 1110px;
-  margin: 0 auto 40px;
-  font-family: 'Poppins', sans-serif;
-}
+function editField(fieldId) {
+  const span = document.getElementById(fieldId);
+  const currentValue = span.textContent;
+  
+  // Create input
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = currentValue;
+  input.className = "edit-input";
+  
+  // Replace span with input
+  span.replaceWith(input);
+  input.focus();
 
-.course-date {
-  display: block;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #295F2D;
-  margin-bottom: 20px;
-  border-top: 1px solid #295F2D;
-  padding: 10px 0;
-}
+  // Save on blur or Enter
+  input.addEventListener("blur", saveEdit);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") input.blur();
+  });
 
-.course-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 20px 0 12px;
-  color: #333;
-}
+  function saveEdit() {
+    const newValue = input.value;
+    
+    // Update span
+    span.textContent = newValue;
+    input.replaceWith(span);
 
-.course-subtitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 24px;
-}
-
-.course-details-btn {
-  width: 136px;
-  display: inline-block;
-  background-color: #295F2D;
-  color: white;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 24px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.course-details-btn:hover {
-  background-color: #1e4821;
+    // Save to localStorage
+    const profileData = JSON.parse(localStorage.getItem("userProfile")) || {};
+    const keyMap = {
+      profileFirstName: "firstName",
+      profileLastName: "lastName",
+      profileMiddleName: "middleName",
+      profileEmail: "email",
+      profilePhone: "phone",
+      profileGender: "gender",
+    };
+    const fieldKey = keyMap[fieldId];
+    if (fieldKey) {
+      profileData[fieldKey] = newValue;
+      localStorage.setItem("userProfile", JSON.stringify(profileData));
+    }
+  }
 }
 
 
-.certificate-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* text stays left */
-  gap: 16px;
+function showStep(stepNumber) {
+  const steps = document.querySelectorAll('.profile-step');
+  const indicators = document.querySelectorAll('.progress-indicator .step');
+
+  steps.forEach((step, index) => {
+    step.style.display = (index === stepNumber - 1) ? 'block' : 'none';
+  });
+
+  indicators.forEach((el, index) => {
+    el.classList.toggle('active', index === stepNumber - 1);
+  });
 }
 
-.certificate-img {
-  display: block;
-  margin: 0 auto; /* image centers */
-  max-width: 100%;
-  height: auto;
-}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.tab');
+  const videoList = document.querySelector('.video-list');
+  const bookList = document.querySelector('.book-list');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Tab styling
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const isVideo = tab.textContent.trim() === 'Відео';
+
+      // Toggle content
+      videoList.style.display = isVideo ? 'flex' : 'none';
+      bookList.style.display = isVideo ? 'none' : 'flex';
+    });
+  });
+});
 
 
-.current-course-item {
-  position: relative;
-  padding-bottom: 80px; /* gives space for button */
-}
 
-/* Holds text and button */
-.current-course-inner {
-  position: relative;
-  padding-right: 160px; /* space for button */
-}
 
-/* Title and subtitle styling */
-.current-course-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2D2D2D;
-  margin-bottom: 12px;
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const stars = document.querySelectorAll("#profileRating .star");
+  let currentRating = parseInt(localStorage.getItem("companyRating")) || 0;
 
-.current-course-subtitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: #444;
-  opacity: 0.9;
-  max-width: 80%;
-}
+  function updateStarDisplay(rating) {
+    stars.forEach(star => {
+      const value = parseInt(star.getAttribute("data-value"));
+      star.src = value <= rating 
+        ? "assets/star-filled.svg"
+        : "assets/star.svg"; 
+    });
+  }
 
-/* The button at the bottom-right */
-.current-show-more-btn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 136px;
-  height: 32px;
-  padding: 10px;
-  border-radius: 24px;
-  background-color: #295F2D;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'Poppins', sans-serif;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+  updateStarDisplay(currentRating); // set stars on load
 
-.current-show-more-btn:hover {
-  background-color: #1e4821;
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      currentRating = parseInt(star.getAttribute("data-value"));
+      localStorage.setItem("companyRating", currentRating);
+      updateStarDisplay(currentRating);
+    });
+  });
+});
+
+
+function previewPhoto(event) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    const img = document.getElementById("profilePhoto");
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(event.target.files[0]);
 }
 
 
 
-.create-course-content {
-  width: 1110px;
-  height: 1600px;
-  background-color: #fffef9;
-  margin: 28px auto;
-  padding: 60px 100px;
-  border-radius: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+  const arrow = document.getElementById('toggleArrow');
+  const logoExpanded = document.getElementById('logoExpanded');
+  const logoCollapsed = document.getElementById('logoCollapsed');
 
-.create-course-content .form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.create-course-content input,
-.create-course-content select {
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-}
-
-.radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  sidebar.classList.toggle('expanded');
+  sidebar.classList.toggle('collapsed');
+  if (sidebar.classList.contains('expanded')) {
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    arrow.style.transform = 'rotate(0deg)';
+  }
 }
 
 
-.save-btn-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
+function setupDateFilterButton() {
+  const inputs = document.querySelectorAll('.date-input');
+  const button = document.querySelector('.filter-btn');
+
+  if (!inputs.length || !button) return; // Don't run if no filter exists on the page
+
+  function toggleButtonState() {
+    const allFilled = Array.from(inputs).every(input => input.value.trim() !== '');
+    button.disabled = !allFilled;
+  }
+
+  inputs.forEach(input => {
+    input.addEventListener('input', toggleButtonState);
+  });
+
+  toggleButtonState();
 }
 
-.save-btn {
-  background-color: #275D2B;
-  color: white;
-  border: none;
-  padding: 10px 53px;
-  font-size: 18px;
-  font-family: 'Poppins', sans-serif;
-  border-radius: 24px;
-  cursor: pointer;
-  width: auto;
-  height: 48px;
-}
+document.addEventListener('DOMContentLoaded', setupDateFilterButton);
 
 
-.checkbox-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.checkbox-tile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.checkbox-square {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #E37009;
-  border-radius: 4px;
-  background-color: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.checkbox-square.checked {
-  background-color: #E37009;
-}
-
-.checkbox-square::after {
-  content: '✔';
-  font-size: 14px;
-  color: white;
-  display: none;
-}
-
-.checkbox-square.checked::after {
-  display: block;
-}
-
-.checkbox-tile span {
-  font-size: 14px;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.accordion-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('open');
+      const content = btn.nextElementSibling;
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+});

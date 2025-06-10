@@ -120,9 +120,9 @@ function enableEdit(fieldId, mongoKey) {
   container.style.alignItems = "center";
   container.style.gap = "10px";
 
-  const input = document.createElement("input");
-  input.type = "text";
+ const input = document.createElement("textarea");
   input.value = currentValue;
+  input.rows = 4; // или больше по умолчанию
   input.className = "edit-input";
   input.style.width = "910px";
   input.style.height = "40px";

@@ -805,10 +805,13 @@
   padding-bottom: 8px;
 }
 
-#step2 p span {
-  flex: 1;
-  margin-left: 12px;
-  color: #333;
+#step2 span,
+#step3 span {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  margin-top: 8px;
 }
 
 #step2 .edit-icon {
@@ -992,10 +995,6 @@
   border-bottom: 1px solid #ddd;
 }
 
-#step3 p span {
-  flex: 1;
-  margin-left: 12px;
-}
 
 #step3 .edit-icon {
   width: 18px;
@@ -1010,6 +1009,12 @@
   opacity: 1;
 }
 
+.profile-step span {
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: block;
+  margin-top: 8px;
+}
 
 .custom-table {
   width: 100%;

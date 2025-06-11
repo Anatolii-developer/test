@@ -88,6 +88,23 @@
   </div>
 
   <script>
+
+    function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const arrow = document.getElementById('toggleArrow');
+
+  sidebar.classList.toggle('expanded');
+  sidebar.classList.toggle('collapsed');
+
+  arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function logoutUser() {
+  // Очистить сессию, токены и т.п.
+  window.location.href = "login.html";
+}
+
+
     const API = "http://157.230.121.24:5050";
     let selectedUserId = null;
 

@@ -5,16 +5,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
-// ✅ CORS – ДО маршрутов!
-app.use(cors({
-  origin: 'http://localhost:5050', // обязательно точный порт и протокол
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-}));
 
 app.use(bodyParser.json());
 app.use(express.json());

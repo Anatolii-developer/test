@@ -20,6 +20,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
+const uploadRoutes = require('./routes/uploadRoutes'); // 👈
+app.use('/api/upload', uploadRoutes); // 👈
+
 // ✅ MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))

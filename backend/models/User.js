@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   education: String,
   directions: [String],
   topics: [String],
+  photoUrl: String,  // ➕ ссылка на фото
   about: String,
   courses: String,
   cost: String,
@@ -50,6 +51,11 @@ userSchema.pre("save", async function (next) {
 if (!this.isModified("password")) return next();
 this.password = await bcrypt.hash(this.password, 10);
 next();
+});
+
+
+userSchema.add({
+  certificates: [{ filename: String, url: String }]
 });
 
 module.exports = mongoose.model("User", userSchema);

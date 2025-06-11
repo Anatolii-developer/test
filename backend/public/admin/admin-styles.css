@@ -616,7 +616,6 @@ body {
 }
 
 
-
 .action-controls {
   display: flex;
   flex-direction: row;
@@ -654,6 +653,16 @@ body {
   justify-content: center; /* или flex-end */
 }
 
+
+.table-card {
+  width: 890px;
+  gap: 36px; /* можно оставить, если используешь flex внутри */
+  border-radius: 24px;
+  background-color: #FFFFF9;
+  padding: 60px 100px;
+  margin-top: 36px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
 .top-title-box {
   width: 326px;

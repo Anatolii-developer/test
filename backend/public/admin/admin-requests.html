@@ -135,6 +135,17 @@ document.addEventListener("DOMContentLoaded", () => {
       tabs.forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
       currentStatus = tab.dataset.status;
+      if (currentStatus === "WAIT FOR REVIEW") {
+      searchEmail.style.display = "block";
+      searchName.style.display = "none";
+    } else if (currentStatus === "APPROVED") {
+      searchEmail.style.display = "none";
+      searchName.style.display = "block";
+    } else {
+      // для REJECTED и других
+      searchEmail.style.display = "none";
+      searchName.style.display = "none";
+    }
       loadUsers();
     });
   });

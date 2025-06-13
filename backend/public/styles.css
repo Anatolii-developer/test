@@ -1697,7 +1697,9 @@
   justify-content: flex-start;
 
 }
-
+.completed-nav-button.create {
+  background-color: #B65600; /* Green */
+}
 /* Base Navigation Button Style */
 .completed-nav-button {
   width: 224px;
@@ -1877,7 +1879,6 @@
 
 .create-course-content {
   width: 1110px;
-  height: 1600px;
   background-color: #fffef9;
   margin: 28px auto;
   padding: 60px 100px;
@@ -1891,23 +1892,38 @@
 .create-course-content .form-group {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .create-course-content input,
-.create-course-content select {
+.create-course-content select,
+.create-course-content textarea {
   padding: 12px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-family: 'Poppins', sans-serif;
+  resize: vertical;
+}
+
+.create-course-content textarea {
+  min-height: 100px;
+  line-height: 1.5;
 }
 
 .radio-group {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  padding-top: 8px;
 }
 
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
 
 .save-btn-wrapper {
   display: flex;
@@ -1926,6 +1942,65 @@
   cursor: pointer;
   width: auto;
   height: 48px;
+}
+
+.date-range,
+.time-range {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.date-range input[type="date"],
+.time-range input[type="time"] {
+  padding: 12px;
+  border: 1px solid #E37009;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  width: 200px;
+  background-color: #fffef9;
+  color: #333;
+}
+
+.weekdays-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.weekdays-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2D2D2D;
+}
+
+.weekdays-checkboxes input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #E37009;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.weekdays-checkboxes input[type="checkbox"]:checked {
+  background-color: #E37009;
+}
+
+.weekdays-checkboxes input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  left: 4px;
+  top: -1px;
 }
 
 

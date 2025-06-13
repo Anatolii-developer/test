@@ -1736,6 +1736,26 @@
   background-color: #3BBA44;
 }
 
+.join-meeting-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.join-meeting-btn {
+  background-color: #275D2B;
+  color: #fff;
+  padding: 12px 32px;
+  border-radius: 24px;
+  font-size: 18px;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.join-meeting-btn:hover {
+  background-color: #1c431f;
+}
 
 .course-date-line {
   display: flex;

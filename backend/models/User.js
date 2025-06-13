@@ -55,7 +55,11 @@ next();
 
 
 userSchema.add({
-  certificates: [{ filename: String, url: String }]
+  certificates: {
+    ua: { filename: String, url: String },
+    eng: { filename: String, url: String }
+  }
 });
+
 
 module.exports = mongoose.model("User", userSchema);

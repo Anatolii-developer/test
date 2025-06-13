@@ -92,7 +92,7 @@
 
     function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
-  const arrow = document.getElementById('toggleArrow');
+  const arrow = document.getElementById('toggleArrow'); 
 
   sidebar.classList.toggle('expanded');
   sidebar.classList.toggle('collapsed');
@@ -192,6 +192,44 @@ function logoutUser() {
 
       fetchParticipants();
     });
+
+    router.post("/api/users/:id/certificate", upload.single("certificate"), async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const lang = req.query.lang;
+
+    console.log("➡ Uploading cert for user:", userId);
+    console.log("➡ Language:", lang);
+    console.log("➡ Uploaded file:", req.file);
+
+    if (!["ua", "eng"].includes(lang)) {
+      return res.status(400).send("Invalid language");
+    }
+
+    if (!req.file) {
+      return res.status(400).send("No file uploaded");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).send("User not found");
+
+    const fileUrl = `/uploads/certificates/${req.file.filename}`;
+    if (!user.certificates) user.certificates = {};
+
+    user.certificates[lang] = {
+      filename: req.file.originalname,
+      url: fileUrl
+    };
+
+    await user.save();
+    res.send({ success: true, url: fileUrl });
+
+  } catch (error) {
+    console.error("❌ Certificate upload error:", error);
+    res.status(500).send("Server error");
+  }
+});
+
   </script>
 </body>
 </html>

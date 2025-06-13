@@ -54,8 +54,7 @@
 
     <div class="table-card">
       <div class="search-block">
-        <input type="text" id="searchEmail" placeholder="Введіть пошту" />
-        <button class="search-btn">Search</button>
+        <input type="text" id="searchName" placeholder="Введіть ім’я або прізвище" />
       </div>
 
       <table class="requests-table">
@@ -180,6 +179,14 @@ function logoutUser() {
             </tr>
           `).join("");
         }
+
+        document.getElementById("searchName").addEventListener("input", function () {
+  const searchValue = this.value.toLowerCase();
+  document.querySelectorAll(".requests-table tbody tr").forEach(row => {
+    const fullName = row.cells[1]?.textContent.toLowerCase(); // full name
+    row.style.display = fullName && fullName.includes(searchValue) ? "" : "none";
+  });
+});
 
         document.querySelectorAll(".more-btn").forEach(btn => {
           btn.addEventListener("click", async () => {

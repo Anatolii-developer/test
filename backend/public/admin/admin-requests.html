@@ -54,7 +54,11 @@
 
     <div class="table-card">
       <div class="search-block">
-        <input type="text" id="searchName" placeholder="Введіть ім’я або прізвище" />
+       <!-- Для заявок -->
+<input type="text" id="searchEmail" placeholder="Введіть пошту" style="display:none;" />
+
+<!-- Для учасників -->
+<input type="text" id="searchName" placeholder="Введіть ім’я або прізвище" style="display:none;" />
       </div>
 
       <table class="requests-table">
@@ -94,6 +98,9 @@
 </div>
 
 <script>
+const API_URL = "http://157.230.121.24:5050";
+let currentUserId = null;
+let currentStatus = "WAIT FOR REVIEW";
 
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
@@ -106,121 +113,118 @@ function toggleSidebar() {
 }
 
 function logoutUser() {
-  // Очистить сессию, токены и т.п.
   window.location.href = "login.html";
 }
 
-  const API_URL = "http://157.230.121.24:5050";
-  let currentUserId = null;
-  let currentStatus = "WAIT FOR REVIEW";
+document.addEventListener("DOMContentLoaded", () => {
+  const tableBody = document.querySelector(".requests-table tbody");
+  const tableHead = document.getElementById("table-header");
+  const modal = document.getElementById("userModal");
+  const userDetails = document.getElementById("userDetails");
+  const modalClose = document.getElementById("modalClose");
+  const tabs = document.querySelectorAll(".top-btn");
+  const decisionSelect = document.getElementById("decisionSelect");
+  const roleSelect = document.getElementById("roleSelect");
+  const submitDecision = document.getElementById("submitDecision");
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const tableBody = document.querySelector(".requests-table tbody");
-    const tableHead = document.getElementById("table-header");
-    const modal = document.getElementById("userModal");
-    const userDetails = document.getElementById("userDetails");
-    const modalClose = document.getElementById("modalClose");
-    const tabs = document.querySelectorAll(".top-btn");
-    const decisionSelect = document.getElementById("decisionSelect");
-    const roleSelect = document.getElementById("roleSelect");
-    const submitDecision = document.getElementById("submitDecision");
+  modalClose.onclick = () => modal.style.display = "none";
+  window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
-    modalClose.onclick = () => modal.style.display = "none";
-    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
-
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentStatus = tab.dataset.status;
-        loadUsers();
-      });
-    });
-
-    submitDecision.onclick = async () => {
-      const status = decisionSelect.value;
-      const role = roleSelect.value;
-      if (!status || !currentUserId) return;
-
-      await fetch(`${API_URL}/api/users/${currentUserId}/status`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, role }),
-      });
-      modal.style.display = "none";
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentStatus = tab.dataset.status;
       loadUsers();
-    };
-
-    async function loadUsers() {
-      try {
-        const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
-        const users = await res.json();
-
-        if (currentStatus === "APPROVED") {
-          tableHead.innerHTML = "<tr><th>ID</th><th>Name and surname</th><th>Email</th><th>Role</th><th>Date of birth</th><th>Review</th></tr>";
-          tableBody.innerHTML = users.map((user, index) => `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${user.firstName} ${user.lastName}</td>
-              <td>${user.email}</td>
-              <td>${user.role || '-'}</td>
-              <td>${user.dateOfBirth || '-'}</td>
-             <td><a href="user-profile.html?id=${user._id}" class="more-btn">More</a></td>
-            </tr>
-          `).join("");
-        } else {
-          tableHead.innerHTML = "<tr><th>Created at</th><th>Email</th><th>Status</th><th>Review</th></tr>";
-          tableBody.innerHTML = users.map(user => `
-            <tr>
-              <td>${new Date(user.createdAt).toLocaleString()}</td>
-              <td>${user.email}</td>
-              <td>${user.status}</td>
-              <td><a href="user-profile.html?id=${user._id}" class="more-btn">More</a></td>
-            </tr>
-          `).join("");
-        }
-
-        document.getElementById("searchName").addEventListener("input", function () {
-  const searchValue = this.value.toLowerCase();
-  document.querySelectorAll(".requests-table tbody tr").forEach(row => {
-    const fullName = row.cells[1]?.textContent.toLowerCase(); // full name
-    row.style.display = fullName && fullName.includes(searchValue) ? "" : "none";
+    });
   });
-});
 
-        document.querySelectorAll(".more-btn").forEach(btn => {
-          btn.addEventListener("click", async () => {
-            const id = btn.dataset.id;
-            const res = await fetch(`${API_URL}/api/users/${id}`);
-            const user = await res.json();
-            currentUserId = id;
+  submitDecision.onclick = async () => {
+    const status = decisionSelect.value;
+    const role = roleSelect.value;
+    if (!status || !currentUserId) return;
 
-            userDetails.innerHTML = `
-  <p><strong>Ім’я:</strong> ${user.firstName || '-'}</p>
-  <p><strong>Прізвище:</strong> ${user.lastName || '-'}</p>
-  <p><strong>По-батькові:</strong> ${user.middleName || '-'}</p>
-  <p><strong>Дата подання заявки:</strong> ${new Date(user.createdAt).toLocaleDateString() || '-'}</p>
-  <p><strong>Дата підтвердження заявки:</strong> ${user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '-'}</p>
-  <p><strong>Дата народження:</strong> ${user.dateOfBirth || '-'}</p>
-  <p><strong>Email:</strong> ${user.email || '-'}</p>
-  <p><strong>Телефон:</strong> ${user.phone || '-'}</p>
-  <p><strong>Стать:</strong> ${user.gender || '-'}</p>
-  <p><strong>Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими:</strong> ${user.experience || '-'}</p>
-  <p><strong>Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування:</strong> ${user.education || '-'}</p>
-  <p><strong>Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування:</strong> ${(user.topics || []).join(', ') || '-'}</p>
-`;
-            roleSelect.value = user.role || "";
-            decisionSelect.value = "";
-            modal.style.display = "block";
-          });
-        });
-      } catch (err) {
-        console.error("Помилка при завантаженні:", err);
-      }
-    }
-
+    await fetch(`${API_URL}/api/users/${currentUserId}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, role }),
+    });
+    modal.style.display = "none";
     loadUsers();
-  });
+  };
+
+  async function loadUsers() {
+    try {
+      const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
+      const users = await res.json();
+
+      if (currentStatus === "APPROVED") {
+        tableHead.innerHTML = "<tr><th>ID</th><th>Name and surname</th><th>Email</th><th>Role</th><th>Date of birth</th><th>Review</th></tr>";
+        tableBody.innerHTML = users.map((user, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${user.firstName} ${user.lastName}</td>
+            <td>${user.email}</td>
+            <td>${user.role || '-'}</td>
+            <td>${user.dateOfBirth || '-'}</td>
+            <td><a href="user-profile.html?id=${user._id}" class="more-btn" data-id="${user._id}">More</a></td>
+          </tr>
+        `).join("");
+      } else {
+        tableHead.innerHTML = "<tr><th>Created at</th><th>Email</th><th>Status</th><th>Review</th></tr>";
+        tableBody.innerHTML = users.map(user => `
+          <tr>
+            <td>${new Date(user.createdAt).toLocaleString()}</td>
+            <td>${user.email}</td>
+            <td>${user.status}</td>
+            <td><a href="user-profile.html?id=${user._id}" class="more-btn" data-id="${user._id}">More</a></td>
+          </tr>
+        `).join("");
+      }
+
+      document.getElementById("searchName").addEventListener("input", function () {
+        const searchValue = this.value.toLowerCase();
+        document.querySelectorAll(".requests-table tbody tr").forEach(row => {
+          const fullName = row.cells[1]?.textContent.toLowerCase();
+          row.style.display = fullName && fullName.includes(searchValue) ? "" : "none";
+        });
+      });
+
+      document.querySelectorAll(".more-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const id = btn.dataset.id;
+          const res = await fetch(`${API_URL}/api/users/${id}`);
+          const user = await res.json();
+          currentUserId = id;
+
+          userDetails.innerHTML = `
+            <p><strong>Ім’я:</strong> ${user.firstName || '-'}</p>
+            <p><strong>Прізвище:</strong> ${user.lastName || '-'}</p>
+            <p><strong>По-батькові:</strong> ${user.middleName || '-'}</p>
+            <p><strong>Дата подання заявки:</strong> ${new Date(user.createdAt).toLocaleDateString() || '-'}</p>
+            <p><strong>Дата підтвердження заявки:</strong> ${user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '-'}</p>
+            <p><strong>Дата народження:</strong> ${user.dateOfBirth || '-'}</p>
+            <p><strong>Email:</strong> ${user.email || '-'}</p>
+            <p><strong>Телефон:</strong> ${user.phone || '-'}</p>
+            <p><strong>Стать:</strong> ${user.gender || '-'}</p>
+            <p><strong>Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими:</strong> ${user.experience || '-'}</p>
+            <p><strong>Психологічна освіта:</strong> ${user.education || '-'}</p>
+            <p><strong>Тематики:</strong> ${(user.topics || []).join(', ') || '-'}</p>
+          `;
+
+          roleSelect.value = user.role || "";
+          decisionSelect.value = "";
+          modal.style.display = "block";
+        });
+      });
+    } catch (err) {
+      console.error("Помилка при завантаженні:", err);
+    }
+  }
+
+  loadUsers();
+});
 </script>
 
 </body>

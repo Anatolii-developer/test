@@ -724,3 +724,33 @@ body {
 .add-btn:hover {
   background-color: #cf6108;
 }
+
+.add-cert-btn {
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  margin: 4px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  color: white;
+}
+
+.add-cert-btn[data-lang="ua"] {
+  background-color: #E37009; /* оранжевый */
+}
+
+.add-cert-btn[data-lang="ua"]:hover {
+  background-color: #c55a00;
+  transform: scale(1.05);
+}
+
+.add-cert-btn[data-lang="eng"] {
+  background-color: #275D2B; /* зелёный */
+}
+
+.add-cert-btn[data-lang="eng"]:hover {
+  background-color: #1e4821;
+  transform: scale(1.05);
+}

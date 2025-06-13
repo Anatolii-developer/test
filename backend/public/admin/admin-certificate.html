@@ -127,40 +127,60 @@ function logoutUser() {
             <td>${user.email}</td>
             <td>${user.role || '-'}</td>
             <td>${user.dateOfBirth || '-'}</td>
-            <td><button class="add-btn" data-id="${user._id}">Add</button></td>
+            <td>
+  <button class="add-cert-btn" data-id="${user._id}" data-lang="ua">
+    ${user.certificates?.ua ? "View UA" : "Add UA"}
+  </button>
+  <button class="add-cert-btn" data-id="${user._id}" data-lang="eng">
+    ${user.certificates?.eng ? "View ENG" : "Add ENG"}
+  </button>
+</td>
+
           </tr>
         `).join("");
 
-        document.querySelectorAll(".add-btn").forEach(btn => {
-          btn.addEventListener("click", () => {
-            selectedUserId = btn.dataset.id;
-            modal.style.display = "block";
-          });
-        });
+        document.querySelectorAll(".add-cert-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedUserId = btn.dataset.id;
+    selectedLang = btn.dataset.lang;
+
+    const user = users.find(u => u._id === selectedUserId);
+    const cert = user.certificates?.[selectedLang];
+
+    if (cert && cert.url) {
+      window.open(cert.url, "_blank"); // открыть PDF или картинку
+    } else {
+      modal.style.display = "block";
+    }
+  });
+});
+
       }
 
       modalClose.onclick = () => modal.style.display = "none";
       window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
       uploadBtn.onclick = async () => {
-        const fileInput = document.getElementById("certificateFile");
-        if (!fileInput.files.length || !selectedUserId) return;
+  const fileInput = document.getElementById("certificateFile");
+  if (!fileInput.files.length || !selectedUserId || !selectedLang) return;
 
-        const formData = new FormData();
-        formData.append("certificate", fileInput.files[0]);
+  const formData = new FormData();
+  formData.append("certificate", fileInput.files[0]);
 
-        const res = await fetch(`${API}/api/users/${selectedUserId}/certificate`, {
-          method: "POST",
-          body: formData
-        });
+  const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}`, {
+    method: "POST",
+    body: formData
+  });
 
-        if (res.ok) {
-          alert("Сертифікат додано успішно");
-          modal.style.display = "none";
-        } else {
-          alert("Помилка при завантаженні сертифікату");
-        }
-      };
+  if (res.ok) {
+    alert(`Сертифікат (${selectedLang}) додано успішно`);
+    modal.style.display = "none";
+    location.reload(); // чтобы обновить кнопки
+  } else {
+    alert("Помилка при завантаженні сертифікату");
+  }
+};
+
 
       searchInput.addEventListener("input", () => {
         const value = searchInput.value.toLowerCase();

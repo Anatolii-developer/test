@@ -23,6 +23,8 @@ app.use('/api/users', userRoutes);
 const uploadRoutes = require('./routes/uploadRoutes');
 app.use(uploadRoutes); // без префикса, потому что маршрут уже включает /api/users
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 // ✅ MongoDB
 mongoose.connect(process.env.MONGO_URI)

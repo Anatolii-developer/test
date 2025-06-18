@@ -7,7 +7,7 @@ const path = require('path');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-const app = express();
+const app = express();  
 
 
 app.use(bodyParser.json());
@@ -24,6 +24,10 @@ const uploadRoutes = require('./routes/uploadRoutes');
 app.use(uploadRoutes); // без префикса, потому что маршрут уже включает /api/users
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const courseRoutes = require('./routes/courseRoutes');
+app.use('/api/courses', courseRoutes);
+
 
 
 // ✅ MongoDB

@@ -23,3 +23,14 @@ exports.getCourses = async (req, res) => {
     res.status(500).json({ message: "Помилка при отриманні курсів", error: error.message });
   }
 };
+
+exports.getCourseById = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ message: "Курс не знайдено" });
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ message: "Помилка при отриманні курсу", error: error.message });
+  }
+};
+

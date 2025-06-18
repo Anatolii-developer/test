@@ -4,5 +4,7 @@ const { createCourse, getCourses } = require('../controllers/courseController');
 
 router.post('/', createCourse);   // ✅ просто /
 router.get('/', getCourses);      // ✅ просто /
+router.get('/:id', getCourseById);
+
 
 module.exports = router;

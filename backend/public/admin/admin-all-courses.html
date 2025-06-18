@@ -68,7 +68,7 @@
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="coursesTableBody">
           <!-- Repeat this <tr> for each course -->
           <tr>
             <td>1</td>
@@ -97,6 +97,41 @@
 function logoutUser() {
   window.location.href = "login.html";
 }
+
+ async function fetchCourses() {
+    try {
+      const res = await fetch("http://localhost:5050/api/courses");
+      const courses = await res.json();
+
+      const tbody = document.getElementById("coursesTableBody");
+      tbody.innerHTML = ""; // очистим перед вставкой
+
+      courses.forEach((course, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${course.courseTitle || "-"}</td>
+          <td>–</td>
+          <td>–</td>
+          <td>${formatDate(course.courseDates?.start)}</td>
+          <td><button class="more-button">More</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+    } catch (err) {
+      console.error("Помилка при отриманні курсів:", err);
+    }
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("uk-UA");
+  }
+
+  // Загружаем курсы при открытии страницы
+  window.addEventListener("DOMContentLoaded", fetchCourses);
   </script>
 </body>
 </html>

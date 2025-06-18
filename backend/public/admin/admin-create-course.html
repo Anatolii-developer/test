@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Створити курс</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+   <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="../assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+    </div>
+  
+    <!-- Логотип -->
+    <img class="logo" src="../assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="../assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+  
+    <!-- Фото и имя -->
+    <img class="profile" src="../assets/profile-photo.png" alt="User" width="40" height="40" />
+    <p style="margin-left: 12px; font-weight: 600;">Admin</p>
+  
+    <!-- Навигация -->
+    <nav>
+      <a href="admin-requests.html"><img src="../assets/sidebar/profile.svg" /><span>Профайли</span></a>
+      <a href="admin-certificate.html"><img src="../assets/sidebar/news.svg" /><span>Сертифікати</span></a>
+      <a href="#"><img src="../assets/sidebar/3.svg" /><span>Планування кар'єри</span></a>
+      <a href="#"><img src="../assets/sidebar/4.svg" /><span>Бібліотека</span></a>
+      <a href="#"><img src="../assets/sidebar/5.svg" /><span>Курси</span></a>
+      <a href="#"><img src="../assets/sidebar/6.svg" /><span>Облік практики</span></a>
+      <a href="#"><img src="../assets/sidebar/7.svg" /><span>Здоров’я</span></a>
+      <a href="#"><img src="../assets/sidebar/8.svg" /><span>Фінанси</span></a>
+      <a href="#"><img src="../assets/sidebar/9.svg" /><span>Нерухомість</span></a>
+    </nav>
+  
+    <!-- Настройки + выход -->
+    <div style="margin-top: auto;">
+      <a href="#"><img src="../assets/sidebar/settings.svg" /><span>Налаштування</span></a>
+      <div class="logout" onclick="logoutUser()">
+        <img src="../assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+        <span>Logout Account</span>
+      </div>
+    </div>
+  </aside>
+
+  <div id="mainContentWrapper">
+  <main id="admin-main">
+
+
+    <div class="completed-nav-buttons">
+      <a href="my-courses.html" class="completed-nav-button secondary">Головна</a>
+      <a href="completed-courses.html" class="completed-nav-button secondary">Пройдені курси</a>
+      <a href="planned-courses.html" class="completed-nav-button secondary">Заплановані курси</a>
+      <a href="create-course.html" class="completed-nav-button create">Створити курс</a>
+    </div>
+
+    <section class="create-course-content">
+      <form id="createCourseForm">
+        <div class="form-group">
+          <label>Оберіть тип заходу</label>
+          <div class="radio-group">
+            <label><input type="radio" name="eventType" value="Курс" /> Курс</label>
+            <label><input type="radio" name="eventType" value="Група" /> Група</label>
+            <label><input type="radio" name="eventType" value="Супервізія" /> Супервізія</label>
+            <label><input type="radio" name="eventType" value="Лекція" /> Лекція</label>
+            <label><input type="radio" name="eventType" value="Семінар" /> Семінар</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Назва курсу</label>
+          <input type="text" name="courseTitle" placeholder="Введіть назву" />
+        </div>
+
+        <div class="form-group">
+          <label>Підзаголовок курсу</label>
+          <input type="text" name="courseSubtitle" placeholder="Введіть підзаголовок" />
+        </div>
+
+        <div class="form-group">
+          <label>Короткий опис курсу</label>
+          <textarea name="courseDescription" placeholder="Опишіть коротко про курс..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Оберіть дати проведення курсу</label>
+          <div class="date-range">
+            <input type="date" name="startDate" />
+            <input type="date" name="endDate" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Оберіть дні проведення курсу</label>
+          <div class="weekdays-checkboxes">
+            <label><input type="checkbox" name="courseDays" value="Понеділок" /> Понеділок</label>
+            <label><input type="checkbox" name="courseDays" value="Вівторок" /> Вівторок</label>
+            <label><input type="checkbox" name="courseDays" value="Середа" /> Середа</label>
+            <label><input type="checkbox" name="courseDays" value="Четвер" /> Четвер</label>
+            <label><input type="checkbox" name="courseDays" value="П’ятниця" /> П’ятниця</label>
+            <label><input type="checkbox" name="courseDays" value="Субота" /> Субота</label>
+            <label><input type="checkbox" name="courseDays" value="Неділя" /> Неділя</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Оберіть години проведення</label>
+          <div class="time-range">
+            <input type="time" name="startTime" />
+            <span>–</span>
+            <input type="time" name="endTime" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Оберіть тип курсу</label>
+          <div class="radio-group">
+            <label><input type="radio" name="accessType" value="Відкрита група" /> Відкрита група</label>
+            <label><input type="radio" name="accessType" value="Закрита група" /> Закрита група</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Тривалість курсу</label>
+          <input type="text" name="courseDuration" placeholder="Наприклад: 4 тижні, 8 занять" />
+        </div>
+
+        <div class="form-group">
+          <label>Вартість курсу</label>
+          <input type="text" name="coursePrice" placeholder="Наприклад: 1200 грн" />
+        </div>
+
+        <div class="form-group">
+          <label>Посилання на Zoom</label>
+          <input type="text" name="zoomLink" placeholder="Вставте Zoom-посилання" />
+        </div>
+
+        <div class="save-btn-wrapper">
+          <button type="submit" class="save-btn">Зберегти</button>
+        </div>
+      </form>
+    </section>
+  </main>
+  </div>
+ <script>
+    function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const arrow = document.getElementById('toggleArrow');
+
+  sidebar.classList.toggle('expanded');
+  sidebar.classList.toggle('collapsed');
+
+  arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function logoutUser() {
+  window.location.href = "login.html";
+}
+
+document.getElementById("createCourseForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const form = e.target;
+const formData = {
+  eventType: form.eventType.value,
+  courseTitle: form.courseTitle.value,
+  courseSubtitle: form.courseSubtitle.value,
+  courseDescription: form.courseDescription.value,
+  courseDates: {
+    start: form.startDate.value,
+    end: form.endDate.value
+  },
+  courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
+  courseTime: {
+    start: form.startTime.value,
+    end: form.endTime.value
+  },
+  accessType: form.accessType.value,
+  courseDuration: form.courseDuration.value,
+  coursePrice: form.coursePrice.value,
+  zoomLink: form.zoomLink.value,
+};
+
+
+  const res = await fetch("http://localhost:5050/api/courses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData)
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    alert("Курс успішно збережено");
+    form.reset();
+  } else {
+    alert("Помилка при збереженні курсу");
+  }
+});
+  </script>
+</body>
+</html>

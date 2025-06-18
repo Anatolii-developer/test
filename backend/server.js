@@ -35,7 +35,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Запуск сервера
-app.listen(5050, () => {
-  console.log('🚀 Server running on port 5050');
+app.listen(5050, '0.0.0.0', () => {
+  console.log('🚀 Server running on port 5050 and accessible externally');
 });

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Деталі курсу</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+</head>
+<body>
+  <div class="course-detail">
+    <h1 id="title">Назва курсу</h1>
+    <p><strong>Тип:</strong> <span id="eventType"></span></p>
+    <p><strong>Підзаголовок:</strong> <span id="subtitle"></span></p>
+    <p><strong>Опис:</strong> <span id="description"></span></p>
+    <p><strong>Дати:</strong> <span id="dates"></span></p>
+    <p><strong>Дні:</strong> <span id="days"></span></p>
+    <p><strong>Час:</strong> <span id="time"></span></p>
+    <p><strong>Тип доступу:</strong> <span id="access"></span></p>
+    <p><strong>Тривалість:</strong> <span id="duration"></span></p>
+    <p><strong>Ціна:</strong> <span id="price"></span></p>
+    <p><strong>Zoom:</strong> <a id="zoom" href="#" target="_blank">Перейти</a></p>
+  </div>
+
+  <script>
+    async function loadCourseDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const courseId = params.get('id');
+      if (!courseId) return;
+
+      try {
+        const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
+        const course = await res.json();
+
+        document.getElementById("title").textContent = course.courseTitle;
+        document.getElementById("eventType").textContent = course.eventType;
+        document.getElementById("subtitle").textContent = course.courseSubtitle;
+        document.getElementById("description").textContent = course.courseDescription;
+        document.getElementById("dates").textContent = `${new Date(course.courseDates.start).toLocaleDateString()} - ${new Date(course.courseDates.end).toLocaleDateString()}`;
+        document.getElementById("days").textContent = course.courseDays.join(', ');
+        document.getElementById("time").textContent = `${course.courseTime.start} - ${course.courseTime.end}`;
+        document.getElementById("access").textContent = course.accessType;
+        document.getElementById("duration").textContent = course.courseDuration;
+        document.getElementById("price").textContent = course.coursePrice;
+        document.getElementById("zoom").href = course.zoomLink;
+      } catch (err) {
+        console.error("Помилка при завантаженні курсу:", err);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadCourseDetails);
+  </script>
+</body>
+</html>

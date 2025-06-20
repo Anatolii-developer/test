@@ -16,10 +16,12 @@ const courseSchema = new mongoose.Schema({
   },
   accessType: String, // Відкрита група / Закрита група
   closedGroupMembers: [String], // optional user IDs
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   courseDuration: String,
   coursePrice: String,
   zoomLink: String,
   createdAt: { type: Date, default: Date.now }
+  
 });
 
 module.exports = mongoose.model('Course', courseSchema);

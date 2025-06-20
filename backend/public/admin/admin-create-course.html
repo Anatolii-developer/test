@@ -120,11 +120,10 @@
           </div>
         </div>
 
-        <div class="form-group">
+       <div class="form-group">
   <label>Оберіть учасників</label>
-  <select name="participants" id="participantsSelect" multiple>
-    <!-- Динамически заполняется -->
-  </select>
+  <select name="participants" id="participantsSelect" multiple></select>
+  <button type="button" onclick="openUserModal()" class="small-button">+ Додати нового</button>
 </div>
 
 
@@ -226,6 +225,58 @@ const formData = {
     alert("Помилка при збереженні курсу");
   }
 });
+
+
+function openUserModal() {
+  document.getElementById("userModal").style.display = "flex";
+}
+function closeUserModal() {
+  document.getElementById("userModal").style.display = "none";
+}
+
+async function createNewUser() {
+  const fullName = document.getElementById("newUserFullName").value.trim();
+  const email = document.getElementById("newUserEmail").value.trim();
+
+  if (!fullName || !email) {
+    alert("Введіть імʼя та email");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email })
+    });
+
+    const newUser = await res.json();
+
+    const select = document.getElementById("participantsSelect");
+    const option = document.createElement("option");
+    option.value = newUser._id;
+    option.textContent = newUser.fullName || newUser.email;
+    option.selected = true;
+    select.appendChild(option);
+
+    closeUserModal();
+  } catch (err) {
+    alert("Помилка при створенні користувача");
+    console.error(err);
+  }
+}
+
   </script>
+
+  <div id="userModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h3>Новий учасник</h3>
+    <input type="text" id="newUserFullName" placeholder="Імʼя та прізвище" />
+    <input type="email" id="newUserEmail" placeholder="Email" />
+    <button onclick="createNewUser()">Додати</button>
+    <button onclick="closeUserModal()">Закрити</button>
+  </div>
+</div>
+
 </body>
 </html>

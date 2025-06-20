@@ -276,12 +276,13 @@ function updateSelectedDisplay() {
 
   allUsers.forEach(user => {
     if (selectedUserIds.has(user._id)) {
-      // визуально
+      // Визуальный бейдж с кнопкой удаления
       const badge = document.createElement("span");
-      badge.textContent = user.fullName || user.email;
-      badge.className = "tag"; // можешь стилизовать
+      badge.className = "tag";
+      badge.innerHTML = `${user.fullName || user.email} <button class="remove-btn" onclick="removeSelected('${user._id}')">✖</button>`;
       container.appendChild(badge);
-      // для формы
+
+      // Hidden option для формы
       const opt = document.createElement("option");
       opt.value = user._id;
       opt.selected = true;
@@ -289,6 +290,13 @@ function updateSelectedDisplay() {
     }
   });
 }
+
+
+function removeSelected(id) {
+  selectedUserIds.delete(id);
+  updateSelectedDisplay();
+}
+
 
 function confirmParticipants() {
   const checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');

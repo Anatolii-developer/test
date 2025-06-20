@@ -24,7 +24,6 @@
     <!-- Навигация -->
     <nav>
       <a href="admin-requests.html"><img src="../assets/sidebar/profile.svg" /><span>Профайли</span></a>
-      <a href="admin-certificate.html"><img src="../assets/sidebar/news.svg" /><span>Сертифікати</span></a>
       <a href="#"><img src="../assets/sidebar/3.svg" /><span>Планування кар'єри</span></a>
       <a href="#"><img src="../assets/sidebar/4.svg" /><span>Бібліотека</span></a>
       <a href="admin-all-courses.html"><img src="../assets/sidebar/5.svg" /><span>Курси</span></a>
@@ -122,6 +121,14 @@
         </div>
 
         <div class="form-group">
+  <label>Оберіть учасників</label>
+  <select name="participants" id="participantsSelect" multiple>
+    <!-- Динамически заполняется -->
+  </select>
+</div>
+
+
+        <div class="form-group">
           <label>Тривалість курсу</label>
           <input type="text" name="courseDuration" placeholder="Наприклад: 4 тижні, 8 занять" />
         </div>
@@ -158,6 +165,27 @@ function logoutUser() {
   window.location.href = "login.html";
 }
 
+
+async function loadParticipants() {
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/users"); // 🟡 путь должен соответствовать твоему API
+    const users = await res.json();
+
+    const select = document.getElementById("participantsSelect");
+    users.forEach(user => {
+      const option = document.createElement("option");
+      option.value = user._id;
+      option.textContent = user.fullName || user.email || "User";
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Помилка при завантаженні учасників", err);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", loadParticipants);
+
+
 document.getElementById("createCourseForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -180,6 +208,7 @@ const formData = {
   courseDuration: form.courseDuration.value,
   coursePrice: form.coursePrice.value,
   zoomLink: form.zoomLink.value,
+  participants: [...form.participants.selectedOptions].map(opt => opt.value),
 };
 
 

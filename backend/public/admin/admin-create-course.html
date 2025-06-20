@@ -172,6 +172,26 @@ function renderUserList(users) {
 }
 
 
+async function openUserModal() {
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/users");
+    const users = await res.json();
+    allUsers = users;
+    renderUserList(users);
+    document.getElementById("userModal").style.display = "flex";
+  } catch (err) {
+    console.error("Не вдалося завантажити користувачів", err);
+    alert("Помилка при відкритті модального вікна");
+  }
+}
+
+
+function closeUserModal() {
+  document.getElementById("userModal").style.display = "none";
+}
+
+
+
     function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const arrow = document.getElementById('toggleArrow');

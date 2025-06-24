@@ -319,7 +319,7 @@ async function loadUserData() {
   if (!userId) return alert("ID не задано");
 
   try {
-    const res = await fetch(`http://localhost:5000/api/${userId}`);
+   const res = await fetch(`http://157.230.121.24:5050/api/${userId}`);
     const user = await res.json();
 
     // Имя

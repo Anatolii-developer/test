@@ -79,3 +79,65 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const nodemailer = require("nodemailer");
+
+exports.sendRecoveryCode = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.recoveryCode = code;
+    await user.save();
+
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_FROM,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Код для відновлення паролю",
+      text: `Ваш код для відновлення паролю: ${code}`
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "Код надіслано на пошту" });
+  } catch (error) {
+    console.error("sendRecoveryCode error:", error);
+    res.status(500).json({ message: "Не вдалося надіслати лист" });
+  }
+};
+
+
+const path = require("path");
+
+const uploadUserPhoto = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const photoPath = req.file ? `/uploads/${req.file.filename}` : null;
+
+    if (!photoPath) return res.status(400).json({ message: "Фото не надіслано." });
+
+    const user = await User.findByIdAndUpdate(userId, { photoUrl: photoPath }, { new: true });
+    res.json({ message: "Фото оновлено", photoUrl: photoPath });
+  } catch (err) {
+    console.error("Photo upload error:", err);
+    res.status(500).json({ message: "Помилка сервера." });
+  }
+};
+
+// Экспортируй
+module.exports = {
+  ...exports,
+  uploadUserPhoto,
+};

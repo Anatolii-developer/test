@@ -248,44 +248,6 @@
 .cert-btn.active {
   background-color: #3DA647;
 }
-
-
-#topicSelect {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  padding: 8px 12px;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  border: 1px solid #275D2B;
-  width: 100%;
-  max-width: 400px;
-}
-
-#selectedTopicsList {
-  list-style: none;
-  padding-left: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-#selectedTopicsList li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-#selectedTopicsList li img {
-  width: 24px;
-  height: 24px;
-}
-
-#selectedTopicsList li span {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
-  color: #1B2A41;
-}
-
   </style>
 </head>
 <body>
@@ -322,19 +284,15 @@
         </div>
       </div>
      <div class="work-list">
-  <h4>Працюю з</h4>
-  <select id="topicSelect">
-    <option disabled selected>Оберіть тему</option>
-    <option value="депресія">депресія</option>
-    <option value="тривожні стани">тривожні стани</option>
-    <option value="депресивні стани">депресивні стани</option>
-    <option value="панічні атаки">панічні атаки</option>
-    <option value="адаптація міграції">адаптація міграції</option>
-  </select>
-
-  <ul id="selectedTopicsList"></ul>
-</div>
-
+       <h4>Працюю з</h4>
+        <ul>
+        <li><img src="./assets/checker.png" alt="check" /><span>депресія</span></li>
+       <li><img src="./assets/checker.png" alt="check" /><span>тривожні стани</span></li>
+        <li><img src="./assets/checker.png" alt="check" /><span>депресивні стани</span></li>
+        <li><img src="./assets/checker.png" alt="check" /><span>панічні атаки</span></li>
+        <li><img src="./assets/checker.png" alt="check" /><span>адаптація міграції</span></li>
+        </ul>
+        </div>
 
       <div class="roles">
         <h4>Роль в компанії</h4>
@@ -356,8 +314,6 @@
     </div>
   </div>
   <script>
-
-    
 async function loadUserData() {
   const userId = getUserIdFromUrl();
   if (!userId) return alert("ID не задано");
@@ -408,25 +364,6 @@ async function loadUserData() {
         workList.appendChild(li);
       });
     }
-
-
-    const topicSelect = document.getElementById("topicSelect");
-const topicList = document.getElementById("selectedTopicsList");
-
-topicSelect.addEventListener("change", () => {
-  const value = topicSelect.value;
-  if (!value) return;
-
-  // Проверка — уже есть?
-  const exists = Array.from(topicList.children).some(li =>
-    li.querySelector("span").textContent === value
-  );
-  if (exists) return;
-
-  const li = document.createElement("li");
-  li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${value}</span>`;
-  topicList.appendChild(li);
-});
 
     // Роли
     const roleTags = document.querySelector(".role-tags");

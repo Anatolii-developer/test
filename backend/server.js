@@ -24,6 +24,8 @@ const uploadRoutes = require('./routes/uploadRoutes');
 app.use(uploadRoutes); // без префикса, потому что маршрут уже включает /api/users
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static("uploads"));
+
 
 const courseRoutes = require('./routes/courseRoutes');
 app.use('/api/courses', courseRoutes);

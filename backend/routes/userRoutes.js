@@ -1,5 +1,4 @@
 const express = require('express');
-const { sendRecoveryCode } = require('../controllers/userController');
 const { registerUser, getAllUsers, getUserById, updateUserStatus, loginUser, updateUser, sendRecoveryCode} = require('../controllers/userController');
 const router = express.Router();
 const multer = require("multer");

@@ -448,6 +448,34 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 
+async function sendRecoveryCode() {
+  const email = document.getElementById("email").value.trim();
+  if (!email) {
+    alert("Будь ласка, введіть email.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("✅ Код надіслано на пошту.");
+      // Можна перейти на сторінку введення коду (якщо є)
+      // window.location.href = "reset-code.html";
+    } else {
+      alert("❌ " + result.message);
+    }
+  } catch (err) {
+    console.error("Server error:", err);
+    alert("Помилка сервера.");
+  }
+}
+
 
 function editField(fieldId) {
   const span = document.getElementById(fieldId);
@@ -556,14 +584,52 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+async function uploadProfilePhoto(file) {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (!storedUser) {
+    alert("Please log in first.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("photo", file); // "photo" — имя поля на сервере
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}/photo`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("Фото оновлено!");
+      document.getElementById("profilePhoto").src = result.photoUrl; // обновляем фото
+    } else {
+      alert("Помилка: " + result.message);
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    alert("Серверна помилка.");
+  }
+}
+
+
 
 function previewPhoto(event) {
+  const file = event.target.files[0];
   const reader = new FileReader();
+
   reader.onload = function () {
     const img = document.getElementById("profilePhoto");
-    img.src = reader.result;
+    img.src = reader.result; // превью
   };
-  reader.readAsDataURL(event.target.files[0]);
+
+  reader.readAsDataURL(file);
+
+  // Загрузка на сервер
+  if (file) {
+    uploadProfilePhoto(file);
+  }
 }
 
 

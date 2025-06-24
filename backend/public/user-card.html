@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Картка спеціаліста</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+  <script>
+    function getUserIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("id");
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    .profile-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .profile-left {
+      flex: 0 0 auto;
+    }
+    .profile-left img {
+      width: 100%;
+      border-radius: 12px;
+    }
+    .profile-card {
+      width: 100%;
+      max-width: 412px;
+      height: auto;
+      border: 2px solid #E5EAF3;
+      border-radius: 20px;
+      background-color: white;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .profile-photo {
+      width: 100%;
+      height: 370px;
+      object-fit: cover;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+    .profile-info {
+      padding: 20px;
+      text-align: center;
+    }
+    .profile-info h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 10px 0 6px;
+      color: #1B2A41;
+    }
+    .profile-info .availability {
+      font-size: 14px;
+      color: #1B2A41;
+      margin-bottom: 16px;
+    }
+    .tags {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tags span {
+      border: 1px solid #1B2A41;
+      border-radius: 16px;
+      padding: 4px 12px;
+      font-size: 13px;
+      color: #1B2A41;
+    }
+    .contact-btn {
+        width: 388px;
+      background-color: #1C5D2F;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .contact-btn:hover {
+      background-color: #174d27;
+    }
+    .profile-right {
+      flex: 1;
+    }
+    .profile-right h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .info-boxes {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .info-box {
+      width: 236px;
+      height: 80px;
+      border: 2px solid #E37009;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .info-box .big {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 24px;
+      color: #1B2A41;
+    }
+    .info-box .small {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: #1B2A41;
+    }
+    .work-list h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: #1B2A41;
+  margin-bottom: 16px;
+}
+
+.work-list ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.work-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.work-list li img {
+  width: 24px;
+  height: 24px;
+}
+
+.work-list li span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: #1B2A41;
+}
+
+    .roles h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: #1B263A;
+}
+
+.role-tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.role-tag {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: #1B263A;
+  border: 1px solid #1B263A;
+  border-radius: 24px;
+  padding: 6px 20px;
+  display: inline-block;
+}
+
+.certificates-section {
+  max-width: 1200px;
+  margin: 60px auto 40px; /* Больше отступ сверху */
+  padding: 0 20px;
+  text-align: center;
+}
+
+
+.certificates-section h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: #1B263A;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.certificate-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap; /* теперь можно переносить */
+}
+
+
+.cert-btn {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  background-color: #275D2B;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 372px;
+  height: 48px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.cert-btn:hover {
+  background-color: #26742c;
+}
+
+.cert-btn.active {
+  background-color: #3DA647;
+}
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <div class="profile-left">
+      <div class="profile-card">
+        <img src="./assets/ava.png" alt="Фото спеціаліста" class="profile-photo" />
+        <div class="profile-info">
+          <h2>Анна Олександрівна Денисова</h2>
+          <p class="availability">Онлайн | Офлайн</p>
+          <div class="tags">
+            <span>Психолог</span>
+            <span>Психоаналітик</span>
+            <span>Психотерапевт</span>
+          </div>
+          <button class="contact-btn">Звернутись</button>
+        </div>
+      </div>
+    </div>
+    <div class="profile-right">
+      <h3>Загальна інформація</h3>
+      <div class="info-boxes">
+        <div class="info-box">
+          <div class="big">від 1000₴</div>
+          <div class="small">за сеанс</div>
+        </div>
+        <div class="info-box">
+          <div class="big">7 років</div>
+          <div class="small">досвіду роботи</div>
+        </div>
+        <div class="info-box">
+          <div class="big">Офлайн</div>
+          <div class="small">Київ</div>
+        </div>
+      </div>
+     <div class="work-list">
+       <h4>Працюю з</h4>
+        <ul>
+        <li><img src="./assets/checker.png" alt="check" /><span>депресія</span></li>
+       <li><img src="./assets/checker.png" alt="check" /><span>тривожні стани</span></li>
+        <li><img src="./assets/checker.png" alt="check" /><span>депресивні стани</span></li>
+        <li><img src="./assets/checker.png" alt="check" /><span>панічні атаки</span></li>
+        <li><img src="./assets/checker.png" alt="check" /><span>адаптація міграції</span></li>
+        </ul>
+        </div>
+
+      <div class="roles">
+        <h4>Роль в компанії</h4>
+      <div class="role-tags">
+        <span class="role-tag">Ментор</span>
+        <span class="role-tag">Супервізор</span>
+        </div>
+        </div>
+
+      </div> 
+      </div><!-- Закрывает .profile-container -->
+
+  <div class="certificates-section">
+    <h3>Сертифікати</h3>
+    <div class="certificate-buttons">
+      <button class="cert-btn active">Підвищення кваліфікації</button>
+      <button class="cert-btn">Проходження курсів</button>
+      <button class="cert-btn">Проходження конференцій</button>
+    </div>
+  </div>
+  <script>
+async function loadUserData() {
+  const userId = getUserIdFromUrl();
+  if (!userId) return alert("ID не задано");
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/${userId}`);
+    const user = await res.json();
+
+    // Имя
+    document.querySelector("h2").textContent = `${user.firstName || ""} ${user.middleName || ""} ${user.lastName || ""}`;
+
+    // Фото
+    if (user.photoUrl) {
+      document.querySelector(".profile-photo").src = user.photoUrl;
+    }
+
+    // Формат (Онлайн / Офлайн)
+    document.querySelector(".availability").textContent = user.format || "Формат не вказано";
+
+    // Направления
+    const tags = document.querySelector(".tags");
+    tags.innerHTML = "";
+    if (Array.isArray(user.directions)) {
+      user.directions.forEach(tag => {
+        const span = document.createElement("span");
+        span.textContent = tag;
+        tags.appendChild(span);
+      });
+    }
+
+    // Стоимость
+    document.querySelector(".info-boxes .info-box:nth-child(1) .big").textContent = `від ${user.cost || "?"}₴`;
+
+    // Опыт
+    document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.experience || "?";
+
+    // Город
+    document.querySelector(".info-boxes .info-box:nth-child(3) .big").textContent = user.format || "—";
+    document.querySelector(".info-boxes .info-box:nth-child(3) .small").textContent = "Місто не вказано";
+
+    // Темы (topics)
+    const workList = document.querySelector(".work-list ul");
+    workList.innerHTML = "";
+    if (Array.isArray(user.topics)) {
+      user.topics.forEach(topic => {
+        const li = document.createElement("li");
+        li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${topic}</span>`;
+        workList.appendChild(li);
+      });
+    }
+
+    // Роли
+    const roleTags = document.querySelector(".role-tags");
+    roleTags.innerHTML = "";
+    if (user.role) {
+      user.role.split(",").forEach(role => {
+        const span = document.createElement("span");
+        span.className = "role-tag";
+        span.textContent = role.trim();
+        roleTags.appendChild(span);
+      });
+    }
+
+    // Сертификаты — если хочешь сделать кнопки рабочими
+    if (user.certificates?.ua?.url) {
+      const btn1 = document.querySelector(".cert-btn:nth-child(1)");
+      btn1.classList.add("active");
+      btn1.onclick = () => window.open(user.certificates.ua.url, "_blank");
+    }
+
+    if (user.certificates?.eng?.url) {
+      const btn2 = document.querySelector(".cert-btn:nth-child(2)");
+      btn2.classList.add("active");
+      btn2.onclick = () => window.open(user.certificates.eng.url, "_blank");
+    }
+
+  } catch (error) {
+    console.error("Помилка при завантаженні користувача:", error);
+    alert("Помилка при завантаженні даних.");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadUserData);
+</script>
+
+</body>
+
+  
+</body>
+</html>

@@ -401,17 +401,23 @@ async function loadUserData() {
     }
 
 
-    // Опыт
-    document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.experience || "?";
+       // Опыт и Город
+    const infoBoxes = document.querySelectorAll(".info-boxes .info-box");
+
+    if (infoBoxes.length > 0) {
+      infoBoxes[0].querySelector(".big").textContent = user.experience || "?";
+      infoBoxes[0].querySelector(".small").textContent = "досвіду роботи";
+    }
+
+    if (infoBoxes.length > 1) {
+      infoBoxes[1].querySelector(".big").textContent = user.format || "—";
+      infoBoxes[1].querySelector(".small").textContent = user.city || "Місто не вказано";
+    }
 
     // Основний досвід
-const mainExperienceText = document.getElementById("mainExperienceText");
-mainExperienceText.textContent = user.experience || "—";
+    const mainExperienceText = document.getElementById("mainExperienceText");
+    mainExperienceText.textContent = user.experience || "—";
 
-
-    // Город
-    document.querySelector(".info-boxes .info-box:nth-child(3) .big").textContent = user.format || "—";
-    document.querySelector(".info-boxes .info-box:nth-child(3) .small").textContent = "Місто не вказано";
 
     // Темы (topics)
     const workList = document.querySelector(".work-list ul");

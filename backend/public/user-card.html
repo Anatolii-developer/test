@@ -279,15 +279,36 @@
   font-size: 24px;
   color: #1B2A41;
   margin-top: 40px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
-#mainExperienceText {
+.main-experience ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.main-experience li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.main-experience li img {
+  width: 24px;
+  height: 24px;
+}
+
+.main-experience li span {
   font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
   font-size: 20px;
   color: #1B2A41;
-  line-height: 1.5;
 }
+
 
 
   </style>
@@ -344,7 +365,7 @@
 
   <div class="main-experience">
   <h4>Досвід</h4>
-  <p id="mainExperienceText"></p>
+  <ul id="mainExperienceList"></ul>
 </div>
 
 
@@ -404,9 +425,16 @@ async function loadUserData() {
     // Опыт
     document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.experience || "?";
 
-    // Основний досвід
-const mainExperienceText = document.getElementById("mainExperienceText");
-mainExperienceText.textContent = user.directions || "—";
+const mainExperienceList = document.getElementById("mainExperienceList");
+mainExperienceList.innerHTML = "";
+if (user.experience) {
+  user.experience.split(",").forEach(exp => {
+    const li = document.createElement("li");
+    li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${exp.trim()}</span>`;
+    mainExperienceList.appendChild(li);
+  });
+}
+
 
 
     // Город

@@ -390,13 +390,13 @@
       <button class="cert-btn">Проходження конференцій</button>
     </div>
   </div>
-  <script>
+<script>
 async function loadUserData() {
   const userId = getUserIdFromUrl();
   if (!userId) return alert("ID не задано");
 
   try {
-   const res = await fetch(`/api/users/${userId}`);
+    const res = await fetch(`/api/users/${userId}`);
     const user = await res.json();
 
     // Имя
@@ -410,37 +410,33 @@ async function loadUserData() {
     // Формат (Онлайн / Офлайн)
     document.querySelector(".availability").textContent = user.format || "Формат не вказано";
 
-    // Направления
+    // Направления (в "tags")
     const tags = document.querySelector(".tags");
     tags.innerHTML = "";
-if (Array.isArray(user.directions)) {
-  user.directions.forEach(exp => {
-    const li = document.createElement("li");
-    li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${exp}</span>`;
-    mainExperienceList.appendChild(li);
-  });
-}
+    if (Array.isArray(user.directions)) {
+      user.directions.forEach(dir => {
+        const span = document.createElement("span");
+        span.textContent = dir;
+        tags.appendChild(span);
+      });
+    }
 
+    // Опыт (в "Досвід")
+    const mainExperienceList = document.getElementById("mainExperienceList");
+    mainExperienceList.innerHTML = "";
+    if (Array.isArray(user.directions)) {
+      user.directions.forEach(exp => {
+        const li = document.createElement("li");
+        li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${exp}</span>`;
+        mainExperienceList.appendChild(li);
+      });
+    }
 
-
-    // Опыт
-    document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.directions || "?";
-
-const mainExperienceList = document.getElementById("mainExperienceList");
-mainExperienceList.innerHTML = "";
-if (user.directions) {
-  user.directions.split(",").forEach(exp => {
-    const li = document.createElement("li");
-    li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${exp.trim()}</span>`;
-    mainExperienceList.appendChild(li);
-  });
-}
-
-
-
-    // Город
-    document.querySelector(".info-boxes .info-box:nth-child(3) .big").textContent = user.format || "—";
-    document.querySelector(".info-boxes .info-box:nth-child(3) .small").textContent = "Місто не вказано";
+    // Город и формат
+    const boxes = document.querySelectorAll(".info-boxes .info-box");
+    boxes[0].querySelector(".big").textContent = user.experience || "—";
+    boxes[1].querySelector(".big").textContent = user.format || "—";
+    boxes[1].querySelector(".small").textContent = user.city || "Місто не вказано";
 
     // Темы (topics)
     const workList = document.querySelector(".work-list ul");
@@ -465,18 +461,20 @@ if (user.directions) {
       });
     }
 
-    // Сертификаты — если хочешь сделать кнопки рабочими
-    if (user.certificates?.ua?.url) {
-      const btn1 = document.querySelector(".cert-btn:nth-child(1)");
-      btn1.classList.add("active");
-      btn1.onclick = () => window.open(user.certificates.ua.url, "_blank");
-    }
+    // Сертификаты
+    const uaBtn = document.querySelector(".cert-btn:nth-child(1)");
+    const engBtn = document.querySelector(".cert-btn:nth-child(2)");
+    const confBtn = document.querySelector(".cert-btn:nth-child(3)");
 
-    if (user.certificates?.eng?.url) {
-      const btn2 = document.querySelector(".cert-btn:nth-child(2)");
-      btn2.classList.add("active");
-      btn2.onclick = () => window.open(user.certificates.eng.url, "_blank");
+    if (user.certificates?.ua?.url) {
+      uaBtn.classList.add("active");
+      uaBtn.onclick = () => window.open(user.certificates.ua.url, "_blank");
     }
+    if (user.certificates?.eng?.url) {
+      engBtn.classList.add("active");
+      engBtn.onclick = () => window.open(user.certificates.eng.url, "_blank");
+    }
+    // можно добавить ещё для конференций, если будет отдельный ключ
 
   } catch (error) {
     console.error("Помилка при завантаженні користувача:", error);

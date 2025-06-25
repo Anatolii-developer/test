@@ -423,12 +423,12 @@ async function loadUserData() {
 
 
     // Опыт
-    document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.experience || "?";
+    document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.directions || "?";
 
 const mainExperienceList = document.getElementById("mainExperienceList");
 mainExperienceList.innerHTML = "";
-if (user.experience) {
-  user.experience.split(",").forEach(exp => {
+if (user.directions) {
+  user.directions.split(",").forEach(exp => {
     const li = document.createElement("li");
     li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${exp.trim()}</span>`;
     mainExperienceList.appendChild(li);

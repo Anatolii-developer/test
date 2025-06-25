@@ -42,7 +42,7 @@
     font-size: 16px;
     margin-right: 40px;
   }
-
+  
     .profile-container {
       display: flex;
       flex-wrap: wrap;
@@ -279,42 +279,21 @@
   font-size: 24px;
   color: #1B2A41;
   margin-top: 40px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-.main-experience ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.main-experience li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.main-experience li img {
-  width: 24px;
-  height: 24px;
-}
-
-.main-experience li span {
+#mainExperienceText {
   font-family: 'Montserrat', sans-serif;
-  font-weight: 400;
   font-size: 20px;
   color: #1B2A41;
+  line-height: 1.5;
 }
-
 
 
   </style>
 </head>
 <body>
-  <header>
+  <header >
   <a href="https://mamko-prof-supervision.com/" target="_blank" rel="noopener noreferrer">
     <img class="logo" src="./assets/logo.png" alt="Institute Logo" style="height: 40px;" />
   </a>
@@ -365,7 +344,7 @@
 
   <div class="main-experience">
   <h4>Досвід</h4>
-  <ul id="mainExperienceList"></ul>
+  <p id="mainExperienceText"></p>
 </div>
 
 
@@ -427,7 +406,7 @@ async function loadUserData() {
 
     // Основний досвід
 const mainExperienceText = document.getElementById("mainExperienceText");
-mainExperienceText.textContent = user.directions || "—";
+mainExperienceText.textContent = user.experience || "—";
 
 
     // Город

@@ -651,6 +651,17 @@ function toggleSidebar() {
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutButton = document.querySelector(".logout");
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    });
+  }
+});
+
+
 function setupDateFilterButton() {
   const inputs = document.querySelectorAll('.date-input');
   const button = document.querySelector('.filter-btn');

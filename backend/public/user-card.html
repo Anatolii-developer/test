@@ -413,13 +413,14 @@ async function loadUserData() {
     // Направления
     const tags = document.querySelector(".tags");
     tags.innerHTML = "";
-    if (Array.isArray(user.directions)) {
-      user.directions.forEach(tag => {
-        const span = document.createElement("span");
-        span.textContent = tag;
-        tags.appendChild(span);
-      });
-    }
+if (Array.isArray(user.directions)) {
+  user.directions.forEach(exp => {
+    const li = document.createElement("li");
+    li.innerHTML = `<img src="./assets/checker.png" alt="check" /><span>${exp}</span>`;
+    mainExperienceList.appendChild(li);
+  });
+}
+
 
 
     // Опыт

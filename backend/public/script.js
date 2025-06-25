@@ -28,12 +28,19 @@ async function login() {
 
 
 function saveLoginAndContinue() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  const confirmPassword = document.getElementById("confirm-password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const confirmPassword = document.getElementById("confirm-password").value.trim();
 
   if (!username || !password || !confirmPassword) {
     alert("Будь ласка, заповніть всі поля.");
+    return;
+  }
+
+  // Проверка: не email ли это
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (emailPattern.test(username)) {
+    alert("Придумайте username, а не email.");
     return;
   }
 

@@ -13,12 +13,36 @@
     }
   </script>
   <style>
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f9f9f9;
     }
+
+    header {
+    background-color: #275D2B;
+    height: 80px;
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 156.48px;
+    height: 48px;
+    object-fit: contain;
+    margin-left: 110px;
+  }
+  
+  .language-select {
+    color: white;
+    font-size: 16px;
+    margin-right: 40px;
+  }
+
     .profile-container {
       display: flex;
       flex-wrap: wrap;
@@ -248,9 +272,37 @@
 .cert-btn.active {
   background-color: #3DA647;
 }
+
+.main-experience h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: #1B2A41;
+  margin-top: 40px;
+  margin-bottom: 12px;
+}
+
+#mainExperienceText {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  color: #1B2A41;
+  line-height: 1.5;
+}
+
+
   </style>
 </head>
 <body>
+  <header>
+  <a href="https://mamko-prof-supervision.com/" target="_blank" rel="noopener noreferrer">
+    <img class="logo" src="./assets/logo.png" alt="Institute Logo" style="height: 40px;" />
+  </a>
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <button onclick="window.history.back()" style="font-family: 'Montserrat', sans-serif; background-color: #E5EAF3; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">← До Дому</button>
+    <div class="language-select">UA ▼</div>
+  </div>
+</header>
+
   <div class="profile-container">
     <div class="profile-left">
       <div class="profile-card">
@@ -271,10 +323,6 @@
       <h3>Загальна інформація</h3>
       <div class="info-boxes">
         <div class="info-box">
-          <div class="big">від 1000₴</div>
-          <div class="small">за сеанс</div>
-        </div>
-        <div class="info-box">
           <div class="big">7 років</div>
           <div class="small">досвіду роботи</div>
         </div>
@@ -294,9 +342,17 @@
         </ul>
         </div>
 
-      <div class="roles">
+  <div class="main-experience">
+  <h4>Досвід</h4>
+  <p id="mainExperienceText"></p>
+</div>
+
+
+        
+
+        <div class="roles">
         <h4>Роль в компанії</h4>
-      <div class="role-tags">
+        <div class="role-tags">
         <span class="role-tag">Ментор</span>
         <span class="role-tag">Супервізор</span>
         </div>
@@ -344,11 +400,14 @@ async function loadUserData() {
       });
     }
 
-    // Стоимость
-    document.querySelector(".info-boxes .info-box:nth-child(1) .big").textContent = `від ${user.cost || "?"}₴`;
 
     // Опыт
     document.querySelector(".info-boxes .info-box:nth-child(2) .big").textContent = user.experience || "?";
+
+    // Основний досвід
+const mainExperienceText = document.getElementById("mainExperienceText");
+mainExperienceText.textContent = user.experience || "—";
+
 
     // Город
     document.querySelector(".info-boxes .info-box:nth-child(3) .big").textContent = user.format || "—";

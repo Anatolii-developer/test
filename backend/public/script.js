@@ -439,7 +439,7 @@ function handleSubmit() {
 window.addEventListener("DOMContentLoaded", () => {
   const profileData = JSON.parse(localStorage.getItem("userProfile"));
   if (profileData) {
-    document.getElementById("profileUsername").textContent = user.username || "";
+    document.getElementById("profileUsername").textContent = profileData.username || "";
     document.getElementById("profileFirstName").textContent = profileData.firstName || "";
     document.getElementById("profileLastName").textContent = profileData.lastName || "";
     document.getElementById("profileMiddleName").textContent = profileData.middleName || "";

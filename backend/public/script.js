@@ -439,7 +439,8 @@ function handleSubmit() {
 window.addEventListener("DOMContentLoaded", () => {
   const profileData = JSON.parse(localStorage.getItem("userProfile"));
   if (profileData) {
-    document.getElementById("profileUsername").textContent = user.username || "";
+   const profileData = JSON.parse(localStorage.getItem("userProfile"));
+    document.getElementById("profileUsername").textContent = profileData?.username || "";
     document.getElementById("profileFirstName").textContent = profileData.firstName || "";
     document.getElementById("profileLastName").textContent = profileData.lastName || "";
     document.getElementById("profileMiddleName").textContent = profileData.middleName || "";
@@ -533,10 +534,11 @@ function editField(fieldId, mongoKey) {
 
     try {
       const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [mongoKey]: newValue }),
-      });
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ [mongoKey]: newValue }),
+    });
+
 
       const result = await res.json();
 

@@ -95,13 +95,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
        document.getElementById("profileAboutTextarea").value = user.about || "";
   document.getElementById("profileCoursesTextarea").value = user.courses || "";
-  document.getElementById("profileRole").textContent = user.role || "";
-  document.getElementById("profileCost").textContent = user.cost || "";
-  document.getElementById("profileVideoLink").textContent = user.videoLink || "";
-  document.getElementById("profileQualifications").textContent = user.qualifications || "";
-  document.getElementById("profileExperienceExtra").textContent = user.experienceExtra || "";
-  document.getElementById("profileLanguage").textContent = user.language || "";
-  document.getElementById("profileFormat").textContent = user.format || "";
+  document.getElementById("profileRoleTextarea").value = user.role || "";
+  document.getElementById("profileCostTextarea").value = user.cost || "";
+  document.getElementById("profileVideoLink").value = user.videoLink || "";
+  document.getElementById("profileQualifications").value = user.qualifications || "";
+  document.getElementById("profileExperienceExtra").value = user.experienceExtra || "";
+  document.getElementById("profileLanguage").value = user.language || "";
+  document.getElementById("profileFormat").value = user.format || "";
       
       window.currentUser = user;
       // ✅ Инициализация textarea "Про мене"

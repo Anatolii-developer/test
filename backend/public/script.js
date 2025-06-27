@@ -93,6 +93,15 @@ window.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("profileEducation").textContent = user.education || "";
       document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
       document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
+       document.getElementById("profileAbout").textContent = user.about || "";
+  document.getElementById("profileCourses").textContent = user.courses || "";
+  document.getElementById("profileRole").textContent = user.role || "";
+  document.getElementById("profileCost").textContent = user.cost || "";
+  document.getElementById("profileVideoLink").textContent = user.videoLink || "";
+  document.getElementById("profileQualifications").textContent = user.qualifications || "";
+  document.getElementById("profileExperienceExtra").textContent = user.experienceExtra || "";
+  document.getElementById("profileLanguage").textContent = user.language || "";
+  document.getElementById("profileFormat").textContent = user.format || "";
       
       window.currentUser = user;
     } catch (err) {
@@ -102,6 +111,48 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const textarea = document.getElementById("profileAboutTextarea");
+  const checkIcon = document.getElementById("aboutCheckIcon");
+
+  // Заполнить textarea данными пользователя
+  if (window.currentUser && window.currentUser.about) {
+    textarea.value = window.currentUser.about;
+  }
+
+  // Показывать галочку при изменении
+  textarea.addEventListener("input", () => {
+    checkIcon.style.display = "inline";
+  });
+
+  // Обновить данные при нажатии на галочку
+  checkIcon.addEventListener("click", async () => {
+    const newValue = textarea.value.trim();
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ about: newValue }),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        checkIcon.style.display = "none";
+        alert("Збережено!");
+      } else {
+        alert("Помилка при збереженні: " + result.message);
+      }
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Серверна помилка.");
+    }
+  });
+});
 
 
 

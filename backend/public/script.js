@@ -524,52 +524,40 @@ function editField(fieldId, mongoKey) {
   input.focus();
 
   checkIcon.addEventListener("click", async () => {
-    const newValue = input.value.trim();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
-      alert("Будь ласка, увійдіть спочатку.");
-      window.location.href = "index.html";
-      return;
-    }
+  const selected = checkboxes
+    .filter(({ square }) => square.classList.contains("checked"))
+    .map(({ value }) => value);
 
-    try {
-      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ [mongoKey]: newValue }),
+  updatedProfileData[mongoKey] = selected;
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [mongoKey]: selected }),
     });
 
+    const result = await res.json();
 
-      const result = await res.json();
-
-      if (res.ok) {
-        // Создать новый span с обновлённым текстом
-        const newSpan = document.createElement("span");
-        newSpan.id = fieldId;
-        newSpan.textContent = newValue;
-        newSpan.className = "profile-value";
-
-        // Создать иконку редактирования заново
-        const newPencil = document.createElement("img");
-        newPencil.src = "assets/edit-icon.svg";
-        newPencil.className = "edit-icon";
-        newPencil.style.cursor = "pointer";
-        newPencil.onclick = () => editField(fieldId, mongoKey);
-
-        // Очистить wrapper и вернуть всё обратно
-        wrapper.innerHTML = "";
-        wrapper.appendChild(newSpan);
-        wrapper.appendChild(newPencil);
-
-        alert("Зміни збережено!");
-      } else {
-        alert("Помилка при збереженні: " + result.message);
-      }
-    } catch (err) {
-      console.error("Помилка при оновленні:", err);
-      alert("Серверна помилка.");
+    if (res.ok) {
+      const newSpan = document.createElement("span");
+      newSpan.id = fieldId;
+      newSpan.textContent = selected.join(", ");
+      checkboxContainer.remove();
+      checkIcon.remove();
+      container.appendChild(newSpan);
+      alert("Збережено!");
+    } else {
+      alert("Помилка при збереженні: " + result.message);
     }
-  });
+  } catch (err) {
+    console.error("❌ Error saving checkboxes:", err);
+    alert("Серверна помилка.");
+  }
+});
+
 }
 
 

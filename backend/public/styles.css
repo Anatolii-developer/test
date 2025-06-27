@@ -874,6 +874,38 @@
   opacity: 1;
 }
 
+.textarea-wrapper {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.edit-textarea {
+  width: 910px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.check-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin-top: 6px;
+  opacity: 0.8;
+}
+.check-icon:hover {
+  opacity: 1;
+}
+
+
 
 .edit-input {
   width: 100%;

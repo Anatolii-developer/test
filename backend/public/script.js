@@ -545,36 +545,6 @@ function editField(fieldId, mongoKey) {
 }
 
 
-  function saveEdit() {
-    const newValue = input.value.trim();
-
-    const newSpan = document.createElement("span");
-    newSpan.id = fieldId;
-    newSpan.textContent = newValue;
-    newSpan.className = "profile-value";
-
-    input.replaceWith(newSpan);
-
-    // Обновляем localStorage
-    const profileData = JSON.parse(localStorage.getItem("userProfile")) || {};
-    const keyMap = {
-      profileFirstName: "firstName",
-      profileLastName: "lastName",
-      profileMiddleName: "middleName",
-      profileEmail: "email",
-      profilePhone: "phone",
-      profileGender: "gender",
-    };
-    const fieldKey = keyMap[fieldId];
-    if (fieldKey) {
-      profileData[fieldKey] = newValue;
-      localStorage.setItem("userProfile", JSON.stringify(profileData));
-    }
-  }
-}
-
-
-
 function showStep(stepNumber) {
   const steps = document.querySelectorAll('.profile-step');
   const indicators = document.querySelectorAll('.progress-indicator .step');

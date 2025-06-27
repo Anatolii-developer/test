@@ -487,16 +487,27 @@ async function sendRecoveryCode() {
 function editField(fieldId) {
   const span = document.getElementById(fieldId);
   const currentValue = span.textContent;
-  
-  // Create input
+
+  const parent = span.parentElement;
+
+  // Ищем иконку ✏️
+  const editIcon = parent.querySelector('.edit-icon');
+
+  // Создаем input
   const input = document.createElement("input");
   input.type = "text";
   input.value = currentValue;
   input.className = "edit-input";
-  
-  // Replace span with input
+
+  // Заменяем span на input
   span.replaceWith(input);
   input.focus();
+
+  // Меняем ✏️ на ✅
+  if (editIcon) {
+    editIcon.src = "assets/check-icon.svg";
+    editIcon.classList.add("check-icon");
+  }
 
   // Save on blur or Enter
   input.addEventListener("blur", saveEdit);
@@ -506,10 +517,19 @@ function editField(fieldId) {
 
   function saveEdit() {
     const newValue = input.value;
-    
-    // Update span
-    span.textContent = newValue;
-    input.replaceWith(span);
+
+    const newSpan = document.createElement("span");
+    newSpan.id = fieldId;
+    newSpan.textContent = newValue;
+    newSpan.className = "profile-value"; // для совместимости
+
+    input.replaceWith(newSpan);
+
+    // Возвращаем ✅ обратно в ✏️
+    if (editIcon) {
+      editIcon.src = "assets/edit-icon.svg";
+      editIcon.classList.remove("check-icon");
+    }
 
     // Save to localStorage
     const profileData = JSON.parse(localStorage.getItem("userProfile")) || {};
@@ -528,6 +548,7 @@ function editField(fieldId) {
     }
   }
 }
+
 
 
 function showStep(stepNumber) {

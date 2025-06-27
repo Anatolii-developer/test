@@ -105,28 +105,29 @@ window.addEventListener("DOMContentLoaded", async () => {
       
       window.currentUser = user;
       // ✅ Инициализация textarea "Про мене"
-const textarea = document.getElementById("profileAboutTextarea");
-const checkIcon = document.getElementById("aboutCheckIcon");
+const coursesTextarea = document.getElementById("profileCoursesTextarea");
+const coursesCheckIcon = document.getElementById("coursesCheckIcon");
 
-if (textarea && checkIcon) {
-  textarea.value = user.about || "";
+if (coursesTextarea && coursesCheckIcon) {
+  coursesTextarea.value = user.courses || "";
 
-  textarea.addEventListener("input", () => {
-    checkIcon.style.display = "inline";
+  coursesTextarea.addEventListener("input", () => {
+    coursesCheckIcon.style.display = "inline";
   });
 
-  checkIcon.addEventListener("click", async () => {
-    const newValue = textarea.value.trim();
+  coursesCheckIcon.addEventListener("click", async () => {
+    const newValue = coursesTextarea.value.trim();
+
     try {
       const res = await fetch(`${API_BASE}/api/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ about: newValue }),
+        body: JSON.stringify({ courses: newValue }),
       });
 
       const result = await res.json();
       if (res.ok) {
-        checkIcon.style.display = "none";
+        coursesCheckIcon.style.display = "none";
         alert("Збережено!");
       } else {
         alert("Помилка при збереженні: " + result.message);
@@ -137,6 +138,7 @@ if (textarea && checkIcon) {
     }
   });
 }
+
 
     } catch (err) {
       console.error("Failed to load user data:", err);

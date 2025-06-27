@@ -801,11 +801,13 @@
   min-width: 120px;
 }
 
+
 .profile-value-wrapper {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
 }
+
 
 .profile-value {
   font-weight: 500;

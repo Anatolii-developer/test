@@ -795,27 +795,37 @@
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
   }
 
-
-  .field-block {
-  margin-bottom: 20px;
-}
-
-.field-label {
+.profile-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 20px;
-  font-family: 'Poppins', sans-serif;
-  opacity: 0.6;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.field-value {
-  margin-top: 8px;
-  font-size: 20px;
-  font-family: 'Poppins', sans-serif;
-  white-space: pre-wrap;
-  word-break: break-word;
+.profile-label {
+  font-weight: 500;
+  min-width: 120px; /* или больше, если нужно */
+  color: #555;
 }
+
+.profile-value {
+  font-weight: bold;
+  color: #000;
+  flex-grow: 1;
+}
+
+.edit-icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.edit-icon:hover {
+  opacity: 1;
+}
+
 
 
 /* Step 2 Card Styling */

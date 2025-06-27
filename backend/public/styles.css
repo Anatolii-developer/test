@@ -795,6 +795,29 @@
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
   }
 
+
+  .field-block {
+  margin-bottom: 20px;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 20px;
+  font-family: 'Poppins', sans-serif;
+  opacity: 0.6;
+}
+
+.field-value {
+  margin-top: 8px;
+  font-size: 20px;
+  font-family: 'Poppins', sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+
 /* Step 2 Card Styling */
 #step2 .profile-card {
   width: 1110px;

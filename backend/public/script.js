@@ -421,8 +421,8 @@ if (saveBtn) {
       gender: document.querySelector('input[name="gender"]:checked')?.value || "",
       experience: document.getElementById("experience").value,
       education: document.getElementById("education").value,
-     directions: [...document.querySelectorAll('.directions-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
-topics: [...document.querySelectorAll('.topics-group input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+    directions: [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
+topics: [...document.querySelectorAll('.work-topics input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
 
       createdAt: new Date(),
       status: "WAIT FOR REVIEW"

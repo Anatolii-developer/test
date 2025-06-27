@@ -483,15 +483,19 @@ async function sendRecoveryCode() {
   }
 }
 
+
+
 function editField(fieldId, mongoKey) {
   const span = document.getElementById(fieldId);
   const currentValue = span.textContent.trim();
-  const parent = span.parentElement;
+  const wrapper = span.closest('.profile-value-wrapper');
 
-  // Удаляем старый <span>
+  // Удалить span и карандаш
+  const pencil = wrapper.querySelector('.edit-icon');
   span.remove();
+  pencil.remove();
 
-  // Создаем input
+  // Создать input
   const input = document.createElement("input");
   input.type = "text";
   input.value = currentValue;
@@ -500,16 +504,25 @@ function editField(fieldId, mongoKey) {
   input.style.fontSize = "16px";
   input.style.border = "1px solid #ccc";
   input.style.borderRadius = "8px";
-  input.style.width = "100%";
+  input.style.flex = "1"; // чтобы занял всё место
+  input.style.minWidth = "0";
 
-  parent.appendChild(input);
+  // Создать иконку подтверждения (галочка)
+  const checkIcon = document.createElement("img");
+  checkIcon.src = "assets/check-icon.svg";
+  checkIcon.className = "check-icon";
+  checkIcon.style.cursor = "pointer";
+  checkIcon.style.width = "20px";
+  checkIcon.style.height = "20px";
+  checkIcon.style.marginLeft = "8px";
+
+  // Добавить input и иконку в wrapper
+  wrapper.appendChild(input);
+  wrapper.appendChild(checkIcon);
+
   input.focus();
 
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") input.blur();
-  });
-
-  input.addEventListener("blur", async () => {
+  checkIcon.addEventListener("click", async () => {
     const newValue = input.value.trim();
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) {
@@ -528,11 +541,24 @@ function editField(fieldId, mongoKey) {
       const result = await res.json();
 
       if (res.ok) {
+        // Создать новый span с обновлённым текстом
         const newSpan = document.createElement("span");
         newSpan.id = fieldId;
         newSpan.textContent = newValue;
         newSpan.className = "profile-value";
-        parent.appendChild(newSpan);
+
+        // Создать иконку редактирования заново
+        const newPencil = document.createElement("img");
+        newPencil.src = "assets/edit-icon.svg";
+        newPencil.className = "edit-icon";
+        newPencil.style.cursor = "pointer";
+        newPencil.onclick = () => editField(fieldId, mongoKey);
+
+        // Очистить wrapper и вернуть всё обратно
+        wrapper.innerHTML = "";
+        wrapper.appendChild(newSpan);
+        wrapper.appendChild(newPencil);
+
         alert("Зміни збережено!");
       } else {
         alert("Помилка при збереженні: " + result.message);

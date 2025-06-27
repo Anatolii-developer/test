@@ -104,37 +104,21 @@ window.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("profileFormat").textContent = user.format || "";
       
       window.currentUser = user;
-    } catch (err) {
-      console.error("Failed to load user data:", err);
-      alert("Failed to load user data.");
-    }
-  }
-});
+      // ✅ Инициализация textarea "Про мене"
+const textarea = document.getElementById("profileAboutTextarea");
+const checkIcon = document.getElementById("aboutCheckIcon");
 
+if (textarea && checkIcon) {
+  textarea.value = user.about || "";
 
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const textarea = document.getElementById("profileAboutTextarea");
-  const checkIcon = document.getElementById("aboutCheckIcon");
-
-  // Заполнить textarea данными пользователя
-  if (window.currentUser && window.currentUser.about) {
-    textarea.value = window.currentUser.about;
-  }
-
-  // Показывать галочку при изменении
   textarea.addEventListener("input", () => {
     checkIcon.style.display = "inline";
   });
 
-  // Обновить данные при нажатии на галочку
   checkIcon.addEventListener("click", async () => {
     const newValue = textarea.value.trim();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-
     try {
-      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+      const res = await fetch(`${API_BASE}/api/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ about: newValue }),
@@ -152,7 +136,18 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Серверна помилка.");
     }
   });
+}
+
+    } catch (err) {
+      console.error("Failed to load user data:", err);
+      alert("Failed to load user data.");
+    }
+  }
 });
+
+
+
+
 
 
 

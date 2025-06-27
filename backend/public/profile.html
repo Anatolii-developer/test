@@ -50,10 +50,14 @@
   <section id="step1" class="profile-card-wrapper profile-step">
   <div class="profile-card">
     <div class="profile-info">
-      <p>Username: 
-  <span id="profileUsername"></span> 
-  <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileUsername', 'username')" />
-</p>
+     <div class="field-block">
+  <div class="field-label">
+    <span>Username:</span>
+    <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileUsername', 'username')" />
+  </div>
+  <div class="field-value" id="profileUsername"></div>
+</div>
+
       <p>Ім’я: 
         <span id="profileFirstName"></span> 
         <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileFirstName', 'firstName')" />

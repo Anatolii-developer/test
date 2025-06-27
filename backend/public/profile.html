@@ -157,10 +157,14 @@
 </div>
 
 
-      <p>Курси, які були пройдені в компанії: 
-        <span id="profileCourses"></span>
-        <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileCourses', 'courses')" />
-      </p>
+     <p class="label-with-textarea">Курси, які були пройдені в компанії:</p>
+<div class="textarea-wrapper">
+  <textarea id="profileCoursesTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
+  <img src="assets/check-icon.svg" class="check-icon" id="coursesCheckIcon" style="display: none;" />
+</div>
+
+
+      
 
       <p>Роль в компанії: 
         <span id="profileRole"></span>

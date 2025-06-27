@@ -483,55 +483,46 @@ async function sendRecoveryCode() {
   }
 }
 
-
 function editField(fieldId) {
   const span = document.getElementById(fieldId);
-  const currentValue = span.textContent;
-
+  const currentValue = span.textContent.trim();
   const parent = span.parentElement;
 
-  // Ищем иконку ✏️
-  const editIcon = parent.querySelector('.edit-icon');
+  // Удаляем span
+  span.remove();
 
   // Создаем input
   const input = document.createElement("input");
   input.type = "text";
   input.value = currentValue;
   input.className = "edit-input";
+  input.style.padding = "8px 12px";
+  input.style.fontSize = "16px";
+  input.style.border = "1px solid #ccc";
+  input.style.borderRadius = "8px";
+  input.style.width = "100%";
 
-  // Заменяем span на input
-  span.replaceWith(input);
+  // Вставляем input на место
+  parent.appendChild(input);
   input.focus();
 
-  // Меняем ✏️ на ✅
-  if (editIcon) {
-    editIcon.src = "assets/check-icon.svg";
-    editIcon.classList.add("check-icon");
-  }
-
-  // Save on blur or Enter
+  // Сохраняем при выходе или Enter
   input.addEventListener("blur", saveEdit);
-  input.addEventListener("keydown", function (e) {
+  input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") input.blur();
   });
 
   function saveEdit() {
-    const newValue = input.value;
+    const newValue = input.value.trim();
 
     const newSpan = document.createElement("span");
     newSpan.id = fieldId;
     newSpan.textContent = newValue;
-    newSpan.className = "profile-value"; // для совместимости
+    newSpan.className = "profile-value";
 
     input.replaceWith(newSpan);
 
-    // Возвращаем ✅ обратно в ✏️
-    if (editIcon) {
-      editIcon.src = "assets/edit-icon.svg";
-      editIcon.classList.remove("check-icon");
-    }
-
-    // Save to localStorage
+    // Обновляем localStorage
     const profileData = JSON.parse(localStorage.getItem("userProfile")) || {};
     const keyMap = {
       profileFirstName: "firstName",

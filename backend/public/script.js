@@ -483,12 +483,12 @@ async function sendRecoveryCode() {
   }
 }
 
-function editField(fieldId) {
+function editField(fieldId, mongoKey) {
   const span = document.getElementById(fieldId);
   const currentValue = span.textContent.trim();
   const parent = span.parentElement;
 
-  // Удаляем span
+  // Удаляем старый <span>
   span.remove();
 
   // Создаем input
@@ -502,15 +502,48 @@ function editField(fieldId) {
   input.style.borderRadius = "8px";
   input.style.width = "100%";
 
-  // Вставляем input на место
   parent.appendChild(input);
   input.focus();
 
-  // Сохраняем при выходе или Enter
-  input.addEventListener("blur", saveEdit);
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") input.blur();
   });
+
+  input.addEventListener("blur", async () => {
+    const newValue = input.value.trim();
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      alert("Будь ласка, увійдіть спочатку.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [mongoKey]: newValue }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        const newSpan = document.createElement("span");
+        newSpan.id = fieldId;
+        newSpan.textContent = newValue;
+        newSpan.className = "profile-value";
+        parent.appendChild(newSpan);
+        alert("Зміни збережено!");
+      } else {
+        alert("Помилка при збереженні: " + result.message);
+      }
+    } catch (err) {
+      console.error("Помилка при оновленні:", err);
+      alert("Серверна помилка.");
+    }
+  });
+}
+
 
   function saveEdit() {
     const newValue = input.value.trim();

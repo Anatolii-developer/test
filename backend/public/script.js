@@ -432,27 +432,8 @@ function handleSubmit() {
     topics: Array.from(document.querySelectorAll('.work-topics input[type="checkbox"]:checked')).map(cb => cb.parentElement.textContent.trim()),
   };
 
-  localStorage.setItem("userProfile", JSON.stringify(data));
   window.location.href = "profile.html";
 }
-
-window.addEventListener("DOMContentLoaded", () => {
-  const profileData = JSON.parse(localStorage.getItem("userProfile"));
-  if (profileData) {
-   const profileData = JSON.parse(localStorage.getItem("userProfile"));
-    document.getElementById("profileUsername").textContent = profileData?.username || "";
-    document.getElementById("profileFirstName").textContent = profileData.firstName || "";
-    document.getElementById("profileLastName").textContent = profileData.lastName || "";
-    document.getElementById("profileMiddleName").textContent = profileData.middleName || "";
-    document.getElementById("profileEmail").textContent = profileData.email || "";
-    document.getElementById("profilePhone").textContent = profileData.phone || "";
-    document.getElementById("profileGender").textContent = profileData.gender || "";
-    document.getElementById("profileExperience").textContent = profileData.experience || "";
-    document.getElementById("profileEducation").textContent = profileData.education || "";
-    document.getElementById("profileDirections").textContent = (profileData.directions || []).join(", ") + (profileData.directionOther ? ", " + profileData.directionOther : "");
-    document.getElementById("profileTopics").textContent = (profileData.topics || []).join(", ");
-  }
-});
 
 
 
@@ -491,7 +472,7 @@ function editField(fieldId, mongoKey) {
   const currentValue = span.textContent.trim();
   const wrapper = span.closest('.profile-value-wrapper');
 
-  // Удалить span и карандаш
+  // Удалить span и иконку
   const pencil = wrapper.querySelector('.edit-icon');
   span.remove();
   pencil.remove();
@@ -505,10 +486,10 @@ function editField(fieldId, mongoKey) {
   input.style.fontSize = "16px";
   input.style.border = "1px solid #ccc";
   input.style.borderRadius = "8px";
-  input.style.flex = "1"; // чтобы занял всё место
+  input.style.flex = "1";
   input.style.minWidth = "0";
 
-  // Создать иконку подтверждения (галочка)
+  // Создать галочку
   const checkIcon = document.createElement("img");
   checkIcon.src = "assets/check-icon.svg";
   checkIcon.className = "check-icon";
@@ -517,48 +498,53 @@ function editField(fieldId, mongoKey) {
   checkIcon.style.height = "20px";
   checkIcon.style.marginLeft = "8px";
 
-  // Добавить input и иконку в wrapper
+  // Вставляем input и галочку
   wrapper.appendChild(input);
   wrapper.appendChild(checkIcon);
 
   input.focus();
 
   checkIcon.addEventListener("click", async () => {
-  const selected = checkboxes
-    .filter(({ square }) => square.classList.contains("checked"))
-    .map(({ value }) => value);
+    const newValue = input.value.trim();
+    if (!newValue) return;
 
-  updatedProfileData[mongoKey] = selected;
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [mongoKey]: newValue }),
+      });
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+      const result = await res.json();
 
-  try {
-    const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [mongoKey]: selected }),
-    });
+      if (res.ok) {
+        // Обновляем DOM
+        const newSpan = document.createElement("span");
+        newSpan.id = fieldId;
+        newSpan.textContent = newValue;
+        newSpan.className = "profile-value";
 
-    const result = await res.json();
+        const newPencil = document.createElement("img");
+        newPencil.src = "assets/edit-icon.svg";
+        newPencil.className = "edit-icon";
+        newPencil.onclick = () => editField(fieldId, mongoKey);
 
-    if (res.ok) {
-      const newSpan = document.createElement("span");
-      newSpan.id = fieldId;
-      newSpan.textContent = selected.join(", ");
-      checkboxContainer.remove();
-      checkIcon.remove();
-      container.appendChild(newSpan);
-      alert("Збережено!");
-    } else {
-      alert("Помилка при збереженні: " + result.message);
+        wrapper.innerHTML = ""; // Очищаем
+        wrapper.appendChild(newSpan);
+        wrapper.appendChild(newPencil);
+
+        alert("Збережено!");
+      } else {
+        alert("Помилка: " + result.message);
+      }
+    } catch (err) {
+      console.error("❌ Error saving field:", err);
+      alert("Серверна помилка.");
     }
-  } catch (err) {
-    console.error("❌ Error saving checkboxes:", err);
-    alert("Серверна помилка.");
-  }
-});
-
+  });
 }
+
 
 
 function showStep(stepNumber) {

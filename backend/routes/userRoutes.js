@@ -4,15 +4,10 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const { uploadUserPhoto } = require('../controllers/userController');
+const User = require('../models/User');
+
 
 router.post('/register', registerUser);
-router.get('/', getAllUsers);
-router.post("/login", loginUser);
-router.put('/:id/status', updateUserStatus); // более специфичный
-router.get('/:id', getUserById);             // общий get
-router.put('/:id', updateUser);  
-router.post("/forgot-password", sendRecoveryCode);
-router.post("/:id/photo", upload.single("photo"), uploadUserPhoto);
 router.get("/approved", async (req, res) => {
   try {
     const users = await User.find({ status: "APPROVED" });
@@ -22,8 +17,14 @@ router.get("/approved", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-            // общий put
+router.get('/', getAllUsers);
+router.post("/login", loginUser);
+router.put('/:id/status', updateUserStatus); // более специфичный
+router.get('/:id', getUserById);             // общий get
+router.put('/:id', updateUser);  
+router.post("/forgot-password", sendRecoveryCode);
+router.post("/:id/photo", upload.single("photo"), uploadUserPhoto);
+       // общий put
 
 
 module.exports = router;

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Члени асоціації</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f7f7f7;
+      padding: 40px;
+    }
+    .members {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 250px;
+      text-align: center;
+    }
+    .card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 100%;
+      object-fit: cover;
+      background: #eee;
+    }
+    .card h3 {
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+    .card p {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center">Члени нашої Асоціації</h1>
+  <div class="members" id="members-container"></div>
+
+  <script>
+    const API_BASE = "http://157.230.121.24:5050";
+
+    async function loadMembers() {
+      try {
+        const res = await fetch(`${API_BASE}/api/users/approved`);
+        const members = await res.json();
+
+        const container = document.getElementById("members-container");
+        container.innerHTML = "";
+
+        members.forEach(user => {
+          const div = document.createElement("div");
+          div.className = "card";
+
+          div.innerHTML = `
+            <img src="${user.photoUrl ? API_BASE + user.photoUrl : 'https://via.placeholder.com/120'}" alt="Фото" />
+            <h3>${user.firstName || ""} ${user.lastName || ""}</h3>
+            <p>${user.role || "Спеціаліст"}</p>
+            <p>${user.about || ""}</p>
+          `;
+
+          container.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Error loading members:", error);
+      }
+    }
+
+    loadMembers();
+  </script>
+</body>
+</html>

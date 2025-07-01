@@ -26,49 +26,6 @@ async function login() {
 }
 
 
-
-function saveLoginAndContinue() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const confirmPassword = document.getElementById("confirm-password").value.trim();
-
-  if (!username || !password || !confirmPassword) {
-    alert("Будь ласка, заповніть всі поля.");
-    return;
-  }
-
-  // Проверка: не email ли это
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (emailPattern.test(username)) {
-    alert("Придумайте username, а не email.");
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    alert("Паролі не співпадають.");
-    return;
-  }
-
-  localStorage.setItem("registrationUsername", username);
-  localStorage.setItem("registrationPassword", password);
-  window.location.href = "registration.html";
-}
-
-function togglePassword(iconElement) {
-  const wrapper = iconElement.closest('.input-wrapper');
-  const passwordInput = wrapper.querySelector('input');
-
-  if (!passwordInput) {
-    console.warn("Input not found");
-    return;
-  }
-
-  const isHidden = passwordInput.type === "password";
-  passwordInput.type = isHidden ? "text" : "password";
-  iconElement.src = isHidden ? "assets/icon-eye-open.svg" : "assets/icon-eye-close.svg";
-}
-
-
 window.addEventListener("DOMContentLoaded", async () => {
   // проверяем, если это profile.html
   if (window.location.pathname.includes("profile.html")) {
@@ -146,6 +103,51 @@ if (coursesTextarea && coursesCheckIcon) {
     }
   }
 });
+
+
+
+function saveLoginAndContinue() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const confirmPassword = document.getElementById("confirm-password").value.trim();
+
+  if (!username || !password || !confirmPassword) {
+    alert("Будь ласка, заповніть всі поля.");
+    return;
+  }
+
+  // Проверка: не email ли это
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (emailPattern.test(username)) {
+    alert("Придумайте username, а не email.");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Паролі не співпадають.");
+    return;
+  }
+
+  localStorage.setItem("registrationUsername", username);
+  localStorage.setItem("registrationPassword", password);
+  window.location.href = "registration.html";
+}
+
+function togglePassword(iconElement) {
+  const wrapper = iconElement.closest('.input-wrapper');
+  const passwordInput = wrapper.querySelector('input');
+
+  if (!passwordInput) {
+    console.warn("Input not found");
+    return;
+  }
+
+  const isHidden = passwordInput.type === "password";
+  passwordInput.type = isHidden ? "text" : "password";
+  iconElement.src = isHidden ? "assets/icon-eye-open.svg" : "assets/icon-eye-close.svg";
+}
+
+
 
 
 

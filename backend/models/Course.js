@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
 
 const courseSchema = new mongoose.Schema({
+  creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  creatorName: String,
+  creatorRole: String,
   eventType: String, // Курс, Група, Супервізія, Лекція, Семінар
   courseTitle: String,
   courseSubtitle: String,
   courseDescription: String,
-  courseDates: {
-    start: Date,
-    end: Date
-  },
+courseDates: {
+  start: new Date(form.startDate.value),
+  end: new Date(form.endDate.value)
+},
   courseDays: [String], // ['Понеділок', 'Середа', ...]
   courseTime: {
     start: String, // e.g. "17:00"

@@ -70,7 +70,6 @@ function togglePassword(iconElement) {
 
 
 window.addEventListener("DOMContentLoaded", async () => {
-  // проверяем, если это profile.html
   if (window.location.pathname.includes("profile.html")) {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) {
@@ -82,6 +81,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     try {
       const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`);
       const user = await res.json();
+
       document.getElementById("profileUsername").textContent = user.username || "";
       document.getElementById("profileFirstName").textContent = user.firstName || "";
       document.getElementById("profileLastName").textContent = user.lastName || "";
@@ -93,52 +93,19 @@ window.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("profileEducation").textContent = user.education || "";
       document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
       document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
-       document.getElementById("profileAboutTextarea").value = user.about || "";
-  document.getElementById("profileCoursesTextarea").value = user.courses || "";
-  document.getElementById("profileRoleTextarea").value = user.role || "";
-  document.getElementById("profileCostTextarea").value = user.cost || "";
-  document.getElementById("profileVideoLink").value = user.videoLink || "";
-  document.getElementById("profileQualifications").value = user.qualifications || "";
-  document.getElementById("profileExperienceExtra").value = user.experienceExtra || "";
-  document.getElementById("profileLanguage").value = user.language || "";
-  document.getElementById("profileFormat").value = user.format || "";
-      
+
+      // ✅ Step 2 поля — загружаем в span
+      document.getElementById("profileAbout").textContent = user.about || "";
+      document.getElementById("profileCourses").textContent = user.courses || "";
+      document.getElementById("profileRole").textContent = user.role || "";
+      document.getElementById("profileCost").textContent = user.cost || "";
+      document.getElementById("profileVideoLink").textContent = user.videoLink || "";
+      document.getElementById("profileQualifications").textContent = user.qualifications || "";
+      document.getElementById("profileExperienceExtra").textContent = user.experienceExtra || "";
+      document.getElementById("profileLanguage").textContent = user.language || "";
+      document.getElementById("profileFormat").textContent = user.format || "";
+
       window.currentUser = user;
-      // ✅ Инициализация textarea "Про мене"
-const coursesTextarea = document.getElementById("profileCoursesTextarea");
-const coursesCheckIcon = document.getElementById("coursesCheckIcon");
-
-if (coursesTextarea && coursesCheckIcon) {
-  coursesTextarea.value = user.courses || "";
-
-  coursesTextarea.addEventListener("input", () => {
-    coursesCheckIcon.style.display = "inline";
-  });
-
-  coursesCheckIcon.addEventListener("click", async () => {
-    const newValue = coursesTextarea.value.trim();
-
-    try {
-      const res = await fetch(`${API_BASE}/api/users/${user._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courses: newValue }),
-      });
-
-      const result = await res.json();
-      if (res.ok) {
-        coursesCheckIcon.style.display = "none";
-        alert("Збережено!");
-      } else {
-        alert("Помилка при збереженні: " + result.message);
-      }
-    } catch (err) {
-      console.error("❌ Error:", err);
-      alert("Серверна помилка.");
-    }
-  });
-}
-
 
     } catch (err) {
       console.error("Failed to load user data:", err);

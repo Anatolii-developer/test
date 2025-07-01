@@ -826,13 +826,9 @@ body {
   border: 1px solid #ddd;
 }
 
-.course-table th {
-  background-color: #FF8B2E;
-  color: white;
-}
 
 .more-button {
-  width: 58px;
+  width: auto;
   height: 20px;
   background-color: #E37009;
   color: white;
@@ -845,11 +841,13 @@ body {
   display: inline-block;
   text-align: center;
   transition: background-color 0.3s ease;
+  text-decoration: none; /* ❌ Убирает линию под ссылкой */
 }
 
 .more-button:hover {
   background-color: #cf6108;
 }
+
 
 
 

@@ -379,9 +379,6 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   });
 }
 
-let allParticipants = [];       // все юзеры
-let selectedParticipants = [];  // выбранные id
-
 function openUserModal() {
   document.getElementById("userModal").style.display = "block";
   const userList = document.getElementById("userList");
@@ -416,32 +413,6 @@ function openUserModal() {
     userList.appendChild(wrapper);
   });
 }
-
-
-
-function renderSelectedParticipants() {
-  const container = document.getElementById("selectedParticipants");
-  container.innerHTML = "";
-
-  selectedParticipants.forEach(id => {
-    const user = allParticipants.find(u => u._id === id);
-    if (!user) return;
-
-    const div = document.createElement("div");
-    div.className = "tag";
-    div.innerHTML = `
-      ${user.firstName} ${user.lastName}
-      <span style="margin-left: 8px; cursor: pointer;" onclick="removeParticipant('${id}')">&times;</span>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function removeParticipant(id) {
-  selectedParticipants = selectedParticipants.filter(pid => pid !== id);
-  renderSelectedParticipants();
-}
-
 
 
 const saveChangesBtn = document.getElementById("saveProfileChangesBtn");

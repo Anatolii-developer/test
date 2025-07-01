@@ -147,6 +147,14 @@
   <div class="modal-content">
     <span class="close" onclick="closeUserModal()">&times;</span>
     <h3>Оберіть учасників</h3>
+<input
+  type="text"
+  id="searchInput"
+  placeholder="Пошук учасника..."
+  oninput="renderUserList(this.value)"
+  style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px;"
+/>
+
 
     <div id="userList" style="margin-top: 16px; max-height: 300px; overflow-y: auto;"></div>
 

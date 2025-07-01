@@ -791,13 +791,20 @@ body {
 
 .course-table-container {
   width: 890px;
-  height: auto;
+  padding: 60px 100px;
   background: white;
-  padding: 30px;
   border-radius: 24px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
   margin: auto;
 }
+
+
+.course-table th {
+  background-color: #E37009;
+  color: white;
+  text-align: center;
+}
+
 
 .table-title {
   font-size: 24px;
@@ -824,14 +831,26 @@ body {
 }
 
 .more-button {
-  background-color: #FF7B00;
-  border: none;
+  width: 58px;
+  height: 20px;
+  background-color: #E37009;
   color: white;
-  padding: 8px 14px;
-  border-radius: 20px;
-  cursor: pointer;
+  border: none;
+  border-radius: 24px;
+  padding: 10px 53px;
   font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  transition: background-color 0.3s ease;
 }
+
+.more-button:hover {
+  background-color: #cf6108;
+}
+
+
 
 
 

@@ -379,7 +379,6 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   });
 }
 
-
 let users = [];
 let selectedParticipants = [];
 
@@ -388,10 +387,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch(`${API_BASE}/api/users`);
     users = await res.json();
   } catch (err) {
-    console.error("Не вдалося завантажити учасників:", err);
+    console.error("Помилка завантаження користувачів:", err);
   }
 });
-
 
 function openUserModal() {
   document.getElementById("userModal").style.display = "block";
@@ -399,11 +397,14 @@ function openUserModal() {
   userList.innerHTML = "";
 
   users.forEach(user => {
-    const wrapper = document.createElement("label");
+    const wrapper = document.createElement("div");
     wrapper.style.display = "flex";
+    wrapper.style.justifyContent = "space-between";
     wrapper.style.alignItems = "center";
-    wrapper.style.gap = "12px";
-    wrapper.style.marginBottom = "8px";
+    wrapper.style.padding = "6px 0";
+
+    const name = document.createElement("span");
+    name.textContent = `${user.firstName} ${user.lastName}`;
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -418,16 +419,21 @@ function openUserModal() {
       } else {
         selectedParticipants = selectedParticipants.filter(id => id !== user._id);
       }
-      updateSelectedDisplay();
     });
 
-    const name = document.createElement("span");
-    name.textContent = `${user.firstName} ${user.lastName}`;
-
-    wrapper.appendChild(checkbox);
     wrapper.appendChild(name);
+    wrapper.appendChild(checkbox);
     userList.appendChild(wrapper);
   });
+}
+
+function closeUserModal() {
+  document.getElementById("userModal").style.display = "none";
+}
+
+function saveSelectedParticipants() {
+  closeUserModal();
+  updateSelectedDisplay();
 }
 
 function updateSelectedDisplay() {
@@ -436,34 +442,33 @@ function updateSelectedDisplay() {
 
   selectedParticipants.forEach(id => {
     const user = users.find(u => u._id === id);
-    if (user) {
-      const tag = document.createElement("div");
-      tag.style.display = "flex";
-      tag.style.alignItems = "center";
-      tag.style.background = "#e0e0e0";
-      tag.style.padding = "4px 8px";
-      tag.style.borderRadius = "8px";
+    if (!user) return;
 
-      const text = document.createElement("span");
-      text.textContent = `${user.firstName} ${user.lastName}`;
-      text.style.marginRight = "8px";
+    const item = document.createElement("div");
+    item.style.display = "flex";
+    item.style.alignItems = "center";
+    item.style.gap = "6px";
+    item.style.padding = "4px 10px";
+    item.style.background = "#f2f2f2";
+    item.style.borderRadius = "12px";
 
-      const close = document.createElement("span");
-      close.textContent = "✕";
-      close.style.cursor = "pointer";
-      close.onclick = () => {
-        selectedParticipants = selectedParticipants.filter(pid => pid !== id);
-        updateSelectedDisplay();
-      };
+    const name = document.createElement("span");
+    name.textContent = `${user.firstName} ${user.lastName}`;
 
-      tag.appendChild(text);
-      tag.appendChild(close);
-      container.appendChild(tag);
-    }
+    const removeBtn = document.createElement("span");
+    removeBtn.textContent = "✕";
+    removeBtn.style.cursor = "pointer";
+    removeBtn.style.color = "red";
+    removeBtn.addEventListener("click", () => {
+      selectedParticipants = selectedParticipants.filter(pid => pid !== id);
+      updateSelectedDisplay();
+    });
+
+    item.appendChild(name);
+    item.appendChild(removeBtn);
+    container.appendChild(item);
   });
 }
-
-
 
 
 const saveChangesBtn = document.getElementById("saveProfileChangesBtn");

@@ -99,8 +99,8 @@ function logoutUser() {
         tr.innerHTML = `
   <td>${index + 1}</td>
   <td>${course.courseTitle || "-"}</td>
-  <td>–</td>
-  <td>–</td>
+  <td>${course.creatorName || "-"}</td>
+  <td>${course.creatorRole || "-"}</td> 
   <td>${formatDate(course.courseDates?.start)}</td>
   <td><a href="admin-course-details.html?id=${course._id}" class="more-button">More</a></td>
 `;

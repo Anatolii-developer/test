@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Створити курс</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin-styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -33,13 +33,11 @@
   </aside>
 
   <main id="mainContent">
-    <!-- Header -->
     <div class="main-header">
       <h2>Створити курс</h2>
       <img src="assets/courses/create.png" alt="Create Course" />
     </div>
 
-    <!-- Tabs -->
     <div class="completed-nav-buttons">
       <a href="my-courses.html" class="completed-nav-button secondary">Головна</a>
       <a href="completed-courses.html" class="completed-nav-button secondary">Пройдені курси</a>
@@ -47,103 +45,102 @@
       <a href="create-course.html" class="completed-nav-button create">Створити курс</a>
     </div>
 
-    <!-- Content Area -->
     <section class="create-course-content">
-      <form>
-  <div class="form-group">
-    <label>Оберіть тип заходу</label>
-    <div class="radio-group">
-      <label><input type="radio" name="type" /> Курс</label>
-      <label><input type="radio" name="type" /> Група</label>
-      <label><input type="radio" name="type" /> Супервізія</label>
-      <label><input type="radio" name="type" /> Лекція</label>
-      <label><input type="radio" name="type" /> Семінар</label>
-    </div>
-  </div>
+      <form id="createCourseForm">
+        <div class="form-group">
+          <label>Оберіть тип заходу</label>
+          <div class="radio-group">
+            <label><input type="radio" name="eventType" value="Курс" /> Курс</label>
+            <label><input type="radio" name="eventType" value="Група" /> Група</label>
+            <label><input type="radio" name="eventType" value="Супервізія" /> Супервізія</label>
+            <label><input type="radio" name="eventType" value="Лекція" /> Лекція</label>
+            <label><input type="radio" name="eventType" value="Семінар" /> Семінар</label>
+          </div>
+        </div>
 
-  <div class="form-group">
-    <label>Назва курсу</label>
-    <input type="text" placeholder="Введіть назву" />
-  </div>
+        <div class="form-group">
+          <label>Назва курсу</label>
+          <input type="text" name="courseTitle" placeholder="Введіть назву" />
+        </div>
 
-  <div class="form-group">
-    <label>Підзаголовок курсу</label>
-    <input type="text" placeholder="Введіть підзаголовок" />
-  </div>
+        <div class="form-group">
+          <label>Підзаголовок курсу</label>
+          <input type="text" name="courseSubtitle" placeholder="Введіть підзаголовок" />
+        </div>
 
-  <div class="form-group">
-    <label>Короткий опис курсу</label>
-    <textarea placeholder="Опишіть коротко про курс..."></textarea>
-  </div>
+        <div class="form-group">
+          <label>Короткий опис курсу</label>
+          <textarea name="courseDescription" placeholder="Опишіть коротко про курс..."></textarea>
+        </div>
 
-  <!-- Вибір дат проведення курсу -->
-<div class="form-group">
-  <label>Оберіть дати проведення курсу</label>
-  <div class="date-range">
-    <input type="date" name="startDate" />
-    <input type="date" name="endDate" />
-  </div>
-</div>
+        <div class="form-group">
+          <label>Оберіть дати проведення курсу</label>
+          <div class="date-range">
+            <input type="date" name="startDate" />
+            <input type="date" name="endDate" />
+          </div>
+        </div>
 
-<!-- Вибір днів тижня -->
-<div class="form-group">
-  <label>Оберіть дні проведення курсу</label>
-  <div class="weekdays-checkboxes">
-    <label><input type="checkbox" name="days" value="Понеділок" /> Понеділок</label>
-    <label><input type="checkbox" name="days" value="Вівторок" /> Вівторок</label>
-    <label><input type="checkbox" name="days" value="Середа" /> Середа</label>
-    <label><input type="checkbox" name="days" value="Четвер" /> Четвер</label>
-    <label><input type="checkbox" name="days" value="П’ятниця" /> П’ятниця</label>
-    <label><input type="checkbox" name="days" value="Субота" /> Субота</label>
-    <label><input type="checkbox" name="days" value="Неділя" /> Неділя</label>
-  </div>
-</div>
+        <div class="form-group">
+          <label>Оберіть дні проведення курсу</label>
+          <div class="weekdays-checkboxes">
+            <label><input type="checkbox" name="courseDays" value="Понеділок" /> Понеділок</label>
+            <label><input type="checkbox" name="courseDays" value="Вівторок" /> Вівторок</label>
+            <label><input type="checkbox" name="courseDays" value="Середа" /> Середа</label>
+            <label><input type="checkbox" name="courseDays" value="Четвер" /> Четвер</label>
+            <label><input type="checkbox" name="courseDays" value="П’ятниця" /> П’ятниця</label>
+            <label><input type="checkbox" name="courseDays" value="Субота" /> Субота</label>
+            <label><input type="checkbox" name="courseDays" value="Неділя" /> Неділя</label>
+          </div>
+        </div>
 
-<!-- Вибір годин -->
-<div class="form-group">
-  <label>Оберіть години проведення</label>
-  <div class="time-range">
-    <input type="time" name="startTime" />
-    <span>–</span>
-    <input type="time" name="endTime" />
-  </div>
-</div>
+        <div class="form-group">
+          <label>Оберіть години проведення</label>
+          <div class="time-range">
+            <input type="time" name="startTime" />
+            <span>–</span>
+            <input type="time" name="endTime" />
+          </div>
+        </div>
 
-  <div class="form-group">
-    <label>Оберіть тип курсу</label>
-    <div class="radio-group">
-      <label><input type="radio" name="access" /> Відкрита група</label>
-      <label><input type="radio" name="access" /> Закрита група</label>
-    </div>
-  </div>
+        <div class="form-group">
+          <label>Оберіть тип курсу</label>
+          <div class="radio-group">
+            <label><input type="radio" name="accessType" value="Відкрита група" /> Відкрита група</label>
+            <label><input type="radio" name="accessType" value="Закрита група" /> Закрита група</label>
+          </div>
+        </div>
 
-  <div class="form-group">
-    <label>Оберіть учасників закритої групи</label>
-    <select>
-      <option>Оберіть учасників</option>
-    </select>
-  </div>
+        <div class="form-group">
+          <label>Оберіть учасників</label>
+          <select name="participants" id="participantsSelect" multiple></select>
+          <button type="button" onclick="openUserModal()" class="small-button">+ Додати нового</button>
+        </div>
 
-  <div class="form-group">
-    <label>Тривалість курсу</label>
-    <input type="text" placeholder="Наприклад: 4 тижні, 8 занять" />
-  </div>
+        <div class="form-group">
+          <label>Обрані учасники</label>
+          <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        </div>
 
-  <div class="form-group">
-    <label>Вартість курсу</label>
-    <input type="text" placeholder="Наприклад: 1200 грн" />
-  </div>
+        <div class="form-group">
+          <label>Тривалість курсу</label>
+          <input type="text" name="courseDuration" placeholder="Наприклад: 4 тижні, 8 занять" />
+        </div>
 
-  <div class="form-group">
-    <label>Посилання на Zoom</label>
-    <input type="text" placeholder="Вставте Zoom-посилання" />
-  </div>
+        <div class="form-group">
+          <label>Вартість курсу</label>
+          <input type="text" name="coursePrice" placeholder="Наприклад: 1200 грн" />
+        </div>
 
-  <div class="save-btn-wrapper">
-    <button type="submit" class="save-btn">Зберегти</button>
-  </div>
-</form>
+        <div class="form-group">
+          <label>Посилання на Zoom</label>
+          <input type="text" name="zoomLink" placeholder="Вставте Zoom-посилання" />
+        </div>
 
+        <div class="save-btn-wrapper">
+          <button type="submit" class="save-btn">Зберегти</button>
+        </div>
+      </form>
     </section>
   </main>
 

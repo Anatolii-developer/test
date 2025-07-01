@@ -3,15 +3,18 @@ const Course = require('../models/Course');
 // POST /api/courses
 exports.createCourse = async (req, res) => {
   try {
+    console.log("📥 New course request:", req.body); // добавьте это
+
     const course = new Course(req.body);
     await course.save();
-res.status(201).json({ success: true, message: "Курс створено", course });
 
- } catch (error) {
-  console.error("❌ Error creating course:", error.message, error.stack);
-  res.status(500).json({ message: "Помилка при створенні курсу", error: error.message });
-}
+    res.status(201).json({ success: true, message: "Курс створено", course });
+  } catch (error) {
+    console.error("❌ Error creating course:", error.message);
+    res.status(500).json({ message: "Помилка при створенні курсу", error: error.message });
+  }
 };
+
 
 // GET /api/courses
 exports.getCourses = async (req, res) => {

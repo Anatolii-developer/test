@@ -392,31 +392,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function openUserModal() {
+  
   document.getElementById("userModal").style.display = "block";
-
   const userList = document.getElementById("userList");
   userList.innerHTML = "";
 
-  // Добавляем строку поиска
-  const searchInput = document.createElement("input");
-  searchInput.type = "text";
-  searchInput.id = "searchInput";
-  searchInput.placeholder = "Пошук учасника...";
-  searchInput.style.width = "100%";
-  searchInput.style.padding = "8px";
-  searchInput.style.marginBottom = "12px";
-  searchInput.style.border = "1px solid #ccc";
-  searchInput.style.borderRadius = "6px";
+  users.forEach(user => {
+    const wrapper = document.createElement("div");
+wrapper.style.display = "flex";
+wrapper.style.justifyContent = "space-between";
+wrapper.style.alignItems = "center";
+wrapper.style.padding = "6px 0";
+wrapper.style.gap = "12px";  // расстояние между текстом и чекбоксом
 
-  searchInput.addEventListener("input", () => {
-    renderUserList(searchInput.value);
+const name = document.createElement("span");
+name.textContent = `${user.firstName} ${user.lastName}`;
+name.style.flex = "1";  // чтобы имя занимало всё свободное место
+
+const checkbox = document.createElement("input");
+checkbox.type = "checkbox";
+checkbox.value = user._id;
+checkbox.checked = selectedParticipants.includes(user._id);
+
+checkbox.addEventListener("change", () => {
+  if (checkbox.checked) {
+    selectedParticipants.push(user._id);
+  } else {
+    selectedParticipants = selectedParticipants.filter(id => id !== user._id);
+  }
+  updateSelectedDisplay();
+});
+
+wrapper.appendChild(name);
+wrapper.appendChild(checkbox);
+userList.appendChild(wrapper);
+
   });
-
-  userList.appendChild(searchInput);
-
-  renderUserList(""); // показать всех при открытии
 }
-
 
 function closeUserModal() {
   document.getElementById("userModal").style.display = "none";

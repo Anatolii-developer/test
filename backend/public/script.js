@@ -382,35 +382,42 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
 let allParticipants = [];       // все юзеры
 let selectedParticipants = [];  // выбранные id
 
-async function openUserModal() {
-  const res = await fetch("http://157.230.121.24:5050/api/users"); // получаем всех
-  const users = await res.json();
-  allParticipants = users;
-
-  const list = document.getElementById("participantList");
-  list.innerHTML = users.map(user => `
-    <label style="display: block;">
-      <input type="checkbox" value="${user._id}" ${selectedParticipants.includes(user._id) ? 'checked' : ''}>
-      ${user.firstName} ${user.lastName}
-    </label>
-  `).join("");
-
+function openUserModal() {
   document.getElementById("userModal").style.display = "block";
+  const userList = document.getElementById("userList");
+  userList.innerHTML = "";
+
+  users.forEach(user => {
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.justifyContent = "space-between";
+    wrapper.style.alignItems = "center";
+    wrapper.style.padding = "6px 0";
+
+    const name = document.createElement("span");
+    name.textContent = `${user.firstName} ${user.lastName}`;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = user._id;
+    checkbox.checked = selectedParticipants.includes(user._id);
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        selectedParticipants.push(user._id);
+      } else {
+        selectedParticipants = selectedParticipants.filter(id => id !== user._id);
+      }
+      updateSelectedDisplay();
+    });
+
+    wrapper.appendChild(name);
+    wrapper.appendChild(checkbox);
+    userList.appendChild(wrapper);
+  });
 }
 
-function closeUserModal() {
-  document.getElementById("userModal").style.display = "none";
-}
 
-function saveSelectedParticipants() {
-  const checkboxes = document.querySelectorAll("#participantList input[type='checkbox']");
-  selectedParticipants = [...checkboxes]
-    .filter(cb => cb.checked)
-    .map(cb => cb.value);
-
-  renderSelectedParticipants();
-  closeUserModal();
-}
 
 function renderSelectedParticipants() {
   const container = document.getElementById("selectedParticipants");

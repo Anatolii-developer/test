@@ -1997,6 +1997,14 @@
   padding: 10px;
 }
 
+.tag {
+  background-color: #f0f0f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+}
 
 
 .create-course-content {

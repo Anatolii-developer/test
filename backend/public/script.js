@@ -379,7 +379,22 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   });
 }
 
-function openUserModal() {
+let allParticipants = [];       // все юзеры
+let selectedParticipants = [];  // выбранные id
+
+async function openUserModal() {
+  const res = await fetch("http://157.230.121.24:5050/api/users"); // получаем всех
+  const users = await res.json();
+  allParticipants = users;
+
+  const list = document.getElementById("participantList");
+  list.innerHTML = users.map(user => `
+    <label style="display: block;">
+      <input type="checkbox" value="${user._id}" ${selectedParticipants.includes(user._id) ? 'checked' : ''}>
+      ${user.firstName} ${user.lastName}
+    </label>
+  `).join("");
+
   document.getElementById("userModal").style.display = "block";
 }
 
@@ -387,55 +402,39 @@ function closeUserModal() {
   document.getElementById("userModal").style.display = "none";
 }
 
-async function addNewParticipant() {
-  const firstName = document.getElementById("newFirstName").value.trim();
-  const lastName = document.getElementById("newLastName").value.trim();
-  const username = document.getElementById("newUsername").value.trim();
-  const password = document.getElementById("newPassword").value.trim();
+function saveSelectedParticipants() {
+  const checkboxes = document.querySelectorAll("#participantList input[type='checkbox']");
+  selectedParticipants = [...checkboxes]
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
 
-  if (!firstName || !lastName || !username || !password) {
-    alert("Будь ласка, заповніть усі поля.");
-    return;
-  }
-
-  const payload = {
-    firstName, lastName, username, password,
-    status: "WAIT FOR REVIEW"
-  };
-
-  try {
-    const res = await fetch(`${API_BASE}/api/users/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      alert("Учасника додано!");
-      closeUserModal();
-
-      const participantsSelect = document.getElementById("participantsSelect");
-      const newOption = document.createElement("option");
-      newOption.value = result._id || result.user._id;
-      newOption.textContent = `${firstName} ${lastName}`;
-      newOption.selected = true;
-      participantsSelect.appendChild(newOption);
-
-      // Додай тег
-      const tag = document.createElement("div");
-      tag.className = "participant-tag";
-      tag.textContent = `${firstName} ${lastName}`;
-      document.getElementById("selectedParticipants").appendChild(tag);
-
-    } else {
-      alert("Помилка: " + result.message);
-    }
-  } catch (err) {
-    console.error("❌", err);
-    alert("Серверна помилка.");
-  }
+  renderSelectedParticipants();
+  closeUserModal();
 }
+
+function renderSelectedParticipants() {
+  const container = document.getElementById("selectedParticipants");
+  container.innerHTML = "";
+
+  selectedParticipants.forEach(id => {
+    const user = allParticipants.find(u => u._id === id);
+    if (!user) return;
+
+    const div = document.createElement("div");
+    div.className = "tag";
+    div.innerHTML = `
+      ${user.firstName} ${user.lastName}
+      <span style="margin-left: 8px; cursor: pointer;" onclick="removeParticipant('${id}')">&times;</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function removeParticipant(id) {
+  selectedParticipants = selectedParticipants.filter(pid => pid !== id);
+  renderSelectedParticipants();
+}
+
 
 
 const saveChangesBtn = document.getElementById("saveProfileChangesBtn");

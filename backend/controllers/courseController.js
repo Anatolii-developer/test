@@ -39,4 +39,15 @@ exports.getCourseById = async (req, res) => {
   }
 };
 
+// PUT /api/courses/:id
+exports.updateCourse = async (req, res) => {
+  try {
+    const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedCourse) return res.status(404).json({ message: "Курс не знайдено" });
+    res.json(updatedCourse);
+  } catch (err) {
+    console.error("Помилка при оновленні курсу:", err);
+    res.status(500).json({ message: "Помилка сервера" });
+  }
+};
 

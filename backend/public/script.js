@@ -516,6 +516,17 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
     creatorRole
   };
 
+  const selectedDiv = document.getElementById("selectedParticipants");
+selectedDiv.innerHTML = ""; // очищаем
+
+[...form.participants.selectedOptions].forEach(opt => {
+  const tag = document.createElement("div");
+  tag.className = "participant-tag";
+  tag.textContent = opt.textContent;
+  selectedDiv.appendChild(tag);
+});
+
+
   const res = await fetch("http://157.230.121.24:5050/api/courses", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -793,6 +804,25 @@ function toggleSidebar() {
     arrow.style.transform = 'rotate(0deg)';
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const participantsSelect = document.getElementById("participantsSelect");
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users`);
+    const users = await res.json();
+
+    users.forEach(user => {
+      const option = document.createElement("option");
+      option.value = user._id;
+      option.textContent = `${user.firstName} ${user.lastName}`.trim() || user.username;
+      participantsSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Не вдалося завантажити учасників:", err);
+  }
+});
 
 
 document.addEventListener("DOMContentLoaded", () => {

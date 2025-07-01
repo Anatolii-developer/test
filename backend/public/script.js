@@ -379,20 +379,31 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   });
 }
 
+
+let users = [];
+let selectedParticipants = [];
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/users`);
+    users = await res.json();
+  } catch (err) {
+    console.error("Не вдалося завантажити учасників:", err);
+  }
+});
+
+
 function openUserModal() {
   document.getElementById("userModal").style.display = "block";
   const userList = document.getElementById("userList");
   userList.innerHTML = "";
 
   users.forEach(user => {
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement("label");
     wrapper.style.display = "flex";
-    wrapper.style.justifyContent = "space-between";
     wrapper.style.alignItems = "center";
-    wrapper.style.padding = "6px 0";
-
-    const name = document.createElement("span");
-    name.textContent = `${user.firstName} ${user.lastName}`;
+    wrapper.style.gap = "12px";
+    wrapper.style.marginBottom = "8px";
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -401,18 +412,58 @@ function openUserModal() {
 
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
-        selectedParticipants.push(user._id);
+        if (!selectedParticipants.includes(user._id)) {
+          selectedParticipants.push(user._id);
+        }
       } else {
         selectedParticipants = selectedParticipants.filter(id => id !== user._id);
       }
       updateSelectedDisplay();
     });
 
-    wrapper.appendChild(name);
+    const name = document.createElement("span");
+    name.textContent = `${user.firstName} ${user.lastName}`;
+
     wrapper.appendChild(checkbox);
+    wrapper.appendChild(name);
     userList.appendChild(wrapper);
   });
 }
+
+function updateSelectedDisplay() {
+  const container = document.getElementById("selectedParticipants");
+  container.innerHTML = "";
+
+  selectedParticipants.forEach(id => {
+    const user = users.find(u => u._id === id);
+    if (user) {
+      const tag = document.createElement("div");
+      tag.style.display = "flex";
+      tag.style.alignItems = "center";
+      tag.style.background = "#e0e0e0";
+      tag.style.padding = "4px 8px";
+      tag.style.borderRadius = "8px";
+
+      const text = document.createElement("span");
+      text.textContent = `${user.firstName} ${user.lastName}`;
+      text.style.marginRight = "8px";
+
+      const close = document.createElement("span");
+      close.textContent = "✕";
+      close.style.cursor = "pointer";
+      close.onclick = () => {
+        selectedParticipants = selectedParticipants.filter(pid => pid !== id);
+        updateSelectedDisplay();
+      };
+
+      tag.appendChild(text);
+      tag.appendChild(close);
+      container.appendChild(tag);
+    }
+  });
+}
+
+
 
 
 const saveChangesBtn = document.getElementById("saveProfileChangesBtn");

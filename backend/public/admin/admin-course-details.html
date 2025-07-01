@@ -5,45 +5,188 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Деталі курсу</title>
   <link rel="stylesheet" href="admin-styles.css" />
+  <style>
+    .course-detail {
+      width: 890px;
+      margin: 40px auto;
+      padding: 60px 100px;
+      border-radius: 24px;
+      background: #fffef9;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .editable-block {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editable-block label {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .editable-block textarea {
+      resize: vertical;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #E37009;
+      border-radius: 8px;
+      background-color: #fffef9;
+      color: #333;
+      min-height: 48px;
+    }
+
+    .editable-block textarea[disabled] {
+      background-color: #f0f0f0;
+      color: #888;
+      border: 1px solid #ccc;
+      cursor: not-allowed;
+    }
+
+    .edit-btn {
+      position: absolute;
+      right: 10px;
+      top: 38px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #E37009;
+    }
+
+    .submit-btn {
+      align-self: flex-end;
+      margin-top: 20px;
+      background-color: #E37009;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="course-detail">
-    <h1 id="title">Назва курсу</h1>
-    <p><strong>Тип:</strong> <span id="eventType"></span></p>
-    <p><strong>Підзаголовок:</strong> <span id="subtitle"></span></p>
-    <p><strong>Опис:</strong> <span id="description"></span></p>
-    <p><strong>Дати:</strong> <span id="dates"></span></p>
-    <p><strong>Дні:</strong> <span id="days"></span></p>
-    <p><strong>Час:</strong> <span id="time"></span></p>
-    <p><strong>Тип доступу:</strong> <span id="access"></span></p>
-    <p><strong>Тривалість:</strong> <span id="duration"></span></p>
-    <p><strong>Ціна:</strong> <span id="price"></span></p>
-    <p><strong>Zoom:</strong> <a id="zoom" href="#" target="_blank">Перейти</a></p>
+    <h1>Деталі курсу</h1>
+
+    <div class="editable-block">
+      <label>Назва курсу</label>
+      <textarea id="title" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('title')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Тип</label>
+      <textarea id="eventType" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('eventType')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Підзаголовок</label>
+      <textarea id="subtitle" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('subtitle')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Опис</label>
+      <textarea id="description" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('description')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Тип доступу</label>
+      <textarea id="access" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('access')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Тривалість</label>
+      <textarea id="duration" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('duration')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Ціна</label>
+      <textarea id="price" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('price')">✏️</button>
+    </div>
+
+    <div class="editable-block">
+      <label>Zoom</label>
+      <textarea id="zoom" disabled></textarea>
+      <button class="edit-btn" onclick="enableEdit('zoom')">✏️</button>
+    </div>
+
+    <button class="submit-btn" onclick="saveChanges()">Зберегти</button>
   </div>
 
   <script>
+    let courseId;
+
     async function loadCourseDetails() {
       const params = new URLSearchParams(window.location.search);
-      const courseId = params.get('id');
+      courseId = params.get('id');
       if (!courseId) return;
 
       try {
         const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
         const course = await res.json();
 
-        document.getElementById("title").textContent = course.courseTitle;
-        document.getElementById("eventType").textContent = course.eventType;
-        document.getElementById("subtitle").textContent = course.courseSubtitle;
-        document.getElementById("description").textContent = course.courseDescription;
-        document.getElementById("dates").textContent = `${new Date(course.courseDates.start).toLocaleDateString()} - ${new Date(course.courseDates.end).toLocaleDateString()}`;
-        document.getElementById("days").textContent = course.courseDays.join(', ');
-        document.getElementById("time").textContent = `${course.courseTime.start} - ${course.courseTime.end}`;
-        document.getElementById("access").textContent = course.accessType;
-        document.getElementById("duration").textContent = course.courseDuration;
-        document.getElementById("price").textContent = course.coursePrice;
-        document.getElementById("zoom").href = course.zoomLink;
+        document.getElementById("title").value = course.courseTitle;
+        document.getElementById("eventType").value = course.eventType;
+        document.getElementById("subtitle").value = course.courseSubtitle;
+        document.getElementById("description").value = course.courseDescription;
+        document.getElementById("access").value = course.accessType;
+        document.getElementById("duration").value = course.courseDuration;
+        document.getElementById("price").value = course.coursePrice;
+        document.getElementById("zoom").value = course.zoomLink;
+
       } catch (err) {
         console.error("Помилка при завантаженні курсу:", err);
+      }
+    }
+
+    function enableEdit(id) {
+      const textarea = document.getElementById(id);
+      textarea.disabled = false;
+      textarea.focus();
+    }
+
+    async function saveChanges() {
+      const updated = {
+        courseTitle: document.getElementById("title").value,
+        eventType: document.getElementById("eventType").value,
+        courseSubtitle: document.getElementById("subtitle").value,
+        courseDescription: document.getElementById("description").value,
+        accessType: document.getElementById("access").value,
+        courseDuration: document.getElementById("duration").value,
+        coursePrice: document.getElementById("price").value,
+        zoomLink: document.getElementById("zoom").value,
+      };
+
+      try {
+        const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        });
+
+        if (res.ok) {
+          alert("Дані оновлено успішно");
+          // отключить textarea обратно
+          document.querySelectorAll("textarea").forEach(t => t.disabled = true);
+        } else {
+          alert("Помилка при збереженні");
+        }
+      } catch (err) {
+        console.error("Помилка при збереженні:", err);
       }
     }
 

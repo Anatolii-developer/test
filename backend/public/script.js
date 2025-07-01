@@ -604,7 +604,8 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
     courseDuration: form.courseDuration.value,
     coursePrice: form.coursePrice.value,
     zoomLink: form.zoomLink.value,
-    participants: [...form.participants.selectedOptions].map(opt => opt.value),
+   participants: selectedParticipants,
+
 
     // ➕ дані автора
     creatorId,
@@ -612,15 +613,6 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
     creatorRole
   };
 
-  const selectedDiv = document.getElementById("selectedParticipants");
-selectedDiv.innerHTML = ""; // очищаем
-
-[...form.participants.selectedOptions].forEach(opt => {
-  const tag = document.createElement("div");
-  tag.className = "participant-tag";
-  tag.textContent = opt.textContent;
-  selectedDiv.appendChild(tag);
-});
 
 
   const res = await fetch("http://157.230.121.24:5050/api/courses", {

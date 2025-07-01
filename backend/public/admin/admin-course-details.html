@@ -47,16 +47,22 @@
       cursor: not-allowed;
     }
 
-    .edit-btn {
-      position: absolute;
-      right: 10px;
-      top: 38px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      color: #E37009;
-    }
+    
+.edit-btn {
+  position: absolute;
+  right: 10px;
+  top: 38px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.edit-btn img {
+  width: 20px;
+  height: 20px;
+}
+
 
     .submit-btn {
       align-self: flex-end;
@@ -79,49 +85,65 @@
     <div class="editable-block">
       <label>Назва курсу</label>
       <textarea id="title" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('title')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('title')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Тип</label>
       <textarea id="eventType" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('eventType')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('eventType')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Підзаголовок</label>
       <textarea id="subtitle" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('subtitle')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('subtitle')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Опис</label>
       <textarea id="description" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('description')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('description')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Тип доступу</label>
       <textarea id="access" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('access')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('access')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Тривалість</label>
       <textarea id="duration" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('duration')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('duration')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Ціна</label>
       <textarea id="price" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('price')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('price')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <div class="editable-block">
       <label>Zoom</label>
       <textarea id="zoom" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('zoom')">✏️</button>
+      <button class="edit-btn" onclick="enableEdit('zoom')">
+        <img src="../assets/edit-icon.svg" alt="Edit" />
+      </button>
     </div>
 
     <button class="submit-btn" onclick="saveChanges()">Зберегти</button>

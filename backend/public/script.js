@@ -106,6 +106,8 @@ if (coursesTextarea && coursesCheckIcon) {
 
 
 
+
+
 function saveLoginAndContinue() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -376,6 +378,65 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
     }
   });
 }
+
+function openUserModal() {
+  document.getElementById("userModal").style.display = "block";
+}
+
+function closeUserModal() {
+  document.getElementById("userModal").style.display = "none";
+}
+
+async function addNewParticipant() {
+  const firstName = document.getElementById("newFirstName").value.trim();
+  const lastName = document.getElementById("newLastName").value.trim();
+  const username = document.getElementById("newUsername").value.trim();
+  const password = document.getElementById("newPassword").value.trim();
+
+  if (!firstName || !lastName || !username || !password) {
+    alert("Будь ласка, заповніть усі поля.");
+    return;
+  }
+
+  const payload = {
+    firstName, lastName, username, password,
+    status: "WAIT FOR REVIEW"
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("Учасника додано!");
+      closeUserModal();
+
+      const participantsSelect = document.getElementById("participantsSelect");
+      const newOption = document.createElement("option");
+      newOption.value = result._id || result.user._id;
+      newOption.textContent = `${firstName} ${lastName}`;
+      newOption.selected = true;
+      participantsSelect.appendChild(newOption);
+
+      // Додай тег
+      const tag = document.createElement("div");
+      tag.className = "participant-tag";
+      tag.textContent = `${firstName} ${lastName}`;
+      document.getElementById("selectedParticipants").appendChild(tag);
+
+    } else {
+      alert("Помилка: " + result.message);
+    }
+  } catch (err) {
+    console.error("❌", err);
+    alert("Серверна помилка.");
+  }
+}
+
 
 const saveChangesBtn = document.getElementById("saveProfileChangesBtn");
 if (saveChangesBtn) {

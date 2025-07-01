@@ -143,6 +143,17 @@
       </form>
     </section>
   </main>
+<div id="userModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeUserModal()">&times;</span>
+    <h3>Додати нового учасника</h3>
+    <input id="newFirstName" placeholder="Імʼя" />
+    <input id="newLastName" placeholder="Прізвище" />
+    <input id="newUsername" placeholder="Username" />
+    <input id="newPassword" type="password" placeholder="Пароль" />
+    <button onclick="addNewParticipant()">Зберегти</button>
+  </div>
+</div>
 
   <script src="script.js"></script>
 </body>

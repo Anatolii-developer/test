@@ -398,32 +398,34 @@ function openUserModal() {
 
   users.forEach(user => {
     const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.justifyContent = "space-between";
-    wrapper.style.alignItems = "center";
-    wrapper.style.padding = "6px 0";
+wrapper.style.display = "flex";
+wrapper.style.justifyContent = "space-between";
+wrapper.style.alignItems = "center";
+wrapper.style.padding = "6px 0";
+wrapper.style.gap = "12px";  // расстояние между текстом и чекбоксом
 
-    const name = document.createElement("span");
-    name.textContent = `${user.firstName} ${user.lastName}`;
+const name = document.createElement("span");
+name.textContent = `${user.firstName} ${user.lastName}`;
+name.style.flex = "1";  // чтобы имя занимало всё свободное место
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = user._id;
-    checkbox.checked = selectedParticipants.includes(user._id);
+const checkbox = document.createElement("input");
+checkbox.type = "checkbox";
+checkbox.value = user._id;
+checkbox.checked = selectedParticipants.includes(user._id);
 
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) {
-        if (!selectedParticipants.includes(user._id)) {
-          selectedParticipants.push(user._id);
-        }
-      } else {
-        selectedParticipants = selectedParticipants.filter(id => id !== user._id);
-      }
-    });
+checkbox.addEventListener("change", () => {
+  if (checkbox.checked) {
+    selectedParticipants.push(user._id);
+  } else {
+    selectedParticipants = selectedParticipants.filter(id => id !== user._id);
+  }
+  updateSelectedDisplay();
+});
 
-    wrapper.appendChild(name);
-    wrapper.appendChild(checkbox);
-    userList.appendChild(wrapper);
+wrapper.appendChild(name);
+wrapper.appendChild(checkbox);
+userList.appendChild(wrapper);
+
   });
 }
 

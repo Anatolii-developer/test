@@ -378,8 +378,9 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
     }
   });
 }
-let users = [];  // сюда подгружаешь всех
-let selectedParticipants = [];
+
+let allParticipants = [];       // все юзеры
+let selectedParticipants = [];  // выбранные id
 
 function openUserModal() {
   document.getElementById("userModal").style.display = "block";
@@ -391,7 +392,7 @@ function openUserModal() {
     wrapper.style.display = "flex";
     wrapper.style.justifyContent = "space-between";
     wrapper.style.alignItems = "center";
-    wrapper.style.marginBottom = "8px";
+    wrapper.style.padding = "6px 0";
 
     const name = document.createElement("span");
     name.textContent = `${user.firstName} ${user.lastName}`;
@@ -418,40 +419,23 @@ function openUserModal() {
 
 
 
-
-function updateSelectedDisplay() {
-  const selectedContainer = document.getElementById("selectedParticipants");
-  selectedContainer.innerHTML = "";
+function renderSelectedParticipants() {
+  const container = document.getElementById("selectedParticipants");
+  container.innerHTML = "";
 
   selectedParticipants.forEach(id => {
-    const user = users.find(u => u._id === id);
+    const user = allParticipants.find(u => u._id === id);
     if (!user) return;
 
-    const tag = document.createElement("div");
-    tag.style.display = "flex";
-    tag.style.alignItems = "center";
-    tag.style.padding = "4px 8px";
-    tag.style.background = "#eee";
-    tag.style.borderRadius = "16px";
-
-    const name = document.createElement("span");
-    name.textContent = `${user.firstName} ${user.lastName}`;
-    name.style.marginRight = "8px";
-
-    const removeBtn = document.createElement("span");
-    removeBtn.textContent = "×";
-    removeBtn.style.cursor = "pointer";
-    removeBtn.onclick = () => {
-      selectedParticipants = selectedParticipants.filter(uid => uid !== id);
-      updateSelectedDisplay();
-    };
-
-    tag.appendChild(name);
-    tag.appendChild(removeBtn);
-    selectedContainer.appendChild(tag);
+    const div = document.createElement("div");
+    div.className = "tag";
+    div.innerHTML = `
+      ${user.firstName} ${user.lastName}
+      <span style="margin-left: 8px; cursor: pointer;" onclick="removeParticipant('${id}')">&times;</span>
+    `;
+    container.appendChild(div);
   });
 }
-
 
 function removeParticipant(id) {
   selectedParticipants = selectedParticipants.filter(pid => pid !== id);

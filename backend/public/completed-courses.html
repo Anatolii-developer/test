@@ -80,5 +80,57 @@
   </main>
 
   <script src="script.js"></script>
+  <script>
+
+  async function loadCompletedCourses() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/courses`);
+      const allCourses = await res.json();
+
+      const completedCourses = allCourses.filter(course =>
+        course.status === "Пройдений" &&
+        (
+          course.accessType === "Відкрита група" ||
+          course.participants.includes(user._id)
+        )
+      );
+
+      const container = document.querySelector(".certificates-list");
+      container.innerHTML = "";
+
+      if (completedCourses.length === 0) {
+        container.innerHTML = "<p>Наразі немає пройдених курсів</p>";
+        return;
+      }
+
+      completedCourses.forEach(course => {
+        const start = course.courseDates?.start
+          ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+          : "";
+        const end = course.courseDates?.end
+          ? new Date(course.courseDates.end).toLocaleDateString("uk-UA")
+          : "";
+
+        const div = document.createElement("div");
+        div.className = "certificate-block";
+        div.innerHTML = `
+          <span class="certificate-dates">${start} – ${end}</span>
+          <h4>${course.courseTitle}</h4>
+          <p>${course.courseSubtitle || ""}</p>
+          <img src="assets/courses/certificate.png" class="certificate-img" alt="Certificate" />
+        `;
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Помилка при завантаженні пройдених курсів:", err);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", loadCompletedCourses);
+</script>
+
 </body>
 </html>

@@ -106,8 +106,9 @@ function logoutUser() {
     const tbody = document.getElementById("coursesTableBody");
     tbody.innerHTML = "";
 
-const filteredCourses = courses; // Показывай всё
-
+    const filteredCourses = courses 
+      ? courses.filter(course => course.status === filterStatus)
+      : courses;
 
     filteredCourses.forEach((course, index) => {
       const tr = document.createElement("tr");

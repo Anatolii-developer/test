@@ -17,6 +17,11 @@ const courseSchema = new mongoose.Schema({
     start: String,
     end: String
   },
+  status: {
+  type: String,
+  enum: ['Запланований', 'Поточний', 'Пройдений'],
+  default: 'Запланований'
+},
   accessType: String, // Відкрита група / Закрита група
   closedGroupMembers: [String],
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

@@ -127,12 +127,13 @@ async function fetchPlannedCourses() {
     const allCourses = await res.json();
 
     const filtered = allCourses.filter(course =>
-      course.status === "Запланований" &&
-      (
-        course.accessType === "open" ||
-        course.participants.includes(storedUser._id)
-      )
-    );
+  course.status === "Запланований" &&
+  (
+    course.accessType === "Відкрита група" ||
+    course.participants.includes(storedUser._id)
+  )
+);
+
 
     const container = document.querySelector(".current-courses-container");
     container.innerHTML = "";

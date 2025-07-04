@@ -482,13 +482,14 @@ async function fetchUserCoursesByStatus(targetStatus) {
     const res = await fetch(`${API_BASE}/api/courses`);
     const courses = await res.json();
 
-    const filtered = courses.filter(course =>
-      course.status === targetStatus &&
-      (
-        course.accessType === "open" ||
-        course.participants.includes(storedUser._id)
-      )
-    );
+    const filtered = allCourses.filter(course =>
+  course.status === "Запланований" &&
+  (
+    course.accessType === "Відкрита група" ||
+    course.participants.includes(storedUser._id)
+  )
+);
+
 
     const container = document.querySelector(".current-courses-container");
     container.innerHTML = "";

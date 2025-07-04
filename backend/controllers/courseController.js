@@ -3,36 +3,31 @@ const Course = require('../models/Course');
 // POST /api/courses
 exports.createCourse = async (req, res) => {
   try {
-    console.log("📥 New course request:", req.body);
-
     const { courseDates } = req.body;
 
-    // Преобразуем строки в Date-объекты, задав начало и конец дня
     const startDate = new Date(`${courseDates.start}T00:00:00`);
     const endDate = new Date(`${courseDates.end}T23:59:59`);
     const now = new Date();
 
-    // Вычисляем статус
     let status = "Запланований";
-    if (now >= startDate && now <= endDate) {
-      status = "Поточний";
-    } else if (now > endDate) {
-      status = "Пройдений";
-    }
+    if (now >= startDate && now <= endDate) status = "Поточний";
+    else if (now > endDate) status = "Пройдений";
 
-    // Создание курса
     const course = new Course({
       ...req.body,
-      courseDates: { start: startDate, end: endDate }, // сохраняем как Date-объекты
+      courseDates: {
+        start: startDate,
+        end: endDate,
+      },
       status
     });
 
     await course.save();
+    res.status(201).json({ success: true, course });
 
-    res.status(201).json({ success: true, message: "Курс створено", course });
-  } catch (error) {
-    console.error("❌ Error creating course:", error.message);
-    res.status(500).json({ message: "Помилка при створенні курсу", error: error.message });
+  } catch (err) {
+    console.error("❌ Error:", err.message);
+    res.status(500).json({ message: "Помилка при створенні курсу", error: err.message });
   }
 };
 

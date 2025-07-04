@@ -168,34 +168,36 @@
       }
 
       currentCourses.forEach(course => {
-        const courseDate = course.courseDates?.start
-          ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
-          : "";
+  const courseDate = course.courseDates?.start
+    ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+    : "";
 
-        const div = document.createElement("div");
-        div.className = "current-course-item";
-        div.innerHTML = `
-          <div class="course-date-line">
-            <hr />
-            <span>${courseDate}</span>
-            <hr />
-          </div>
-          <div class="current-course-inner">
-            <div>
-              <h3 class="current-course-title">${course.courseTitle}</h3>
-              <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-            </div>
-            ${course.zoomLink ? `
-              <div class="join-meeting-wrapper">
-                <a href="${course.zoomLink}" target="_blank" class="join-meeting-btn">
-                  Приєднатися до зустрічі
-                </a>
-              </div>` : ""}
-            <button class="current-show-more-btn">Дізнатись більше</button>
-          </div>
-        `;
-        container.appendChild(div);
-      });
+  const div = document.createElement("div");
+  div.className = "current-course-item";
+  div.innerHTML = `
+    <div class="course-date-line">
+      <hr />
+      <span>${courseDate}</span>
+      <hr />
+    </div>
+    <div class="current-course-inner">
+      <div>
+        <h3 class="current-course-title">${course.courseTitle}</h3>
+        <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+        <p class="current-course-description">${course.courseDescription || ""}</p>
+      </div>
+      ${course.zoomLink ? `
+        <div class="join-meeting-wrapper">
+          <a href="${course.zoomLink}" target="_blank" class="join-meeting-btn">
+            Приєднатися до зустрічі
+          </a>
+        </div>` : ""}
+      <button class="current-show-more-btn">Дізнатись більше</button>
+    </div>
+  `;
+  container.appendChild(div);
+});
+
     } catch (err) {
       console.error("Помилка при завантаженні курсів:", err);
     }

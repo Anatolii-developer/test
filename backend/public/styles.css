@@ -1735,9 +1735,16 @@
       height: 64px;
     }
     
-    
+
 
     
+
+    .current-course-description {
+  font-size: 15px;
+  color: #555;
+  margin-top: 4px;
+}
+
 
     /* Completed Courses Content */
 .completed-courses-content {

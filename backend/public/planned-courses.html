@@ -143,27 +143,29 @@ async function fetchPlannedCourses() {
     }
 
     filtered.forEach(course => {
-      const startDate = new Date(course.courseDates?.start).toLocaleDateString("uk-UA");
-      const courseHTML = `
-        <div class="current-course-item">
-          <div class="course-date-line">
-            <hr />
-            <span>${startDate}</span>
-            <hr />
-          </div>
-          <div class="current-course-inner">
-            <div>
-              <h3 class="current-course-title">${course.courseTitle}</h3>
-              <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-            </div>
-            <a href="course-details.html?id=${course._id}">
-              <button class="current-show-more-btn">Дізнатись більше</button>
-            </a>
-          </div>
+  const startDate = new Date(course.courseDates?.start).toLocaleDateString("uk-UA");
+  const courseHTML = `
+    <div class="current-course-item">
+      <div class="course-date-line">
+        <hr />
+        <span>${startDate}</span>
+        <hr />
+      </div>
+      <div class="current-course-inner">
+        <div>
+          <h3 class="current-course-title">${course.courseTitle}</h3>
+          <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+          <p class="current-course-description">${course.courseDescription || ""}</p>
         </div>
-      `;
-      container.insertAdjacentHTML("beforeend", courseHTML);
-    });
+        <a href="course-details.html?id=${course._id}">
+          <button class="current-show-more-btn">Дізнатись більше</button>
+        </a>
+      </div>
+    </div>
+  `;
+  container.insertAdjacentHTML("beforeend", courseHTML);
+});
+
 
   } catch (err) {
     console.error("Помилка при завантаженні курсів:", err);

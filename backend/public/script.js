@@ -615,74 +615,72 @@ function toggleCheckboxes() {
 
 
 
-document.getElementById("createCourseForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+window.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("createCourseForm");
+  if (!form) return;
 
-  const form = e.target;
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const creatorId = storedUser?._id;
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const creatorId = storedUser?._id;
 
-  let creatorName = "";
-  let creatorRole = "";
+    let creatorName = "";
+    let creatorRole = "";
 
-  try {
-    const resUser = await fetch(`http://157.230.121.24:5050/api/users/${creatorId}`);
-    const user = await resUser.json();
-    creatorName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-    creatorRole = user.role || "";
-  } catch (err) {
-    console.error("Помилка при отриманні даних користувача:", err);
-  }
+    try {
+      const resUser = await fetch(`http://157.230.121.24:5050/api/users/${creatorId}`);
+      const user = await resUser.json();
+      creatorName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+      creatorRole = user.role || "";
+    } catch (err) {
+      console.error("Помилка при отриманні даних користувача:", err);
+    }
 
-  const formData = {
-    eventType: form.eventType.value,
-    courseTitle: form.courseTitle.value,
-    courseSubtitle: form.courseSubtitle.value,
-    courseDescription: form.courseDescription.value,
-    courseDates: {
-      start: form.startDate.value,
-      end: form.endDate.value
-    },
-    courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
-    courseTime: {
-      start: form.startTime.value,
-      end: form.endTime.value
-    },
-    accessType: form.accessType.value,
-    courseDuration: form.courseDuration.value,
-    coursePrice: form.coursePrice.value,
-    zoomLink: form.zoomLink.value,
-   participants: selectedParticipants,
+    const formData = {
+      eventType: form.eventType.value,
+      courseTitle: form.courseTitle.value,
+      courseSubtitle: form.courseSubtitle.value,
+      courseDescription: form.courseDescription.value,
+      courseDates: {
+        start: form.startDate.value,
+        end: form.endDate.value
+      },
+      courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
+      courseTime: {
+        start: form.startTime.value,
+        end: form.endTime.value
+      },
+      accessType: form.accessType.value,
+      courseDuration: form.courseDuration.value,
+      coursePrice: form.coursePrice.value,
+      zoomLink: form.zoomLink.value,
+      participants: selectedParticipants,
+      creatorId,
+      creatorName,
+      creatorRole
+    };
 
+    try {
+      const res = await fetch("http://157.230.121.24:5050/api/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
 
-    // ➕ дані автора
-    creatorId,
-    creatorName,
-    creatorRole
-  };
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message || "Не вдалося зберегти курс");
+      }
 
-
-
-  const res = await fetch("http://157.230.121.24:5050/api/courses", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData)
+      alert("Курс успішно збережено");
+      form.reset();
+    } catch (err) {
+      alert("Помилка при збереженні курсу: " + err.message);
+    }
   });
-
-  const result = await res.json();
-  if (!res.ok) {
-  const error = await res.json();
-  throw new Error(error.message || "Не вдалося зберегти курс");
-}
-
-  if (result.success) {
-    alert("Курс успішно збережено");
-    form.reset();
-  } else {
-    alert("Помилка при збереженні курсу");
-  }
 });
+
 
 
 function handleSubmit() {

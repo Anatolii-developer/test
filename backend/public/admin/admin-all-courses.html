@@ -45,12 +45,13 @@
  <main class="admin-main">
 
     <!-- Top Navigation Buttons -->
-    <div class="completed-nav-buttons">
-      <a href="planned-courses.html" class="completed-nav-button">Заплановані</a>
-      <a href="current-courses.html" class="completed-nav-button">Поточні</a>
-      <a href="completed-courses.html" class="completed-nav-button">Пройдені</a>
-      <a href="admin-create-course.html" class="completed-nav-button create">Створити</a>
-    </div>
+<div class="completed-nav-buttons">
+  <button class="completed-nav-button" data-status="Запланований">Заплановані</button>
+  <button class="completed-nav-button" data-status="Поточний">Поточні</button>
+  <button class="completed-nav-button" data-status="Пройдений">Пройдені</button>
+  <a href="admin-create-course.html" class="completed-nav-button create">Створити</a>
+</div>
+
 
     <!-- All Courses Table -->
     <div class="course-table-container">
@@ -120,6 +121,49 @@ function logoutUser() {
 
   // Загружаем курсы при открытии страницы
   window.addEventListener("DOMContentLoaded", fetchCourses);
+
+
+  async function fetchCourses(filterStatus = null) {
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/courses");
+    const courses = await res.json();
+
+    const tbody = document.getElementById("coursesTableBody");
+    tbody.innerHTML = "";
+
+    const filteredCourses = filterStatus 
+      ? courses.filter(course => course.status === filterStatus)
+      : courses;
+
+    filteredCourses.forEach((course, index) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${course.courseTitle || "-"}</td>
+        <td>${course.creatorName || "-"}</td>
+        <td>${course.creatorRole || "-"}</td> 
+        <td>${formatDate(course.courseDates?.start)}</td>
+        <td><a href="admin-course-details.html?id=${course._id}" class="more-button">More</a></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error("Помилка при отриманні курсів:", err);
+  }
+}
+
+
+document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
+  button.addEventListener('click', () => {
+    const status = button.getAttribute('data-status');
+    fetchCourses(status);
+  });
+});
+
+
+window.addEventListener("DOMContentLoaded", () => fetchCourses());
+
   </script>
 </body>
 </html>

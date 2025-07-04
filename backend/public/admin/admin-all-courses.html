@@ -87,32 +87,7 @@ function logoutUser() {
   window.location.href = "login.html";
 }
 
- async function fetchCourses() {
-    try {
-      const res = await fetch("http://157.230.121.24:5050/api/courses");
-      const courses = await res.json();
-
-      const tbody = document.getElementById("coursesTableBody");
-      tbody.innerHTML = ""; // очистим перед вставкой
-
-      courses.forEach((course, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-  <td>${index + 1}</td>
-  <td>${course.courseTitle || "-"}</td>
-  <td>${course.creatorName || "-"}</td>
-  <td>${course.creatorRole || "-"}</td> 
-  <td>${formatDate(course.courseDates?.start)}</td>
-  <td><a href="admin-course-details.html?id=${course._id}" class="more-button">More</a></td>
-`;
-        tbody.appendChild(tr);
-      });
-
-    } catch (err) {
-      console.error("Помилка при отриманні курсів:", err);
-    }
-  }
-
+ 
   function formatDate(dateString) {
     if (!dateString) return "-";
     const date = new Date(dateString);

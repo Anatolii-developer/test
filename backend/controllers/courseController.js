@@ -1,18 +1,18 @@
 const Course = require('../models/Course');
 
 // POST /api/courses
-// POST /api/courses
 exports.createCourse = async (req, res) => {
   try {
     console.log("📥 New course request:", req.body);
 
     const { courseDates } = req.body;
 
-    // Проверка и вычисление статуса
+    // Преобразуем строки в Date-объекты, задав начало и конец дня
+    const startDate = new Date(`${courseDates.start}T00:00:00`);
+    const endDate = new Date(`${courseDates.end}T23:59:59`);
     const now = new Date();
-    const startDate = new Date(courseDates.start);
-    const endDate = new Date(courseDates.end);
 
+    // Вычисляем статус
     let status = "Запланований";
     if (now >= startDate && now <= endDate) {
       status = "Поточний";
@@ -20,8 +20,10 @@ exports.createCourse = async (req, res) => {
       status = "Пройдений";
     }
 
+    // Создание курса
     const course = new Course({
       ...req.body,
+      courseDates: { start: startDate, end: endDate }, // сохраняем как Date-объекты
       status
     });
 

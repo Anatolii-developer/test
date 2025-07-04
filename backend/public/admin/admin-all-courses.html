@@ -106,7 +106,7 @@ function logoutUser() {
     const tbody = document.getElementById("coursesTableBody");
     tbody.innerHTML = "";
 
-    const filteredCourses = filterStatus 
+    const filteredCourses = courses 
       ? courses.filter(course => course.status === filterStatus)
       : courses;
 

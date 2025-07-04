@@ -141,5 +141,69 @@
   </main>
 
   <script src="script.js"></script>
+  <script>
+  const API_BASE = "http://157.230.121.24:5050";
+
+  async function loadCurrentCourses() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/courses`);
+      const allCourses = await res.json();
+
+      const currentCourses = allCourses.filter(course =>
+        course.status === "Поточний" &&
+        (
+          course.accessType === "Відкрита група" ||
+          course.participants.includes(user._id)
+        )
+      );
+
+      const container = document.querySelector(".current-courses-container");
+      container.innerHTML = "";
+
+      if (currentCourses.length === 0) {
+        container.innerHTML = "<p>Наразі немає поточних курсів</p>";
+        return;
+      }
+
+      currentCourses.forEach(course => {
+        const courseDate = course.courseDates?.start
+          ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+          : "";
+
+        const div = document.createElement("div");
+        div.className = "current-course-item";
+        div.innerHTML = `
+          <div class="course-date-line">
+            <hr />
+            <span>${courseDate}</span>
+            <hr />
+          </div>
+          <div class="current-course-inner">
+            <div>
+              <h3 class="current-course-title">${course.courseTitle}</h3>
+              <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+            </div>
+            ${course.zoomLink ? `
+              <div class="join-meeting-wrapper">
+                <a href="${course.zoomLink}" target="_blank" class="join-meeting-btn">
+                  Приєднатися до зустрічі
+                </a>
+              </div>` : ""}
+            <button class="current-show-more-btn">Дізнатись більше</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Помилка при завантаженні курсів:", err);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", loadCurrentCourses);
+</script>
+
 </body>
 </html>

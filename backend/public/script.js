@@ -474,6 +474,53 @@ function updateSelectedDisplay() {
 }
 
 
+async function fetchUserCoursesByStatus(targetStatus) {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  if (!storedUser) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/courses`);
+    const courses = await res.json();
+
+    const filtered = courses.filter(course =>
+      course.status === targetStatus &&
+      (
+        course.accessType === "open" ||
+        course.participants.includes(storedUser._id)
+      )
+    );
+
+    const container = document.querySelector(".current-courses-container");
+    container.innerHTML = "";
+
+    filtered.forEach(course => {
+      const courseHTML = `
+        <div class="current-course-item">
+          <div class="course-date-line">
+            <hr />
+            <span>${new Date(course.courseDates.start).toLocaleDateString("uk-UA")}</span>
+            <hr />
+          </div>
+          <div class="current-course-inner">
+            <div>
+              <h3 class="current-course-title">${course.courseTitle}</h3>
+              <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+            </div>
+            <a href="course-details.html?id=${course._id}">
+              <button class="current-show-more-btn">Дізнатись більше</button>
+            </a>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML("beforeend", courseHTML);
+    });
+
+  } catch (err) {
+    console.error("Не вдалося завантажити курси:", err);
+  }
+}
+
+
 const saveChangesBtn = document.getElementById("saveProfileChangesBtn");
 if (saveChangesBtn) {
   saveChangesBtn.addEventListener("click", async () => {

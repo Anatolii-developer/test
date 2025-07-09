@@ -6,7 +6,7 @@ router.post('/', createCourse);
 router.get('/', getCourses);
 router.get('/:id', getCourseById);
 router.put('/:id', updateCourse);
-router.put('/courses/:id/approve', approveCourse);
+router.put('/:id/approve', approveCourse)
 
 
 module.exports = router;

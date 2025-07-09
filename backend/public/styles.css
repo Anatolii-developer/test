@@ -1749,7 +1749,7 @@
     /* Completed Courses Content */
 .completed-courses-content {
   width: 1110px;
-  height: 2344px;
+  height: auto;
   margin: 60px auto;
   padding: 60px 100px;
   border-radius: 24px;

@@ -270,13 +270,28 @@ const formData = {
     body: JSON.stringify(formData)
   });
 
+ try {
+  const res = await fetch("http://157.230.121.24:5050/api/courses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData)
+  });
+
   const result = await res.json();
-  if (result.success) {
-    alert("Курс успішно збережено");
-    form.reset();
-  } else {
-    alert("Помилка при збереженні курсу");
+
+  if (!res.ok) {
+    console.error("❌ Server returned error:", result);
+    alert("Помилка при збереженні курсу: " + (result.message || "Невідома помилка"));
+    return;
   }
+
+  alert("Курс успішно збережено");
+  form.reset();
+} catch (err) {
+  console.error("❌ Помилка на фронтенді:", err);
+  alert("Сервер тимчасово недоступний");
+}
+
 });
 
 function updateSelectedDisplay() {

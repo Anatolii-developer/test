@@ -76,11 +76,14 @@ exports.getCourses = async (req, res) => {
           newStatus = "Пройдений";
         }
 
-        // Если статус отличается — обновляем в базе
-        if (course.status !== newStatus) {
-          course.status = newStatus;
-          await course.save(); // сохраняем изменение в MongoDB
-        }
+       if (
+  course.status !== 'WAITING_FOR_APPROVAL' &&
+  course.status !== newStatus
+) {
+  course.status = newStatus;
+  await course.save();
+}
+
 
         return course;
       })

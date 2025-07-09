@@ -98,7 +98,7 @@ function logoutUser() {
   window.addEventListener("DOMContentLoaded", fetchCourses);
 
 
- async function fetchCourses(filterStatus = "WAITING_FOR_APPROVAL") {
+  async function fetchCourses(filterStatus = null) {
   try {
     const res = await fetch("http://157.230.121.24:5050/api/courses");
     const courses = await res.json();
@@ -106,7 +106,9 @@ function logoutUser() {
     const tbody = document.getElementById("coursesTableBody");
     tbody.innerHTML = "";
 
-    const filteredCourses = courses.filter(course => course.status === filterStatus);
+    const filteredCourses = courses 
+      ? courses.filter(course => course.status === filterStatus)
+      : courses;
 
     filteredCourses.forEach((course, index) => {
       const tr = document.createElement("tr");
@@ -116,10 +118,7 @@ function logoutUser() {
         <td>${course.creatorName || "-"}</td>
         <td>${course.creatorRole || "-"}</td> 
         <td>${formatDate(course.courseDates?.start)}</td>
-        <td>
-          <a href="admin-course-details.html?id=${course._id}" class="more-button">More</a>
-          ${filterStatus === "WAITING_FOR_APPROVAL" ? `<button onclick="approveCourse('${course._id}')">✅ Підтвердити</button>` : ""}
-        </td>
+        <td><a href="admin-course-details.html?id=${course._id}" class="more-button">More</a></td>
       `;
       tbody.appendChild(tr);
     });
@@ -130,37 +129,15 @@ function logoutUser() {
 }
 
 
-async function approveCourse(courseId) {
-  try {
-    const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/approve`, {
-      method: "PUT",
-    });
-
-    if (res.ok) {
-      alert("Курс підтверджено!");
-      fetchCourses(); // оновити таблицю
-    } else {
-      const result = await res.json();
-      alert("❌ " + result.message);
-    }
-  } catch (err) {
-    console.error("❌", err);
-    alert("Серверна помилка");
-  }
-}
-
-
 document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
   button.addEventListener('click', () => {
     const status = button.getAttribute('data-status');
-    fetchCourses(status); // передаём статус
+    fetchCourses(status);
   });
 });
 
 
-
-window.addEventListener("DOMContentLoaded", () => fetchCourses("WAITING_FOR_APPROVAL"));
-
+window.addEventListener("DOMContentLoaded", () => fetchCourses());
 
   </script>
 </body>

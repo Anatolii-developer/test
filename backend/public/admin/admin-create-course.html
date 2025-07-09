@@ -234,6 +234,8 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
   e.preventDefault();
 
   const form = e.target;
+const storedUser = JSON.parse(localStorage.getItem("user"));
+
 const formData = {
   eventType: form.eventType.value,
   courseTitle: form.courseTitle.value,
@@ -252,7 +254,12 @@ const formData = {
   courseDuration: form.courseDuration.value,
   coursePrice: form.coursePrice.value,
   zoomLink: form.zoomLink.value,
-  participants: Array.from(selectedUserIds), // ✅ фикс
+  participants: Array.from(selectedUserIds),
+
+  // 🟢 Добавь эти 3 поля
+  creatorId: storedUser?._id || null,
+  creatorName: `${storedUser?.firstName || ""} ${storedUser?.lastName || ""}`.trim(),
+  creatorRole: storedUser?.role || "",
 };
 
 

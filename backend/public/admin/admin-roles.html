@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Керування ролями</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+  <style>
+    .roles-wrapper {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 40px;
+      background: #fffef9;
+      border-radius: 16px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .roles-wrapper h1 {
+      margin-bottom: 24px;
+    }
+
+    .roles-list {
+      margin-top: 20px;
+    }
+
+    .role-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+
+    .role-item input {
+      font-size: 16px;
+      padding: 6px;
+      width: 200px;
+    }
+
+    .role-actions button {
+      margin-left: 10px;
+      padding: 6px 12px;
+      background: #E37009;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .add-role-form {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .add-role-form input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .add-role-form button {
+      padding: 10px 20px;
+      background: #16A34A;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="roles-wrapper">
+    <h1>Керування ролями</h1>
+
+    <div class="roles-list" id="rolesList">
+      <!-- Тут будуть ролі -->
+    </div>
+
+    <div class="add-role-form">
+      <input type="text" id="newRole" placeholder="Нова роль..." />
+      <button onclick="addRole()">Додати</button>
+    </div>
+  </div>
+
+  <script>
+    let roles = [];
+
+    async function loadRoles() {
+      try {
+        const res = await fetch("http://157.230.121.24:5050/api/roles");
+        roles = await res.json();
+        renderRoles();
+      } catch (err) {
+        console.error("Не вдалося завантажити ролі", err);
+      }
+    }
+
+    function renderRoles() {
+      const list = document.getElementById("rolesList");
+      list.innerHTML = "";
+
+      roles.forEach(role => {
+        const div = document.createElement("div");
+        div.className = "role-item";
+        div.innerHTML = `
+          <span>${role.name}</span>
+          <div class="role-actions">
+            <button onclick="editRole('${role._id}', '${role.name}')">✏️</button>
+            <button onclick="deleteRole('${role._id}')">🗑️</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function addRole() {
+      const name = document.getElementById("newRole").value.trim();
+      if (!name) return;
+
+      try {
+        const res = await fetch("http://157.230.121.24:5050/api/roles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+
+        if (res.ok) {
+          document.getElementById("newRole").value = "";
+          await loadRoles();
+        } else {
+          alert("Помилка при додаванні ролі");
+        }
+      } catch (err) {
+        console.error("Помилка при створенні ролі:", err);
+      }
+    }
+
+    async function deleteRole(id) {
+      if (!confirm("Видалити роль?")) return;
+
+      try {
+        const res = await fetch(`http://157.230.121.24:5050/api/roles/${id}`, {
+          method: "DELETE"
+        });
+
+        if (res.ok) {
+          await loadRoles();
+        } else {
+          alert("Не вдалося видалити роль");
+        }
+      } catch (err) {
+        console.error("Помилка при видаленні:", err);
+      }
+    }
+
+    function editRole(id, oldName) {
+      const newName = prompt("Нова назва ролі:", oldName);
+      if (!newName || newName === oldName) return;
+
+      fetch(`http://157.230.121.24:5050/api/roles/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName })
+      }).then(res => {
+        if (res.ok) loadRoles();
+        else alert("Помилка при оновленні ролі");
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", loadRoles);
+  </script>
+</body>
+</html>

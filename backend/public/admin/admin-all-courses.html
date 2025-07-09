@@ -98,7 +98,7 @@ function logoutUser() {
   window.addEventListener("DOMContentLoaded", fetchCourses);
 
 
-  async function fetchCourses() {
+ async function fetchCourses(filterStatus = "WAITING_FOR_APPROVAL") {
   try {
     const res = await fetch("http://157.230.121.24:5050/api/courses");
     const courses = await res.json();
@@ -106,7 +106,7 @@ function logoutUser() {
     const tbody = document.getElementById("coursesTableBody");
     tbody.innerHTML = "";
 
-    const filteredCourses = courses.filter(course => course.status === "WAITING_FOR_APPROVAL");
+    const filteredCourses = courses.filter(course => course.status === filterStatus);
 
     filteredCourses.forEach((course, index) => {
       const tr = document.createElement("tr");
@@ -118,7 +118,7 @@ function logoutUser() {
         <td>${formatDate(course.courseDates?.start)}</td>
         <td>
           <a href="admin-course-details.html?id=${course._id}" class="more-button">More</a>
-          <button onclick="approveCourse('${course._id}')">✅ Підтвердити</button>
+          ${filterStatus === "WAITING_FOR_APPROVAL" ? `<button onclick="approveCourse('${course._id}')">✅ Підтвердити</button>` : ""}
         </td>
       `;
       tbody.appendChild(tr);
@@ -150,16 +150,17 @@ async function approveCourse(courseId) {
 }
 
 
-
 document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
   button.addEventListener('click', () => {
     const status = button.getAttribute('data-status');
-    fetchCourses(status);
+    fetchCourses(status); // передаём статус
   });
 });
 
 
-window.addEventListener("DOMContentLoaded", () => fetchCourses());
+
+window.addEventListener("DOMContentLoaded", () => fetchCourses("WAITING_FOR_APPROVAL"));
+
 
   </script>
 </body>

@@ -7,11 +7,6 @@ exports.createCourse = async (req, res) => {
 
     const startDate = new Date(`${courseDates.start}T00:00:00`);
     const endDate = new Date(`${courseDates.end}T23:59:59`);
-    const now = new Date();
-
-    let status = "Запланований";
-    if (now >= startDate && now <= endDate) status = "Поточний";
-    else if (now > endDate) status = "Пройдений";
 
     const course = new Course({
       ...req.body,
@@ -19,7 +14,7 @@ exports.createCourse = async (req, res) => {
         start: startDate,
         end: endDate,
       },
-      status
+      status: "WAITING_FOR_APPROVAL" // ⬅ статус заявки
     });
 
     await course.save();
@@ -28,6 +23,34 @@ exports.createCourse = async (req, res) => {
   } catch (err) {
     console.error("❌ Error:", err.message);
     res.status(500).json({ message: "Помилка при створенні курсу", error: err.message });
+  }
+};
+
+
+// PUT /api/courses/:id/approve
+exports.approveCourse = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ message: "Курс не знайдено" });
+
+    const now = new Date();
+    const start = new Date(course.courseDates.start);
+    const end = new Date(course.courseDates.end);
+
+    let newStatus = "Запланований";
+    if (now >= start && now <= end) {
+      newStatus = "Поточний";
+    } else if (now > end) {
+      newStatus = "Пройдений";
+    }
+
+    course.status = newStatus;
+    await course.save();
+
+    res.json({ success: true, course });
+  } catch (err) {
+    console.error("❌ Error approving course:", err.message);
+    res.status(500).json({ message: "Помилка при підтвердженні курсу", error: err.message });
   }
 };
 

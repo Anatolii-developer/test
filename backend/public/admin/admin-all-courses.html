@@ -72,73 +72,92 @@
       </table>
     </div>
   </main>
+
+
   <script>
-    function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const arrow = document.getElementById('toggleArrow');
+  const API_BASE = "http://157.230.121.24:5050";
 
-  sidebar.classList.toggle('expanded');
-  sidebar.classList.toggle('collapsed');
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const arrow = document.getElementById('toggleArrow');
+    sidebar.classList.toggle('expanded');
+    sidebar.classList.toggle('collapsed');
+    arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+  }
 
-  arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
-}
+  function logoutUser() {
+    window.location.href = "login.html";
+  }
 
-function logoutUser() {
-  window.location.href = "login.html";
-}
-
- 
   function formatDate(dateString) {
     if (!dateString) return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("uk-UA");
   }
 
-  // Загружаем курсы при открытии страницы
-  window.addEventListener("DOMContentLoaded", fetchCourses);
+  async function fetchCourses(filterStatus = "WAITING_FOR_APPROVAL") {
+    try {
+      const res = await fetch(`${API_BASE}/api/courses`);
+      const courses = await res.json();
 
+      const tbody = document.getElementById("coursesTableBody");
+      tbody.innerHTML = "";
 
-  async function fetchCourses(filterStatus = null) {
-  try {
-    const res = await fetch("http://157.230.121.24:5050/api/courses");
-    const courses = await res.json();
+      const filteredCourses = filterStatus
+        ? courses.filter(course => course.status === filterStatus)
+        : courses;
 
-    const tbody = document.getElementById("coursesTableBody");
-    tbody.innerHTML = "";
-
-    const filteredCourses = courses 
-      ? courses.filter(course => course.status === filterStatus)
-      : courses;
-
-    filteredCourses.forEach((course, index) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${course.courseTitle || "-"}</td>
-        <td>${course.creatorName || "-"}</td>
-        <td>${course.creatorRole || "-"}</td> 
-        <td>${formatDate(course.courseDates?.start)}</td>
-        <td><a href="admin-course-details.html?id=${course._id}" class="more-button">More</a></td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-  } catch (err) {
-    console.error("Помилка при отриманні курсів:", err);
+      filteredCourses.forEach((course, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${course.courseTitle || "-"}</td>
+          <td>${course.creatorName || "-"}</td>
+          <td>${course.creatorRole || "-"}</td>
+          <td>${formatDate(course.courseDates?.start)}</td>
+          <td>
+            <a href="admin-course-details.html?id=${course._id}" class="more-button">More</a>
+            ${filterStatus === "WAITING_FOR_APPROVAL"
+              ? `<button onclick="approveCourse('${course._id}')">✅ Підтвердити</button>` : ""}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("Помилка при отриманні курсів:", err);
+    }
   }
-}
 
+  async function approveCourse(courseId) {
+    try {
+      const res = await fetch(`${API_BASE}/api/courses/${courseId}/approve`, {
+        method: "PUT",
+      });
 
-document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
-  button.addEventListener('click', () => {
-    const status = button.getAttribute('data-status');
-    fetchCourses(status);
+      if (res.ok) {
+        alert("Курс підтверджено!");
+        fetchCourses("WAITING_FOR_APPROVAL");
+      } else {
+        const result = await res.json();
+        alert("❌ " + result.message);
+      }
+    } catch (err) {
+      console.error("❌", err);
+      alert("Серверна помилка");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchCourses("WAITING_FOR_APPROVAL");
+
+    document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
+      button.addEventListener('click', () => {
+        const status = button.getAttribute('data-status');
+        fetchCourses(status);
+      });
+    });
   });
-});
+</script>
 
-
-window.addEventListener("DOMContentLoaded", () => fetchCourses());
-
-  </script>
 </body>
 </html>

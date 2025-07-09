@@ -125,7 +125,11 @@
     <div class="editable-block">
   <label>Учасники</label>
   <ul id="participantsList" style="margin-top: 6px; padding-left: 16px;"></ul>
+  <button class="edit-btn" onclick="openParticipantsModal()">
+    <img src="../assets/edit-icon.svg" alt="Edit" />
+  </button>
 </div>
+
 
 
     <div class="editable-block">
@@ -157,68 +161,168 @@
 
   <script>
     let courseId;
+let allUsers = [];
+let selectedParticipantIds = [];
 
-    async function loadCourseDetails() {
-      const params = new URLSearchParams(window.location.search);
-      courseId = params.get('id');
-      if (!courseId) return;
+function getFullName(user) {
+  return [user.firstName, user.lastName].filter(Boolean).join(" ");
+}
 
-      try {
-        const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
-        const course = await res.json();
+async function loadCourseDetails() {
+  const params = new URLSearchParams(window.location.search);
+  courseId = params.get('id');
+  if (!courseId) return;
 
-        document.getElementById("title").value = course.courseTitle;
-        document.getElementById("eventType").value = course.eventType;
-        document.getElementById("subtitle").value = course.courseSubtitle;
-        document.getElementById("description").value = course.courseDescription;
-        document.getElementById("access").value = course.accessType;
-        document.getElementById("duration").value = course.courseDuration;
-        document.getElementById("price").value = course.coursePrice;
-        document.getElementById("zoom").value = course.zoomLink;
+  try {
+    // Загружаем курс
+    const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
+    const course = await res.json();
 
-      } catch (err) {
-        console.error("Помилка при завантаженні курсу:", err);
-      }
+    document.getElementById("title").value = course.courseTitle;
+    document.getElementById("eventType").value = course.eventType;
+    document.getElementById("subtitle").value = course.courseSubtitle;
+    document.getElementById("description").value = course.courseDescription;
+    document.getElementById("access").value = course.accessType;
+    document.getElementById("duration").value = course.courseDuration;
+    document.getElementById("price").value = course.coursePrice;
+    document.getElementById("zoom").value = course.zoomLink;
+
+    // Сохраняем участников
+    selectedParticipantIds = course.participants || [];
+
+    // Загружаем всех пользователей
+    const usersRes = await fetch("http://157.230.121.24:5050/api/users");
+    allUsers = await usersRes.json();
+
+    updateParticipantsUI();
+  } catch (err) {
+    console.error("Помилка при завантаженні курсу:", err);
+  }
+}
+
+function updateParticipantsUI() {
+  const list = document.getElementById("participantsList");
+  list.innerHTML = "";
+  allUsers.forEach(user => {
+    if (selectedParticipantIds.includes(user._id)) {
+      const li = document.createElement("li");
+      li.textContent = getFullName(user) || user.email;
+      list.appendChild(li);
     }
+  });
+}
 
-    function enableEdit(id) {
-      const textarea = document.getElementById(id);
-      textarea.disabled = false;
-      textarea.focus();
+function enableEdit(id) {
+  const textarea = document.getElementById(id);
+  textarea.disabled = false;
+  textarea.focus();
+}
+
+async function saveChanges() {
+  const updated = {
+    courseTitle: document.getElementById("title").value,
+    eventType: document.getElementById("eventType").value,
+    courseSubtitle: document.getElementById("subtitle").value,
+    courseDescription: document.getElementById("description").value,
+    accessType: document.getElementById("access").value,
+    courseDuration: document.getElementById("duration").value,
+    coursePrice: document.getElementById("price").value,
+    zoomLink: document.getElementById("zoom").value,
+    participants: selectedParticipantIds,
+  };
+
+  try {
+    const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    });
+
+    if (res.ok) {
+      alert("Дані оновлено успішно");
+      document.querySelectorAll("textarea").forEach(t => t.disabled = true);
+    } else {
+      alert("Помилка при збереженні");
     }
+  } catch (err) {
+    console.error("Помилка при збереженні:", err);
+  }
+}
 
-    async function saveChanges() {
-      const updated = {
-        courseTitle: document.getElementById("title").value,
-        eventType: document.getElementById("eventType").value,
-        courseSubtitle: document.getElementById("subtitle").value,
-        courseDescription: document.getElementById("description").value,
-        accessType: document.getElementById("access").value,
-        courseDuration: document.getElementById("duration").value,
-        coursePrice: document.getElementById("price").value,
-        zoomLink: document.getElementById("zoom").value,
-      };
+window.addEventListener("DOMContentLoaded", loadCourseDetails);
 
-      try {
-        const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updated)
-        });
 
-        if (res.ok) {
-          alert("Дані оновлено успішно");
-          // отключить textarea обратно
-          document.querySelectorAll("textarea").forEach(t => t.disabled = true);
-        } else {
-          alert("Помилка при збереженні");
-        }
-      } catch (err) {
-        console.error("Помилка при збереженні:", err);
-      }
+function getFullName(user) {
+  return [user.firstName, user.lastName].filter(Boolean).join(" ");
+}
+
+async function openParticipantsModal() {
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/users");
+    allUsers = await res.json();
+    renderUserList(allUsers);
+    document.getElementById("participantsModal").style.display = "flex";
+  } catch (err) {
+    console.error("Не вдалося завантажити користувачів:", err);
+  }
+}
+
+function renderUserList(users) {
+  const container = document.getElementById("userList");
+  container.innerHTML = "";
+  users.forEach(user => {
+    const div = document.createElement("div");
+    const fullName = getFullName(user);
+    div.innerHTML = `
+      <label>
+        <input type="checkbox" value="${user._id}" ${selectedParticipantIds.includes(user._id) ? 'checked' : ''} />
+        ${fullName || user.email}
+      </label>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function applySelectedParticipants() {
+  const checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');
+  selectedParticipantIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+  updateParticipantsUI();
+  closeParticipantsModal();
+}
+
+function closeParticipantsModal() {
+  document.getElementById("participantsModal").style.display = "none";
+}
+
+function updateParticipantsUI() {
+  const list = document.getElementById("participantsList");
+  list.innerHTML = "";
+  allUsers.forEach(user => {
+    if (selectedParticipantIds.includes(user._id)) {
+      const li = document.createElement("li");
+      li.textContent = getFullName(user) || user.email;
+      list.appendChild(li);
     }
+  });
+}
 
-    window.addEventListener("DOMContentLoaded", loadCourseDetails);
+function filterParticipants(e) {
+  const query = e.target.value.toLowerCase();
+  const filtered = allUsers.filter(u => getFullName(u).toLowerCase().includes(query));
+  renderUserList(filtered);
+}
+
   </script>
+
+  <div id="participantsModal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+    <h3>Редагувати учасників</h3>
+    <input type="text" placeholder="Пошук..." oninput="filterParticipants(event)" />
+    <div id="userList" style="margin: 10px 0;"></div>
+    <button onclick="applySelectedParticipants()">Застосувати</button>
+    <button onclick="closeParticipantsModal()">Скасувати</button>
+  </div>
+</div>
+
 </body>
 </html>

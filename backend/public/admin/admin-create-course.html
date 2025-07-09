@@ -252,8 +252,9 @@ const formData = {
   courseDuration: form.courseDuration.value,
   coursePrice: form.coursePrice.value,
   zoomLink: form.zoomLink.value,
-  participants: [...form.participants.selectedOptions].map(opt => opt.value),
+  participants: Array.from(selectedUserIds), // ✅ фикс
 };
+
 
 
   const res = await fetch("http://157.230.121.24:5050/api/courses", {

@@ -19,9 +19,10 @@ const courseSchema = new mongoose.Schema({
   },
   status: {
   type: String,
-  enum: ['Запланований', 'Поточний', 'Пройдений'],
-  default: 'Запланований'
+  enum: ['WAITING_FOR_APPROVAL', 'Запланований', 'Поточний', 'Пройдений'],
+  default: 'WAITING_FOR_APPROVAL'
 },
+
   accessType: String, // Відкрита група / Закрита група
   closedGroupMembers: [String],
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

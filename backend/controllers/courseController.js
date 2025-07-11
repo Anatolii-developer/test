@@ -141,3 +141,15 @@ exports.updateCourse = async (req, res) => {
   }
 };
 
+
+exports.getCourseParticipants = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id).populate('participants');
+    if (!course) return res.status(404).json({ message: "Курс не знайдено" });
+    res.json(course.participants);
+  } catch (err) {
+    console.error("❌ Error fetching participants:", err.message);
+    res.status(500).json({ message: "Помилка сервера", error: err.message });
+  }
+};
+

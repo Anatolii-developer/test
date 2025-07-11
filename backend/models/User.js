@@ -56,8 +56,17 @@ next();
 
 userSchema.add({
   certificates: {
-    ua: { filename: String, url: String },
-    eng: { filename: String, url: String }
+    type: Map,
+    of: {
+      ua: {
+        filename: String,
+        url: String
+      },
+      eng: {
+        filename: String,
+        url: String
+      }
+    }
   }
 });
 

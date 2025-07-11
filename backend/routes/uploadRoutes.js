@@ -8,7 +8,6 @@ const router = express.Router();
 // Настройка multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, "../public/uploads/certificates")),
-
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
 });
 const upload = multer({ storage });

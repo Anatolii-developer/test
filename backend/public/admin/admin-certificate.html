@@ -89,7 +89,7 @@
 <script>
   function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const arrow = document.getElementById('toggleArrow'); 
+    const arrow = document.getElementById('toggleArrow');
     sidebar.classList.toggle('expanded');
     sidebar.classList.toggle('collapsed');
     arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
@@ -122,25 +122,29 @@
     });
 
     uploadBtn.onclick = async () => {
-      if (!certificateFile.files.length || !selectedUserId || !selectedLang) return;
+      if (!certificateFile.files.length || !selectedUserId || !selectedLang || !courseSelect.value) return;
 
       const formData = new FormData();
       formData.append("certificate", certificateFile.files[0]);
 
-    const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}&courseId=${courseSelect.value}`, {
-  method: "POST",
-  body: formData
-});
+      try {
+        const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}&courseId=${courseSelect.value}`, {
+          method: "POST",
+          body: formData
+        });
 
-
-
-
-      if (res.ok) {
-        alert(`Сертифікат (${selectedLang}) додано успішно`);
-        modal.style.display = "none";
-        courseSelect.dispatchEvent(new Event("change"));
-      } else {
-        alert("Помилка при завантаженні сертифікату");
+        if (res.ok) {
+          alert(`Сертифікат (${selectedLang}) додано успішно`);
+          modal.style.display = "none";
+          courseSelect.dispatchEvent(new Event("change"));
+        } else {
+          const error = await res.json();
+          console.error("❌ Server error:", error.message);
+          alert("Помилка при завантаженні сертифікату");
+        }
+      } catch (err) {
+        console.error("❌ Upload error:", err.message);
+        alert("Помилка з'єднання з сервером");
       }
     };
 
@@ -151,31 +155,35 @@
       const res = await fetch(`${API}/api/courses/${courseId}/participants`);
       const users = await res.json();
 
-      table.innerHTML = users.map((user, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${user.firstName} ${user.lastName}</td>
-          <td>${user.email}</td>
-          <td>${user.role || '-'}</td>
-          <td>${user.dateOfBirth || '-'}</td>
-          <td>
-            <button class="add-cert-btn" data-id="${user._id}" data-lang="ua">
-              ${user.certificates?.ua ? "View UA" : "Add UA"}
-            </button>
-            <button class="add-cert-btn" data-id="${user._id}" data-lang="eng">
-              ${user.certificates?.eng ? "View ENG" : "Add ENG"}
-            </button>
-          </td>
-        </tr>
-      `).join("");
+      table.innerHTML = users.map((user, i) => {
+        const certs = user.certificates?.[courseId] || {};
+        return `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${user.firstName} ${user.lastName}</td>
+            <td>${user.email}</td>
+            <td>${user.role || '-'}</td>
+            <td>${user.dateOfBirth || '-'}</td>
+            <td>
+              <button class="add-cert-btn" data-id="${user._id}" data-lang="ua">
+                ${certs.ua ? "View UA" : "Add UA"}
+              </button>
+              <button class="add-cert-btn" data-id="${user._id}" data-lang="eng">
+                ${certs.eng ? "View ENG" : "Add ENG"}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
 
       document.querySelectorAll(".add-cert-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           selectedUserId = btn.dataset.id;
           selectedLang = btn.dataset.lang;
 
+          const courseId = courseSelect.value;
           const user = users.find(u => u._id === selectedUserId);
-          const cert = user.certificates?.[selectedLang];
+          const cert = user.certificates?.[courseId]?.[selectedLang];
 
           if (cert && cert.url) {
             window.open(cert.url, "_blank");
@@ -186,7 +194,6 @@
       });
     });
 
-    // 🔁 Перемещённая внутрь функция
     async function loadCompletedCourses() {
       const res = await fetch(`${API}/api/courses?status=Пройдений`);
       const courses = await res.json();

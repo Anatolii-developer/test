@@ -57,8 +57,6 @@
         <input type="text" id="searchName" placeholder="Введіть ім’я або прізвище" />
         <select id="courseSelect">
           <option value="">Оберіть курс</option>
-          <option value="course1">Курс 1</option>
-          <option value="course2">Курс 2</option>
         </select>
       </div>
       <table class="requests-table">
@@ -115,71 +113,8 @@ function logoutUser() {
       const modal = document.getElementById("certificateModal");
       const modalClose = document.getElementById("modalClose");
       const uploadBtn = document.getElementById("uploadCertificateBtn");
-
-      async function fetchParticipants() {
-        const res = await fetch(`${API}/api/users?status=APPROVED`);
-        const users = await res.json();
-
-        table.innerHTML = users.map((user, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${user.firstName} ${user.lastName}</td>
-            <td>${user.email}</td>
-            <td>${user.role || '-'}</td>
-            <td>${user.dateOfBirth || '-'}</td>
-            <td>
-  <button class="add-cert-btn" data-id="${user._id}" data-lang="ua">
-    ${user.certificates?.ua ? "View UA" : "Add UA"}
-  </button>
-  <button class="add-cert-btn" data-id="${user._id}" data-lang="eng">
-    ${user.certificates?.eng ? "View ENG" : "Add ENG"}
-  </button>
-</td>
-
-          </tr>
-        `).join("");
-
-        document.querySelectorAll(".add-cert-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    selectedUserId = btn.dataset.id;
-    selectedLang = btn.dataset.lang;
-
-    const user = users.find(u => u._id === selectedUserId);
-    const cert = user.certificates?.[selectedLang];
-
-    if (cert && cert.url) {
-      window.open(cert.url, "_blank"); // открыть PDF или картинку
-    } else {
-      modal.style.display = "block";
-    }
-  });
-});
-
-      }
-
-      modalClose.onclick = () => modal.style.display = "none";
-      window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
-
-      uploadBtn.onclick = async () => {
-  const fileInput = document.getElementById("certificateFile");
-  if (!fileInput.files.length || !selectedUserId || !selectedLang) return;
-
-  const formData = new FormData();
-  formData.append("certificate", fileInput.files[0]);
-
-  const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}`, {
-    method: "POST",
-    body: formData
-  });
-
-  if (res.ok) {
-    alert(`Сертифікат (${selectedLang}) додано успішно`);
-    modal.style.display = "none";
-    location.reload(); // чтобы обновить кнопки
-  } else {
-    alert("Помилка при завантаженні сертифікату");
-  }
-};
+      let selectedLang = null;
+      const certificateFile = document.getElementById("certificateFile");
 
 
       searchInput.addEventListener("input", () => {
@@ -189,46 +124,90 @@ function logoutUser() {
           row.style.display = name.includes(value) ? "" : "none";
         });
       });
-
-      fetchParticipants();
+ loadCompletedCourses();
     });
 
-    router.post("/api/users/:id/certificate", upload.single("certificate"), async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const lang = req.query.lang;
 
-    console.log("➡ Uploading cert for user:", userId);
-    console.log("➡ Language:", lang);
-    console.log("➡ Uploaded file:", req.file);
+const courseSelect = document.getElementById("courseSelect");
 
-    if (!["ua", "eng"].includes(lang)) {
-      return res.status(400).send("Invalid language");
-    }
+uploadBtn.onclick = async () => {
+  if (!certificateFile.files.length || !selectedUserId || !selectedLang) return;
 
-    if (!req.file) {
-      return res.status(400).send("No file uploaded");
-    }
+  const formData = new FormData();
+  formData.append("certificate", certificateFile.files[0]);
 
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).send("User not found");
+  const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}`, {
+    method: "POST",
+    body: formData
+  });
 
-    const fileUrl = `/uploads/certificates/${req.file.filename}`;
-    if (!user.certificates) user.certificates = {};
-
-    user.certificates[lang] = {
-      filename: req.file.originalname,
-      url: fileUrl
-    };
-
-    await user.save();
-    res.send({ success: true, url: fileUrl });
-
-  } catch (error) {
-    console.error("❌ Certificate upload error:", error);
-    res.status(500).send("Server error");
+  if (res.ok) {
+    alert(`Сертифікат (${selectedLang}) додано успішно`);
+    modal.style.display = "none";
+    courseSelect.dispatchEvent(new Event("change")); // 🔁 обновить список участников
+  } else {
+    alert("Помилка при завантаженні сертифікату");
   }
+};
+
+
+courseSelect.addEventListener("change", async () => {
+  const courseId = courseSelect.value;
+  if (!courseId) return;
+
+  const res = await fetch(`${API}/api/courses/${courseId}/participants`);
+  const users = await res.json();
+
+  table.innerHTML = users.map((user, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${user.firstName} ${user.lastName}</td>
+      <td>${user.email}</td>
+      <td>${user.role || '-'}</td>
+      <td>${user.dateOfBirth || '-'}</td>
+      <td>
+        <button class="add-cert-btn" data-id="${user._id}" data-lang="ua">
+          ${user.certificates?.ua ? "View UA" : "Add UA"}
+        </button>
+        <button class="add-cert-btn" data-id="${user._id}" data-lang="eng">
+          ${user.certificates?.eng ? "View ENG" : "Add ENG"}
+        </button>
+      </td>
+    </tr>
+  `).join("");
+
+  // 🔁 Назначь события на новые кнопки
+  document.querySelectorAll(".add-cert-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedUserId = btn.dataset.id;
+      selectedLang = btn.dataset.lang;
+
+      const user = users.find(u => u._id === selectedUserId);
+      const cert = user.certificates?.[selectedLang];
+
+      if (cert && cert.url) {
+        window.open(cert.url, "_blank");
+      } else {
+        modal.style.display = "block";
+      }
+    });
+  });
 });
+
+
+async function loadCompletedCourses() {
+  const res = await fetch(`${API}/api/courses?status=Пройдений`);
+  const courses = await res.json();
+
+  courseSelect.innerHTML = `<option value="">Оберіть курс</option>`;
+  courses.forEach(course => {
+    const opt = document.createElement("option");
+    opt.value = course._id;
+    opt.textContent = course.courseTitle;
+    courseSelect.appendChild(opt);
+  });
+}
+
 
   </script>
 </body>

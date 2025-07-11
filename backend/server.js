@@ -30,6 +30,9 @@ app.use("/uploads", express.static("uploads"));
 const courseRoutes = require('./routes/courseRoutes');
 app.use('/api/courses', courseRoutes);
 
+const certificateRoutes = require('./routes/certificateRoutes');
+app.use('/api', certificateRoutes);
+
 
 
 // ✅ MongoDB

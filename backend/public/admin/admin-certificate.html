@@ -127,10 +127,11 @@
       const formData = new FormData();
       formData.append("certificate", certificateFile.files[0]);
 
-     await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}&courseId=${courseSelect.value}`, {
+    const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}&courseId=${courseSelect.value}`, {
   method: "POST",
   body: formData
 });
+
 
 
 

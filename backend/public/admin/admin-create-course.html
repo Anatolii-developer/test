@@ -238,65 +238,55 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
   e.preventDefault();
 
   const form = e.target;
-const storedUser = JSON.parse(localStorage.getItem("user"));
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
-const formData = {
-  eventType: form.eventType.value,
-  courseTitle: form.courseTitle.value,
-  courseSubtitle: form.courseSubtitle.value,
-  courseDescription: form.courseDescription.value,
-  courseDates: {
-    start: form.startDate.value,
-    end: form.endDate.value
-  },
-  courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
-  courseTime: {
-    start: form.startTime.value,
-    end: form.endTime.value
-  },
-  accessType: form.accessType.value,
-  courseDuration: form.courseDuration.value,
-  coursePrice: form.coursePrice.value,
-  zoomLink: form.zoomLink.value,
-  participants: Array.from(selectedUserIds),
+  const formData = {
+    eventType: form.eventType.value,
+    courseTitle: form.courseTitle.value,
+    courseSubtitle: form.courseSubtitle.value,
+    courseDescription: form.courseDescription.value,
+    courseDates: {
+      start: form.startDate.value,
+      end: form.endDate.value
+    },
+    courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
+    courseTime: {
+      start: form.startTime.value,
+      end: form.endTime.value
+    },
+    accessType: form.accessType.value,
+    courseDuration: form.courseDuration.value,
+    coursePrice: form.coursePrice.value,
+    zoomLink: form.zoomLink.value,
+    participants: Array.from(selectedUserIds),
+    creatorId: storedUser?._id || null,
+    creatorName: `${storedUser?.firstName || ""} ${storedUser?.lastName || ""}`.trim(),
+    creatorRole: storedUser?.role || "",
+  };
 
-  // 🟢 Добавь эти 3 поля
-  creatorId: storedUser?._id || null,
-  creatorName: `${storedUser?.firstName || ""} ${storedUser?.lastName || ""}`.trim(),
-  creatorRole: storedUser?.role || "",
-};
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/courses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    });
 
+    const result = await res.json();
 
+    if (!res.ok) {
+      console.error("❌ Server returned error:", result);
+      alert("Помилка при збереженні курсу: " + (result.message || "Невідома помилка"));
+      return;
+    }
 
-  const res = await fetch("http://157.230.121.24:5050/api/courses", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData)
-  });
-
- try {
-  const res = await fetch("http://157.230.121.24:5050/api/courses", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData)
-  });
-
-  const result = await res.json();
-
-  if (!res.ok) {
-    console.error("❌ Server returned error:", result);
-    alert("Помилка при збереженні курсу: " + (result.message || "Невідома помилка"));
-    return;
+    alert("Курс успішно збережено");
+    form.reset();
+  } catch (err) {
+    console.error("❌ Помилка на фронтенді:", err);
+    alert("Сервер тимчасово недоступний");
   }
-
-  alert("Курс успішно збережено");
-  form.reset();
-} catch (err) {
-  console.error("❌ Помилка на фронтенді:", err);
-  alert("Сервер тимчасово недоступний");
-}
-
 });
+
 
 function updateSelectedDisplay() {
   const container = document.getElementById("selectedParticipants");

@@ -769,6 +769,7 @@ body {
   flex-wrap: wrap;
 }
 
+
 .completed-nav-button {
   padding: 12px 28px;
   border-radius: 24px;
@@ -788,6 +789,11 @@ body {
 .completed-nav-button.create {
   background-color: #B65600;
 }
+
+.completed-nav-button.active {
+  background-color: #2F8B35 !important;
+}
+
 
 
 .course-table-container {

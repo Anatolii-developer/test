@@ -45,13 +45,14 @@
   </aside>
  <main class="admin-main">
 
-    <!-- Top Navigation Buttons -->
 <div class="completed-nav-buttons">
   <button class="completed-nav-button" data-status="Запланований">Заплановані</button>
   <button class="completed-nav-button" data-status="Поточний">Поточні</button>
   <button class="completed-nav-button" data-status="Пройдений">Пройдені</button>
+  <button class="completed-nav-button" data-status="WAITING_FOR_APPROVAL">Заявки на курси</button>
   <a href="admin-create-course.html" class="completed-nav-button create">Створити</a>
 </div>
+
 
 
     <!-- All Courses Table -->
@@ -148,16 +149,41 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    fetchCourses("WAITING_FOR_APPROVAL");
+ document.addEventListener("DOMContentLoaded", () => {
+  const defaultStatus = "WAITING_FOR_APPROVAL";
+  fetchCourses(defaultStatus);
 
-    document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
-      button.addEventListener('click', () => {
-        const status = button.getAttribute('data-status');
-        fetchCourses(status);
-      });
+  // Подсветить кнопку по умолчанию
+  const defaultBtn = document.querySelector(`.completed-nav-button[data-status="${defaultStatus}"]`);
+  if (defaultBtn) defaultBtn.classList.add("active");
+
+  // Назначить обработчики для кнопок
+  document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
+    button.addEventListener('click', () => {
+      const status = button.getAttribute('data-status');
+      fetchCourses(status);
+
+      // Убрать активность со всех
+      document.querySelectorAll('.completed-nav-button').forEach(btn => btn.classList.remove("active"));
+      // Добавить активность текущей
+      button.classList.add("active");
     });
   });
+});
+
+
+  document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
+  button.addEventListener('click', () => {
+    const status = button.getAttribute('data-status');
+    fetchCourses(status);
+
+    document.querySelectorAll('.completed-nav-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    button.classList.add('active');
+  });
+});
+
 </script>
 
 </body>

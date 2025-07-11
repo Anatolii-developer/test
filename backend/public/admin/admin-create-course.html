@@ -47,14 +47,18 @@
   <main id="admin-main">
 
 
-    <div class="completed-nav-buttons">
-      <a href="admin-all-courses.html" class="completed-nav-button secondary">Головна</a>
-      <a href="completed-courses.html" class="completed-nav-button secondary">Пройдені</a>
-      <a href="ongoing-courses.html" class="completed-nav-button secondary">Поточні</a>
-      <a href="planned-courses.html" class="completed-nav-button secondary">Заплановані</a>
-      <a href="admin-create-course.html" class="completed-nav-button create">Створити курс</a>
-    </div>
+<div class="completed-nav-buttons">
+  <div class="top-buttons">
+     <a href="admin-create-course.html" class="completed-nav-button create">Створити</a>
+    <button class="completed-nav-button" data-status="Запланований">Заплановані</button>
+    <button class="completed-nav-button" data-status="Поточний">Поточні</button>
+    <button class="completed-nav-button" data-status="Пройдений">Пройдені</button>
+  </div>
 
+  <div class="bottom-center-button">
+    <button class="completed-nav-button" data-status="WAITING_FOR_APPROVAL">Заявки на курси</button>
+  </div>
+</div>
     <section class="create-course-content">
       <form id="createCourseForm">
         <div class="form-group">

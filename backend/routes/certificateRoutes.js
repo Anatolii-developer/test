@@ -12,8 +12,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// POST /api/users/:id/certificate?lang=ua|eng&courseId=667abcd1234
-router.post("/api/users/:id/certificate", upload.single("certificate"), async (req, res) => {
+// ✅ Путь должен быть: /:id/certificate — НЕ полный!
+router.post("/:id/certificate", upload.single("certificate"), async (req, res) => {
   try {
     const userId = req.params.id;
     const lang = req.query.lang;
@@ -27,26 +27,24 @@ router.post("/api/users/:id/certificate", upload.single("certificate"), async (r
       return res.status(400).json({ success: false, message: "No file uploaded" });
     }
 
-   const user = await User.findById(userId);
-if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-const fileUrl = `/uploads/certificates/${req.file.filename}`;
+    const fileUrl = `/uploads/certificates/${req.file.filename}`;
 
-// 🔥 Обновляем корректно Mixed поле
-const certificates = user.certificates || {};
-const courseCerts = certificates[courseId] || {};
+    const certificates = user.certificates || {};
+    const courseCerts = certificates[courseId] || {};
 
-courseCerts[lang] = {
-  filename: req.file.originalname,
-  url: fileUrl
-};
+    courseCerts[lang] = {
+      filename: req.file.originalname,
+      url: fileUrl
+    };
 
-certificates[courseId] = courseCerts;
-user.certificates = certificates;
+    certificates[courseId] = courseCerts;
+    user.certificates = certificates;
 
-await user.save();
-res.json({ success: true, url: fileUrl });
-
+    await user.save();
+    res.json({ success: true, url: fileUrl });
 
   } catch (error) {
     console.error("❌ Certificate upload error:", error.message);

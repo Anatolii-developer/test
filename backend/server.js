@@ -34,10 +34,6 @@ const certificateRoutes = require('./routes/certificateRoutes');
 app.use('/api', certificateRoutes);
 
 
-const certificateRoutes = require('./routes/certificateRoutes');
-app.use('/api/certificates', certificateRoutes);
-
-
 
 // ✅ MongoDB
 mongoose.connect(process.env.MONGO_URI)

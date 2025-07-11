@@ -56,19 +56,11 @@ next();
 
 userSchema.add({
   certificates: {
-    type: Map,
-    of: {
-      ua: {
-        filename: String,
-        url: String
-      },
-      eng: {
-        filename: String,
-        url: String
-      }
-    }
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
   }
 });
+
 
 
 module.exports = mongoose.model("User", userSchema);

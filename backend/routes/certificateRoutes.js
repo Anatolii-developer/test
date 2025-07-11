@@ -47,9 +47,15 @@ router.post("/:id/certificate", upload.single("certificate"), async (req, res) =
     res.json({ success: true, url: fileUrl });
 
   } catch (error) {
-    console.error("❌ Certificate upload error:", error.message);
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
-  }
+  console.error("❌ Certificate upload error:", error); // 👉 показывает весь объект ошибки
+  res.status(500).json({
+    success: false,
+    message: "Server error",
+    error: error.message,
+    stack: error.stack   // 👈 добавляем стек для отладки
+  });
+}
+
 });
 
 module.exports = router;

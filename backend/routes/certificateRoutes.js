@@ -27,20 +27,26 @@ router.post("/api/users/:id/certificate", upload.single("certificate"), async (r
       return res.status(400).json({ success: false, message: "No file uploaded" });
     }
 
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+   const user = await User.findById(userId);
+if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    const fileUrl = `/uploads/certificates/${req.file.filename}`;
-    if (!user.certificates) user.certificates = {};
-    if (!user.certificates[courseId]) user.certificates[courseId] = {};
+const fileUrl = `/uploads/certificates/${req.file.filename}`;
 
-    user.certificates[courseId][lang] = {
-      filename: req.file.originalname,
-      url: fileUrl
-    };
+// 🔥 Обновляем корректно Mixed поле
+const certificates = user.certificates || {};
+const courseCerts = certificates[courseId] || {};
 
-    await user.save();
-    res.json({ success: true, url: fileUrl });
+courseCerts[lang] = {
+  filename: req.file.originalname,
+  url: fileUrl
+};
+
+certificates[courseId] = courseCerts;
+user.certificates = certificates;
+
+await user.save();
+res.json({ success: true, url: fileUrl });
+
 
   } catch (error) {
     console.error("❌ Certificate upload error:", error.message);

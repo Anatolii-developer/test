@@ -1,48 +1,50 @@
-const express = require('express');
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const User = require("../models/User");
+
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const User = require('../models/User');
 
-// Настройка хранилища
+// Настройка multer
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../public/uploads/certificates');
-    fs.mkdirSync(uploadPath, { recursive: true }); // создаём папку, если нет
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const filename = `${Date.now()}-${file.fieldname}${ext}`;
-    cb(null, filename);
-  },
+  destination: (req, file, cb) => cb(null, "uploads/certificates"),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
 });
-
 const upload = multer({ storage });
 
-// Загрузка сертификата
-router.post('/users/:userId/certificate', upload.single('certificate'), async (req, res) => {
+// POST /api/users/:id/certificate?lang=ua|eng&courseId=667abcd1234
+router.post("/api/users/:id/certificate", upload.single("certificate"), async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.params.id;
     const lang = req.query.lang;
-    if (!['ua', 'eng'].includes(lang)) {
-      return res.status(400).json({ message: 'Невірна мова сертифікату' });
+    const courseId = req.query.courseId;
+
+    if (!["ua", "eng"].includes(lang) || !courseId) {
+      return res.status(400).json({ success: false, message: "Missing or invalid query params" });
     }
 
-    const fileUrl = `/uploads/certificates/${req.file.filename}`;
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: 'Користувача не знайдено' });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    user.certificates = user.certificates || {};
-    user.certificates[lang] = { url: fileUrl };
+    const fileUrl = `/uploads/certificates/${req.file.filename}`;
+    if (!user.certificates) user.certificates = {};
+    if (!user.certificates[courseId]) user.certificates[courseId] = {};
+
+    user.certificates[courseId][lang] = {
+      filename: req.file.originalname,
+      url: fileUrl
+    };
+
     await user.save();
+    res.json({ success: true, url: fileUrl });
 
-    res.status(200).json({ message: 'Сертифікат успішно збережено', url: fileUrl });
-  } catch (err) {
-    console.error('❌ Серверна помилка при збереженні сертифікату:', err);
-    res.status(500).json({ message: 'Помилка сервера' });
+  } catch (error) {
+    console.error("❌ Certificate upload error:", error.message);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 });
 

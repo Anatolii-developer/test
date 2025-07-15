@@ -1807,6 +1807,14 @@
 }
 
 
+.current-course-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
 .course-actions {
   display: flex;
   align-items: center;
@@ -1817,7 +1825,7 @@
 .join-meeting-btn,
 .current-show-more-btn {
   font-family: 'Poppins', sans-serif;
-  padding: 10px;
+  padding: 10px 20px;
   border-radius: 24px;
   height: 32px;
   font-size: 12px;
@@ -1833,10 +1841,6 @@
 
 .join-meeting-btn {
   background-color: #275D2B;
-}
-
-.join-meeting-btn:hover {
-  background-color: #1c431f;
 }
 
 .current-show-more-btn {

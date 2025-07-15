@@ -1578,20 +1578,8 @@
       gap: 15px;
       padding-bottom: 60px;
     }
+
     
-    .course-title {
-      font-size: 20px;
-      font-weight: 700;
-      text-align: center;
-      color: #2D2D2D;
-    }
-    
-    .course-description {
-      font-size: 14px;
-      color: #2D2D2D;
-      opacity: 0.8;
-      line-height: 1.5;
-    }
     
     /* Матеріали до лекції */
     .lecture-materials-row {
@@ -1878,19 +1866,7 @@
   padding: 10px 0;
 }
 
-.course-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 20px 0 12px;
-  color: #333;
-}
 
-.course-subtitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 24px;
-}
 
 .course-details-btn {
   width: 136px;
@@ -1984,7 +1960,7 @@
     line-height: 24px;
     letter-spacing: 0;
     text-align: justify;
-    color: #414141;
+    color: #414141; 
     vertical-align: middle;
     margin: 12px 0;
 }

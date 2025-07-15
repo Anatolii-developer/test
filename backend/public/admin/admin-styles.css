@@ -12,7 +12,7 @@ body {
   }
   
   .sidebar {
-    width: 240px;
+    width: 220px;
     background-color: #F8F8F8;
     padding: 24px;
     display: flex;
@@ -436,24 +436,6 @@ body {
 
 
 
-/*Sidebar*/
-.sidebar {
-  position: fixed;  /* instead of absolute */
-  left: 0;
-  top: 0;
-  z-index: 100; /* make sure it's above content */
-  height: 100vh;
-  background-color: #ECF5EB;
-  padding: 24px;
-  gap: 24px;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); /* optional shadow */
-}
-
-
 .sidebar.expanded {
   width: 256px;
   align-items: flex-start;
@@ -556,14 +538,7 @@ body {
   display: none;
 }
 
-.sidebar.collapsed .logo {
-  display: none;
-}
 
-.sidebar.collapsed .logo-collapsed {
-  display: block;
-  margin-left: 0; /* optional if you want it centered */
-}
 
 
 
@@ -576,11 +551,6 @@ body {
     .sidebar.expanded .line {
       width: 208px;
     }
-
-    .sidebar.collapsed .line {
-      width: 44px;
-    }
-    
 
 
 
@@ -597,10 +567,6 @@ body {
     }
     
 
-.sidebar.collapsed nav a span {
-  display: none;
-}
-
 .sidebar .logout {
   display: flex;
   align-items: center;
@@ -612,9 +578,7 @@ body {
   font-size: 16px;
 }
 
-.sidebar.collapsed .logout span {
-  display: none;
-}
+
 
 
 .action-controls {
@@ -871,16 +835,6 @@ body {
 
 
 
-
-#mainContentWrapper {
-  margin-left: 240px; /* ширина sidebar */
-  width: calc(100% - 240px);
-}
-
-.sidebar.collapsed + #mainContentWrapper {
-  margin-left: 92px;
-  width: calc(100% - 92px);
-}
 
 /* Центрирование .create-course-content */
 .create-course-content {

@@ -1825,6 +1825,7 @@
 
 .join-meeting-btn,
 .current-show-more-btn {
+  width: auto;
   font-family: 'Poppins', sans-serif;
   padding: 10px 20px;
   border-radius: 24px;

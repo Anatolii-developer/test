@@ -54,8 +54,7 @@ router.put('/:id', updateUser);
 router.post("/:id/photo", profilePhotoUpload.single("photo"), uploadUserPhoto);
 
 
-// =================== Certificate upload ===================
-router.post("/:id/certificate", certUpload.single("certificate"), async (req, res) => {
+router.post("/:id/certificate", upload.single("certificate"), async (req, res) => {
   try {
     const userId = req.params.id;
     const lang = req.query.lang;
@@ -78,18 +77,24 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
 
     const fileUrl = `/uploads/certificates/${req.file.filename}`;
 
-    const certificates = user.certificates || {};
-    const courseCerts = certificates[courseId] || {};
+    // 🛠️ Гарантируем, что структура инициализирована
+    if (!user.certificates) user.certificates = {};
+    if (!user.certificates[courseId]) user.certificates[courseId] = {};
 
-    courseCerts[lang] = {
+    // 📝 Записываем сертификат
+    user.certificates[courseId][lang] = {
       filename: req.file.originalname,
-      url: fileUrl
+      url: fileUrl,
+      uploadedAt: new Date()
     };
 
-    certificates[courseId] = courseCerts;
-    user.certificates = certificates;
+    // 🔥 ОБЯЗАТЕЛЬНО для вложенных объектов
+    user.markModified("certificates");
 
+    // 💾 Сохраняем
     await user.save();
+
+    console.log("✅ Certificate saved for user", userId);
     res.json({ success: true, url: fileUrl });
 
   } catch (error) {
@@ -97,8 +102,7 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
     res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message,
-      stack: error.stack
+      error: error.message
     });
   }
 });

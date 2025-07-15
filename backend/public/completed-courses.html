@@ -59,8 +59,8 @@
     <div class="date-section">
         <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
         <div class="date-inputs">
-          <input type="date" class="date-input" />
-          <input type="date" class="date-input" />
+          <input type="date" class="date-input" id="startDate" />
+          <input type="date" class="date-input" id="endDate" />
         </div>
         <div class="filter-btn-wrapper">
           <button class="filter-btn">Фільтрувати</button>
@@ -87,21 +87,32 @@
   if (!user) return;
 
   try {
-    // Подгружаем свежего пользователя с сертификатами
     const resUser = await fetch(`${API_BASE}/api/users/${user._id}`);
     const freshUser = await resUser.json();
 
-    // Загружаем все курсы
     const res = await fetch(`${API_BASE}/api/courses`);
     const allCourses = await res.json();
 
-    const completedCourses = allCourses.filter(course =>
-      course.status === "Пройдений" &&
-      (
-        course.accessType === "Відкрита група" ||
-        course.participants.includes(user._id)
-      )
-    );
+    const startDateValue = document.getElementById("startDate")?.value;
+    const endDateValue = document.getElementById("endDate")?.value;
+
+    const startFilter = startDateValue ? new Date(startDateValue) : null;
+    const endFilter = endDateValue ? new Date(endDateValue) : null;
+
+    const completedCourses = allCourses.filter(course => {
+      if (course.status !== "Пройдений") return false;
+      if (
+        course.accessType !== "Відкрита група" &&
+        !course.participants.includes(user._id)
+      ) return false;
+
+      const courseStart = course.courseDates?.start ? new Date(course.courseDates.start) : null;
+
+      if (startFilter && courseStart && courseStart < startFilter) return false;
+      if (endFilter && courseStart && courseStart > endFilter) return false;
+
+      return true;
+    });
 
     const container = document.querySelector(".certificates-list");
     container.innerHTML = "";
@@ -120,43 +131,49 @@
         : "";
 
       const certData = freshUser.certificates?.[course._id];
-
       const certUA = certData?.ua?.url;
       const certENG = certData?.eng?.url;
 
       const div = document.createElement("div");
-div.className = "certificate-block";
-div.innerHTML = `
-  <div class="course-date-line">
-    <hr />
-    <span>${start} – ${end}</span>
-    <hr />
-  </div>
-  <div class="current-course-inner">
-    <div>
-      <h3 class="current-course-title">${course.courseTitle}</h3>
-      <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-      <p class="current-course-description">${course.courseDescription || ""}</p>
-    </div>
-    ${
-      certUA || certENG
-        ? `
-          <div class="certificate-links">
-            ${certUA ? `<a href="${certUA}" class="view-btn-cert" target="_blank">UA</a>` : ""}
-            ${certENG ? `<a href="${certENG}" class="view-btn-cert" target="_blank">ENG</a>` : ""}
+      div.className = "certificate-block";
+      div.innerHTML = `
+        <div class="course-date-line">
+          <hr />
+          <span>${start} – ${end}</span>
+          <hr />
+        </div>
+        <div class="current-course-inner">
+          <div>
+            <h3 class="current-course-title">${course.courseTitle}</h3>
+            <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+            <p class="current-course-description">${course.courseDescription || ""}</p>
           </div>
-        `
-        : `<p class="text-medium" style="color: gray;">Сертифікат ще не додано</p>`
-    }
-  </div>
-`;
-container.appendChild(div);
-
+          ${
+            certUA || certENG
+              ? `
+                <div class="certificate-links">
+                  ${certUA ? `<a href="${certUA}" class="view-btn-cert" target="_blank">UA</a>` : ""}
+                  ${certENG ? `<a href="${certENG}" class="view-btn-cert" target="_blank">ENG</a>` : ""}
+                </div>
+              `
+              : `<p class="text-medium" style="color: gray;">Сертифікат ще не додано</p>`
+          }
+        </div>
+      `;
+      container.appendChild(div);
     });
   } catch (err) {
     console.error("Помилка при завантаженні пройдених курсів:", err);
   }
 }
+window.addEventListener("DOMContentLoaded", () => {
+  loadCompletedCourses();
+
+  document.querySelector(".filter-btn")?.addEventListener("click", () => {
+    loadCompletedCourses();
+  });
+});
+
 
 
 

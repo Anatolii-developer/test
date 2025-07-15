@@ -1937,6 +1937,47 @@
   text-decoration: none;
 }
 
+.certificate-dates {
+    display: block;
+    color: #275D2B;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 28px;
+    text-align: center;
+    width: 910px;
+    opacity: 1;
+    margin: 0 auto 12px;
+}
+
+.course-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: #414141;
+    margin: 8px 0;
+}
+
+.course-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #606060;
+    margin: 6px 0;
+}
+
+.course-description {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0;
+    text-align: justify;
+    color: #414141;
+    vertical-align: middle;
+    margin: 12px 0;
+}
+
 
 .current-course-item {
   position: relative;

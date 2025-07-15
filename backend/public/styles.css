@@ -1832,7 +1832,16 @@
   background-color: #1c431f;
 }
 
+.certificate-block {
+  width: 100%;
+  max-width: 910px;
+  margin: 0 auto;
+}
+
+
+
 .course-date-line {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1871,6 +1880,7 @@
   border-top: 1px solid #295F2D;
   padding: 10px 0;
 }
+
 
 
 
@@ -1913,6 +1923,7 @@
   gap: 16px;
   margin-top: 8px;
 }
+
 .certificate-links a {
   color: #1E48C1;
   font-weight: 600;

@@ -11,16 +11,21 @@ body {
     background-color: #97C194;
   }
   
-  .sidebar {
-    width: 220px;
-    height: 100vh;
-    background-color: #F8F8F8;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-right: 1px solid #ccc;
-  }
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background-color: #F8F8F8;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #ccc;
+  z-index: 1000; /* поверх остального контента */
+}
+
   
   .admin-logo {
     width: 100%;

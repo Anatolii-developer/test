@@ -2030,24 +2030,6 @@
   max-width: 80%;
 }
 
-/* The button at the bottom-right */
-.current-show-more-btn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 136px;
-  height: 32px;
-  padding: 10px;
-  border-radius: 24px;
-  background-color: #295F2D;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'Poppins', sans-serif;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
 
 .current-show-more-btn:hover {
   background-color: #1e4821;

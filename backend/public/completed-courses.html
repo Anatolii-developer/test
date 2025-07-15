@@ -125,7 +125,7 @@
       const certENG = certData?.eng?.url;
 
       const div = document.createElement("div");
-      div.className = "certificate-block";
+div.className = "certificate-block";
 div.innerHTML = `
   <div class="course-date-line">
     <hr />
@@ -142,17 +142,16 @@ div.innerHTML = `
       certUA || certENG
         ? `
           <div class="certificate-links">
-            ${certUA ? `<a href="${certUA}" class="view-btn-certificate" target="_blank">UA</a>` : ""}
-            ${certENG ? `<a href="${certENG}" class="view-btn-certificate" target="_blank">ENG</a>` : ""}
+            ${certUA ? `<a href="${certUA}" class="view-btn" target="_blank">UA</a>` : ""}
+            ${certENG ? `<a href="${certENG}" class="view-btn" target="_blank">ENG</a>` : ""}
           </div>
         `
-        : `<p style="color: gray;">Сертифікат ще не додано</p>`
+        : `<p class="text-medium" style="color: gray;">Сертифікат ще не додано</p>`
     }
   </div>
 `;
+container.appendChild(div);
 
-
-      container.appendChild(div);
     });
   } catch (err) {
     console.error("Помилка при завантаженні пройдених курсів:", err);

@@ -173,29 +173,28 @@
 
   const div = document.createElement("div");
   div.className = "current-course-item";
-  div.innerHTML = `
-    <div class="course-date-line">
-      <hr />
-      <span>${courseDate}</span>
-      <hr />
+ div.innerHTML = `
+  <div class="course-date-line">
+    <hr />
+    <span>${courseDate}</span>
+    <hr />
+  </div>
+  <div class="current-course-inner">
+    <div>
+      <h3 class="current-course-title">${course.courseTitle}</h3>
+      <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+      <p class="current-course-description">${course.courseDescription || ""}</p>
     </div>
-    <div class="current-course-inner">
-      <div>
-        <h3 class="current-course-title">${course.courseTitle}</h3>
-        <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-        <p class="current-course-description">${course.courseDescription || ""}</p>
-      </div>
-      ${course.zoomLink || true ? `
- <div class="course-actions">
-  ${course.zoomLink ? `
-    <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
-      Приєднатися до зустрічі
-    </a>` : ""}
-  <button class="current-show-more-btn">Дізнатись більше</button>
-</div>
-` : ""}
+    <div class="course-actions">
+      ${course.zoomLink ? `
+        <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
+          Приєднатися до зустрічі
+        </a>` : ""}
+      <button class="current-show-more-btn">Дізнатись більше</button>
+    </div>
+  </div>
+`;
 
-  `;
   container.appendChild(div);
 });
 

@@ -2005,11 +2005,14 @@
   padding-bottom: 80px; /* gives space for button */
 }
 
-/* Holds text and button */
 .current-course-inner {
-  position: relative;
-  padding-right: 160px; /* space for button */
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: flex-end; 
 }
+
 
 /* Title and subtitle styling */
 .current-course-title {

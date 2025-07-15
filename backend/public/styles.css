@@ -1770,6 +1770,73 @@
 }
 
 
+.course-date-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 910px;
+  margin: 0 auto 40px auto;
+  color: #275D2B;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.course-date-line hr {
+  flex-grow: 1;
+  border: none;
+  height: 1px;
+  background-color: #275D2B;
+  opacity: 1;
+}
+
+.course-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: #414141;
+  margin-bottom: 12px;
+}
+
+.course-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #606060;
+  margin-bottom: 24px;
+}
+
+.course-description {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #414141;
+  text-align: justify;
+  line-height: 24px;
+  margin-bottom: 36px;
+}
+
+.course-meta {
+  margin-top: 20px;
+}
+
+.meta-label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #8F8F8F;
+}
+
+.meta-value {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #414141;
+}
+
+
     /* Completed Courses Content */
 .completed-courses-content {
   width: 1110px;

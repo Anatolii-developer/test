@@ -1810,34 +1810,37 @@
 .course-actions {
   display: flex;
   align-items: center;
-  gap: 12px; /* регулюй відстань між кнопками */
-  margin-top: 16px;
-  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .join-meeting-btn,
 .current-show-more-btn {
   font-family: 'Poppins', sans-serif;
   padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+  border-radius: 24px;
+  height: 32px;
+  font-size: 12px;
   text-decoration: none;
   color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .join-meeting-btn {
-  background-color: #1E48C1;
+  background-color: #275D2B;
+}
+
+.join-meeting-btn:hover {
+  background-color: #1c431f;
 }
 
 .current-show-more-btn {
   background-color: #295F2D;
-}
-
-.join-meeting-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 40px;
 }
 
 .join-meeting-btn {

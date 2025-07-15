@@ -1578,7 +1578,13 @@
       gap: 15px;
       padding-bottom: 60px;
     }
-
+    
+    .course-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      color: #2D2D2D;
+    }
     
     
     /* Матеріали до лекції */
@@ -1727,10 +1733,10 @@
 
     
 
-.certificate-block .current-course-description {
+    .current-course-description {
   font-size: 15px;
   color: #555;
-  margin-bottom: 24px;
+  margin-top: 4px;
 }
 
 
@@ -1826,8 +1832,7 @@
   background-color: #1c431f;
 }
 
-
-.certificate-block .course-date-line {
+.course-date-line {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1836,9 +1841,9 @@
   font-size: 16px;
   font-weight: 500;
   color: #295F2D;
-} 
+}
 
-.certificate-block .course-date-line hr {
+.course-date-line hr {
   flex: 1;
   height: 1px;
   border: none;
@@ -1887,14 +1892,12 @@
   background-color: #1e4821;
 }
 
+
 .certificate-block {
-  position: relative;
-  padding-bottom: 80px;
-  border-radius: 24px;
-  background-color: #fffef9;
-  padding: 40px 60px;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* text stays left */
+  gap: 16px;
 }
 
 .certificate-img {
@@ -1905,7 +1908,7 @@
 }
 
 
-.certificate-block .certificate-links {
+.certificate-links {
   display: flex;
   gap: 16px;
   margin-top: 8px;
@@ -1978,23 +1981,23 @@
 /* Holds text and button */
 .current-course-inner {
   position: relative;
-  padding-right: 160px;
+  padding-right: 160px; /* space for button */
 }
 
 /* Title and subtitle styling */
-.certificate-block .current-course-title {
+.current-course-title {
   font-size: 28px;
   font-weight: 700;
   color: #2D2D2D;
   margin-bottom: 12px;
 }
 
-.certificate-block .current-course-subtitle {
+.current-course-subtitle {
   font-size: 18px;
   font-weight: 600;
   color: #444;
   opacity: 0.9;
-  margin-bottom: 12px;
+  max-width: 80%;
 }
 
 /* The button at the bottom-right */

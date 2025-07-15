@@ -83,13 +83,6 @@
   <script>
   const API_BASE = "http://157.230.121.24:5050";
 
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const arrow = document.getElementById('toggleArrow');
-    sidebar.classList.toggle('expanded');
-    sidebar.classList.toggle('collapsed');
-    arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
-  }
 
   function logoutUser() {
     window.location.href = "login.html";

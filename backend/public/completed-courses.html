@@ -82,11 +82,16 @@
   <script src="script.js"></script>
   <script>
 
-  async function loadCompletedCourses() {
+ async function loadCompletedCourses() {
   const user = JSON.parse(localStorage.getItem("user"));
   if (!user) return;
 
   try {
+    // Подгружаем свежего пользователя с сертификатами
+    const resUser = await fetch(`${API_BASE}/api/users/${user._id}`);
+    const freshUser = await resUser.json();
+
+    // Загружаем все курсы
     const res = await fetch(`${API_BASE}/api/courses`);
     const allCourses = await res.json();
 
@@ -114,8 +119,10 @@
         ? new Date(course.courseDates.end).toLocaleDateString("uk-UA")
         : "";
 
-      const certData = user.certificates?.[course._id]; // доступ к сертификатам по courseId
-      const certUrl = certData?.ua?.url || certData?.eng?.url || null;
+      const certData = freshUser.certificates?.[course._id];
+
+      const certUA = certData?.ua?.url;
+      const certENG = certData?.eng?.url;
 
       const div = document.createElement("div");
       div.className = "certificate-block";
@@ -124,8 +131,13 @@
         <h4>${course.courseTitle}</h4>
         <p>${course.courseSubtitle || ""}</p>
         ${
-          certUrl
-            ? `<a href="${certUrl}" target="_blank"><img src="${certUrl}" class="certificate-img" alt="Certificate" /></a>`
+          certUA || certENG
+            ? `
+              <div class="certificate-links">
+                ${certUA ? `<a href="${certUA}" target="_blank">UA</a>` : ""}
+                ${certENG ? `<a href="${certENG}" target="_blank">ENG</a>` : ""}
+              </div>
+            `
             : `<p style="color: gray;">Сертифікат ще не додано</p>`
         }
       `;
@@ -135,6 +147,7 @@
     console.error("Помилка при завантаженні пройдених курсів:", err);
   }
 }
+
 
 
   window.addEventListener("DOMContentLoaded", loadCompletedCourses);

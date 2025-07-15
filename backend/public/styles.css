@@ -1926,6 +1926,18 @@
 }
 
 
+.certificate-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+.certificate-links a {
+  color: #1E48C1;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+
 .current-course-item {
   position: relative;
   padding-bottom: 80px; /* gives space for button */

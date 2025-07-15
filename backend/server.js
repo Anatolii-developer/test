@@ -21,8 +21,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
-const certificateRoutes = require('./routes/certificateRoutes');
-app.use('/api/users', certificateRoutes); // префикс добавлен один раз — правильно
 
 const courseRoutes = require('./routes/courseRoutes');
 app.use('/api/courses', courseRoutes);

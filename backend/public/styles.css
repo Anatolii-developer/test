@@ -1817,6 +1817,7 @@
 
 .course-actions {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
   gap: 12px;
   margin-top: 20px;
@@ -1838,6 +1839,7 @@
   border: none;
   cursor: pointer;
 }
+
 
 .join-meeting-btn {
   background-color: #275D2B;
@@ -2010,7 +2012,7 @@
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
-  align-items: flex-end; 
+  align-items: flex-end; /* выравнивание кнопок по низу */
 }
 
 

@@ -1727,10 +1727,10 @@
 
     
 
-    .current-course-description {
+.certificate-block .current-course-description {
   font-size: 15px;
   color: #555;
-  margin-top: 4px;
+  margin-bottom: 24px;
 }
 
 
@@ -1826,7 +1826,8 @@
   background-color: #1c431f;
 }
 
-.course-date-line {
+
+.certificate-block .course-date-line {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1835,9 +1836,9 @@
   font-size: 16px;
   font-weight: 500;
   color: #295F2D;
-}
+} 
 
-.course-date-line hr {
+.certificate-block .course-date-line hr {
   flex: 1;
   height: 1px;
   border: none;
@@ -1886,12 +1887,14 @@
   background-color: #1e4821;
 }
 
-
 .certificate-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* text stays left */
-  gap: 16px;
+  position: relative;
+  padding-bottom: 80px;
+  border-radius: 24px;
+  background-color: #fffef9;
+  padding: 40px 60px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .certificate-img {
@@ -1902,7 +1905,7 @@
 }
 
 
-.certificate-links {
+.certificate-block .certificate-links {
   display: flex;
   gap: 16px;
   margin-top: 8px;
@@ -1975,23 +1978,23 @@
 /* Holds text and button */
 .current-course-inner {
   position: relative;
-  padding-right: 160px; /* space for button */
+  padding-right: 160px;
 }
 
 /* Title and subtitle styling */
-.current-course-title {
+.certificate-block .current-course-title {
   font-size: 28px;
   font-weight: 700;
   color: #2D2D2D;
   margin-bottom: 12px;
 }
 
-.current-course-subtitle {
+.certificate-block .current-course-subtitle {
   font-size: 18px;
   font-weight: 600;
   color: #444;
   opacity: 0.9;
-  max-width: 80%;
+  margin-bottom: 12px;
 }
 
 /* The button at the bottom-right */

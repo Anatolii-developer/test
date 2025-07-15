@@ -206,39 +206,37 @@ document.getElementById("closeModal").addEventListener("click", () => {
         return;
       }
 
-      currentCourses.forEach(course => {
-        const showMoreBtn = div.querySelector(".current-show-more-btn");
-showMoreBtn.addEventListener("click", () => openCourseModal(course));
+currentCourses.forEach(course => {
   const courseDate = course.courseDates?.start
     ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
     : "";
 
-const div = document.createElement("div");
-div.className = "current-course-item";
-div.innerHTML = `
-  <div class="course-date-line">
-    <hr />
-    <span>${courseDate}</span>
-    <hr />
-  </div>
-  <div class="current-course-inner">
-    <div>
-      <h3 class="current-course-title">${course.courseTitle}</h3>
-      <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-      <p class="current-course-description">${course.courseDescription || ""}</p>
+  const div = document.createElement("div");
+  div.className = "current-course-item";
+  div.innerHTML = `
+    <div class="course-date-line">
+      <hr />
+      <span>${courseDate}</span>
+      <hr />
     </div>
-    <div class="course-actions">
-      ${course.zoomLink ? `
-        <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
-          Приєднатися до зустрічі
-        </a>` : ""}
-      <button class="current-show-more-btn" onclick='openCourseModal(${JSON.stringify(course)})'>
-  Дізнатись більше
-</button>
+    <div class="current-course-inner">
+      <div>
+        <h3 class="current-course-title">${course.courseTitle}</h3>
+        <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+        <p class="current-course-description">${course.courseDescription || ""}</p>
+      </div>
+      <div class="course-actions">
+        ${course.zoomLink ? `
+          <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
+            Приєднатися до зустрічі
+          </a>` : ""}
+        <button class="current-show-more-btn">Дізнатись більше</button>
+      </div>
+    </div>
+  `;
 
-    </div>
-  </div>
-`;
+  const showMoreBtn = div.querySelector(".current-show-more-btn");
+  showMoreBtn.addEventListener("click", () => openCourseModal(course));
 
   container.appendChild(div);
 });

@@ -186,14 +186,15 @@
         <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
         <p class="current-course-description">${course.courseDescription || ""}</p>
       </div>
-      ${course.zoomLink ? `
-        <div class="join-meeting-wrapper">
-          <a href="${course.zoomLink}" target="_blank" class="join-meeting-btn">
-            Приєднатися до зустрічі
-          </a>
-        </div>` : ""}
-      <button class="current-show-more-btn">Дізнатись більше</button>
-    </div>
+      ${course.zoomLink || true ? `
+  <div class="course-actions">
+    ${course.zoomLink ? `
+      <a href="${course.zoomLink}" target="_blank" class="join-meeting-btn">
+        Приєднатися до зустрічі
+      </a>` : ""}
+    <button class="current-show-more-btn">Дізнатись більше</button>
+  </div>` : ""}
+
   `;
   container.appendChild(div);
 });

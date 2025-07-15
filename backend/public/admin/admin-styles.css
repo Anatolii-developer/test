@@ -436,32 +436,6 @@ body {
 
 
 
-.sidebar.expanded {
-  width: 256px;
-  align-items: flex-start;
-}
-
-.sidebar.collapsed {
-  width: 92px;
-  align-items: center;
-}
-
-.sidebar .toggle-button {
-  position: absolute;
-  top: 32px;
-  right: -12px; /* this makes it "stick out" from the sidebar */
-  width: 32px;
-  height: 32px;
-  background: #f3f8f1;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000; /* make sure it's above other elements */
-  transition: right 0.3s ease;
-}
-
-
 .sidebar nav a.active {
   background-color: #FFFFFF;
 }
@@ -478,35 +452,8 @@ body {
   margin-left: 10px;
 }
 
-.sidebar.collapsed nav a span {
-  opacity: 0;
-  max-width: 0;
-  margin-left: 0;
-}
 
 
-.sidebar.collapsed nav a .tooltip {
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: #2D5C2D;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  white-space: nowrap;
-  font-size: 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.1s ease;
-  margin-left: 8px;
-  z-index: 9999;
-}
-
-.sidebar.collapsed nav a:hover .tooltip {
-  opacity: 1;
-}
 
 
 .sidebar .toggle-button img {
@@ -531,12 +478,6 @@ body {
   margin-left: 12px;       /* Add some spacing inside the sidebar */
 }
 
-.sidebar .logo-collapsed {
-  width: 40px;
-  height: auto;
-  object-fit: contain;
-  display: none;
-}
 
 
 
@@ -546,10 +487,6 @@ body {
       border-radius: 2px;
       height: 2px;
       margin: 12px 0;
-    }
-
-    .sidebar.expanded .line {
-      width: 208px;
     }
 
 

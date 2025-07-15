@@ -142,6 +142,33 @@
   <script src="script.js"></script>
   <script>
 
+    function openCourseModal(course) {
+  const modal = document.getElementById('courseModal');
+  const content = document.getElementById('modalCourseContent');
+  const start = new Date(course.courseDates.start).toLocaleDateString("uk-UA");
+  const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
+
+  content.innerHTML = `
+    <h2>${course.courseTitle}</h2>
+    <p><strong>${course.courseSubtitle}</strong></p>
+    <p>${course.courseDescription}</p>
+    <p><strong>Тип заходу:</strong> ${course.eventType}</p>
+    <p><strong>Дати:</strong> ${start} – ${end}</p>
+    <p><strong>Дні:</strong> ${course.courseDays.join(', ')}</p>
+    <p><strong>Час:</strong> ${course.courseTime.start} – ${course.courseTime.end}</p>
+    <p><strong>Тип групи:</strong> ${course.accessType}</p>
+    <p><strong>Тривалість:</strong> ${course.courseDuration}</p>
+    <p><strong>Ціна:</strong> ${course.coursePrice}</p>
+    ${course.zoomLink ? `<p><a href="${course.zoomLink}" target="_blank">Перейти на зустріч</a></p>` : ""}
+  `;
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById('courseModal').style.display = "none";
+}
+
+
   async function loadCurrentCourses() {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) return;
@@ -190,7 +217,10 @@ div.innerHTML = `
         <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
           Приєднатися до зустрічі
         </a>` : ""}
-      <button class="current-show-more-btn">Дізнатись більше</button>
+      <button class="current-show-more-btn" onclick='openCourseModal(${JSON.stringify(course)})'>
+  Дізнатись більше
+</button>
+
     </div>
   </div>
 `;
@@ -205,6 +235,14 @@ div.innerHTML = `
 
   window.addEventListener("DOMContentLoaded", loadCurrentCourses);
 </script>
+
+<div class="modal-current-course" id="courseModal">
+  <div class="modal-current-course-content">
+    <span class="modal-current-course-close" onclick="closeModal()">&times;</span>
+    <div id="modalCourseContent"></div>
+  </div>
+</div>
+
 
 </body>
 </html>

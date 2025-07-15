@@ -126,22 +126,31 @@
 
       const div = document.createElement("div");
       div.className = "certificate-block";
-      div.innerHTML = `
-        <span class="certificate-dates">${start} – ${end}</span>
-        <h4>${course.courseTitle}</h4>
-        <p>${course.courseSubtitle || ""}</p>
-        p>${course.courseDescription || ""}</p>
-        ${
-          certUA || certENG
-            ? `
-              <div class="certificate-links">
-                ${certUA ? `<a href="${certUA}" target="_blank">UA</a>` : ""}
-                ${certENG ? `<a href="${certENG}" target="_blank">ENG</a>` : ""}
-              </div>
-            `
-            : `<p style="color: gray;">Сертифікат ще не додано</p>`
-        }
-      `;
+     div.innerHTML = `
+  <div class="course-date-line">
+    <hr />
+    <span>${start} – ${end}</span>
+    <hr />
+  </div>
+  <div class="current-course-inner">
+    <div>
+      <h3 class="current-course-title">${course.courseTitle}</h3>
+      <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+      <p class="current-course-description">${course.courseDescription || ""}</p>
+    </div>
+    ${
+      certUA || certENG
+        ? `
+          <div class="certificate-links">
+            ${certUA ? `<a href="${certUA}" target="_blank">UA</a>` : ""}
+            ${certENG ? `<a href="${certENG}" target="_blank">ENG</a>` : ""}
+          </div>
+        `
+        : `<p style="color: gray;">Сертифікат ще не додано</p>`
+    }
+  </div>
+`;
+
       container.appendChild(div);
     });
   } catch (err) {

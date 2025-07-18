@@ -1729,16 +1729,29 @@
       height: 64px;
     }
     
-
-
-    .certificate-display {
+/* Make the outer certificate block expand */
+.certificate-block {
   width: 100%;
   max-width: 100%;
+  padding: 0;
+  margin-bottom: 40px;
+}
+
+/* Allow the viewer to stretch */
+.certificate-image-switcher {
+  width: 100%;
+  max-width: none;
+  margin-top: 24px;
+}
+
+/* Force embed to fill parent */
+.certificate-display {
+  display: block;
+  width: 100%;
   height: 600px;
   border: none;
   border-radius: 12px;
 }
-
 
     .current-course-description {
   font-size: 15px;

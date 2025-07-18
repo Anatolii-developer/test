@@ -125,13 +125,15 @@ router.get("/roles-with-users", async (req, res) => {
     const grouped = {};
 
     users.forEach(user => {
-      if (!user.role) return;
+      const role = typeof user.role === 'string' ? user.role.trim() : null;
 
-      if (!grouped[user.role]) {
-        grouped[user.role] = [];
+      if (!role) return; // пропускаем, если роль отсутствует
+
+      if (!grouped[role]) {
+        grouped[role] = [];
       }
 
-      grouped[user.role].push({
+      grouped[role].push({
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
         status: user.status
       });
@@ -139,11 +141,10 @@ router.get("/roles-with-users", async (req, res) => {
 
     res.json(grouped);
   } catch (err) {
-    console.error("Помилка при групуванні користувачів:", err);
-    res.status(500).json({ message: "Серверна помилка" });
+    console.error("❌ roles-with-users error:", err);
+    res.status(500).json({ message: "Серверна помилка", error: err.message });
   }
 });
-
 
 
 module.exports = router;

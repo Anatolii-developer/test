@@ -82,7 +82,12 @@
       const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
 
       content.innerHTML = `
-        <p class="modal-course-dates">${start} – ${end}</p>
+      <div class="modal-course-dates-line">
+  <hr />
+  <span>${start} – ${end}</span>
+  <hr />
+</div>
+
         <h2 class="modal-course-title">${course.courseTitle}</h2>
         <h4 class="modal-course-subtitle">${course.courseSubtitle}</h4>
         <p class="modal-course-description">${course.courseDescription}</p>

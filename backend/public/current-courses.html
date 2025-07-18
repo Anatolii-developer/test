@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Sidebar -->
   <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -32,30 +33,23 @@
     </div>
   </aside>
 
+  <!-- Main Content -->
   <main id="mainContent">
-    <!-- Title Header -->
     <div class="main-header">
       <h2>Поточні курси</h2>
       <img src="assets/library/going.png" alt="Current Courses" />
     </div>
 
-    <!-- Navigation Buttons -->
- <div class="completed-nav-buttons">
-  <a href="my-courses.html" class="completed-nav-button">  
-    <img src="assets/library/arrow-main.svg">Головна
-  </a>
-  <a href="completed-courses.html" class="completed-nav-button">Пройдені</a>
-  <a href="current-courses.html" class="completed-nav-button active">Поточні</a>
-  <a href="planned-courses.html" class="completed-nav-button">Заплановані</a>
-  <a href="create-course.html" class="completed-nav-button create">Створити</a>
-</div>
+    <div class="completed-nav-buttons">
+      <a href="my-courses.html" class="completed-nav-button"><img src="assets/library/arrow-main.svg">Головна</a>
+      <a href="completed-courses.html" class="completed-nav-button">Пройдені</a>
+      <a href="current-courses.html" class="completed-nav-button active">Поточні</a>
+      <a href="planned-courses.html" class="completed-nav-button">Заплановані</a>
+      <a href="create-course.html" class="completed-nav-button create">Створити</a>
+    </div>
 
-
-
-    <!-- Courses List -->
     <section class="completed-courses-content">
-            <!-- Filter -->
-    <div class="date-section">
+      <div class="date-section">
         <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
         <div class="date-inputs">
           <input type="date" class="date-input" />
@@ -65,90 +59,29 @@
           <button class="filter-btn" disabled>Фільтрувати</button>
         </div>
       </div>
-      <div class="current-courses-container">
-        <div class="current-course-item">
-          <div class="course-date-line">
-            <hr />
-            <span>30.04.2025</span>
-            <hr />
-          </div>
-        
-          <div class="current-course-inner">
-            <div>
-              <h3 class="current-course-title">Дослідження воєнного часу – Супервізійний курс – Осінь–2024</h3>
-              <p class="current-course-subtitle">Модуль 1 з 2-х річної кваліфікаційної програми з організації консультативної взаємодії психолога з клієнтами.</p>
-            </div>
-           <div class="course-actions">
-  <a href="..." class="join-meeting-btn">Приєднатися до зустрічі</a>
-  <button class="current-show-more-btn">Дізнатись більше</button>
-</div>
 
-          </div>
-        </div>
-        
-        
-          
-
-        <div class="current-course-item">
-          <div class="course-date-line">
-            <hr />
-            <span>30.04.2025</span>
-            <hr />
-          </div>
-        
-          <div class="current-course-inner">
-            <div>
-              <h3 class="current-course-title">Дослідження воєнного часу – Супервізійний курс – Осінь–2024</h3>
-              <p class="current-course-subtitle">Модуль 1 з 2-х річної кваліфікаційної програми з організації консультативної взаємодії психолога з клієнтами.</p>
-            </div>
-            <button class="current-show-more-btn">Дізнатись більше</button>
-             <div class="join-meeting-wrapper">
-  <a href="https://zoom.us/my/meeting-id" target="_blank" class="join-meeting-btn">
-    Приєднатися до зустрічі
-  </a>
-</div>
-          </div>
-        </div>
-        
-          
-
-        <div class="current-course-item">
-          <div class="course-date-line">
-            <hr />
-            <span>30.04.2025</span>
-            <hr />
-          </div>
-        
-          <div class="current-course-inner">
-            <div>
-              <h3 class="current-course-title">Дослідження воєнного часу – Супервізійний курс – Осінь–2024</h3>
-              <p class="current-course-subtitle">Модуль 1 з 2-х річної кваліфікаційної програми з організації консультативної взаємодії психолога з клієнтами.</p>
-            </div>
-             <div class="join-meeting-wrapper">
-  <a href="https://zoom.us/my/meeting-id" target="_blank" class="join-meeting-btn">
-    Приєднатися до зустрічі
-  </a>
-</div>
-            <button class="current-show-more-btn">Дізнатись більше</button>
-           
-          </div>
-        </div>
-        
-          
-      </div>
+      <div class="current-courses-container"></div>
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <!-- Modal -->
+  <div class="modal-current-course" id="courseModal">
+    <div class="modal-current-course-content">
+      <span class="modal-current-course-close" onclick="closeModal()">&times;</span>
+      <div id="modalCourseContent"></div>
+    </div>
+  </div>
+
   <script>
+    const API_BASE = "http://157.230.121.24:5050";
 
     function openCourseModal(course) {
-  const modal = document.getElementById('courseModal');
-  const content = document.getElementById('modalCourseContent');
-  const start = new Date(course.courseDates.start).toLocaleDateString("uk-UA");
-  const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
+      const modal = document.getElementById('courseModal');
+      const content = document.getElementById('modalCourseContent');
+      const start = new Date(course.courseDates.start).toLocaleDateString("uk-UA");
+      const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
 
-  content.innerHTML = `
+      content.innerHTML = `
         <p class="modal-course-dates">${start} – ${end}</p>
         <h2 class="modal-course-title">${course.courseTitle}</h2>
         <h4 class="modal-course-subtitle">${course.courseSubtitle}</h4>
@@ -167,85 +100,67 @@
       modal.style.display = "flex";
     }
 
-function closeModal() {
-  document.getElementById('courseModal').style.display = "none";
-}
-
-
-  async function loadCurrentCourses() {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/api/courses`);
-      const allCourses = await res.json();
-
-      const currentCourses = allCourses.filter(course =>
-        course.status === "Поточний" &&
-        (
-          course.accessType === "Відкрита група" ||
-          course.participants.includes(user._id)
-        )
-      );
-
-      const container = document.querySelector(".current-courses-container");
-      container.innerHTML = "";
-
-      if (currentCourses.length === 0) {
-        container.innerHTML = "<p>Наразі немає поточних курсів</p>";
-        return;
-      }
-
-      currentCourses.forEach(course => {
-  const courseDate = course.courseDates?.start
-    ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
-    : "";
-
-const div = document.createElement("div");
-div.className = "current-course-item";
-div.innerHTML = `
-  <div class="course-date-line">
-    <hr />
-    <span>${courseDate}</span>
-    <hr />
-  </div>
-  <div class="current-course-inner">
-    <div>
-      <h3 class="current-course-title">${course.courseTitle}</h3>
-      <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-      <p class="current-course-description">${course.courseDescription || ""}</p>
-    </div>
-    <div class="course-actions">
-      ${course.zoomLink ? `
-        <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
-          Приєднатися до зустрічі
-        </a>` : ""}
-     <button class="current-show-more-btn">Дізнатись більше</button>
-  Дізнатись більше
-</button>
-
-    </div>
-  </div>
-`;
-
-  container.appendChild(div);
-});
-
-    } catch (err) {
-      console.error("Помилка при завантаженні курсів:", err);
+    function closeModal() {
+      document.getElementById('courseModal').style.display = "none";
     }
-  }
 
-  window.addEventListener("DOMContentLoaded", loadCurrentCourses);
-</script>
+    async function loadCurrentCourses() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) return;
 
-<div class="modal-current-course" id="courseModal">
-  <div class="modal-current-course-content">
-    <span class="modal-current-course-close" onclick="closeModal()">&times;</span>
-    <div id="modalCourseContent"></div>
-  </div>
-</div>
+      try {
+        const res = await fetch(`${API_BASE}/api/courses`);
+        const allCourses = await res.json();
 
+        const currentCourses = allCourses.filter(course =>
+          course.status === "Поточний" &&
+          (course.accessType === "Відкрита група" || course.participants.includes(user._id))
+        );
 
+        const container = document.querySelector(".current-courses-container");
+        container.innerHTML = "";
+
+        if (currentCourses.length === 0) {
+          container.innerHTML = "<p>Наразі немає поточних курсів</p>";
+          return;
+        }
+
+        currentCourses.forEach(course => {
+          const courseDate = course.courseDates?.start
+            ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+            : "";
+
+          const div = document.createElement("div");
+          div.className = "current-course-item";
+          div.innerHTML = `
+            <div class="course-date-line">
+              <hr />
+              <span>${courseDate}</span>
+              <hr />
+            </div>
+            <div class="current-course-inner">
+              <div>
+                <h3 class="current-course-title">${course.courseTitle}</h3>
+                <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+                <p class="current-course-description">${course.courseDescription || ""}</p>
+              </div>
+              <div class="course-actions">
+                ${course.zoomLink ? `<a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">Приєднатися до зустрічі</a>` : ""}
+                <button class="current-show-more-btn">Дізнатись більше</button>
+              </div>
+            </div>`;
+
+          div.querySelector(".current-show-more-btn").addEventListener("click", () => openCourseModal(course));
+
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Помилка при завантаженні курсів:", err);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadCurrentCourses);
+  </script>
 </body>
 </html>

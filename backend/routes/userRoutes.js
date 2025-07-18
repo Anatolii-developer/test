@@ -120,14 +120,15 @@ router.get("/users-with-roles", async (req, res) => {
 
 router.get("/roles-with-users", async (req, res) => {
   try {
-    const users = await User.find({}, "firstName lastName role status");
+    const users = await User.find(
+      { role: { $exists: true, $type: "string", $ne: "" } }, // 👈 фильтрация
+      "firstName lastName role status"
+    );
 
     const grouped = {};
 
     for (const user of users) {
       const role = user.role;
-
-      if (!role || typeof role !== "string") continue;
 
       if (!grouped[role]) {
         grouped[role] = [];
@@ -145,6 +146,7 @@ router.get("/roles-with-users", async (req, res) => {
     res.status(500).json({ message: "Серверна помилка", error: err.message });
   }
 });
+
 
 
 module.exports = router;

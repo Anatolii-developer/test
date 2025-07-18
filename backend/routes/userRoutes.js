@@ -129,7 +129,15 @@ router.get("/roles-with-users", async (req, res) => {
     const grouped = {};
 
     for (const user of users) {
-     const role = typeof user.role === "string" ? user.role.trim() : "";
+      const role = typeof user.role === "string" ? user.role.trim() : "";
+
+      // 🧪 debug log
+      console.log("USER:", {
+        id: user._id,
+        role: user.role,
+        name: user.firstName + " " + user.lastName,
+        status: user.status
+      });
 
       if (!role) continue;
 
@@ -145,7 +153,7 @@ router.get("/roles-with-users", async (req, res) => {
 
     res.json(grouped);
   } catch (err) {
-    console.error("❌ roles-with-users error:", err); // ✅ обязательно подробный лог
+    console.error("❌ roles-with-users error:", err);
     res.status(500).json({ message: "Серверна помилка", error: err.message });
   }
 });

@@ -54,6 +54,7 @@ router.put('/:id', updateUser);
 router.post("/:id/photo", profilePhotoUpload.single("photo"), uploadUserPhoto);
 
 
+
 router.post("/:id/certificate", certUpload.single("certificate"), async (req, res) => {
   try {
     const userId = req.params.id;

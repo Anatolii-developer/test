@@ -124,9 +124,10 @@ router.get("/roles-with-users", async (req, res) => {
 
     const grouped = {};
 
-    users.forEach(user => {
+    for (const user of users) {
       const role = user.role;
-if (!role || typeof role !== "string") return; // безопасно
+
+      if (!role || typeof role !== "string") continue;
 
       if (!grouped[role]) {
         grouped[role] = [];
@@ -136,7 +137,7 @@ if (!role || typeof role !== "string") return; // безопасно
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
         status: user.status
       });
-    });
+    }
 
     res.json(grouped);
   } catch (err) {

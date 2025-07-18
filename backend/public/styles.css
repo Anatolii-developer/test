@@ -1809,7 +1809,7 @@
       color: #414141;
     }
     .modal-current-course {
-  display: flex;
+   display: none; 
   justify-content: center;
   align-items: center;
   position: fixed;

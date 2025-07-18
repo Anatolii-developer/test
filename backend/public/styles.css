@@ -1739,7 +1739,7 @@
 
 /* Allow the viewer to stretch */
 .certificate-image-switcher {
-  width: 100%;
+  width: 50%;
   max-width: none;
   margin-top: 24px;
 }

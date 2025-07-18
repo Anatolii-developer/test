@@ -6,6 +6,7 @@
   <title>Пройдені курси</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
  <aside class="sidebar collapsed" id="sidebar">
@@ -59,8 +60,8 @@
     <div class="date-section">
         <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
         <div class="date-inputs">
-          <input type="date" class="date-input" id="startDate" />
-          <input type="date" class="date-input" id="endDate" />
+          <input type="text" id="startDate" class="date-input" placeholder="DD/MM/YYYY" />
+          <input type="text" id="endDate" class="date-input" placeholder="DD/MM/YYYY" />
         </div>
         <div class="filter-btn-wrapper">
           <button class="filter-btn">Фільтрувати</button>
@@ -93,16 +94,12 @@
     const res = await fetch(`${API_BASE}/api/courses`);
     const allCourses = await res.json();
 
-    function parseDateDMY(value) {
-  const [year, month, day] = value.split("-");
-  return new Date(+year, +month - 1, +day); // month is 0-based
-}
+const startDateValue = document.getElementById("startDate").value;
+const endDateValue = document.getElementById("endDate").value;
 
-const startDateValue = document.getElementById("startDate")?.value;
-const endDateValue = document.getElementById("endDate")?.value;
+const startFilter = startDateValue ? parseDMY(startDateValue) : null;
+const endFilter = endDateValue ? parseDMY(endDateValue) : null;
 
-const startFilter = startDateValue ? parseDateDMY(startDateValue) : null;
-const endFilter = endDateValue ? parseDateDMY(endDateValue) : null;
 
 
     const completedCourses = allCourses.filter(course => {
@@ -181,10 +178,19 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+flatpickr("#startDate", {
+  dateFormat: "d/m/Y"
+});
+flatpickr("#endDate", {
+  dateFormat: "d/m/Y"
+});
 
-
-  window.addEventListener("DOMContentLoaded", loadCompletedCourses);
+function parseDMY(value) {
+  const [day, month, year] = value.split("/");
+  return new Date(+year, +month - 1, +day);
+}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 </body>
 </html>

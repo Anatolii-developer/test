@@ -149,23 +149,26 @@
   const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
 
   content.innerHTML = `
-    <h2>${course.courseTitle}</h2>
-    <p><strong>${course.courseSubtitle}</strong></p>
-    <p>${course.courseDescription}</p>
-    <p><strong>Тип заходу:</strong> ${course.eventType}</p>
-    <p><strong>Дати:</strong> ${start} – ${end}</p>
-    <p><strong>Дні:</strong> ${course.courseDays.join(', ')}</p>
-    <p><strong>Час:</strong> ${course.courseTime.start} – ${course.courseTime.end}</p>
-    <p><strong>Тип групи:</strong> ${course.accessType}</p>
-    <p><strong>Тривалість:</strong> ${course.courseDuration}</p>
-    <p><strong>Ціна:</strong> ${course.coursePrice}</p>
-    ${course.zoomLink ? `<p><a href="${course.zoomLink}" target="_blank">Перейти на зустріч</a></p>` : ""}
-  `;
-  modal.style.display = "flex";
-}
+        <p class="modal-course-dates">${start} – ${end}</p>
+        <h2 class="modal-course-title">${course.courseTitle}</h2>
+        <h4 class="modal-course-subtitle">${course.courseSubtitle}</h4>
+        <p class="modal-course-description">${course.courseDescription}</p>
+        <div class="modal-course-info">
+          <div><span class="modal-course-label">Тип заходу:</span> <span class="modal-course-answer">${course.eventType}</span></div>
+          <div><span class="modal-course-label">Дати:</span> <span class="modal-course-answer">${start} – ${end}</span></div>
+          <div><span class="modal-course-label">Дні:</span> <span class="modal-course-answer">${course.courseDays.join(', ')}</span></div>
+          <div><span class="modal-course-label">Час:</span> <span class="modal-course-answer">${course.courseTime.start} – ${course.courseTime.end}</span></div>
+          <div><span class="modal-course-label">Тип групи:</span> <span class="modal-course-answer">${course.accessType}</span></div>
+          <div><span class="modal-course-label">Тривалість:</span> <span class="modal-course-answer">${course.courseDuration}</span></div>
+          <div><span class="modal-course-label">Ціна:</span> <span class="modal-course-answer">${course.coursePrice}</span></div>
+          ${course.zoomLink ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Перейти на зустріч</a></span></div>` : ""}
+        </div>`;
+
+      modal.style.display = "flex";
+    }
 
 function closeModal() {
-  document.getElementById('courseModal').style.display = "flex";
+  document.getElementById('courseModal').style.display = "none";
 }
 
 

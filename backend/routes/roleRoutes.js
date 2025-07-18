@@ -1,13 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-
-const roleSchema = new mongoose.Schema({
-  name: String,
-  active: { type: Boolean, default: true }
-});
-
-const Role = mongoose.model("Role", roleSchema);
+const Role = require("../models/Role");
 
 // GET all roles
 router.get("/", async (req, res) => {

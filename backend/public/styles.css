@@ -1760,7 +1760,7 @@
 }
 
 .modal-course-dates {
-      font-family: Poppins;
+      font-family: 'Poppins', sans-serif;
       font-weight: 500;
       font-size: 20px;
       line-height: 28px;
@@ -1769,21 +1769,21 @@
       margin-bottom: 32px;
     }
     .modal-course-title {
-      font-family: Poppins;
+     font-family: 'Poppins', sans-serif;
       font-weight: 600;
       font-size: 32px;
       color: #414141;
       margin-bottom: 24px;
     }
     .modal-course-subtitle {
-      font-family: Poppins;
+      font-family: 'Poppins', sans-serif;
       font-weight: 600;
       font-size: 20px;
       color: #606060;
       margin-bottom: 24px;
     }
     .modal-course-description {
-      font-family: Poppins;
+      font-family: 'Poppins', sans-serif;
       font-weight: 400;
       font-size: 16px;
       line-height: 24px;
@@ -1797,13 +1797,13 @@
       gap: 12px;
     }
     .modal-course-label {
-      font-family: Poppins;
+      font-family: 'Poppins', sans-serif;
       font-weight: 400;
       font-size: 16px;
       color: #8F8F8F;
     }
     .modal-course-answer {
-      font-family: Poppins;
+     font-family: 'Poppins', sans-serif;
       font-weight: 500;
       font-size: 18px;
       color: #414141;

@@ -153,13 +153,17 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
           </div>
           ${
             certUA || certENG
-              ? `
-                <div class="certificate-links">
-                  ${certUA ? `<a href="${certUA}" class="view-btn-cert" target="_blank">UA</a>` : ""}
-                  ${certENG ? `<a href="${certENG}" class="view-btn-cert" target="_blank">ENG</a>` : ""}
-                </div>
-              `
-              : `<p class="text-medium" style="color: gray;">Сертифікат ще не додано</p>`
+  ? `
+    <div class="certificate-image-switcher">
+      <div class="switch-buttons">
+        ${certUA ? `<button onclick="switchCertificate(this, '${certUA}')">UA</button>` : ""}
+        ${certENG ? `<button onclick="switchCertificate(this, '${certENG}')">ENG</button>` : ""}
+      </div>
+      <img class="certificate-display" src="${certUA || certENG}" alt="Certificate" />
+    </div>
+  `
+  : `<p class="text-medium" style="color: gray;">Сертифікат ще не додано</p>`
+
           }
         </div>
       `;
@@ -176,6 +180,17 @@ window.addEventListener("DOMContentLoaded", () => {
     loadCompletedCourses();
   });
 });
+
+
+function switchCertificate(button, newSrc) {
+  const container = button.closest(".certificate-image-switcher");
+  const img = container.querySelector(".certificate-display");
+  img.src = newSrc;
+
+  // Optional: Highlight active button
+  container.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+  button.classList.add("active");
+}
 
 
 flatpickr("#startDate", {

@@ -129,7 +129,7 @@ router.get("/roles-with-users", async (req, res) => {
     const grouped = {};
 
     for (const user of users) {
-      const role = user.role?.trim(); // ⬅️ защитился от null
+     const role = typeof user.role === "string" ? user.role.trim() : "";
 
       if (!role) continue;
 

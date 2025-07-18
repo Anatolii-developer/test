@@ -141,36 +141,36 @@
 
   <script src="script.js"></script>
   <script>
+  const API_BASE = "http://157.230.121.24:5050"; // Убедись, что такой URL тебе подходит
 
-    function openCourseModal(course) {
-  const modal = document.getElementById('courseModal');
-  const content = document.getElementById('modalCourseContent');
-  const start = new Date(course.courseDates.start).toLocaleDateString("uk-UA");
-  const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
+  function openCourseModal(course) {
+    const modal = document.getElementById('courseModal');
+    const content = document.getElementById('modalCourseContent');
+    const start = new Date(course.courseDates.start).toLocaleDateString("uk-UA");
+    const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
 
-  content.innerHTML = `
-        <p class="modal-course-dates">${start} – ${end}</p>
-        <h2 class="modal-course-title">${course.courseTitle}</h2>
-        <h4 class="modal-course-subtitle">${course.courseSubtitle}</h4>
-        <p class="modal-course-description">${course.courseDescription}</p>
-        <div class="modal-course-info">
-          <div><span class="modal-course-label">Тип заходу:</span> <span class="modal-course-answer">${course.eventType}</span></div>
-          <div><span class="modal-course-label">Дати:</span> <span class="modal-course-answer">${start} – ${end}</span></div>
-          <div><span class="modal-course-label">Дні:</span> <span class="modal-course-answer">${course.courseDays.join(', ')}</span></div>
-          <div><span class="modal-course-label">Час:</span> <span class="modal-course-answer">${course.courseTime.start} – ${course.courseTime.end}</span></div>
-          <div><span class="modal-course-label">Тип групи:</span> <span class="modal-course-answer">${course.accessType}</span></div>
-          <div><span class="modal-course-label">Тривалість:</span> <span class="modal-course-answer">${course.courseDuration}</span></div>
-          <div><span class="modal-course-label">Ціна:</span> <span class="modal-course-answer">${course.coursePrice}</span></div>
-          ${course.zoomLink ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Перейти на зустріч</a></span></div>` : ""}
-        </div>`;
+    content.innerHTML = `
+      <p class="modal-course-dates">${start} – ${end}</p>
+      <h2 class="modal-course-title">${course.courseTitle}</h2>
+      <h4 class="modal-course-subtitle">${course.courseSubtitle}</h4>
+      <p class="modal-course-description">${course.courseDescription}</p>
+      <div class="modal-course-info">
+        <div><span class="modal-course-label">Тип заходу:</span> <span class="modal-course-answer">${course.eventType}</span></div>
+        <div><span class="modal-course-label">Дати:</span> <span class="modal-course-answer">${start} – ${end}</span></div>
+        <div><span class="modal-course-label">Дні:</span> <span class="modal-course-answer">${course.courseDays.join(', ')}</span></div>
+        <div><span class="modal-course-label">Час:</span> <span class="modal-course-answer">${course.courseTime.start} – ${course.courseTime.end}</span></div>
+        <div><span class="modal-course-label">Тип групи:</span> <span class="modal-course-answer">${course.accessType}</span></div>
+        <div><span class="modal-course-label">Тривалість:</span> <span class="modal-course-answer">${course.courseDuration}</span></div>
+        <div><span class="modal-course-label">Ціна:</span> <span class="modal-course-answer">${course.coursePrice}</span></div>
+        ${course.zoomLink ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Перейти на зустріч</a></span></div>` : ""}
+      </div>
+    `;
+    modal.style.display = "flex";
+  }
 
-      modal.style.display = "flex";
-    }
-
-function closeModal() {
-  document.getElementById('courseModal').style.display = "none";
-}
-
+  function closeModal() {
+    document.getElementById('courseModal').style.display = "none";
+  }
 
   async function loadCurrentCourses() {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -197,39 +197,40 @@ function closeModal() {
       }
 
       currentCourses.forEach(course => {
-  const courseDate = course.courseDates?.start
-    ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
-    : "";
+        const courseDate = course.courseDates?.start
+          ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+          : "";
 
-const div = document.createElement("div");
-div.className = "current-course-item";
-div.innerHTML = `
-  <div class="course-date-line">
-    <hr />
-    <span>${courseDate}</span>
-    <hr />
-  </div>
-  <div class="current-course-inner">
-    <div>
-      <h3 class="current-course-title">${course.courseTitle}</h3>
-      <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-      <p class="current-course-description">${course.courseDescription || ""}</p>
-    </div>
-    <div class="course-actions">
-      ${course.zoomLink ? `
-        <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
-          Приєднатися до зустрічі
-        </a>` : ""}
-      <button class="current-show-more-btn" onclick='openCourseModal(${JSON.stringify(course)})'>
-  Дізнатись більше
-</button>
+        const div = document.createElement("div");
+        div.className = "current-course-item";
+        div.innerHTML = `
+          <div class="course-date-line">
+            <hr />
+            <span>${courseDate}</span>
+            <hr />
+          </div>
+          <div class="current-course-inner">
+            <div>
+              <h3 class="current-course-title">${course.courseTitle}</h3>
+              <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
+              <p class="current-course-description">${course.courseDescription || ""}</p>
+            </div>
+            <div class="course-actions">
+              ${course.zoomLink ? `
+                <a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">
+                  Приєднатися до зустрічі
+                </a>` : ""}
+              <button class="current-show-more-btn">Дізнатись більше</button>
+            </div>
+          </div>
+        `;
 
-    </div>
-  </div>
-`;
+        div.querySelector(".current-show-more-btn").addEventListener("click", () => {
+          openCourseModal(course);
+        });
 
-  container.appendChild(div);
-});
+        container.appendChild(div);
+      });
 
     } catch (err) {
       console.error("Помилка при завантаженні курсів:", err);
@@ -238,6 +239,7 @@ div.innerHTML = `
 
   window.addEventListener("DOMContentLoaded", loadCurrentCourses);
 </script>
+
 
 <div class="modal-current-course" id="courseModal">
   <div class="modal-current-course-content">

@@ -107,5 +107,43 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
   }
 });
 
+router.get("/users-with-roles", async (req, res) => {
+  try {
+    const users = await User.find({}, "firstName lastName email role status"); // получаем нужные поля
+    res.json(users);
+  } catch (err) {
+    console.error("Ошибка при получении пользователей:", err);
+    res.status(500).json({ message: "Серверная ошибка" });
+  }
+});
+
+
+router.get("/roles-with-users", async (req, res) => {
+  try {
+    const users = await User.find({}, "firstName lastName role status");
+
+    const grouped = {};
+
+    users.forEach(user => {
+      if (!user.role) return;
+
+      if (!grouped[user.role]) {
+        grouped[user.role] = [];
+      }
+
+      grouped[user.role].push({
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        status: user.status
+      });
+    });
+
+    res.json(grouped);
+  } catch (err) {
+    console.error("Помилка при групуванні користувачів:", err);
+    res.status(500).json({ message: "Серверна помилка" });
+  }
+});
+
+
 
 module.exports = router;

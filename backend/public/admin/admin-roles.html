@@ -36,10 +36,44 @@
         const res = await fetch("http://157.230.121.24:5050/api/roles");
         roles = await res.json();
         renderRoles();
+        loadUsersForRoles(); 
       } catch (err) {
         console.error("Не вдалося завантажити ролі", err);
       }
     }
+
+
+    async function loadUsersForRoles() {
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/users/roles-with-users");
+    const data = await res.json();
+
+    roles.forEach(role => {
+      const users = data[role.name] || [];
+
+      const row = [...document.querySelectorAll("#rolesBody tr")]
+        .find(tr => tr.firstChild.textContent === role.name);
+
+      if (row) {
+        const usersTd = document.createElement("td");
+        usersTd.colSpan = 3;
+        usersTd.style.fontSize = "14px";
+        usersTd.style.color = "#555";
+        usersTd.style.paddingLeft = "20px";
+        usersTd.innerHTML = users.length
+          ? `🔸 <b>Користувачі:</b> ${users.map(u => u.name + (u.status === "APPROVED" ? "" : ` (${u.status})`)).join(", ")}`
+          : "<i>Немає користувачів</i>";
+
+        const userRow = document.createElement("tr");
+        userRow.appendChild(usersTd);
+        document.getElementById("rolesBody").insertBefore(userRow, row.nextSibling);
+      }
+    });
+  } catch (err) {
+    console.error("Не вдалося завантажити користувачів по ролях:", err);
+  }
+}
+
 
     function renderRoles() {
   const tbody = document.getElementById("rolesBody");

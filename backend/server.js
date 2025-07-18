@@ -25,6 +25,10 @@ app.use('/api/users', userRoutes);
 const courseRoutes = require('./routes/courseRoutes');
 app.use('/api/courses', courseRoutes);
 
+const roleRoutes = require("./routes/roleRoutes");
+app.use("/api/roles", roleRoutes);
+
+
 // ✅ MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))

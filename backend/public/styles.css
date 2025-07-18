@@ -1808,16 +1808,40 @@
       font-size: 18px;
       color: #414141;
     }
-    .modal-current-course-content {
-      background: #fff;
-      padding: 60px 100px;
-      max-width: 1110px;
-      width: 100%;
-      border-radius: 24px;
-      position: relative;
-    }
+    .modal-current-course {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+}
 
 
+.modal-current-course-content {
+  background: #fff;
+  width: 1110px;
+  height: auto;
+  border-radius: 24px;
+  padding: 60px 100px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+
+.modal-current-course-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 32px;
+  cursor: pointer;
+}
 
     /* Completed Courses Content */
 .completed-courses-content {

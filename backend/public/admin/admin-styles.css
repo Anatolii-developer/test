@@ -950,6 +950,7 @@ body {
     color: red;
   }
 .roles-wrapper {
+  margin-left: 250px;
   width: 890px;
   height: 642px;
   background-color: white;

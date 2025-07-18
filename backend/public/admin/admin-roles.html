@@ -5,86 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Керування ролями</title>
   <link rel="stylesheet" href="admin-styles.css" />
-  <style>
-    .roles-wrapper {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 40px;
-      background: #fffef9;
-      border-radius: 16px;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .roles-wrapper h1 {
-      margin-bottom: 24px;
-    }
-
-    .roles-list {
-      margin-top: 20px;
-    }
-
-    .role-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      background: #fff;
-    }
-
-    .role-item input {
-      font-size: 16px;
-      padding: 6px;
-      width: 200px;
-    }
-
-    .role-actions button {
-      margin-left: 10px;
-      padding: 6px 12px;
-      background: #E37009;
-      border: none;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .add-role-form {
-      display: flex;
-      gap: 12px;
-      margin-top: 30px;
-    }
-
-    .add-role-form input {
-      flex: 1;
-      padding: 10px;
-      font-size: 16px;
-    }
-
-    .add-role-form button {
-      padding: 10px 20px;
-      background: #16A34A;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
 </head>
 <body>
   <div class="roles-wrapper">
-    <h1>Керування ролями</h1>
+  <h1>Керування ролями</h1>
 
-    <div class="roles-list" id="rolesList">
-      <!-- Тут будуть ролі -->
-    </div>
+  <table class="roles-table" id="rolesTable">
+    <thead>
+      <tr>
+        <th>Роль</th>
+        <th>Статус</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="rolesBody"></tbody>
+  </table>
 
-    <div class="add-role-form">
-      <input type="text" id="newRole" placeholder="Нова роль..." />
-      <button onclick="addRole()">Додати</button>
-    </div>
+  <div class="add-role-form">
+    <input type="text" id="newRole" placeholder="Нова роль..." />
+    <button onclick="addRole()">Додати</button>
   </div>
+</div>
+
 
   <script>
     let roles = [];
@@ -100,22 +42,37 @@
     }
 
     function renderRoles() {
-      const list = document.getElementById("rolesList");
-      list.innerHTML = "";
+  const tbody = document.getElementById("rolesBody");
+  tbody.innerHTML = "";
 
-      roles.forEach(role => {
-        const div = document.createElement("div");
-        div.className = "role-item";
-        div.innerHTML = `
-          <span>${role.name}</span>
-          <div class="role-actions">
-            <button onclick="editRole('${role._id}', '${role.name}')">✏️</button>
-            <button onclick="deleteRole('${role._id}')">🗑️</button>
-          </div>
-        `;
-        list.appendChild(div);
-      });
-    }
+  roles.forEach(role => {
+    const tr = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = role.name;
+    nameCell.style.cursor = "pointer";
+    nameCell.onclick = () => editRole(role._id, role.name);
+
+    const statusCell = document.createElement("td");
+    const isActive = role.active !== false; // default true
+    statusCell.textContent = isActive ? "Активна" : "Неактивна";
+    statusCell.className = isActive ? "active" : "inactive";
+
+    const deleteCell = document.createElement("td");
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Видалити";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.onclick = () => deleteRole(role._id);
+    deleteCell.appendChild(deleteBtn);
+
+    tr.appendChild(nameCell);
+    tr.appendChild(statusCell);
+    tr.appendChild(deleteCell);
+
+    tbody.appendChild(tr);
+  });
+}
+
 
     async function addRole() {
       const name = document.getElementById("newRole").value.trim();
@@ -173,5 +130,6 @@
 
     window.addEventListener("DOMContentLoaded", loadRoles);
   </script>
+
 </body>
 </html>

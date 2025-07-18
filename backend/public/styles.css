@@ -1775,7 +1775,7 @@
 .modal-current-course-content {
   background: #fff;
   width: 1110px;
-  height: 1072px;
+  height: auto;
   border-radius: 24px;
   padding: 60px 100px;
   position: relative;

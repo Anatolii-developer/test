@@ -32,15 +32,14 @@
     let roles = [];
 
     async function loadRoles() {
-      try {
-        const res = await fetch("http://157.230.121.24:5050/api/roles");
-        roles = await res.json();
-        renderRoles();
-        loadUsersForRoles(); 
-      } catch (err) {
-        console.error("Не вдалося завантажити ролі", err);
-      }
-    }
+  roles = [
+    { _id: "1", name: "Психолог", active: true },
+    { _id: "2", name: "Супервізор II категорії", active: true },
+    { _id: "3", name: "Супервізор I категорії", active: true }
+  ];
+  renderRoles();
+}
+
 
 
     async function loadUsersForRoles() {

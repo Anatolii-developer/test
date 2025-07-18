@@ -1731,7 +1731,14 @@
     
 
 
-    
+    .certificate-display {
+  width: 100%;
+  max-width: 100%;
+  height: 600px;
+  border: none;
+  border-radius: 12px;
+}
+
 
     .current-course-description {
   font-size: 15px;

@@ -125,9 +125,8 @@ router.get("/roles-with-users", async (req, res) => {
     const grouped = {};
 
     users.forEach(user => {
-      const role = typeof user.role === 'string' ? user.role.trim() : null;
-
-      if (!role) return; // пропускаем, если роль отсутствует
+      const role = user.role;
+if (!role || typeof role !== "string") return; // безопасно
 
       if (!grouped[role]) {
         grouped[role] = [];

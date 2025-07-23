@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+   <div class="layout">
    <aside class="sidebar" id="sidebar">
     <!-- Логотип -->
     <img class="logo" src="../assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
@@ -67,7 +68,7 @@
         <td>jksncctoelk@gmail.com</td>
         <td>Супервізор 1 категорії</td>
         <td>11.05.2002</td>
-        <td><img src="check-icon.svg" alt="✔️" /></td>
+        <td><img src="checkbox.png" alt="✔️" /></td>
       </tr>
     </tbody>
   </table>
@@ -84,6 +85,7 @@
   </div>
 
   <button class="submit-button">Submit</button>
+</div>
 </div>
 
 <script>
@@ -104,7 +106,7 @@
           <td>${user.email}</td>
           <td>${user.role || "-"}</td>
           <td>${new Date(user.dateOfBirth).toLocaleDateString("uk-UA")}</td>
-          <td><img src="check-icon.svg" alt="✔️" /></td>
+          <td><img src="checkbox.png" alt="✔️" /></td>
         `;
 
         tbody.appendChild(row);

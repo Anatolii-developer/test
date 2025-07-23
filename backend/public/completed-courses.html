@@ -152,15 +152,17 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
       <p class="current-course-description">${course.courseDescription || ""}</p>
     </div>
   </div>
-  ${certUA || certENG ? `
-    <div class="certificate-image-switcher">
-      <div class="switch-buttons">
-        ${certUA ? `<button onclick="switchCertificate(this, '${certUA}', this)">UA</button>` : ""}
-        ${certENG ? `<button onclick="switchCertificate(this, '${certENG}', this)">ENG</button>` : ""}
-      </div>
-      <embed class="certificate-display" src="${certUA || certENG}" type="application/pdf" width="100%" height="500px" />
-    </div>
-  ` : `<p class="text-medium" style="color: gray;">Сертифікат ще не додано</p>`}
+  <div class="certificate-header">
+  <span class="certificate-dates">${start} - ${end}</span>
+  <div class="language-toggle">
+    ${certUA ? `<button class="lang-btn active" onclick="switchCertificate(this, '${certUA}')">UA</button>` : ''}
+    ${certENG ? `<button class="lang-btn ${!certUA ? 'active' : ''}" onclick="switchCertificate(this, '${certENG}')">EN</button>` : ''}
+  </div>
+</div>
+<h4 class="certificate-title">${course.courseTitle}</h4>
+<p class="certificate-description">${course.courseSubtitle || ""}</p>
+<button class="view-button" onclick="openCertificate('${certUA || certENG}')">Переглянути</button>
+
 `;
 
 
@@ -202,6 +204,10 @@ function parseDMY(value) {
   const [day, month, year] = value.split("/");
   return new Date(+year, +month - 1, +day);
 }
+function openCertificate(url) {
+  window.open(url, '_blank');
+}
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 

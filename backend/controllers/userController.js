@@ -4,11 +4,26 @@ exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
+
+    await sendMail(
+      user.email,
+      "Підтвердження отримання заявки на реєстрацію",
+      `
+      <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
+      <p>Дякуємо за вашу заявку на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії.</p>
+      <p>Наразі ваша заявка перебуває на розгляді. Найближчим часом вона буде підтверджена та Ви отримаєте лист з усіма необхідними даними для входу та користування кабінетом.</p>
+      <p>Якщо у вас виникнуть запитання, ви можете звертатися на нашу електронну пошту: profsupervision@gmail.com.</p>
+      <p>З повагою,<br>Команда IPS</p>
+      <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
+      `
+    );
+
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
@@ -37,16 +52,37 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUserStatus = async (req, res) => {
   try {
-    const { status, role } = req.body; // ✅ получаем role тоже
+    const { status, role } = req.body;
     const update = { status };
     if (role) update.role = role;
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
+
+    if (status === "APPROVED") {
+      await sendMail(
+        user.email,
+        "Ваш доступ до особистого кабінету IPS активовано",
+        `
+        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
+        <p>Ваша заявка на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії була успішно підтверджена.</p>
+        <p>Відтепер ви маєте доступ до вашого персонального кабінету.</p>
+        <p>🔐 <strong>Дані для входу:</strong><br>
+        Посилання: <a href="http://mamko-prof-supervision.com/login">Вхід</a><br>
+        Ім’я користувача: ${user.username}<br>
+        Ваш пароль: [********]</p>
+        <p>📌 Якщо ви маєте запитання — звертайтесь на profsupervision@gmail.com.</p>
+        <p>З повагою,<br>Команда IPS</p>
+        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
+        `
+      );
+    }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // controllers/userController.js
 const bcrypt = require("bcryptjs");
@@ -82,6 +118,22 @@ exports.updateUser = async (req, res) => {
 
 const nodemailer = require("nodemailer");
 
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_FROM,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+async function sendMail(to, subject, html) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject,
+    html,
+  });
+}
 exports.sendRecoveryCode = async (req, res) => {
   const { email } = req.body;
 

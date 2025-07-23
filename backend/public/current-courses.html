@@ -100,9 +100,13 @@
           <div><span class="modal-course-label">Тривалість курсу:</span> <span class="modal-course-answer">${course.courseDuration}</span></div>
           <div><span class="modal-course-label">Вартість курсу:</span> <span class="modal-course-answer">${course.coursePrice}</span></div>
           ${course.zoomLink ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Посилання на зустріч:</a></span></div>` : ""}
+           <div class="modal-course-footer">
+    <button class="view-site-button">Переглянути на сайті</button>
+  </div>
         </div>`;
 
       modal.style.display = "flex";
+      
     }
 
     function closeModal() {

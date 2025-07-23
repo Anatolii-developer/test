@@ -146,7 +146,7 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
     </div>
 
     <div class="certificate-preview">
-      <img src="${certUA || certENG}" alt="Certificate" class="certificate-img" id="cert-img-${course._id}" />
+      <embed src="${certUA || certENG}" type="application/pdf" class="certificate-embed" id="cert-pdf-${course._id}" />
     </div>
 
     <div class="card-body">
@@ -157,15 +157,16 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
     <div class="card-bottom">
       <div class="lang-toggle-wrapper">
         <label class="switch">
-          <input type="checkbox" onchange="switchImage(this, '${course._id}', '${certUA}', '${certENG}')">
+          <input type="checkbox" onchange="switchPDF(this, '${course._id}', '${certUA}', '${certENG}')">
           <span class="slider round"></span>
         </label>
         <span class="lang-labels">UA EN</span>
       </div>
-      <button class="view-button" onclick="openCertificate(document.getElementById('cert-img-${course._id}').src)">Переглянути</button>
+      <button class="view-button" onclick="openCertificate(document.getElementById('cert-pdf-${course._id}').src)">Переглянути</button>
     </div>
   </div>
 `;
+
 
 
 

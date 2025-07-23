@@ -1056,7 +1056,6 @@ body {
 
 .main-content {
   width: 100%;
-  max-width: 890px; /* добавь если нужно ограничить */
   background-color: white;
   border-radius: 24px;
   padding: 60px 100px;

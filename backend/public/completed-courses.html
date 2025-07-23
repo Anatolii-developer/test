@@ -140,17 +140,32 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
       const div = document.createElement("div");
       div.className = "certificate-block";
     div.innerHTML = `
-  <div class="certificate-header">
-    <span class="certificate-dates">${start} – ${end}</span>
-    <div class="language-toggle">
-      ${certUA ? `<button class="lang-btn active" onclick="switchLangBtn(this); openCertificate('${certUA}')">UA</button>` : ""}
-      ${certENG ? `<button class="lang-btn ${!certUA ? 'active' : ''}" onclick="switchLangBtn(this); openCertificate('${certENG}')">EN</button>` : ""}
+  <div class="certificate-card">
+    <div class="card-top">
+      <div class="date-line">
+        <hr><span>${start} – ${end}</span><hr>
+      </div>
+      <div class="lang-switch">
+        <label class="switch">
+          <input type="checkbox" onchange="handleLangToggle(this, '${certUA}', '${certENG}')">
+          <span class="slider round"></span>
+        </label>
+        <div class="lang-labels">
+          <span>UA</span>
+          <span>EN</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h4 class="certificate-title">${course.courseTitle}</h4>
+      <p class="certificate-description">${course.courseSubtitle || ""}</p>
+    </div>
+    <div class="card-footer">
+      <button class="view-button" onclick="openCertificate('${certUA || certENG}')">Переглянути</button>
     </div>
   </div>
-  <h4 class="certificate-title">${course.courseTitle}</h4>
-  <p class="certificate-description">${course.courseSubtitle || ""}</p>
-  <button class="view-button" onclick="openCertificate('${certUA || certENG}')">Переглянути</button>
 `;
+
 
 
 
@@ -191,6 +206,12 @@ function parseDMY(value) {
 }
 function openCertificate(url) {
   window.open(url, '_blank');
+}
+
+
+function handleLangToggle(checkbox, ua, en) {
+  const url = checkbox.checked ? en : ua;
+  if (url) openCertificate(url);
 }
 
 </script>

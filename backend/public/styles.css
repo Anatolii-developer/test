@@ -1760,67 +1760,125 @@
 }
 
 
-.certificate-block {
-  padding: 24px;
-  border-radius: 16px;
-  background-color: #fff;
+.certificate-card {
+  background: #fff;
+  border-radius: 20px;
   box-shadow: 0px 6px 20px rgba(0,0,0,0.06);
+  padding: 24px;
   margin-bottom: 36px;
-  font-family: Poppins, sans-serif;
+  font-family: Poppins;
+  position: relative;
 }
 
-.certificate-header {
+.card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
-  color: #275D2B;
-  font-weight: 500;
-  margin-bottom: 12px;
 }
 
-.language-toggle {
+.date-line {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #275D2B;
+  flex: 1;
+}
+
+.date-line hr {
+  flex: 1;
+  height: 1px;
+  background: #275D2B;
+  border: none;
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.lang-btn {
-  background-color: #F1F1F1;
-  border: none;
-  border-radius: 16px;
-  padding: 4px 12px;
+.lang-labels {
+  display: flex;
+  gap: 4px;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  color: #06142E;
 }
 
-.lang-btn.active {
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
   background-color: #275D2B;
-  color: #fff;
+  border-radius: 34px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.card-body {
+  margin-top: 16px;
 }
 
 .certificate-title {
+  font-size: 18px;
   font-weight: 600;
-  font-size: 20px;
   color: #1E1E1E;
   margin-bottom: 4px;
 }
 
 .certificate-description {
-  font-size: 16px;
+  font-size: 15px;
   color: #414141;
-  margin-bottom: 16px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .view-button {
-  font-size: 16px;
+  width: 110px;
+  height: 24px;
+  font-size: 14px;
   font-weight: 500;
   background-color: #275D2B;
   color: white;
   border: none;
-  padding: 10px 28px;
-  border-radius: 24px;
+  border-radius: 12px;
   cursor: pointer;
 }
 

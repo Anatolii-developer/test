@@ -211,9 +211,15 @@ function switchImage(toggle, id, uaUrl, enUrl) {
   img.src = toggle.checked ? enUrl : uaUrl;
 }
 
+function switchPDF(toggle, id, uaUrl, enUrl) {
+  const embed = document.getElementById(`cert-pdf-${id}`);
+  embed.src = toggle.checked ? enUrl : uaUrl;
+}
+
 function openCertificate(url) {
   window.open(url, '_blank');
 }
+
 
 
 function handleLangToggle(checkbox, ua, en) {

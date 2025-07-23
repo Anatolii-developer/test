@@ -89,7 +89,7 @@
 <script>
   document.addEventListener("DOMContentLoaded", async () => {
     try {
-      const response = await fetch("http://localhost:5050/api/users/approved"); // замени на свой реальный backend URL
+     const response = await fetch("http://157.230.121.24:5050/api/users/approved");
       const users = await response.json();
 
       const tbody = document.querySelector(".participants-table tbody");

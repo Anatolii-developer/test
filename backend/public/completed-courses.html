@@ -204,6 +204,12 @@ function parseDMY(value) {
   const [day, month, year] = value.split("/");
   return new Date(+year, +month - 1, +day);
 }
+
+function switchImage(toggle, id, uaUrl, enUrl) {
+  const img = document.getElementById(`cert-img-${id}`);
+  img.src = toggle.checked ? enUrl : uaUrl;
+}
+
 function openCertificate(url) {
   window.open(url, '_blank');
 }

@@ -141,31 +141,31 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
       div.className = "certificate-block";
     div.innerHTML = `
   <div class="certificate-card">
-    <div class="card-top">
-      <div class="date-line">
-        <hr><span>${start} – ${end}</span><hr>
-      </div>
-      <div class="lang-switch">
-        <label class="switch">
-          <input type="checkbox" onchange="handleLangToggle(this, '${certUA}', '${certENG}')">
-          <span class="slider round"></span>
-        </label>
-        <div class="lang-labels">
-          <span>UA</span>
-          <span>EN</span>
-        </div>
-      </div>
+    <div class="date-line">
+      <hr><span>${start} – ${end}</span><hr>
     </div>
+
+    <div class="certificate-preview">
+      <img src="${certUA || certENG}" alt="Certificate" class="certificate-img" id="cert-img-${course._id}" />
+    </div>
+
     <div class="card-body">
       <h4 class="certificate-title">${course.courseTitle}</h4>
       <p class="certificate-description">${course.courseSubtitle || ""}</p>
     </div>
-    <div class="card-footer">
-      <button class="view-button" onclick="openCertificate('${certUA || certENG}')">Переглянути</button>
+
+    <div class="card-bottom">
+      <div class="lang-toggle-wrapper">
+        <label class="switch">
+          <input type="checkbox" onchange="switchImage(this, '${course._id}', '${certUA}', '${certENG}')">
+          <span class="slider round"></span>
+        </label>
+        <span class="lang-labels">UA EN</span>
+      </div>
+      <button class="view-button" onclick="openCertificate(document.getElementById('cert-img-${course._id}').src)">Переглянути</button>
     </div>
   </div>
 `;
-
 
 
 

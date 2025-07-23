@@ -1764,49 +1764,69 @@
   width: 100%;
   height: auto;
   background: #fff;
-  border-radius: 20px;
+  border-radius: 24px;
   box-shadow: 0px 6px 20px rgba(0,0,0,0.06);
   padding: 24px;
   margin-bottom: 36px;
   font-family: Poppins;
-  position: relative;
-}
-
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .date-line {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   font-size: 16px;
   font-weight: 500;
   color: #275D2B;
-  flex: 1;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .date-line hr {
   flex: 1;
-  height: 1px;
-  background: #275D2B;
   border: none;
+  border-top: 1px solid #275D2B;
 }
 
-.lang-switch {
+.certificate-preview {
+  text-align: center;
+}
+
+.certificate-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+}
+
+.card-body {
+  margin-bottom: 16px;
+}
+
+.certificate-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E1E1E;
+  margin-bottom: 4px;
+}
+
+.certificate-description {
+  font-size: 15px;
+  color: #414141;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.lang-toggle-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.lang-labels {
-  display: flex;
-  gap: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #06142E;
 }
 
 .switch {
@@ -1825,7 +1845,7 @@
 .slider {
   position: absolute;
   cursor: pointer;
-  background-color: #275D2B;
+  background-color: #ccc;
   border-radius: 34px;
   top: 0;
   left: 0;
@@ -1846,30 +1866,18 @@
   border-radius: 50%;
 }
 
+input:checked + .slider {
+  background-color: #275D2B;
+}
+
 input:checked + .slider:before {
   transform: translateX(20px);
 }
 
-.card-body {
-  margin-top: 16px;
-}
-
-.certificate-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1E1E1E;
-  margin-bottom: 4px;
-}
-
-.certificate-description {
-  font-size: 15px;
-  color: #414141;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+.lang-labels {
+  font-size: 14px;
+  color: #06142E;
+  font-weight: 500;
 }
 
 .view-button {
@@ -1881,7 +1889,10 @@ input:checked + .slider:before {
   color: white;
   border: none;
   border-radius: 12px;
+  line-height: 24px;
+  padding: 0;
   cursor: pointer;
+  text-align: center;
 }
 
 

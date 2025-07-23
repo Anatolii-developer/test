@@ -1069,16 +1069,6 @@ body {
   margin-bottom: 30px;
 }
 
-.btn-green,
-.btn-light-green,
-.btn-dark-green {
-  padding: 12px 24px;
-  font-weight: 600;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
 .btn-green-add {
   background-color: #275D2B;
   color: white;

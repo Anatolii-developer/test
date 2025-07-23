@@ -357,6 +357,7 @@ body {
 }
 
 .modal-content {
+  position: relative; /* важно для корректного позиционирования крестика */
   background-color: #FFFFF9;
   border-radius: 24px;
   padding: 40px 50px;
@@ -368,6 +369,7 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+
 .modal-close {
   font-size: 24px;
   font-weight: bold;
@@ -377,6 +379,7 @@ body {
   right: 30px;
   cursor: pointer;
 }
+
 
 .modal-content p {
   margin-bottom: 12px;
@@ -911,15 +914,6 @@ body {
 
 
 
-
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  width: 400px;
-  border-radius: 10px;
-  position: relative;
-}
 
 
 

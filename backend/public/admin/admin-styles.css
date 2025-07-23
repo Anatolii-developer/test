@@ -1055,8 +1055,8 @@ body {
 
 
 .main-content {
-  width: 100%;
-  height: auto;
+  width: 890px;
+  /* height: auto; ← можно вообще не указывать, это поведение по умолчанию */
   background-color: white;
   border-radius: 24px;
   padding: 60px 100px;
@@ -1064,6 +1064,7 @@ body {
   font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
 }
+
 
 
 .materials-header {

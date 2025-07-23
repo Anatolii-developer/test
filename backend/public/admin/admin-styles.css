@@ -910,7 +910,7 @@ body {
 }
 
 .modal {
-  position: fixed;
+  position: flex;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.4);
   display: flex;
@@ -923,6 +923,7 @@ body {
   padding: 20px;
   width: 400px;
   border-radius: 10px;
+  position: relative;
 }
 
 

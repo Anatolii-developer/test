@@ -204,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
           currentUserId = id;
 
           userDetails.innerHTML = `
+           <p><strong>Username:</strong> ${user.username || '-'}</p>
             <p><strong>Ім’я:</strong> ${user.firstName || '-'}</p>
             <p><strong>Прізвище:</strong> ${user.lastName || '-'}</p>
             <p><strong>По-батькові:</strong> ${user.middleName || '-'}</p>

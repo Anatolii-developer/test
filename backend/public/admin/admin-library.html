@@ -86,6 +86,34 @@
   <button class="submit-button">Submit</button>
 </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("http://localhost:5050/api/users/approved"); // замени на свой реальный backend URL
+      const users = await response.json();
+
+      const tbody = document.querySelector(".participants-table tbody");
+      tbody.innerHTML = "";
+
+      users.forEach((user, index) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${user.firstName || ""} ${user.lastName || ""}</td>
+          <td>${user.email}</td>
+          <td>${user.role || "-"}</td>
+          <td>${new Date(user.dateOfBirth).toLocaleDateString("uk-UA")}</td>
+          <td><img src="check-icon.svg" alt="✔️" /></td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Помилка при отриманні користувачів:", err);
+    }
+  });
+</script>
 
 </body>
 </html>

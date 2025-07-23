@@ -944,6 +944,11 @@ function toggleSidebar() {
 document.addEventListener("DOMContentLoaded", async () => {
   const participantsSelect = document.getElementById("participantsSelect");
 
+  if (!participantsSelect) {
+    console.warn("Елемент #participantsSelect не знайдено в DOM.");
+    return;
+  }
+
   try {
     const res = await fetch(`${API_BASE}/api/users`);
     const users = await res.json();

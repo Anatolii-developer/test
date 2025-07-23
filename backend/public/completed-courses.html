@@ -139,14 +139,20 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
 
       const div = document.createElement("div");
       div.className = "certificate-block";
-    div.innerHTML = `
+    const certAvailable = certUA || certENG;
+
+div.innerHTML = `
   <div class="certificate-card">
     <div class="date-line">
       <hr><span>${start} – ${end}</span><hr>
     </div>
 
     <div class="certificate-preview">
-      <embed src="${certUA || certENG}" type="application/pdf" class="certificate-embed" id="cert-pdf-${course._id}" />
+      ${certAvailable ? `
+        <embed src="${certUA || certENG}" type="application/pdf" class="certificate-embed" id="cert-pdf-${course._id}" />
+      ` : `
+        <p class="certificate-placeholder">Сертифікат ще не додано</p>
+      `}
     </div>
 
     <div class="card-body">
@@ -154,6 +160,7 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
       <p class="certificate-description">${course.courseSubtitle || ""}</p>
     </div>
 
+    ${certAvailable ? `
     <div class="card-bottom">
       <div class="lang-toggle-wrapper">
         <label class="switch">
@@ -164,9 +171,9 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
       </div>
       <button class="view-button" onclick="openCertificate(document.getElementById('cert-pdf-${course._id}').src)">Переглянути</button>
     </div>
+    ` : ''}
   </div>
 `;
-
 
 
 

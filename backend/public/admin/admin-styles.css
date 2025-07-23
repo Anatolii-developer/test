@@ -11,10 +11,16 @@ body {
     background-color: #97C194;
   }
 
-  html, body {
-  height: 100%;
+body, html {
   margin: 0;
   padding: 0;
+  height: 100%;
+}
+
+.layout {
+  display: flex;
+  height: auto; /* или min-height: 100vh; */
+  width: 100%;
 }
   
 .sidebar {

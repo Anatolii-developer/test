@@ -391,6 +391,8 @@ let users = [];
 let selectedParticipants = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+  if (window.location.pathname.includes("registration")) return;
+
   try {
     const res = await fetch(`${API_BASE}/api/users`);
     users = await res.json();
@@ -398,6 +400,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Помилка завантаження користувачів:", err);
   }
 });
+
 
 function openUserModal() {
   

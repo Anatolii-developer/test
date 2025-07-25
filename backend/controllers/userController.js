@@ -3,7 +3,7 @@ const User = require('../models/User');
 exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    await user.save();
+    //await user.save();
 
     try {
       await sendMail(

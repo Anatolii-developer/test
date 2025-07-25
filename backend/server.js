@@ -7,6 +7,7 @@ const path = require('path');
 
 require('dotenv').config();
 
+console.log("📡 MONGO_URI:", process.env.MONGO_URI);
 
 const app = express();  
 
@@ -42,3 +43,4 @@ mongoose.connect(process.env.MONGO_URI, {
 app.listen(5050, '0.0.0.0', () => {
   console.log('🚀 Server running on port 5050 and accessible externally');
 });
+

@@ -1,318 +1,201 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const sendRecoveryCodeEmail = require('../mailer/sendRecoveryCodeEmail');
 
-function genCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString(); // 6 цифр
-}
-
-
-function signUser(user) {
-  return jwt.sign(
-    {
-      id: user._id,
-      roles: Array.isArray(user.roles) ? user.roles : [],
-      email: user.email,
-      username: user.username,
-    },
-    process.env.JWT_SECRET || 'dev_secret',
-    { expiresIn: '7d' }
-  );
-}
-
-// ------- Auth
-async function loginUser(req, res) {
-  const { username, password } = req.body;
+exports.registerUser = async (req, res) => {
   try {
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.status !== 'APPROVED') return res.status(403).json({ message: 'Account not approved' });
-
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
-
-    const token = signUser(user);
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax', secure: false, path: '/', maxAge: 7*24*60*60*1000 });
-    // ⬇⬇⬇ ВОТ ЭТО ДОБАВИМ
-    res.status(200).json({ ok: true, message: 'Login successful', user, token });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-}
-
-async function adminLogin(req, res) {
-  const { username, password } = req.body;
-  try {
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.status !== 'APPROVED') return res.status(403).json({ message: 'Account not approved' });
-
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
-
-    const roles = (user.roles || []).map(r => String(r).toLowerCase());
-    if (!roles.includes('admin')) return res.status(403).json({ message: 'Admin role required' });
-
-    const token = signUser(user);
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax', secure: false, path: '/', maxAge: 7*24*60*60*1000 });
-    // ⬇⬇⬇ И ЗДЕСЬ ТОЖЕ
-    res.status(200).json({ ok: true, message: 'Admin login successful', user, token });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-}
-
-async function profile(req, res) {
-  try {
-    if (!req.user) return res.status(401).json({ ok: false, message: 'Unauthorized' });
-    const user = await User.findById(req.user.id).lean();
-    if (!user) return res.status(404).json({ ok: false, message: 'User not found' });
-    res.json({ ok: true, user });
-  } catch (e) {
-    res.status(500).json({ ok: false, message: e.message });
-  }
-}
-
-function toArray(val) {
-  if (Array.isArray(val)) return val.map(String).map(s => s.trim()).filter(Boolean);
-  if (typeof val === 'string') {
-    const s = val.trim();
-    return s ? [s] : [];
-  }
-  return [];
-}
-
-
-function normalizeFormatAndCity(body) {
-  let format = toArray(body.format);
-
-  // подхват флагов, если они пришли с чекбоксов
-  const yes = (v) => v === true || v === 'true' || v === 'on' || v === '1' || v === 1;
-
-  if (yes(body.formatOnline) && !format.includes('Онлайн')) format.push('Онлайн');
-  if (yes(body.formatOffline) && !format.includes('Офлайн')) format.push('Офлайн');
-
-  format = Array.from(new Set(format)); // на всякий случай уникальные
-
-  let city = (body.city || body.offlineCity || '').trim();
-  // если офлайн не выбран — город не сохраняем
-  if (!format.includes('Офлайн')) city = '';
-
-  return { format, city };
-}
-async function registerUser(req, res) {
-  try {
-    const body = req.body || {};
-    const { format, city } = normalizeFormatAndCity(body);
-
-    const user = new User({
-      username: body.username,
-      password: body.password,
-      firstName: body.firstName,
-      lastName: body.lastName,
-      middleName: body.middleName,
-      dateOfBirth: body.dateOfBirth,
-      email: body.email,
-      phone: body.phone,
-      gender: body.gender,
-      experience: body.experience,
-      education: body.education,
-      directions: toArray(body.directions),
-      topics: toArray(body.topics),
-
-      // ⬇️ новые поля
-      format,
-      city,
-
-      status: body.status || 'WAIT FOR REVIEW',
-      createdAt: body.createdAt || new Date()
-    });
-
+    const user = new User(req.body);
     await user.save();
-    res.status(201).json({ message: 'User registered successfully.', user, emailEnqueued: true });
 
-   
-  } catch (e) {
-    console.error('Registration error:', e);
-    res.status(500).json({ error: e.message });
+    try {
+      await sendMail(
+        user.email,
+        "Підтвердження отримання заявки на реєстрацію",
+        `
+        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
+        <p>Дякуємо за вашу заявку на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії.</p>
+        <p>Наразі ваша заявка перебуває на розгляді. Найближчим часом вона буде підтверджена та Ви отримаєте лист з усіма необхідними даними для входу та користування кабінетом.</p>
+        <p>Якщо у вас виникнуть запитання, ви можете звертатися на нашу електронну пошту: profsupervision@gmail.com.</p>
+        <p>З повагою,<br>Команда IPS</p>
+        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
+        `
+      );
+    } catch (emailErr) {
+      console.error("❌ Send email failed:", emailErr.message);
+      // Можно даже записать это в логи или в базу данных, но пользователю не показывать
+    }
+
+    res.status(201).json({ message: "User registered successfully." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-async function getAllUsers(req, res) {
+
+
+
+
+exports.getAllUsers = async (req, res) => {
   try {
     const { status } = req.query;
     const filter = status ? { status } : {};
+
     const users = await User.find(filter).sort({ createdAt: -1 });
     res.json(users);
-  } catch (e) {
+  } catch (error) {
+    console.error("Ошибка при получении пользователей:", error);
     res.status(500).json({ message: 'Server error' });
   }
-}
+};
 
-async function getUserById(req, res) {
+exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-async function updateUser(req, res) {
+exports.updateUserStatus = async (req, res) => {
   try {
-    const body = req.body || {};
-    const update = { ...body };
-
-    // нормализуем формат/город, если пришли поля
-    if (
-      body.format !== undefined ||
-      body.formatOnline !== undefined ||
-      body.formatOffline !== undefined ||
-      body.city !== undefined ||
-      body.offlineCity !== undefined
-    ) {
-      const { format, city } = normalizeFormatAndCity(body);
-      update.format = format;
-      update.city = city;
-      // уберём вспомогательные флаги, чтобы не лезли в базу
-      delete update.formatOnline;
-      delete update.formatOffline;
-      delete update.offlineCity;
-    }
+    const { status, role } = req.body;
+    const update = { status };
+    if (role) update.role = role;
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (status === "APPROVED") {
+      await sendMail(
+        user.email,
+        "Ваш доступ до особистого кабінету IPS активовано",
+        `
+        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
+        <p>Ваша заявка на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії була успішно підтверджена.</p>
+        <p>Відтепер ви маєте доступ до вашого персонального кабінету.</p>
+        <p>🔐 <strong>Дані для входу:</strong><br>
+        Посилання: <a href="http://mamko-prof-supervision.com/login">Вхід</a><br>
+        Ім’я користувача: ${user.username}<br>
+        Ваш пароль: [********]</p>
+        <p>📌 Якщо ви маєте запитання — звертайтесь на profsupervision@gmail.com.</p>
+        <p>З повагою,<br>Команда IPS</p>
+        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
+        `
+      );
+    }
+
     res.json(user);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-}
-
-
-
-async function updateUserStatus(req, res) {
-  try {
-    const { status, roles } = req.body;
-    const update = {};
-    if (typeof status === 'string' && status.trim()) update.status = status.trim();
-    if (Array.isArray(roles)) update.roles = roles;
-
-    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    res.json(user);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-}
-
-// 1) отправить код
-async function sendRecoveryCode(req, res) {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: 'Email is required' });
-
-  try {
-    const user = await User.findOne({ email: String(email).trim() });
-    // Чтобы не палить наличие аккаунта, отвечаем одинаково.
-    if (!user) {
-      return res.json({ message: 'Якщо аккаунт існує, код надіслано' });
-    }
-
-    const code = genCode();
-    user.recoveryCode = code;
-    user.recoveryCodeExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 мин
-    await user.save();
-
-    await sendRecoveryCodeEmail(user.email, code);
-    res.json({ message: 'Код надіслано (якщо аккаунт існує)' });
-  } catch (e) {
-    console.error('sendRecoveryCode error:', e);
-    res.status(500).json({ message: 'Не вдалося надіслати код' });
-  }
-}
-
-
-// 2) проверить код (опционально, можно пропустить и проверять в reset)
-async function verifyRecoveryCode(req, res) {
-  const { email, code } = req.body;
-  if (!email || !code) return res.status(400).json({ message: 'Email і код обовʼязкові' });
-
-  try {
-    const user = await User.findOne({ email: String(email).trim() });
-    if (!user || !user.recoveryCode || !user.recoveryCodeExpires) {
-      return res.status(400).json({ message: 'Невірний код' });
-    }
-    if (user.recoveryCode !== String(code).trim()) {
-      return res.status(400).json({ message: 'Невірний код' });
-    }
-    if (new Date() > user.recoveryCodeExpires) {
-      return res.status(400).json({ message: 'Код прострочено' });
-    }
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ message: 'Помилка перевірки коду' });
-  }
-}
+};
 
 
 // controllers/userController.js
-async function resetPassword(req, res) {
-  const { email, code, newPassword } = req.body;
-  if (!email || !code || !newPassword) {
-    return res.status(400).json({ message: 'Email, код та новий пароль обовʼязкові' });
-  }
+const bcrypt = require("bcryptjs");
+
+exports.loginUser = async (req, res) => {
+  const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ email: String(email).trim() });
-    if (!user || !user.recoveryCode || !user.recoveryCodeExpires) {
-      return res.status(400).json({ message: 'Невірний код' });
-    }
-    if (user.recoveryCode !== String(code).trim()) {
-      return res.status(400).json({ message: 'Невірний код' });
-    }
-    if (new Date() > user.recoveryCodeExpires) {
-      return res.status(400).json({ message: 'Код прострочено' });
-    }
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.status !== "APPROVED") return res.status(403).json({ message: "Account not approved" });
 
-    // КЛЮЧЕВОЕ: кладём сырой пароль — pre('save') его захеширует
-    user.password = String(newPassword);
-    user.recoveryCode = null;
-    user.recoveryCodeExpires = null;
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+    res.status(200).json({ message: "Login successful", user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+exports.updateUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_FROM,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+async function sendMail(to, subject, html) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject,
+    html,
+  });
+}
+exports.sendRecoveryCode = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.recoveryCode = code;
     await user.save();
 
-    res.json({ ok: true, message: 'Пароль змінено' });
-  } catch (e) {
-    console.error('resetPassword error:', e);
-    res.status(500).json({ message: 'Не вдалося оновити пароль' });
-  }
-}
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_FROM,
+        pass: process.env.EMAIL_PASS
+      }
+    });
 
-async function uploadUserPhoto(req, res) {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Код для відновлення паролю",
+      text: `Ваш код для відновлення паролю: ${code}`
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "Код надіслано на пошту" });
+  } catch (error) {
+    console.error("sendRecoveryCode error:", error);
+    res.status(500).json({ message: "Не вдалося надіслати лист" });
+  }
+};
+
+
+const path = require("path");
+
+const uploadUserPhoto = async (req, res) => {
   try {
     const userId = req.params.id;
     const photoPath = req.file ? `/uploads/${req.file.filename}` : null;
-    if (!photoPath) return res.status(400).json({ message: 'Фото не надіслано.' });
 
-    await User.findByIdAndUpdate(userId, { photoUrl: photoPath }, { new: true });
-    res.json({ message: 'Фото оновлено', photoUrl: photoPath });
-  } catch (e) {
-    res.status(500).json({ message: 'Помилка сервера.' });
+    if (!photoPath) return res.status(400).json({ message: "Фото не надіслано." });
+
+    const user = await User.findByIdAndUpdate(userId, { photoUrl: photoPath }, { new: true });
+    res.json({ message: "Фото оновлено", photoUrl: photoPath });
+  } catch (err) {
+    console.error("Photo upload error:", err);
+    res.status(500).json({ message: "Помилка сервера." });
   }
-}
+};
 
+// Экспортируй
 module.exports = {
-  loginUser,
-  adminLogin,
-  profile,
-  registerUser,
-  getAllUsers,
-  getUserById,
-  updateUserStatus,
-  updateUser,            
+  ...exports,
   uploadUserPhoto,
-  sendRecoveryCode,
-  verifyRecoveryCode,
-  resetPassword,
 };

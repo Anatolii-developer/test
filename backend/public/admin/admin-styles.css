@@ -1074,6 +1074,44 @@ body, html {
 }
 
 
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.filters input[type="text"],
+.filters select,
+.filters button {
+  font-family: Poppins, sans-serif;
+  font-size: 16px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+.filters input[type="text"],
+.filters select {
+  min-width: 200px;
+  background-color: #fff;
+}
+
+.filters button {
+  background-color: #d3f4dc;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filters button:hover {
+  background-color: #b8eac8;
+}
+
+
 
 .materials-header {
   display: flex;

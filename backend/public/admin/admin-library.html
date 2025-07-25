@@ -93,13 +93,22 @@
         const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${fullName}</td>
-          <td>${user.email}</td>
-          <td>${user.role || "-"}</td>
-          <td>${new Date(user.dateOfBirth).toLocaleDateString("uk-UA")}</td>
-          <td><input type="checkbox" class="user-checkbox" data-role="${user.role}"></td>
-        `;
+  <td>${index + 1}</td>
+  <td>${fullName}</td>
+  <td>${user.email}</td>
+  <td>${user.role || "-"}</td>
+  <td>${new Date(user.dateOfBirth).toLocaleDateString("uk-UA")}</td>
+  <td>
+    <img 
+      src="images/checkbox-empty.png" 
+      alt="checkbox" 
+      class="custom-checkbox" 
+      data-role="${user.role}" 
+      data-checked="false"
+      style="width: 24px; height: 24px; cursor: pointer;" />
+  </td>
+`;
+
         tbody.appendChild(row);
       });
     }
@@ -131,16 +140,27 @@
       document.getElementById("roleFilter").addEventListener("change", applyFilters);
 
       document.getElementById("selectAllBtn").addEventListener("click", () => {
-        const selectedRole = document.getElementById("roleFilter").value;
-        document.querySelectorAll(".user-checkbox").forEach(cb => {
-          if (!selectedRole || cb.dataset.role === selectedRole) {
-            cb.checked = true;
-          } else {
-            cb.checked = false;
-          }
-        });
-      });
+  const selectedRole = document.getElementById("roleFilter").value;
+  document.querySelectorAll(".custom-checkbox").forEach(cb => {
+    const match = !selectedRole || cb.dataset.role === selectedRole;
+    cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
+    cb.dataset.checked = match.toString();
+  });
+});
+
+      document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("custom-checkbox")) {
+    const checkbox = e.target;
+    const isChecked = checkbox.dataset.checked === "true";
+
+    checkbox.src = isChecked ? "images/checkbox-empty.png" : "images/checkbox.png";
+    checkbox.dataset.checked = (!isChecked).toString();
+  }
+});
+
     });
+
+    
   </script>
 </body>
 </html>

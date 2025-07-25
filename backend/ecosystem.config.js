@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: "psychologist-api",
-      script: "./server.js",
-      cwd: "./backend",
+      script: "server.js",
+      cwd: "./backend", // Оставляем, так как запускаем из корня
       env: {
         NODE_ENV: "production",
         PORT: 5050,

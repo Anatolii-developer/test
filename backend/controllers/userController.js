@@ -1,27 +1,23 @@
 const User = require('../models/User');
+const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const path = require("path");
 
 exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    //await user.save();
+    await user.save(); // не забудь раскомментировать сохранение, если оно тоже было отключено
 
-    try {
-      await sendMail(
-        user.email,
-        "Підтвердження отримання заявки на реєстрацію",
-        `
-        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
-        <p>Дякуємо за вашу заявку на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії.</p>
-        <p>Наразі ваша заявка перебуває на розгляді. Найближчим часом вона буде підтверджена та Ви отримаєте лист з усіма необхідними даними для входу та користування кабінетом.</p>
-        <p>Якщо у вас виникнуть запитання, ви можете звертатися на нашу електронну пошту: profsupervision@gmail.com.</p>
-        <p>З повагою,<br>Команда IPS</p>
-        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
-        `
-      );
-    } catch (emailErr) {
-      console.error("❌ Send email failed:", emailErr.message);
-      // Можно даже записать это в логи или в базу данных, но пользователю не показывать
-    }
+    // Отправка email временно отключена
+    // try {
+    //   await sendMail(
+    //     user.email,
+    //     "Підтвердження отримання заявки на реєстрацію",
+    //     `...`
+    //   );
+    // } catch (emailErr) {
+    //   console.error("❌ Send email failed:", emailErr.message);
+    // }
 
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
@@ -29,15 +25,10 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-
-
-
-
 exports.getAllUsers = async (req, res) => {
   try {
     const { status } = req.query;
     const filter = status ? { status } : {};
-
     const users = await User.find(filter).sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
@@ -64,34 +55,20 @@ exports.updateUserStatus = async (req, res) => {
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
 
-    if (status === "APPROVED") {
-      await sendMail(
-        user.email,
-        "Ваш доступ до особистого кабінету IPS активовано",
-        `
-        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
-        <p>Ваша заявка на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії була успішно підтверджена.</p>
-        <p>Відтепер ви маєте доступ до вашого персонального кабінету.</p>
-        <p>🔐 <strong>Дані для входу:</strong><br>
-        Посилання: <a href="http://mamko-prof-supervision.com/login">Вхід</a><br>
-        Ім’я користувача: ${user.username}<br>
-        Ваш пароль: [********]</p>
-        <p>📌 Якщо ви маєте запитання — звертайтесь на profsupervision@gmail.com.</p>
-        <p>З повагою,<br>Команда IPS</p>
-        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
-        `
-      );
-    }
+    // Отправка email временно отключена
+    // if (status === "APPROVED") {
+    //   await sendMail(
+    //     user.email,
+    //     "Ваш доступ до особистого кабінету IPS активовано",
+    //     `...`
+    //   );
+    // }
 
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
-
-// controllers/userController.js
-const bcrypt = require("bcryptjs");
 
 exports.loginUser = async (req, res) => {
   const { username, password } = req.body;
@@ -110,8 +87,6 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-
-
 exports.updateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -122,8 +97,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-const nodemailer = require("nodemailer");
-
+// Email transporter (оставлен, но не используется)
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -133,13 +107,11 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendMail(to, subject, html) {
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
-    to,
-    subject,
-    html,
-  });
+  // Временно отключено
+  console.log(`📭 Email отключен. Не отправлен на: ${to}`);
+  return;
 }
+
 exports.sendRecoveryCode = async (req, res) => {
   const { email } = req.body;
 
@@ -153,6 +125,7 @@ exports.sendRecoveryCode = async (req, res) => {
     user.recoveryCode = code;
     await user.save();
 
+    // Email отправка остаётся активной, если хочешь — её тоже можно закомментировать
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -176,9 +149,6 @@ exports.sendRecoveryCode = async (req, res) => {
   }
 };
 
-
-const path = require("path");
-
 const uploadUserPhoto = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -194,7 +164,6 @@ const uploadUserPhoto = async (req, res) => {
   }
 };
 
-// Экспортируй
 module.exports = {
   ...exports,
   uploadUserPhoto,

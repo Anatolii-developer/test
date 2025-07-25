@@ -6,24 +6,15 @@ const path = require("path");
 exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    await user.save(); // не забудь раскомментировать сохранение, если оно тоже было отключено
-
-    // Отправка email временно отключена
-    // try {
-    //   await sendMail(
-    //     user.email,
-    //     "Підтвердження отримання заявки на реєстрацію",
-    //     `...`
-    //   );
-    // } catch (emailErr) {
-    //   console.error("❌ Send email failed:", emailErr.message);
-    // }
+    await user.save(); // ← не забудь раскомментировать, если она ещё закомментирована
 
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
+    console.error("❌ Registration error:", error); // 👈 это важно
     res.status(500).json({ error: error.message });
   }
 };
+
 
 exports.getAllUsers = async (req, res) => {
   try {

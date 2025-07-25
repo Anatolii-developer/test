@@ -109,8 +109,16 @@ if (coursesTextarea && coursesCheckIcon) {
 
 
 function saveLoginAndContinue() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+  
+const username = localStorage.getItem("registrationUsername");
+const password = localStorage.getItem("registrationPassword");
+
+if (!username || !password) {
+  alert("Дані входу не знайдені. Будь ласка, перейдіть на попередню сторінку та введіть логін і пароль.");
+  window.location.href = "index.html"; // или та страница, где saveLoginAndContinue
+  return;
+}
+
   const confirmPassword = document.getElementById("confirm-password").value.trim();
 
   if (!username || !password || !confirmPassword) {
@@ -576,23 +584,26 @@ topics: [...document.querySelectorAll('.work-topics input[type="checkbox"]:check
     };
 
     try {
-      console.log("📤 Payload:", payload);
-      const res = await fetch(`${API_BASE}/api/users/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+  console.log("📤 Payload:", payload);
+  const res = await fetch(`${API_BASE}/api/users/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-      const result = await res.json();
-      if (res.ok) {
-        window.location.href = "registration-success.html";
-      } else {
-        alert("Error: " + result.message);
-      }
-    } catch (err) {
-      console.error("❌ Server error:", err);
-      alert("Server error");
-    }
+  const result = await res.json();
+  console.log("📩 Response:", result); // 👈 Добавь это
+
+  if (res.ok) {
+    window.location.href = "registration-success.html";
+  } else {
+    alert("❌ Error: " + result.message);
+  }
+} catch (err) {
+  console.error("❌ Server error:", err);
+  alert("Server error");
+}
+
   });
 }
 

@@ -6,14 +6,22 @@ const path = require("path");
 exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    await user.save(); // ← не забудь раскомментировать, если она ещё закомментирована
+    await user.save();
+
+    await sendMail(
+      user.email,
+      "Реєстрація на платформі успішна",
+      `<p>Дякуємо за реєстрацію, ${user.firstName || "користувач"}!</p>
+       <p>Ваш акаунт успішно створено. Після схвалення адміністратором ви зможете увійти в систему.</p>`
+    );
 
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
-    console.error("❌ Registration error:", error); // 👈 это важно
+    console.error("❌ Registration error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 exports.getAllUsers = async (req, res) => {
@@ -46,14 +54,6 @@ exports.updateUserStatus = async (req, res) => {
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
 
-    // Отправка email временно отключена
-    // if (status === "APPROVED") {
-    //   await sendMail(
-    //     user.email,
-    //     "Ваш доступ до особистого кабінету IPS активовано",
-    //     `...`
-    //   );
-    // }
 
     res.json(user);
   } catch (error) {
@@ -98,9 +98,17 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendMail(to, subject, html) {
-  // Временно отключено
-  console.log(`📭 Email отключен. Не отправлен на: ${to}`);
-  return;
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject,
+      html,
+    });
+    console.log(`📬 Email sent to ${to}`);
+  } catch (err) {
+    console.error("❌ Email sending error:", err);
+  }
 }
 
 exports.sendRecoveryCode = async (req, res) => {

@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "psychologist-api",
-      script: "server.js",
+      script: "./server.js",
       cwd: "./backend",
       env: {
         NODE_ENV: "production",

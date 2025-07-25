@@ -5,24 +5,30 @@ exports.registerUser = async (req, res) => {
     const user = new User(req.body);
     await user.save();
 
-    await sendMail(
-      user.email,
-      "Підтвердження отримання заявки на реєстрацію",
-      `
-      <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
-      <p>Дякуємо за вашу заявку на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії.</p>
-      <p>Наразі ваша заявка перебуває на розгляді. Найближчим часом вона буде підтверджена та Ви отримаєте лист з усіма необхідними даними для входу та користування кабінетом.</p>
-      <p>Якщо у вас виникнуть запитання, ви можете звертатися на нашу електронну пошту: profsupervision@gmail.com.</p>
-      <p>З повагою,<br>Команда IPS</p>
-      <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
-      `
-    );
+    try {
+      await sendMail(
+        user.email,
+        "Підтвердження отримання заявки на реєстрацію",
+        `
+        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
+        <p>Дякуємо за вашу заявку на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії.</p>
+        <p>Наразі ваша заявка перебуває на розгляді. Найближчим часом вона буде підтверджена та Ви отримаєте лист з усіма необхідними даними для входу та користування кабінетом.</p>
+        <p>Якщо у вас виникнуть запитання, ви можете звертатися на нашу електронну пошту: profsupervision@gmail.com.</p>
+        <p>З повагою,<br>Команда IPS</p>
+        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
+        `
+      );
+    } catch (emailErr) {
+      console.error("❌ Send email failed:", emailErr.message);
+      // Можно даже записать это в логи или в базу данных, но пользователю не показывать
+    }
 
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 

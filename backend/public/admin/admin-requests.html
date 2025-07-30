@@ -94,8 +94,7 @@ function logoutUser() {
 document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.querySelector(".requests-table tbody");
   const tableHead = document.getElementById("table-header");
-  
-  modalClose.onclick = () => modal.style.display = "none";
+
   window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
   tabs.forEach(tab => {

@@ -164,6 +164,22 @@
   margin-top: 32px;
 }
 
+.input-with-select {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.option-select {
+  width: 160px;
+  height: 28px;
+  border-radius: 5px;
+  background-color: #FFEED9;
+  border: none;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+}
+
 
   </style>
 </head>
@@ -304,14 +320,14 @@ if (status === "APPROVED") {
           const value = Array.isArray(user[key]) ? user[key].join(", ") : (user[key] || "-");
           const isLongText = value.length > 100;
 
-       const fieldHTML = `
+      const fieldHTML = `
   <div class="field-row ${isLongText ? 'full' : ''}">
     <label>${label}</label>
     ${isLongText
       ? `<textarea readonly>${value}</textarea>`
-      : `<div style="display: flex; gap: 12px; align-items: center;">
+      : `<div class="input-with-select">
            <input type="text" value="${value}" readonly />
-           <select class="option-select" style="width: 160px; height: 28px; border-radius: 5px; background-color: #FFEED9;">
+           <select class="option-select">
              <option value="">Оберіть опцію</option>
              <option value="картка спеціаліста">картка спеціаліста</option>
              <option value="ментору">ментору</option>
@@ -322,6 +338,8 @@ if (status === "APPROVED") {
     }
   </div>
 `;
+
+
 
 
           formContainer.insertAdjacentHTML("beforeend", fieldHTML);

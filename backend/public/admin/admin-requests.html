@@ -195,39 +195,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
 
-      document.querySelectorAll(".more-btn").forEach(btn => {
-        btn.addEventListener("click", async (e) => {
-          e.preventDefault();
-          const id = btn.dataset.id;
-          const res = await fetch(`${API_URL}/api/users/${id}`);
-          const user = await res.json();
-          currentUserId = id;
-
-          userDetails.innerHTML = `
-           <p><strong>Username:</strong> ${user.username || '-'}</p>
-            <p><strong>Ім’я:</strong> ${user.firstName || '-'}</p>
-            <p><strong>Прізвище:</strong> ${user.lastName || '-'}</p>
-            <p><strong>По-батькові:</strong> ${user.middleName || '-'}</p>
-            <p><strong>Дата подання заявки:</strong> ${new Date(user.createdAt).toLocaleDateString() || '-'}</p>
-            <p><strong>Дата підтвердження заявки:</strong> ${user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '-'}</p>
-            <p><strong>Дата народження:</strong> ${user.dateOfBirth || '-'}</p>
-            <p><strong>Email:</strong> ${user.email || '-'}</p>
-            <p><strong>Телефон:</strong> ${user.phone || '-'}</p>
-            <p><strong>Стать:</strong> ${user.gender || '-'}</p>
-            <p><strong>Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими:</strong> ${user.experience || '-'}</p>
-            <p><strong>Психологічна освіта:</strong> ${user.education || '-'}</p>
-            <p><strong>Тематики:</strong> ${(user.topics || []).join(', ') || '-'}</p>
-          `;
-
-          roleSelect.value = user.role || "";
-          decisionSelect.value = "";
-          modal.style.display = "block";
-        });
-      });
+  
     } catch (err) {
       console.error("Помилка при завантаженні:", err);
     }
-  }
+  } 
 
   loadUsers();
 });

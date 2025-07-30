@@ -1284,3 +1284,20 @@ label[for="courseSelect"] {
       font-family: 'Poppins', sans-serif;
       cursor: pointer;
     }
+
+
+     .profile-wrapper {
+      max-width: 890px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 24px;
+      padding: 60px 100px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .profile-wrapper h2 {
+      margin-bottom: 24px;
+    }
+    .profile-wrapper p {
+      margin: 10px 0;
+      line-height: 1.6;
+    }

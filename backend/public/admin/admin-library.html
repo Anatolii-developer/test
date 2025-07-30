@@ -132,32 +132,34 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const response = await fetch("http://157.230.121.24:5050/api/users/approved");
-        allUsers = await response.json();
-        renderTable(allUsers);
-      } catch (err) {
-        console.error("Помилка при отриманні користувачів:", err);
-      }
+  // Загружаем список курсів
+  async function loadCurrentCourses() {
+    const res = await fetch("http://157.230.121.24:5050/api/courses");
+    const allCourses = await res.json();
+    const currentCourses = allCourses.filter(c => c.status === "Поточний");
 
-      async function loadCurrentCourses() {
-  const res = await fetch("http://157.230.121.24:5050/api/courses");
-  const allCourses = await res.json();
-  const currentCourses = allCourses.filter(c => c.status === "Поточний");
+    const courseSelect = document.getElementById("courseSelect");
+    courseSelect.innerHTML = `<option value="">-- Оберіть курс --</option>`;
+    currentCourses.forEach(course => {
+      const opt = document.createElement("option");
+      opt.value = course._id;
+      opt.textContent = course.courseTitle;
+      courseSelect.appendChild(opt);
+    });
+  }
 
-  const courseSelect = document.getElementById("courseSelect");
-  courseSelect.innerHTML = `<option value="">-- Оберіть курс --</option>`;
-  currentCourses.forEach(course => {
-    const opt = document.createElement("option");
-    opt.value = course._id;
-    opt.textContent = course.courseTitle;
-    courseSelect.appendChild(opt);
-  });
-}
+  await loadCurrentCourses();
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadCurrentCourses();
+  // Загружаем пользователей по умолчанию (всі approved)
+  try {
+    const response = await fetch("http://157.230.121.24:5050/api/users/approved");
+    allUsers = await response.json();
+    renderTable(allUsers);
+  } catch (err) {
+    console.error("Помилка при отриманні користувачів:", err);
+  }
 
+  // Фільтрація по обраному курсу
   document.getElementById("courseSelect").addEventListener("change", async (e) => {
     const courseId = e.target.value;
     if (!courseId) return;
@@ -171,32 +173,30 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Помилка при отриманні учасників курсу:", err);
     }
   });
-});
 
+  document.getElementById("searchInput").addEventListener("input", applyFilters);
+  document.getElementById("roleFilter").addEventListener("change", applyFilters);
 
-      document.getElementById("searchInput").addEventListener("input", applyFilters);
-      document.getElementById("roleFilter").addEventListener("change", applyFilters);
+  document.getElementById("selectAllBtn").addEventListener("click", () => {
+    const selectedRole = document.getElementById("roleFilter").value;
+    document.querySelectorAll(".custom-checkbox").forEach(cb => {
+      const match = !selectedRole || cb.dataset.role === selectedRole;
+      cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
+      cb.dataset.checked = match.toString();
+    });
+  });
 
-      document.getElementById("selectAllBtn").addEventListener("click", () => {
-  const selectedRole = document.getElementById("roleFilter").value;
-  document.querySelectorAll(".custom-checkbox").forEach(cb => {
-    const match = !selectedRole || cb.dataset.role === selectedRole;
-    cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
-    cb.dataset.checked = match.toString();
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("custom-checkbox")) {
+      const checkbox = e.target;
+      const isChecked = checkbox.dataset.checked === "true";
+
+      checkbox.src = isChecked ? "images/checkbox-empty.png" : "images/checkbox.png";
+      checkbox.dataset.checked = (!isChecked).toString();
+    }
   });
 });
 
-      document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("custom-checkbox")) {
-    const checkbox = e.target;
-    const isChecked = checkbox.dataset.checked === "true";
-
-    checkbox.src = isChecked ? "images/checkbox-empty.png" : "images/checkbox.png";
-    checkbox.dataset.checked = (!isChecked).toString();
-  }
-});
-
-    });
 
     
   </script>

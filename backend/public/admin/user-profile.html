@@ -180,16 +180,27 @@
   font-family: 'Poppins', sans-serif;
 }
 
-.field-row.full textarea {
-  width: 100%;
-  box-sizing: border-box;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  font-size: 14px;
+.two-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.two-columns input {
+  flex: 1;
+  max-width: 60%;
+}
+
+.two-columns select {
+  width: 180px;
+  height: 28px;
+  border-radius: 5px;
+  background-color: #FFEED9;
+  border: none;
+  outline: none;
   font-family: 'Poppins', sans-serif;
 }
+
   </style>
 </head>
 <body>
@@ -333,20 +344,23 @@ if (status === "APPROVED") {
   <div class="field-row ${isLongText ? 'full' : ''}">
     <label>${label}</label>
     ${isLongText
-      ? `<textarea readonly style="width: 100%; background: #fff; border-radius: 8px; border: 1px solid #ccc; padding: 10px;">${value}</textarea>`
-      : `<div class="input-with-select">
-           <input type="text" value="${value}" readonly />
-           <select class="option-select">
-             <option value="">Оберіть опцію</option>
-             <option value="картка спеціаліста">картка спеціаліста</option>
-             <option value="ментору">ментору</option>
-             <option value="супервізору">супервізору</option>
-             <option value="лише для мене">лише для мене</option>
-           </select>
-         </div>`
+      ? `<textarea readonly>${value}</textarea>`
+      : `
+      <div class="two-columns">
+        <input type="text" value="${value}" readonly />
+        <select class="option-select">
+          <option value="">Оберіть опцію</option>
+          <option value="картка спеціаліста">картка спеціаліста</option>
+          <option value="ментору">ментору</option>
+          <option value="супервізору">супервізору</option>
+          <option value="лише для мене">лише для мене</option>
+        </select>
+      </div>
+      `
     }
   </div>
 `;
+
 
 
 

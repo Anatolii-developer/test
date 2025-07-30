@@ -180,7 +180,16 @@
   font-family: 'Poppins', sans-serif;
 }
 
-
+.field-row.full textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
   </style>
 </head>
 <body>
@@ -324,7 +333,7 @@ if (status === "APPROVED") {
   <div class="field-row ${isLongText ? 'full' : ''}">
     <label>${label}</label>
     ${isLongText
-      ? `<textarea readonly>${value}</textarea>`
+      ? `<textarea readonly style="width: 100%; background: #fff; border-radius: 8px; border: 1px solid #ccc; padding: 10px;">${value}</textarea>`
       : `<div class="input-with-select">
            <input type="text" value="${value}" readonly />
            <select class="option-select">
@@ -338,6 +347,7 @@ if (status === "APPROVED") {
     }
   </div>
 `;
+
 
 
 

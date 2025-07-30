@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.querySelector(".requests-table tbody");
   const tableHead = document.getElementById("table-header");
 
-  window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
@@ -127,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, role }),
     });
-    modal.style.display = "none";
+    
     loadUsers();
   };
 

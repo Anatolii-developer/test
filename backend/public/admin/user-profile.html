@@ -86,7 +86,6 @@
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      background: #E5F6E0;
       font-size: 16px;
     }
 
@@ -201,6 +200,10 @@
   font-family: 'Poppins', sans-serif;
 }
 
+.approved-fields input {
+  background: #E5F6E0;
+}
+
   </style>
 </head>
 <body>
@@ -297,7 +300,7 @@ if (status === "APPROVED") {
       <img id="userPhoto" src="${user.photoUrl || 'assets/profile-photo.png'}" alt="Фото учасника" class="profile-photo" />
       <div class="upload-icon">↻</div>
     </div>
-    <div class="profile-name-block">
+    <div class="profile-name-block approved-fields">
       <label>Username</label>
       <input type="text" id="username" value="${user.username || ''}" readonly />
       <label>Прізвище</label>

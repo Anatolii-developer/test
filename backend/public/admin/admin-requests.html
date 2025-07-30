@@ -70,26 +70,7 @@
   </div>
 </main>
 
-<div id="userModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span id="modalClose" class="modal-close">&times;</span>
-    <div id="userDetails" class="modal-details"></div>
-    <div style="margin-top: 1rem;">
-      <select id="roleSelect">
-        <option value="">Оберіть роль</option>
-        <option value="Супервізор I категорії">Супервізор I категорії</option>
-        <option value="Супервізор II категорії">Супервізор II категорії</option>
-        <option value="Психолог">Психолог</option>
-      </select>
-      <select id="decisionSelect">
-        <option value="">Оберіть рішення</option>
-        <option value="APPROVED">✅ Прийняти</option>
-        <option value="REJECTED">❌ Відхилити</option>
-      </select>
-      <button id="submitDecision">Submit</button>
-    </div>
-  </div>
-</div>
+
 
 <script>
 const API_URL = "http://157.230.121.24:5050";
@@ -113,14 +94,7 @@ function logoutUser() {
 document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.querySelector(".requests-table tbody");
   const tableHead = document.getElementById("table-header");
-  const modal = document.getElementById("userModal");
-  const userDetails = document.getElementById("userDetails");
-  const modalClose = document.getElementById("modalClose");
-  const tabs = document.querySelectorAll(".top-btn");
-  const decisionSelect = document.getElementById("decisionSelect");
-  const roleSelect = document.getElementById("roleSelect");
-  const submitDecision = document.getElementById("submitDecision");
-
+  
   modalClose.onclick = () => modal.style.display = "none";
   window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 

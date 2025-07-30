@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // 📥 POST /api/library
-router.post("/api/library", upload.single("bookFile"), async (req, res) => {
+router.post("/", upload.single("bookFile"), async (req, res) => {
   try {
     const { type, title, description, videoLink } = req.body;
 
@@ -45,7 +45,7 @@ router.post("/api/library", upload.single("bookFile"), async (req, res) => {
 });
 
 // 📤 GET /api/library
-router.get("/api/library", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const all = await Library.find().sort({ date: -1 });
     res.json(all);

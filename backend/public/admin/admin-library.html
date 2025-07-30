@@ -38,15 +38,23 @@
         <button class="btn-light-green">Додати матеріали групи</button>
       </div>
 
-      <div class="filters">
-        <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
-        <select id="roleFilter">
-          <option value="">Усі ролі</option>
-          <option value="Психолог">Психолог</option>
-          <option value="Супервізор 1 категорії">Супервізор 1 категорії</option>
-        </select>
-        <button id="selectAllBtn" class="btn-light-green">Виділити всіх</button>
-      </div>
+     <div class="filters">
+  <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
+
+  <select id="roleFilter">
+    <option value="">Усі ролі</option>
+    <option value="Психолог">Психолог</option>
+    <option value="Супервізор I категорії">Супервізор I категорії</option>
+    <option value="Супервізор II категорії">Супервізор II категорії</option>
+  </select>
+
+  <label class="checkbox-label">
+    <input type="checkbox" id="filterCurrentCourseOnly" />
+    Лише поточні
+  </label>
+
+  <button id="selectAllBtn" class="btn-light-green">Виділити всіх</button>
+</div>
 
       <table class="participants-table">
         <thead>
@@ -130,6 +138,22 @@
       } catch (err) {
         console.error("Помилка при отриманні користувачів:", err);
       }
+      document.getElementById("filterCurrentCourseOnly").addEventListener("change", async (e) => {
+  const isChecked = e.target.checked;
+  try {
+    const response = await fetch(
+      isChecked
+        ? "http://157.230.121.24:5050/api/courses/current-course-participants"
+        : "http://157.230.121.24:5050/api/users/approved"
+    );
+    const data = await response.json();
+    allUsers = data;
+    applyFilters(); // применит фильтры по имени и роли
+  } catch (err) {
+    console.error("Помилка при перемиканні фільтру поточних курсів:", err);
+  }
+});
+
 
       document.getElementById("searchInput").addEventListener("input", applyFilters);
       document.getElementById("roleFilter").addEventListener("change", applyFilters);

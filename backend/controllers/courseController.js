@@ -153,3 +153,26 @@ exports.getCourseParticipants = async (req, res) => {
   }
 };
 
+
+exports.getCurrentCourseParticipants = async (req, res) => {
+  try {
+    const currentCourses = await Course.find({ status: 'Поточний' }).populate('participants');
+
+    const participantsMap = new Map();
+
+    currentCourses.forEach(course => {
+      course.participants.forEach(user => {
+        if (!participantsMap.has(user._id.toString())) {
+          participantsMap.set(user._id.toString(), user);
+        }
+      });
+    });
+
+    const uniqueParticipants = Array.from(participantsMap.values());
+
+    res.json(uniqueParticipants);
+  } catch (err) {
+    console.error("❌ Error fetching current course participants:", err.message);
+    res.status(500).json({ message: "Помилка сервера", error: err.message });
+  }
+};

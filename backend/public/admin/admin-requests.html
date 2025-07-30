@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.querySelector(".requests-table tbody");
   const tableHead = document.getElementById("table-header");
 
-
+const tabs = document.querySelectorAll(".top-btn");
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
       tabs.forEach(t => t.classList.remove("active"));
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, role }),
     });
-    
+
     loadUsers();
   };
 

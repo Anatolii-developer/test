@@ -210,6 +210,40 @@
       try {
         const res = await fetch(`${API_URL}/api/users/${userId}`);
         const user = await res.json();
+        const profileHeader = document.getElementById("profileHeader");
+
+if (status === "APPROVED") {
+  profileHeader.innerHTML = `
+    <div class="profile-photo-section">
+      <img id="userPhoto" src="${user.photoUrl || 'assets/profile-photo.png'}" alt="Фото учасника" class="profile-photo" />
+      <div class="upload-icon">↻</div>
+    </div>
+    <div class="profile-name-block">
+      <label>Username</label>
+      <input type="text" id="username" value="${user.username || ''}" readonly />
+      <label>Прізвище</label>
+      <input type="text" id="lastName" value="${user.lastName || ''}" readonly />
+      <label>Ім’я</label>
+      <input type="text" id="firstName" value="${user.firstName || ''}" readonly />
+      <label>По-батькові</label>
+      <input type="text" id="middleName" value="${user.middleName || ''}" readonly />
+    </div>
+  `;
+} else {
+  profileHeader.innerHTML = `
+    <div class="profile-name-block" style="width:100%">
+      <label>Username</label>
+      <input type="text" id="username" value="${user.username || ''}" readonly />
+      <label>Прізвище</label>
+      <input type="text" id="lastName" value="${user.lastName || ''}" readonly />
+      <label>Ім’я</label>
+      <input type="text" id="firstName" value="${user.firstName || ''}" readonly />
+      <label>По-батькові</label>
+      <input type="text" id="middleName" value="${user.middleName || ''}" readonly />
+    </div>
+  `;
+}
+
 
         document.getElementById("username").value = user.username || "";
         document.getElementById("firstName").value = user.firstName || "";
@@ -276,39 +310,8 @@
   }
 });
 
-const profileHeader = document.getElementById("profileHeader");
 
-if (status === "APPROVED") {
-  profileHeader.innerHTML = `
-    <div class="profile-photo-section">
-      <img id="userPhoto" src="${user.photoUrl || 'assets/profile-photo.png'}" alt="Фото учасника" class="profile-photo" />
-      <div class="upload-icon">↻</div>
-    </div>
-    <div class="profile-name-block">
-      <label>Username</label>
-      <input type="text" value="${user.username || ''}" readonly />
-      <label>Прізвище</label>
-      <input type="text" value="${user.lastName || ''}" readonly />
-      <label>Ім’я</label>
-      <input type="text" value="${user.firstName || ''}" readonly />
-      <label>По-батькові</label>
-      <input type="text" value="${user.middleName || ''}" readonly />
-    </div>
-  `;
-} else {
-  profileHeader.innerHTML = `
-    <div class="profile-name-block" style="width:100%">
-      <label>Username</label>
-      <input type="text" value="${user.username || ''}" readonly />
-      <label>Прізвище</label>
-      <input type="text" value="${user.lastName || ''}" readonly />
-      <label>Ім’я</label>
-      <input type="text" value="${user.firstName || ''}" readonly />
-      <label>По-батькові</label>
-      <input type="text" value="${user.middleName || ''}" readonly />
-    </div>
-  `;
-}
+
 
 
   </script>

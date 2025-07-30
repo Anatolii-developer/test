@@ -134,21 +134,7 @@
 <body>
   <main class="user-profile-container">
     <div class="profile-card" id="userProfileCard">
-      <div class="profile-header">
-        <div class="profile-photo-section">
-          <img id="userPhoto" src="assets/profile-photo.png" alt="Фото учасника" class="profile-photo" />
-          <div class="upload-icon">↻</div>
-        </div>
-        <div class="profile-name-block">
-          <label>Username</label>
-          <input type="text" id="username" readonly />
-          <label>Прізвище</label>
-          <input type="text" id="lastName" readonly />
-          <label>Ім’я</label>
-          <input type="text" id="firstName" readonly />
-          <label>По-батькові</label>
-          <input type="text" id="middleName" readonly />
-        </div>
+      <div id="profileHeader" class="profile-header"></div>
       </div>
       <div class="action-controls">
   <select id="roleSelect">
@@ -175,6 +161,8 @@
   </main>
 
   <script>
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
     const API_URL = "http://157.230.121.24:5050";
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get("id");
@@ -287,6 +275,42 @@
     alert("Серверна помилка.");
   }
 });
+
+const profileHeader = document.getElementById("profileHeader");
+
+if (status === "APPROVED") {
+  profileHeader.innerHTML = `
+    <div class="profile-photo-section">
+      <img id="userPhoto" src="${user.photoUrl || 'assets/profile-photo.png'}" alt="Фото учасника" class="profile-photo" />
+      <div class="upload-icon">↻</div>
+    </div>
+    <div class="profile-name-block">
+      <label>Username</label>
+      <input type="text" value="${user.username || ''}" readonly />
+      <label>Прізвище</label>
+      <input type="text" value="${user.lastName || ''}" readonly />
+      <label>Ім’я</label>
+      <input type="text" value="${user.firstName || ''}" readonly />
+      <label>По-батькові</label>
+      <input type="text" value="${user.middleName || ''}" readonly />
+    </div>
+  `;
+} else {
+  profileHeader.innerHTML = `
+    <div class="profile-name-block" style="width:100%">
+      <label>Username</label>
+      <input type="text" value="${user.username || ''}" readonly />
+      <label>Прізвище</label>
+      <input type="text" value="${user.lastName || ''}" readonly />
+      <label>Ім’я</label>
+      <input type="text" value="${user.firstName || ''}" readonly />
+      <label>По-батькові</label>
+      <input type="text" value="${user.middleName || ''}" readonly />
+    </div>
+  `;
+}
+
+
   </script>
 </body>
 </html>

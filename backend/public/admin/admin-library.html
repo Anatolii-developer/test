@@ -48,10 +48,11 @@
     <option value="Супервізор II категорії">Супервізор II категорії</option>
   </select>
 
-  <label class="checkbox-label">
-    <input type="checkbox" id="filterCurrentCourseOnly" />
-    Лише поточні
-  </label>
+  <label for="courseSelect">Оберіть курс</label>
+<select id="courseSelect">
+  <option value="">-- Оберіть курс --</option>
+</select>
+
 
   <button id="selectAllBtn" class="btn-light-green">Виділити всіх</button>
 </div>
@@ -138,20 +139,38 @@
       } catch (err) {
         console.error("Помилка при отриманні користувачів:", err);
       }
-      document.getElementById("filterCurrentCourseOnly").addEventListener("change", async (e) => {
-  const isChecked = e.target.checked;
-  try {
-    const response = await fetch(
-      isChecked
-        ? "http://157.230.121.24:5050/api/courses/current-course-participants"
-        : "http://157.230.121.24:5050/api/users/approved"
-    );
-    const data = await response.json();
-    allUsers = data;
-    applyFilters(); // применит фильтры по имени и роли
-  } catch (err) {
-    console.error("Помилка при перемиканні фільтру поточних курсів:", err);
-  }
+
+      async function loadCurrentCourses() {
+  const res = await fetch("http://157.230.121.24:5050/api/courses");
+  const allCourses = await res.json();
+  const currentCourses = allCourses.filter(c => c.status === "Поточний");
+
+  const courseSelect = document.getElementById("courseSelect");
+  courseSelect.innerHTML = `<option value="">-- Оберіть курс --</option>`;
+  currentCourses.forEach(course => {
+    const opt = document.createElement("option");
+    opt.value = course._id;
+    opt.textContent = course.courseTitle;
+    courseSelect.appendChild(opt);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadCurrentCourses();
+
+  document.getElementById("courseSelect").addEventListener("change", async (e) => {
+    const courseId = e.target.value;
+    if (!courseId) return;
+
+    try {
+      const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/participants`);
+      const users = await res.json();
+      allUsers = users;
+      applyFilters(); // ← твоя функция фильтрации
+    } catch (err) {
+      console.error("Помилка при отриманні учасників курсу:", err);
+    }
+  });
 });
 
 

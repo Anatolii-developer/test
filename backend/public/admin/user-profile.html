@@ -304,15 +304,25 @@ if (status === "APPROVED") {
           const value = Array.isArray(user[key]) ? user[key].join(", ") : (user[key] || "-");
           const isLongText = value.length > 100;
 
-          const fieldHTML = `
-            <div class="field-row ${isLongText ? 'full' : ''}">
-              <label>${label}</label>
-              ${isLongText
-                ? `<textarea readonly>${value}</textarea>`
-                : `<input type="text" value="${value}" readonly />`
-              }
-            </div>
-          `;
+       const fieldHTML = `
+  <div class="field-row ${isLongText ? 'full' : ''}">
+    <label>${label}</label>
+    ${isLongText
+      ? `<textarea readonly>${value}</textarea>`
+      : `<div style="display: flex; gap: 12px; align-items: center;">
+           <input type="text" value="${value}" readonly />
+           <select class="option-select" style="width: 160px; height: 28px; border-radius: 5px; background-color: #FFEED9;">
+             <option value="">Оберіть опцію</option>
+             <option value="картка спеціаліста">картка спеціаліста</option>
+             <option value="ментору">ментору</option>
+             <option value="супервізору">супервізору</option>
+             <option value="лише для мене">лише для мене</option>
+           </select>
+         </div>`
+    }
+  </div>
+`;
+
 
           formContainer.insertAdjacentHTML("beforeend", fieldHTML);
         }

@@ -129,35 +129,52 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    .top-block {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.action-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
   </style>
 </head>
 <body>
   <main class="user-profile-container">
     <div class="profile-card" id="userProfileCard">
-      <div id="profileHeader" class="profile-header"></div>
-      </div>
-      <div class="action-controls">
-  <select id="roleSelect">
-    <option value="">Оберіть роль</option>
-    <option value="Супервізор I категорії">Супервізор I категорії</option>
-    <option value="Супервізор II категорії">Супервізор II категорії</option>
-    <option value="Психолог">Психолог</option>
-  </select>
+  <div class="top-block">
+    <div id="profileHeader" class="profile-header"></div>
+    <div class="action-controls">
+      <select id="roleSelect">
+        <option value="">Оберіть роль</option>
+        <option value="Супервізор I категорії">Супервізор I категорії</option>
+        <option value="Супервізор II категорії">Супервізор II категорії</option>
+        <option value="Психолог">Психолог</option>
+      </select>
 
-  <select id="decisionSelect">
-    <option value="">Оберіть рішення</option>
-    <option value="APPROVED">✅ Прийняти</option>
-    <option value="REJECTED">❌ Відхилити</option>
-  </select>
+      <select id="decisionSelect">
+        <option value="">Оберіть рішення</option>
+        <option value="APPROVED">✅ Прийняти</option>
+        <option value="REJECTED">❌ Відхилити</option>
+      </select>
 
-  <button id="submitDecision">Submit</button>
-</div>
-      <div class="profile-form" id="profileForm">
-        <!-- Остальные поля добавятся JS -->
-      </div>
-
-      <button class="submit-btn">Назад</button>
+      <button id="submitDecision">Submit</button>
     </div>
+  </div>
+
+  <div class="profile-form" id="profileForm">
+    <!-- Остальные поля добавятся JS -->
+  </div>
+
+  <button class="submit-btn">Назад</button>
+</div>
+
   </main>
 
   <script>

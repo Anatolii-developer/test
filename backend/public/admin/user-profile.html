@@ -117,18 +117,39 @@
       background-color: #fff;
     }
 
-    .submit-btn {
-      width: 150px;
-      align-self: center;
-      background-color: #E37009;
-      color: white;
-      font-weight: 600;
-      font-size: 16px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    .decision-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.styled-select {
+  height: 28px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background-color: #ECF5EB;
+  border: 1px solid #ccc;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+.submit-btn {
+  width: 150px;
+  align-self: center;
+  background-color: #E37009;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 24px;
+}
+
     .top-block {
   display: flex;
   justify-content: space-between;
@@ -148,32 +169,32 @@
 <body>
   <main class="user-profile-container">
     <div class="profile-card" id="userProfileCard">
-  <div class="top-block">
-    <div id="profileHeader" class="profile-header"></div>
-    <div class="action-controls">
-      <select id="roleSelect">
-        <option value="">Оберіть роль</option>
-        <option value="Супервізор I категорії">Супервізор I категорії</option>
-        <option value="Супервізор II категорії">Супервізор II категорії</option>
-        <option value="Психолог">Психолог</option>
-      </select>
-
-      <select id="decisionSelect">
-        <option value="">Оберіть рішення</option>
-        <option value="APPROVED">✅ Прийняти</option>
-        <option value="REJECTED">❌ Відхилити</option>
-      </select>
-
-      <button id="submitDecision">Submit</button>
-    </div>
-  </div>
+  <div id="profileHeader" class="profile-header"></div>
 
   <div class="profile-form" id="profileForm">
-    <!-- Остальные поля добавятся JS -->
+    <!-- Поля добавятся через JS -->
+  </div>
+
+  <div class="decision-controls">
+    <select id="roleSelect" class="styled-select" style="width: 180px;">
+      <option value="">Оберіть роль</option>
+      <option value="Супервізор I категорії">Супервізор I категорії</option>
+      <option value="Супервізор II категорії">Супервізор II категорії</option>
+      <option value="Психолог">Психолог</option>
+    </select>
+
+    <select id="decisionSelect" class="styled-select" style="width: 226px;">
+      <option value="">Оберіть рішення</option>
+      <option value="APPROVED">✅ Прийняти</option>
+      <option value="REJECTED">❌ Відхилити</option>
+    </select>
+
+    <button id="submitDecision" class="submit-btn">Submit</button>
   </div>
 
   <button class="submit-btn">Назад</button>
 </div>
+
 
   </main>
 

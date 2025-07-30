@@ -196,9 +196,102 @@
     }
   });
 });
+document.querySelector(".btn-green-add").addEventListener("click", () => {
+  openModal("video");
+});
+document.querySelector(".btn-dark-green").addEventListener("click", () => {
+  openModal("book");
+});
 
+function openModal(type) {
+  document.getElementById("addMaterialModal").style.display = "block";
+  document.getElementById("materialType").value = type;
+  toggleInputs(type);
+}
+function closeModal() {
+  document.getElementById("addMaterialModal").style.display = "none";
+}
+
+document.getElementById("materialType").addEventListener("change", e => {
+  toggleInputs(e.target.value);
+});
+
+function toggleInputs(type) {
+  document.getElementById("videoLink").style.display = type === "video" ? "block" : "none";
+  document.getElementById("bookFile").style.display = type === "book" ? "block" : "none";
+}
+
+async function submitMaterial() {
+  const type = document.getElementById("materialType").value;
+  const title = document.getElementById("materialTitle").value;
+  const description = document.getElementById("materialDescription").value;
+
+  const formData = new FormData();
+  formData.append("type", type);
+  formData.append("title", title);
+  formData.append("description", description);
+
+  if (type === "video") {
+    const link = document.getElementById("videoLink").value;
+    formData.append("videoLink", link);
+  } else {
+    const file = document.getElementById("bookFile").files[0];
+    if (!file) return alert("Оберіть файл");
+    formData.append("bookFile", file);
+  }
+
+  try {
+    await fetch("http://157.230.121.24:5050/api/library", {
+      method: "POST",
+      body: formData
+    });
+    alert("Успішно додано!");
+    closeModal();
+    // тут можно перезагрузить список
+  } catch (err) {
+    alert("Помилка при завантаженні.");
+    console.error(err);
+  }
+}
+
+const multer = require("multer");
+const upload = multer({ dest: "uploads/books/" }); // для PDF
+
+router.post("/api/library", upload.single("bookFile"), async (req, res) => {
+  const { type, title, description, videoLink } = req.body;
+  const newItem = {
+    type,
+    title,
+    description,
+    date: new Date(),
+  };
+
+  if (type === "video") {
+    newItem.videoLink = videoLink;
+  } else {
+    newItem.filePath = req.file.path;
+  }
+
+  await LibraryModel.create(newItem);
+  res.status(200).send("OK");
+});
 
     
   </script>
+  <div id="addMaterialModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3>Додати матеріал</h3>
+    <select id="materialType">
+      <option value="video">Відео (YouTube посилання)</option>
+      <option value="book">Книга (PDF)</option>
+    </select>
+    <input type="text" id="materialTitle" placeholder="Назва" />
+    <textarea id="materialDescription" placeholder="Опис"></textarea>
+    <input type="url" id="videoLink" placeholder="Посилання на відео" style="display:none;" />
+    <input type="file" id="bookFile" accept="application/pdf" style="display:none;" />
+    <button onclick="submitMaterial()">Завантажити</button>
+  </div>
+</div>
 </body>
 </html>

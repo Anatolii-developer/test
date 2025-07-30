@@ -129,5 +129,31 @@
   </main>
 
   <script src="script.js"></script>
+  <script>const res = await fetch("http://157.230.121.24:5050/api/library");
+const items = await res.json();
+
+const videoList = document.querySelector(".video-list");
+const bookList = document.querySelector(".book-list");
+
+items.forEach(item => {
+  if (item.type === "video") {
+    const div = document.createElement("div");
+    div.className = "video-item";
+    div.innerHTML = `<h4>${item.title}</h4><p>${item.description}</p><div class="video-thumb"><a href="${item.videoLink}" target="_blank">Переглянути відео</a></div>`;
+    videoList.appendChild(div);
+  } else {
+    const div = document.createElement("div");
+    div.className = "book-item";
+    div.innerHTML = `
+      <div class="book-info">
+        <h4>${item.title}</h4>
+        <p>${item.description}</p>
+      </div>
+      <a class="book-download-btn" href="/${item.filePath}" download>Завантажити</a>
+    `;
+    bookList.appendChild(div);
+  }
+});
+</script>
 </body>
 </html>

@@ -337,7 +337,7 @@ if (status === "APPROVED") {
         }
 
         const formContainer = document.getElementById("profileForm");
-        const ignoreKeys = ["username", "password", "__v", "_id", "firstName", "lastName", "middleName", "photoUrl", "role", "status"];
+        const ignoreKeys = ["usernames", "password", "__v", "_id", "firstName", "lastName", "middleName", "photoUrl", "role", "status"];
 
         for (const [key, label] of Object.entries(fieldLabels)) {
           if (ignoreKeys.includes(key)) continue;

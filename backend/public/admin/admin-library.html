@@ -336,17 +336,17 @@ async function submitMaterial() {
   }
 
   // 🧠 Визначення типу розміщення
-  if (selectedCourseId) {
-    console.log("selectedCourseId:", selectedCourseId);
-    console.log("selectedRole:", selectedRole);
-    formData.append("destination", "courses");
-    formData.append("courseId", selectedCourseId);
-  } else if (selectedRole) {
-     formData.append("role", selectedRole);
-    formData.append("destination", "addons");
-  } else {
-    formData.append("destination", "general");
-  }
+ if (selectedCourseId) {
+  console.log("Курс:", selectedCourseId, "Роль:", selectedRole);
+  formData.append("destination", "courses");
+  formData.append("courseId", selectedCourseId);
+} else if (selectedRole) {
+  formData.append("role", selectedRole);
+  formData.append("destination", "addons");
+} else {
+  formData.append("destination", "general");
+}
+
 
   try {
     await fetch("http://157.230.121.24:5050/api/library", {

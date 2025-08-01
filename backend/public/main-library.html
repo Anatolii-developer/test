@@ -130,6 +130,11 @@
 
   <script src="script.js"></script>
   <script>
+    function getYouTubeEmbedUrl(link) {
+  const match = link.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : "";
+}
+
   async function loadMaterials() {
     try {
       const res = await fetch("http://157.230.121.24:5050/api/library");
@@ -148,9 +153,18 @@
           div.innerHTML = `
             <h4>${item.title}</h4>
             <p>${item.description}</p>
-            <div class="video-thumb">
-              <a href="${item.videoLink}" target="_blank">Переглянути відео</a>
-            </div>
+           <div class="video-thumb">
+  <iframe 
+    width="100%" 
+    height="315" 
+    src="${getYouTubeEmbedUrl(item.videoLink)}" 
+    title="Відео ${item.title}" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+</div>
+
           `;
           videoList.appendChild(div);
         } else if (item.type === "book") {

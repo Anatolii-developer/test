@@ -16,7 +16,7 @@ const {
 } = require('../controllers/userController');
 
 const User = require('../models/User');
-
+const sendConfirmationEmail = require('../utils/mailer'); // 📧 добавлено
 
 // =================== Multer setups ===================
 
@@ -33,7 +33,20 @@ const certUpload = multer({ storage: certStorage });
 // =================== Routes ===================
 
 // Auth & general
-router.post('/register', registerUser);
+router.post('/register', async (req, res) => {
+  try {
+    const newUser = await registerUser(req, res, true); // доп логика в контроллере для отправки
+    if (!newUser) return; // ошибка уже отправлена
+
+    // Отправка письма
+    await sendConfirmationEmail(newUser.email, newUser.firstName, newUser.lastName);
+    console.log("✅ Confirmation email sent to", newUser.email);
+  } catch (error) {
+    console.error("❌ Registration + email error:", error);
+    res.status(500).json({ message: "Помилка при реєстрації" });
+  }
+});
+
 router.post("/login", loginUser);
 router.post("/forgot-password", sendRecoveryCode);
 
@@ -52,8 +65,6 @@ router.get('/:id', getUserById);
 router.put('/:id/status', updateUserStatus);
 router.put('/:id', updateUser);
 router.post("/:id/photo", profilePhotoUpload.single("photo"), uploadUserPhoto);
-
-
 
 router.post("/:id/certificate", certUpload.single("certificate"), async (req, res) => {
   try {
@@ -78,26 +89,20 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
 
     const fileUrl = `/uploads/certificates/${req.file.filename}`;
 
-    // 🛠️ Гарантируем, что структура инициализирована
     if (!user.certificates) user.certificates = {};
     if (!user.certificates[courseId]) user.certificates[courseId] = {};
 
-    // 📝 Записываем сертификат
     user.certificates[courseId][lang] = {
       filename: req.file.originalname,
       url: fileUrl,
       uploadedAt: new Date()
     };
 
-    // 🔥 ОБЯЗАТЕЛЬНО для вложенных объектов
     user.markModified("certificates");
-
-    // 💾 Сохраняем
     await user.save();
 
     console.log("✅ Certificate saved for user", userId);
     res.json({ success: true, url: fileUrl });
-
   } catch (error) {
     console.error("❌ Certificate upload error:", error);
     res.status(500).json({
@@ -110,14 +115,13 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
 
 router.get("/users-with-roles", async (req, res) => {
   try {
-    const users = await User.find({}, "firstName lastName email role status"); // получаем нужные поля
+    const users = await User.find({}, "firstName lastName email role status");
     res.json(users);
   } catch (err) {
     console.error("Ошибка при получении пользователей:", err);
     res.status(500).json({ message: "Серверная ошибка" });
   }
 });
-
 
 router.get("/roles-with-users", async (req, res) => {
   try {
@@ -131,7 +135,6 @@ router.get("/roles-with-users", async (req, res) => {
     for (const user of users) {
       const role = typeof user.role === "string" ? user.role.trim() : "";
 
-      // 🧪 debug log
       console.log("USER:", {
         id: user._id,
         role: user.role,
@@ -157,7 +160,5 @@ router.get("/roles-with-users", async (req, res) => {
     res.status(500).json({ message: "Серверна помилка", error: err.message });
   }
 });
-
-
 
 module.exports = router;

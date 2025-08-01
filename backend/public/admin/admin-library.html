@@ -337,6 +337,8 @@ async function submitMaterial() {
 
   // 🧠 Визначення типу розміщення
   if (selectedCourseId) {
+    console.log("selectedCourseId:", selectedCourseId);
+    console.log("selectedRole:", selectedRole);
     formData.append("destination", "courses");
     formData.append("courseId", selectedCourseId);
   } else if (selectedRole) {

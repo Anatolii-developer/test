@@ -340,15 +340,15 @@ async function submitMaterial() {
     .filter(cb => cb.dataset.checked === "true");
 
   // 🧠 Визначити destination
-  if (selectedCourseId) {
-    formData.append("destination", "courses");
-    formData.append("courseId", selectedCourseId);
-  } else if (selectedRole && checkedUsers.length > 0) {
-    formData.append("destination", "addons");
-    formData.append("role", selectedRole);
-  } else {
-    formData.append("destination", "general");
-  }
+if (selectedRole && checkedUsers.length > 0) {
+  formData.append("destination", "addons");
+  formData.append("role", selectedRole);
+} else if (selectedCourseId) {
+  formData.append("destination", "courses");
+  formData.append("courseId", selectedCourseId);
+} else {
+  formData.append("destination", "general");
+}
 
   try {
     await fetch("http://157.230.121.24:5050/api/library", {

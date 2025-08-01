@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-
 const librarySchema = new mongoose.Schema({
   type: String, // 'video' or 'book'
   title: String,
@@ -8,7 +6,9 @@ const librarySchema = new mongoose.Schema({
   filePath: String,
   date: Date,
   destination: String, // 'general', 'addons', 'courses'
-  courseId: String,    // Якщо destination === 'courses'
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+  },
+  role: String // ← Додай це
 });
-
-module.exports = mongoose.model("Library", librarySchema);

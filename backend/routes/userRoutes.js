@@ -16,7 +16,7 @@ const {
 } = require('../controllers/userController');
 
 const User = require('../models/User');
-const sendConfirmationEmail = require('../utils/mailer'); // 📧 добавлено
+const sendConfirmationEmail = require('../mailer'); // 📧 добавлено
 
 // =================== Multer setups ===================
 

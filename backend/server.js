@@ -26,6 +26,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+
 // ✅ Роуты
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);

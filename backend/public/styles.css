@@ -1314,7 +1314,7 @@
     
     .library-content {
       width: 1110px;
-      height: 1814px;
+      height: auto;
       margin: 28px auto;
       padding: 10px 100px;
       border-radius: 24px;

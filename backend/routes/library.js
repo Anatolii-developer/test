@@ -21,19 +21,24 @@ const upload = multer({ storage });
 // 📥 POST /api/library
 router.post("/", upload.single("bookFile"), async (req, res) => {
   try {
-    const { type, title, description, videoLink } = req.body;
+    const { type, title, description, videoLink, destination, courseId } = req.body;
 
     const newItem = {
       type,
       title,
       description,
       date: new Date(),
+      destination: destination || "general" // fallback на загальні
     };
 
     if (type === "video") {
       newItem.videoLink = videoLink;
     } else if (req.file) {
-      newItem.filePath = req.file.path.replace(/\\/g, "/"); // cross-platform fix
+      newItem.filePath = req.file.path.replace(/\\/g, "/");
+    }
+
+    if (destination === "courses" && courseId) {
+      newItem.courseId = courseId;
     }
 
     const saved = await Library.create(newItem);
@@ -44,10 +49,17 @@ router.post("/", upload.single("bookFile"), async (req, res) => {
   }
 });
 
+
 // 📤 GET /api/library
 router.get("/", async (req, res) => {
   try {
-    const all = await Library.find().sort({ date: -1 });
+    const { destination, courseId } = req.query;
+
+    const query = {};
+    if (destination) query.destination = destination;
+    if (courseId) query.courseId = courseId;
+
+    const all = await Library.find(query).sort({ date: -1 });
     res.json(all);
   } catch (err) {
     console.error("❌ Помилка при завантаженні:", err);

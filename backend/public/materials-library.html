@@ -135,5 +135,87 @@
     </section>
   </main>
   <script src="script.js"></script>
+  <script>
+    window.onload = () => {
+  loadCourseMaterials(); // загрузка при старте
+};
+
+// 🔄 Получение и отрисовка материалов
+async function loadCourseMaterials() {
+  try {
+    const response = await fetch("http://157.230.121.24:5050/api/library?destination=courses");
+    const materials = await response.json();
+
+    const courseList = document.querySelector(".course-list");
+    courseList.innerHTML = ""; // очистка
+
+    if (materials.length === 0) {
+      courseList.innerHTML = "<p>Наразі матеріали відсутні.</p>";
+      return;
+    }
+
+    // Группируем по заголовку (если в будущем будет courseId — группируй по нему)
+    const grouped = {};
+    materials.forEach((item) => {
+      const key = item.title || "Інші матеріали";
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(item);
+    });
+
+    for (const title in grouped) {
+      const courseItem = document.createElement("div");
+      courseItem.classList.add("course-item");
+
+      courseItem.innerHTML = `
+        <h4 class="course-title">${title}</h4>
+        <p class="course-description">Матеріали, що відносяться до курсу "${title}"</p>
+        <div class="week-block">
+          <button class="accordion-toggle">Матеріали до лекції</button>
+          <div class="accordion-content"></div>
+        </div>
+      `;
+
+      const contentBlock = courseItem.querySelector(".accordion-content");
+
+      grouped[title].forEach((mat) => {
+        const row = document.createElement("div");
+        row.classList.add("lecture-row");
+
+        if (mat.type === "video") {
+          row.innerHTML = `
+            <span>Відео-матеріали</span>
+            <a class="view-btn" href="${mat.videoLink}" target="_blank">Переглянути</a>
+          `;
+        } else if (mat.type === "book") {
+          row.innerHTML = `
+            <span>Книжкові матеріали</span>
+            <a class="view-btn" href="http://157.230.121.24:5050/${mat.filePath}" target="_blank">Завантажити</a>
+          `;
+        }
+
+        contentBlock.appendChild(row);
+      });
+
+      courseList.appendChild(courseItem);
+    }
+
+    initAccordionToggles(); // инициализация аккордеонов
+
+  } catch (err) {
+    console.error("Помилка при завантаженні матеріалів:", err);
+  }
+}
+
+// ⏬ Аккордеоны
+function initAccordionToggles() {
+  document.querySelectorAll(".accordion-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const content = btn.nextElementSibling;
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    });
+  });
+}
+
+  </script>
 </body>
 </html>

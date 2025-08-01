@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 
 const librarySchema = new mongoose.Schema({
-  type: { type: String, enum: ["video", "book"], required: true },
+  type: String, // 'video' or 'book'
   title: String,
   description: String,
   videoLink: String,
   filePath: String,
-  date: { type: Date, default: Date.now },
+  date: Date,
+  destination: String, // 'general', 'addons', 'courses'
+  courseId: String,    // Якщо destination === 'courses'
 });
 
 module.exports = mongoose.model("Library", librarySchema);

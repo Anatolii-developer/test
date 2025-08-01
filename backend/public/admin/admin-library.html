@@ -318,6 +318,8 @@ async function submitMaterial() {
   const type = document.getElementById("materialType").value;
   const title = document.getElementById("materialTitle").value;
   const description = document.getElementById("materialDescription").value;
+  const selectedCourseId = document.getElementById("courseSelect").value;
+  const selectedRole = document.getElementById("roleFilter").value;
 
   const formData = new FormData();
   formData.append("type", type);
@@ -333,6 +335,16 @@ async function submitMaterial() {
     formData.append("bookFile", file);
   }
 
+  // 🧠 Визначення типу розміщення
+  if (selectedCourseId) {
+    formData.append("destination", "courses");
+    formData.append("courseId", selectedCourseId);
+  } else if (selectedRole) {
+    formData.append("destination", "addons");
+  } else {
+    formData.append("destination", "general");
+  }
+
   try {
     await fetch("http://157.230.121.24:5050/api/library", {
       method: "POST",
@@ -340,12 +352,12 @@ async function submitMaterial() {
     });
     alert("Успішно додано!");
     closeModal();
-    // тут можно перезагрузить список
   } catch (err) {
     alert("Помилка при завантаженні.");
     console.error(err);
   }
 }
+
 function toggleInputs(type) {
   document.getElementById("videoInput").style.display = type === "video" ? "block" : "none";
   document.getElementById("bookInput").style.display = type === "book" ? "block" : "none";

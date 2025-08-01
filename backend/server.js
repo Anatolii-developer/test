@@ -24,7 +24,7 @@ app.use(express.json());
 
 // ✅ Статические файлы
 app.use(express.static(path.join(__dirname, 'public')));
-app.use("/uploads", express.static(path.join(__dirname, "backend/uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 

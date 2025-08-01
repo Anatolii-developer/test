@@ -180,6 +180,7 @@
   </div>
 
   <script>
+    let selectAllClicked = false;
     let allUsers = [];
 
     function renderTable(users) {
@@ -270,14 +271,16 @@
   document.getElementById("searchInput").addEventListener("input", applyFilters);
   document.getElementById("roleFilter").addEventListener("change", applyFilters);
 
-  document.getElementById("selectAllBtn").addEventListener("click", () => {
-    const selectedRole = document.getElementById("roleFilter").value;
-    document.querySelectorAll(".custom-checkbox").forEach(cb => {
-      const match = !selectedRole || cb.dataset.role === selectedRole;
-      cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
-      cb.dataset.checked = match.toString();
-    });
+document.getElementById("selectAllBtn").addEventListener("click", () => {
+  selectAllClicked = true;
+
+  const selectedRole = document.getElementById("roleFilter").value;
+  document.querySelectorAll(".custom-checkbox").forEach(cb => {
+    const match = !selectedRole || cb.dataset.role === selectedRole;
+    cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
+    cb.dataset.checked = match.toString();
   });
+});
 
   document.addEventListener("click", (e) => {
     if (e.target.classList.contains("custom-checkbox")) {
@@ -338,20 +341,18 @@ async function submitMaterial() {
   // 👉 Отмеченные участники
   const checkedUsers = [...document.querySelectorAll(".custom-checkbox")]
     .filter(cb => cb.dataset.checked === "true");
-
-  // 🧠 Определение назначения
-  if (selectedRole) {
-    formData.append("destination", "addons");
-    formData.append("role", selectedRole);
-  } else if (selectedCourseId) {
-    formData.append("destination", "courses");
-    formData.append("courseId", selectedCourseId);
-  } else if (checkedUsers.length > 0) {
-    formData.append("destination", "general");
-  } else {
-    alert("Будь ласка, виберіть курс, роль або виділіть учасників.");
-    return;
-  }
+if (selectedRole) {
+  formData.append("destination", "addons");
+  formData.append("role", selectedRole);
+} else if (selectedCourseId) {
+  formData.append("destination", "courses");
+  formData.append("courseId", selectedCourseId);
+} else if (selectAllClicked) {
+  formData.append("destination", "general");
+} else {
+  alert("Будь ласка, виберіть курс, роль або натисніть 'Виділити всіх'");
+  return;
+}
 
   try {
     await fetch("http://157.230.121.24:5050/api/library", {

@@ -342,6 +342,7 @@ async function submitMaterial() {
     formData.append("destination", "courses");
     formData.append("courseId", selectedCourseId);
   } else if (selectedRole) {
+     formData.append("role", selectedRole);
     formData.append("destination", "addons");
   } else {
     formData.append("destination", "general");

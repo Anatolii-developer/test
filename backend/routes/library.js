@@ -27,18 +27,20 @@ router.post("/", upload.single("bookFile"), async (req, res) => {
       type,
       title,
       description,
+      destination, // ← збережи
       date: new Date(),
-      destination: destination || "general" // fallback на загальні
     };
+
+    if (destination === "courses" && courseId) {
+      newItem.courseId = courseId;
+    } else if (destination === "addons" && req.body.role) {
+      newItem.role = req.body.role; // ← додай сюди
+    }
 
     if (type === "video") {
       newItem.videoLink = videoLink;
     } else if (req.file) {
       newItem.filePath = req.file.path.replace(/\\/g, "/");
-    }
-
-    if (destination === "courses" && courseId) {
-      newItem.courseId = courseId;
     }
 
     const saved = await Library.create(newItem);

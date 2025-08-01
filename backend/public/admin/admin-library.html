@@ -254,28 +254,6 @@ async function submitMaterial() {
   }
 }
 
-const multer = require("multer");
-const upload = multer({ dest: "uploads/books/" }); // для PDF
-
-router.post("/api/library", upload.single("bookFile"), async (req, res) => {
-  const { type, title, description, videoLink } = req.body;
-  const newItem = {
-    type,
-    title,
-    description,
-    date: new Date(),
-  };
-
-  if (type === "video") {
-    newItem.videoLink = videoLink;
-  } else {
-    newItem.filePath = req.file.path;
-  }
-
-  await LibraryModel.create(newItem);
-  res.status(200).send("OK");
-});
-
     
   </script>
   <div id="addMaterialModal" class="modal" style="display:none;">

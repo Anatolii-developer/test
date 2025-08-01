@@ -289,11 +289,14 @@
     }
   });
 });
-document.querySelector(".btn-green-add").addEventListener("click", () => {
-  openModal("video");
-});
-document.querySelector(".btn-dark-green").addEventListener("click", () => {
-  openModal("book");
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelector(".btn-green-add").addEventListener("click", () => {
+    openModal("video");
+  });
+
+  document.querySelector(".btn-dark-green").addEventListener("click", () => {
+    openModal("book");
+  });
 });
 
 function openModal(type) {
@@ -309,10 +312,7 @@ document.getElementById("materialType").addEventListener("change", e => {
   toggleInputs(e.target.value);
 });
 
-function toggleInputs(type) {
-  document.getElementById("videoLink").style.display = type === "video" ? "block" : "none";
-  document.getElementById("bookFile").style.display = type === "book" ? "block" : "none";
-}
+
 
 async function submitMaterial() {
   const type = document.getElementById("materialType").value;

@@ -2,18 +2,24 @@ const User = require('../models/User');
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const sendRegistrationEmail = require("../mailer");
+
 
 exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
-    await user.save(); // ← не забудь раскомментировать, если она ещё закомментирована
+    await user.save();
+
+    // ✅ Надсилання email після успішної реєстрації
+    await sendRegistrationEmail(user.email, user.firstName, user.lastName);
 
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
-    console.error("❌ Registration error:", error); // 👈 это важно
+    console.error("❌ Registration error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 exports.getAllUsers = async (req, res) => {

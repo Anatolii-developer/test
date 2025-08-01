@@ -175,7 +175,15 @@
               <h4>${item.title}</h4>
               <p>${item.description}</p>
             </div>
-            <a class="book-download-btn" href="/${item.filePath}" download>Завантажити</a>
+           <div class="book-preview">
+  <iframe 
+    src="/${item.filePath}" 
+    width="100%" 
+    height="500px" 
+    style="border: 1px solid #ccc; border-radius: 8px;">
+  </iframe>
+</div>
+
           `;
           bookList.appendChild(div);
         }

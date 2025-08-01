@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const librarySchema = new mongoose.Schema({
   type: String, // 'video' or 'book'
   title: String,
@@ -12,3 +14,6 @@ const librarySchema = new mongoose.Schema({
   },
   role: String // ← Додай це
 });
+
+
+module.exports = mongoose.model("Library", librarySchema);

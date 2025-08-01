@@ -335,20 +335,23 @@ async function submitMaterial() {
     formData.append("bookFile", file);
   }
 
-  // 👉 Отримати всіх відмічених
+  // 👉 Отмеченные участники
   const checkedUsers = [...document.querySelectorAll(".custom-checkbox")]
     .filter(cb => cb.dataset.checked === "true");
 
-  // 🧠 Визначити destination
-if (selectedRole && checkedUsers.length > 0) {
-  formData.append("destination", "addons");
-  formData.append("role", selectedRole);
-} else if (selectedCourseId) {
-  formData.append("destination", "courses");
-  formData.append("courseId", selectedCourseId);
-} else {
-  formData.append("destination", "general");
-}
+  // 🧠 Определение назначения
+  if (selectedRole) {
+    formData.append("destination", "addons");
+    formData.append("role", selectedRole);
+  } else if (selectedCourseId) {
+    formData.append("destination", "courses");
+    formData.append("courseId", selectedCourseId);
+  } else if (checkedUsers.length > 0) {
+    formData.append("destination", "general");
+  } else {
+    alert("Будь ласка, виберіть курс, роль або виділіть учасників.");
+    return;
+  }
 
   try {
     await fetch("http://157.230.121.24:5050/api/library", {
@@ -362,7 +365,6 @@ if (selectedRole && checkedUsers.length > 0) {
     console.error(err);
   }
 }
-
 
 function toggleInputs(type) {
   document.getElementById("videoInput").style.display = type === "video" ? "block" : "none";

@@ -249,6 +249,7 @@
 
 const userRole = (localStorage.getItem("role") || "").toLowerCase();
 
+console.log("Роль в localStorage:", localStorage.getItem("role"));
 if (userRole === "ментор" || userRole === "mentor") {
   document.getElementById("mentorButton").style.display = "flex";
 }

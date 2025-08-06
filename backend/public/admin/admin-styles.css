@@ -13,6 +13,12 @@ body {
   }
 
 
+  .requests-table td {
+  vertical-align: top;
+  word-wrap: break-word;
+  max-width: 180px;
+}
+
 .layout {
   display: flex;
   height: auto; /* или min-height: 100vh; */

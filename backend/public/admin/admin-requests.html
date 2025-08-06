@@ -135,19 +135,26 @@ const tabs = document.querySelectorAll(".top-btn");
       const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
       const users = await res.json();
 
-      if (currentStatus === "APPROVED") {
-        tableHead.innerHTML = "<tr><th>ID</th><th>Name and surname</th><th>Email</th><th>Role</th><th>Date of birth</th><th>Review</th></tr>";
-        tableBody.innerHTML = users.map((user, index) => `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${user.firstName} ${user.lastName}</td>
-            <td>${user.email}</td>
-            <td>${user.role || '-'}</td>
-            <td>${user.dateOfBirth || '-'}</td>
-           <td><a href="user-profile.html?id=${user._id}&status=${user.status}" class="more-btn">More</a></td>
-          </tr>
-        `).join("");
-      } else {
+     if (currentStatus === "APPROVED") {
+  tableHead.innerHTML = "<tr><th>ID</th><th>Name and surname</th><th>Email</th><th>Role(s)</th><th>Date of birth</th><th>Review</th></tr>";
+  tableBody.innerHTML = users.map((user, index) => {
+    const roles = Array.isArray(user.role)
+      ? user.role.join(", ")
+      : (user.role || '-');
+
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${user.firstName} ${user.lastName}</td>
+        <td>${user.email}</td>
+        <td style="max-width: 150px; word-wrap: break-word;">${roles}</td>
+        <td>${user.dateOfBirth || '-'}</td>
+        <td><a href="user-profile.html?id=${user._id}&status=${user.status}" class="more-btn">More</a></td>
+      </tr>
+    `;
+  }).join("");
+}
+ else {
         tableHead.innerHTML = "<tr><th>Created at</th><th>Email</th><th>Status</th><th>Review</th></tr>";
         tableBody.innerHTML = users.map(user => `
           <tr>

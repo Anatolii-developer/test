@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ - Career Planning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #97C194;
+    }
+
+    .hero {
+      width: 100%;
+      height: 700px;
+      background: url('./assets/library/career-img.png') no-repeat center center/cover;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-title {
+      color: #FFFFFF;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 64px;
+      text-transform: uppercase;
+      position: absolute;
+      bottom: 40px;
+      text-align: center;
+    }
+
+    .faq-section {
+      width: 1110px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 24px;
+      padding: 60px 100px;
+      box-sizing: border-box;
+      color: #414141;
+    }
+
+    .faq-section h2 {
+      font-size: 40px;
+      font-weight: 600;
+      margin-bottom: 40px;
+      color: #414141;
+      text-align: center;
+    }
+
+    .faq-item {
+      background-color: #FFEED9CC;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      padding: 20px 24px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 20px;
+      color: #414141;
+      transition: all 0.2s ease;
+    }
+
+    .faq-answer {
+      font-weight: 400;
+      font-size: 16px;
+      margin-top: 12px;
+      color: #414141;
+    }
+
+    .apply-button {
+  width: 1110px;
+  height: 212px;
+  margin: 40px auto;
+  background-color: white;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  padding: 60px 100px;
+}
+
+.apply-button:hover {
+  background-color: #f0f0f0;
+}
+
+.apply-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 40px;
+  color: #414141;
+}
+
+.apply-img {
+  width: 284px;
+  height: 164px;
+  object-fit: contain;
+}
+
+.apply-arrow {
+  width: 64px;
+  height: 64px;
+}
+
+
+
+
+
+    @media (max-width: 1200px) {
+      .faq-section, .apply-button {
+        width: 90%;
+        padding: 40px 30px;
+      }
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-title">CAREER PLANNING</div>
+  </div>
+
+  <div class="faq-section">
+    <h2>FAQ</h2>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      Що таке менторство у психотерапевтичному середовищі?
+      <div class="faq-answer" style="display: none;">
+        Менторство — це форма професійної підтримки, коли досвідчений спеціаліст супроводжує колегу на певному етапі його професійного становлення.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      Чим менторство відрізняється від супервізії?
+      <div class="faq-answer" style="display: none;">
+        Відповідь...
+      </div>
+    </div>
+
+   <div class="faq-item" onclick="toggleFAQ(this)">
+    Чи буде в мене план дій із професійного розвитку під час роботи з ментором?
+    <div class="faq-answer" style="display: none;">
+      <!-- Відповідь тут -->
+    </div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Як виглядає робота з ментором?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Хто може бути ментором?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Скільки триває менторство?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Чи є теми, які не входять у менторство?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Чи є різниця між менторством і наставництвом?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Як відбувається добір ментора?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Що мені дасть менторство?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Як враховується робота з ментором в загальному обліку проходження супервізії?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFAQ(this)">
+    Який смисл та значення має менторство для формування високопрофесійного спеціаліста в області ментального здоров’я та психологічної підтримки?
+    <div class="faq-answer" style="display: none;"></div>
+  </div>
+
+  </div>
+
+<div class="apply-button">
+  <div class="apply-text">Подати заявку</div>
+  <img src="./assets/career-apply.png" alt="Apply Image" class="apply-img" />
+  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+</div>
+
+
+
+  <script>
+    function toggleFAQ(item) {
+      const answer = item.querySelector('.faq-answer');
+      if (answer.style.display === 'none' || !answer.style.display) {
+        answer.style.display = 'block';
+        item.classList.add('open');
+      } else {
+        answer.style.display = 'none';
+        item.classList.remove('open');
+      }
+    }
+  </script>
+
+</body>
+</html>

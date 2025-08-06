@@ -254,6 +254,17 @@ if (userRole === "ментор" || userRole === "mentor") {
   document.getElementById("mentorButton").style.display = "flex";
 }
 
+fetch("http://157.230.121.24:5050/api/users/profile", {
+  method: "GET",
+  credentials: "include" // если сессии, иначе убери
+})
+  .then(res => res.json())
+  .then(user => {
+    if (user.role && user.role.toLowerCase() === "ментор") {
+      document.getElementById("mentorButton").style.display = "flex";
+    }
+  })
+  .catch(err => console.error("Error loading user role:", err));
 
   </script>
  <script src="script.js"></script>

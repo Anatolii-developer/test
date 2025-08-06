@@ -99,6 +99,27 @@ router.get('/approved', async (req, res) => {
   }
 });
 
+router.get("/profile", async (req, res) => {
+  try {
+    const userId = req.session?.userId || req.user?._id || req.query.id; // или другой способ получить ID текущего юзера
+
+    if (!userId) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    const user = await User.findById(userId).select("firstName lastName email role status");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("❌ Profile fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 router.put('/:id/status', updateUserStatus);
@@ -151,6 +172,7 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
     });
   }
 });
+
 
 
 

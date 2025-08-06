@@ -32,57 +32,30 @@
   <script>
     let roles = [];
 
-   async function loadRoles() {
+async function loadRoles() {
   try {
     const res = await fetch("http://157.230.121.24:5050/api/roles");
     roles = await res.json();
-    renderRoles();
-     await loadUsersForRoles();
+    await renderRoles(); // теперь тоже async
   } catch (err) {
     console.error("❌ Помилка при завантаженні ролей:", err);
   }
 }
 
 
-
-
-    async function loadUsersForRoles() {
-  try {
-    const res = await fetch("http://157.230.121.24:5050/api/users/roles-with-users");
-    const data = await res.json();
-
-    roles.forEach(role => {
-      const users = data[role.name] || [];
-
-      const row = [...document.querySelectorAll("#rolesBody tr")]
-        .find(tr => tr.firstChild.textContent === role.name);
-
-      if (row) {
-        const usersTd = document.createElement("td");
-        usersTd.colSpan = 3;
-        usersTd.style.fontSize = "14px";
-        usersTd.style.color = "#555";
-        usersTd.style.paddingLeft = "20px";
-        usersTd.innerHTML = users.length
-          ? `🔸 <b>Користувачі:</b> ${users.map(u => u.name + (u.status === "APPROVED" ? "" : ` (${u.status})`)).join(", ")}`
-          : "<i>Немає користувачів</i>";
-
-        const userRow = document.createElement("tr");
-        userRow.appendChild(usersTd);
-        document.getElementById("rolesBody").insertBefore(userRow, row.nextSibling);
-      }
-    });
-  } catch (err) {
-    console.error("Не вдалося завантажити користувачів по ролях:", err);
-  }
-}
-
-
-    function renderRoles() {
+   async function renderRoles() {
   const tbody = document.getElementById("rolesBody");
   tbody.innerHTML = "";
 
-  roles.forEach(role => {
+  let usersByRole = {};
+  try {
+    const res = await fetch("http://157.230.121.24:5050/api/users/roles-with-users");
+    usersByRole = await res.json();
+  } catch (err) {
+    console.error("❌ Не вдалося завантажити користувачів по ролях:", err);
+  }
+
+  for (const role of roles) {
     const tr = document.createElement("tr");
 
     const nameCell = document.createElement("td");
@@ -91,7 +64,7 @@
     nameCell.onclick = () => editRole(role._id, role.name);
 
     const statusCell = document.createElement("td");
-    const isActive = role.active !== false; // default true
+    const isActive = role.active !== false;
     statusCell.textContent = isActive ? "Активна" : "Неактивна";
     statusCell.className = isActive ? "active" : "inactive";
 
@@ -107,8 +80,23 @@
     tr.appendChild(deleteCell);
 
     tbody.appendChild(tr);
-  });
+
+    // Users row
+    const users = usersByRole[role.name] || [];
+    const usersTr = document.createElement("tr");
+    const usersTd = document.createElement("td");
+    usersTd.colSpan = 3;
+    usersTd.style.fontSize = "14px";
+    usersTd.style.color = "#555";
+    usersTd.style.paddingLeft = "20px";
+    usersTd.innerHTML = users.length
+      ? `🔸 <b>Користувачі:</b> ${users.map(u => u.username + (u.status === "APPROVED" ? "" : ` (${u.status})`)).join(", ")}`
+      : "<i>Немає користувачів</i>";
+    usersTr.appendChild(usersTd);
+    tbody.appendChild(usersTr);
+  }
 }
+
 
 
     async function addRole() {

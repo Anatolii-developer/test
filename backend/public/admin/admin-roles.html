@@ -90,8 +90,8 @@ async function loadRoles() {
     usersTd.style.color = "#555";
     usersTd.style.paddingLeft = "20px";
     usersTd.innerHTML = users.length
-      ? `🔸 <b>Користувачі:</b> ${users.map(u => u.username + (u.status === "APPROVED" ? "" : ` (${u.status})`)).join(", ")}`
-      : "<i>Немає користувачів</i>";
+  ? `🔸 <b>Користувачі:</b> ${users.map(u => u.name + (u.status === "APPROVED" ? "" : ` (${u.status})`)).join(", ")}`
+  : "<i>Немає користувачів</i>";
     usersTr.appendChild(usersTd);
     tbody.appendChild(usersTr);
   }

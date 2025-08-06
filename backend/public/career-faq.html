@@ -228,6 +228,13 @@
   <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
 </div>
 
+<div class="apply-button" id="mentorButton" style="display: none;" onclick="location.href='mentor-dashboard.html'">
+  <div class="apply-text">Менторство</div>
+  <img src="./assets/career-apply.png" alt="Mentor Image" class="apply-img" />
+  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+</div>
+
+
   <script>
     function toggleFAQ(item) {
       const answer = item.querySelector('.faq-answer');
@@ -239,6 +246,14 @@
         item.classList.remove('open');
       }
     }
+
+  // Предполагаем, что роль хранится в localStorage (можно заменить на другой способ)
+  const userRole = localStorage.getItem("role");
+
+  if (userRole === "Ментор" || userRole === "Mentor") {
+    document.getElementById("mentorButton").style.display = "flex";
+  }
+
   </script>
  <script src="script.js"></script>
 </body>

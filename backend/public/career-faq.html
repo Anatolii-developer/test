@@ -247,12 +247,12 @@
       }
     }
 
-  // Предполагаем, что роль хранится в localStorage (можно заменить на другой способ)
-  const userRole = localStorage.getItem("role");
+const userRole = (localStorage.getItem("role") || "").toLowerCase();
 
-  if (userRole === "Ментор" || userRole === "Mentor") {
-    document.getElementById("mentorButton").style.display = "flex";
-  }
+if (userRole === "ментор" || userRole === "mentor") {
+  document.getElementById("mentorButton").style.display = "flex";
+}
+
 
   </script>
  <script src="script.js"></script>

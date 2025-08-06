@@ -37,6 +37,7 @@
     const res = await fetch("http://157.230.121.24:5050/api/roles");
     roles = await res.json();
     renderRoles();
+     await loadUsersForRoles();
   } catch (err) {
     console.error("❌ Помилка при завантаженні ролей:", err);
   }

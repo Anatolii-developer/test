@@ -216,7 +216,7 @@
   </div>
 
   <div class="decision-controls">
-    <select id="roleSelect" class="styled-select" style="width: 180px;">
+    <div id="rolesContainer" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
       <option value="">Оберіть роль</option>
       <option value="Супервізор I категорії">Супервізор I категорії</option>
       <option value="Супервізор II категорії">Супервізор II категорії</option>
@@ -287,6 +287,26 @@
       crisisGroups: "Кризові групи",
       psychoanalyticDramaGroups: "Групи психоаналітичної драми"
     };
+
+    async function loadRoles() {
+  try {
+    const res = await fetch(`${API_URL}/api/roles`);
+    const roles = await res.json();
+    const container = document.getElementById("rolesContainer");
+
+    container.innerHTML = roles
+      .filter(r => r.active)
+      .map(role => `
+        <label style="display: flex; align-items: center; gap: 6px;">
+          <input type="checkbox" name="roles" value="${role.name}" />
+          ${role.name}
+        </label>
+      `).join("");
+  } catch (err) {
+    console.error("Не вдалося завантажити ролі:", err);
+  }
+}
+
 
     async function loadUser() {
       try {
@@ -378,11 +398,23 @@ if (status === "APPROVED") {
     }
 
     loadUser();
-
+loadRoles();
 
     document.getElementById("submitDecision").addEventListener("click", async () => {
   const status = document.getElementById("decisionSelect").value;
-  const role = document.getElementById("roleSelect").value;
+  const selectedRoles = Array.from(document.querySelectorAll('input[name="roles"]:checked')).map(cb => cb.value);
+
+if (!status) {
+  alert("Оберіть рішення.");
+  return;
+}
+
+const res = await fetch(`${API_URL}/api/users/${userId}/status`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ status, roles: selectedRoles }),
+});
+
 
   if (!status) {
     alert("Оберіть рішення.");

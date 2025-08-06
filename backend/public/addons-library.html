@@ -127,5 +127,47 @@
   </main>
 
   <script src="script.js"></script>
+  <script>async function loadAddonsMaterials() {
+  try {
+    const response = await fetch("http://157.230.121.24:5050/api/library?destination=addons");
+    const data = await response.json();
+
+    const videoList = document.querySelector(".video-list");
+    const bookList = document.querySelector(".book-list");
+
+    // Очистка старых
+    videoList.innerHTML = "";
+    bookList.innerHTML = "";
+
+    data.forEach((item) => {
+      if (item.type === "video") {
+        const videoItem = document.createElement("div");
+        videoItem.classList.add("video-item");
+        videoItem.innerHTML = `
+          <h4>${item.title}</h4>
+          <p>${item.description}</p>
+          <div class="video-thumb">
+            <iframe src="${item.videoLink}" frameborder="0" allowfullscreen></iframe>
+          </div>`;
+        videoList.appendChild(videoItem);
+      }
+
+      if (item.type === "book") {
+        const bookItem = document.createElement("div");
+        bookItem.classList.add("book-item");
+        bookItem.innerHTML = `
+          <div class="book-info">
+            <h4>${item.title}</h4>
+            <p>${item.description}</p>
+          </div>
+          <a class="book-download-btn" href="http://157.230.121.24:5050/${item.filePath}" target="_blank">Завантажити</a>`;
+        bookList.appendChild(bookItem);
+      }
+    });
+  } catch (err) {
+    console.error("Помилка при завантаженні додаткових матеріалів", err);
+  }
+}
+</script>
 </body>
 </html>

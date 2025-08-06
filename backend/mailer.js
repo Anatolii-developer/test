@@ -34,7 +34,7 @@ async function sendRegistrationEmail(to, firstName, lastName) {
         </p>
         <p>З повагою,<br><strong>Команда IPS</strong></p>
         <p>
-          <img src="https://mamko-prof-supervision.com/logo.png" alt="IPS Logo" style="height: 50px;" /><br>
+          <img src="/" alt="IPS Logo" style="height: 50px;" /><br>
           <a href="https://mamko-prof-supervision.com/">https://mamko-prof-supervision.com/</a><br>
           <a href="https://www.facebook.com/Profsupervision/">Facebook</a>
         </p>

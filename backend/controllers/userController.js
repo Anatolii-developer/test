@@ -46,13 +46,18 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUserStatus = async (req, res) => {
   try {
-    const { status, role } = req.body;
+    const { status, roles } = req.body;
     const update = { status };
-    if (role) update.role = role;
+
+    if (Array.isArray(roles)) {
+      update.roles = roles;
+    }
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
 
-    // Отправка email временно отключена
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // 📨 Email сповіщення (опціонально)
     // if (status === "APPROVED") {
     //   await sendMail(
     //     user.email,
@@ -63,9 +68,11 @@ exports.updateUserStatus = async (req, res) => {
 
     res.json(user);
   } catch (error) {
+    console.error("❌ updateUserStatus error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 exports.loginUser = async (req, res) => {
   const { username, password } = req.body;

@@ -126,32 +126,22 @@ router.get("/users-with-roles", async (req, res) => {
 router.get("/roles-with-users", async (req, res) => {
   try {
     const users = await User.find(
-      { role: { $exists: true, $type: "string", $ne: "" } },
-      "firstName lastName role status"
+      { roles: { $exists: true, $ne: [] } },
+      "firstName lastName roles status"
     );
 
     const grouped = {};
 
     for (const user of users) {
-      const role = typeof user.role === "string" ? user.role.trim() : "";
-
-      console.log("USER:", {
-        id: user._id,
-        role: user.role,
-        name: user.firstName + " " + user.lastName,
-        status: user.status
-      });
-
-      if (!role) continue;
-
-      if (!grouped[role]) {
-        grouped[role] = [];
+      if (Array.isArray(user.roles)) {
+        for (const role of user.roles) {
+          if (!grouped[role]) grouped[role] = [];
+          grouped[role].push({
+            name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+            status: user.status
+          });
+        }
       }
-
-      grouped[role].push({
-        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        status: user.status
-      });
     }
 
     res.json(grouped);
@@ -160,5 +150,6 @@ router.get("/roles-with-users", async (req, res) => {
     res.status(500).json({ message: "Серверна помилка", error: err.message });
   }
 });
+
 
 module.exports = router;

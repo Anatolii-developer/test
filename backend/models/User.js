@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   therapyGroups: String,              // ➕ новое
   crisisGroups: String,               // ➕ новое
   psychoanalyticDramaGroups: String,  // ➕ новое
-  role: String,
+  roles: [{ type: String }],
   status: { type: String, default: "WAIT FOR REVIEW" },
   createdAt: { type: Date, default: Date.now },
 });

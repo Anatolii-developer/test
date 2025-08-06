@@ -47,6 +47,45 @@ router.post('/register', async (req, res) => {
   }
 });
 
+
+router.get("/users-with-roles", async (req, res) => {
+  try {
+    const users = await User.find({}, "firstName lastName email role status");
+    res.json(users);
+  } catch (err) {
+    console.error("Ошибка при получении пользователей:", err);
+    res.status(500).json({ message: "Серверная ошибка" });
+  }
+});
+
+router.get("/roles-with-users", async (req, res) => {
+  try {
+    const users = await User.find(
+      { roles: { $exists: true, $ne: [] } },
+      "firstName lastName roles status"
+    );
+
+    const grouped = {};
+
+    for (const user of users) {
+      if (Array.isArray(user.roles)) {
+        for (const role of user.roles) {
+          if (!grouped[role]) grouped[role] = [];
+          grouped[role].push({
+            name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+            status: user.status
+          });
+        }
+      }
+    }
+
+    res.json(grouped);
+  } catch (err) {
+    console.error("❌ roles-with-users error:", err);
+    res.status(500).json({ message: "Серверна помилка", error: err.message });
+  }
+});
+
 router.post("/login", loginUser);
 router.post("/forgot-password", sendRecoveryCode);
 
@@ -113,43 +152,7 @@ router.post("/:id/certificate", certUpload.single("certificate"), async (req, re
   }
 });
 
-router.get("/users-with-roles", async (req, res) => {
-  try {
-    const users = await User.find({}, "firstName lastName email role status");
-    res.json(users);
-  } catch (err) {
-    console.error("Ошибка при получении пользователей:", err);
-    res.status(500).json({ message: "Серверная ошибка" });
-  }
-});
 
-router.get("/roles-with-users", async (req, res) => {
-  try {
-    const users = await User.find(
-      { roles: { $exists: true, $ne: [] } },
-      "firstName lastName roles status"
-    );
-
-    const grouped = {};
-
-    for (const user of users) {
-      if (Array.isArray(user.roles)) {
-        for (const role of user.roles) {
-          if (!grouped[role]) grouped[role] = [];
-          grouped[role].push({
-            name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-            status: user.status
-          });
-        }
-      }
-    }
-
-    res.json(grouped);
-  } catch (err) {
-    console.error("❌ roles-with-users error:", err);
-    res.status(500).json({ message: "Серверна помилка", error: err.message });
-  }
-});
 
 
 module.exports = router;

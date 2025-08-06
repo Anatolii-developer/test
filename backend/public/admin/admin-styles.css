@@ -953,7 +953,7 @@ body {
 .roles-wrapper {
   margin-left: 250px;
   width: 890px;
-  height: 642px;
+  height: auto;
   background-color: white;
   border-radius: 24px;
   padding: 60px 100px;

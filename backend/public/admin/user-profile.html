@@ -205,10 +205,49 @@
 }
 
 
-.styled-select[multiple] {
-  height: auto;
-  min-height: 120px;
+.custom-dropdown {
+  position: relative;
+  min-width: 260px;
+  font-family: 'Poppins', sans-serif;
 }
+
+.dropdown-toggle {
+  background-color: #ECF5EB;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+}
+
+.dropdown-options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-options label {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown-options label:hover {
+  background-color: #f1f1f1;
+}
+
   </style>
 </head>
 <body>
@@ -221,9 +260,10 @@
   </div>
 
   <div class="decision-controls">
-    <select id="rolesSelect" multiple size="5" class="styled-select" style="min-width: 260px; max-width: 100%;">
-  <!-- Опції додадуться через JS -->
-</select>
+   <div class="custom-dropdown">
+  <div class="dropdown-toggle" id="dropdownToggle">Оберіть роль</div>
+  <div class="dropdown-options" id="dropdownOptions"></div>
+</div>
 
     <select id="decisionSelect" class="styled-select" style="width: 226px;">
       <option value="">Оберіть рішення</option>
@@ -294,12 +334,33 @@
   try {
     const res = await fetch(`${API_URL}/api/roles`);
     const roles = await res.json();
-    const select = document.getElementById("rolesSelect");
+    const container = document.getElementById("dropdownOptions");
 
-    select.innerHTML = roles
+    container.innerHTML = roles
       .filter(r => r.active)
-      .map(role => `<option value="${role.name}">${role.name}</option>`)
-      .join("");
+      .map(role => `
+        <label>
+          <input type="checkbox" value="${role.name}" />
+          ${role.name}
+        </label>
+      `).join("");
+
+    const toggle = document.getElementById("dropdownToggle");
+
+    toggle.addEventListener("click", () => {
+      container.style.display = container.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".custom-dropdown")) {
+        container.style.display = "none";
+      }
+    });
+
+    container.addEventListener("change", () => {
+      const selected = Array.from(container.querySelectorAll("input:checked")).map(cb => cb.value);
+      toggle.textContent = selected.length ? selected.join(", ") : "Оберіть роль";
+    });
   } catch (err) {
     console.error("Не вдалося завантажити ролі:", err);
   }
@@ -401,7 +462,8 @@ loadRoles();
 
     document.getElementById("submitDecision").addEventListener("click", async () => {
   const status = document.getElementById("decisionSelect").value;
-  const selectedRoles = Array.from(document.getElementById("rolesSelect").selectedOptions).map(option => option.value);
+  const selectedRoles = Array.from(document.querySelectorAll('.dropdown-options input:checked')).map(cb => cb.value);
+
 
 
 if (!status) {

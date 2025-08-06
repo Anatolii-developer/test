@@ -204,6 +204,11 @@
   background: #E5F6E0;
 }
 
+
+.styled-select[multiple] {
+  height: auto;
+  min-height: 120px;
+}
   </style>
 </head>
 <body>
@@ -216,7 +221,9 @@
   </div>
 
   <div class="decision-controls">
-    <div id="rolesContainer" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
+    <select id="rolesSelect" multiple size="5" class="styled-select" style="min-width: 260px; max-width: 100%;">
+  <!-- Опції додадуться через JS -->
+</select>
       <option value="">Оберіть роль</option>
       <option value="Супервізор I категорії">Супервізор I категорії</option>
       <option value="Супервізор II категорії">Супервізор II категорії</option>
@@ -292,20 +299,17 @@
   try {
     const res = await fetch(`${API_URL}/api/roles`);
     const roles = await res.json();
-    const container = document.getElementById("rolesContainer");
+    const select = document.getElementById("rolesSelect");
 
-    container.innerHTML = roles
+    select.innerHTML = roles
       .filter(r => r.active)
-      .map(role => `
-        <label style="display: flex; align-items: center; gap: 6px;">
-          <input type="checkbox" name="roles" value="${role.name}" />
-          ${role.name}
-        </label>
-      `).join("");
+      .map(role => `<option value="${role.name}">${role.name}</option>`)
+      .join("");
   } catch (err) {
     console.error("Не вдалося завантажити ролі:", err);
   }
 }
+
 
 
     async function loadUser() {
@@ -402,7 +406,8 @@ loadRoles();
 
     document.getElementById("submitDecision").addEventListener("click", async () => {
   const status = document.getElementById("decisionSelect").value;
-  const selectedRoles = Array.from(document.querySelectorAll('input[name="roles"]:checked')).map(cb => cb.value);
+  const selectedRoles = Array.from(document.getElementById("rolesSelect").selectedOptions).map(option => option.value);
+
 
 if (!status) {
   alert("Оберіть рішення.");

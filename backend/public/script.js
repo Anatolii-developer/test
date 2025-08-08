@@ -54,6 +54,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("profileCoursesTextarea").value = user.courses || "";
       document.getElementById("profileRoleTextarea").value = user.role || "";
       document.getElementById("profileCostTextarea").value = user.cost || "";
+      document.getElementById("profileVideoLink").value = user.videoLink || "";
       document.getElementById("profileQualifications").value = user.qualifications || "";
       document.getElementById("profileExperienceExtra").value = user.experienceExtra || "";
       document.getElementById("profileLanguage").value = user.language || "";

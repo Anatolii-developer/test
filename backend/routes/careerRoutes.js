@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const career = require('../controllers/careerApplicationsController');
+const careerCtrl = require('../controllers/careerController'); 
 
-router.post('/', career.create); // не вызываем!
-router.get('/', career.list);
+router.post('/', careerCtrl.create); // передаём функцию, НЕ вызываем
+router.get('/', careerCtrl.list);
 
 module.exports = router;

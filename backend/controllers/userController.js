@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
 const path = require("path");
 const sendRegistrationEmail = require("../mailer");
 
@@ -122,16 +121,7 @@ exports.sendRecoveryCode = async (req, res) => {
     user.recoveryCode = code;
     await user.save();
 
-    // Email отправка остаётся активной, если хочешь — её тоже можно закомментировать
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
-      port: parseInt(process.env.SMTP_PORT || "587", 10),
-      secure: (process.env.SMTP_SECURE || "false") === "true",
-      auth: {
-        user: process.env.BREVO_USER || process.env.EMAIL_FROM,
-        pass: process.env.BREVO_PASS || process.env.EMAIL_PASS,
-      },
-    });
+
 
     const mailOptions = {
       from: process.env.BREVO_USER || process.env.EMAIL_FROM,

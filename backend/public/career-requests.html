@@ -114,7 +114,8 @@
     }
 
     function rowTemplate(i, item){
-      const fullName = item.fullName || item.name || item.userName || "Без імені";
+       const fullName = `${item.user?.firstName || ''} ${item.user?.lastName || ''}`.trim() || 'Без імені';
+
       const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
 
       const row = document.createElement('div');

@@ -1,17 +1,17 @@
-// backend/models/CareerApplication.js
-const mongoose = require("mongoose");
+// models/CareerApplication.js
+const { Schema, model, Types } = require('mongoose');
 
-const CareerApplicationSchema = new mongoose.Schema(
-  {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }, // если есть сессии
-    fullName: String, // на случай без авторизации
-    email: String,
-    experience: { type: String, enum: ["<7", "7-15", "15+"] },
-    ageGroup: { type: String }, // "до 32", "32-42", ...
-    requestText: { type: String },
-    aboutText: { type: String }
-  },
-  { timestamps: true }
-);
+const careerApplicationSchema = new Schema({
+  user: { type: Types.ObjectId, ref: 'User' }, // можно без required, чтобы не падали старые данные
+  // бэкапные поля — чтобы показывать имя даже если user не проставлен
+  fullName: String,
+  email: String,
 
-module.exports = mongoose.model("CareerApplication", CareerApplicationSchema);
+  experience: String,
+  ageGroup: String,
+  requestText: String,
+  aboutText: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = model('CareerApplication', careerApplicationSchema);

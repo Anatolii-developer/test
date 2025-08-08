@@ -1,44 +1,51 @@
-// backend/controllers/careerController.js
-const CareerApplication = require("../models/CareerApplication");
+// controllers/careerApplicationsController.js
+const CareerApplication = require('../models/CareerApplication');
+const User = require('../models/User');
 
-exports.createApplication = async (req, res) => {
+exports.create = async (req, res) => {
   try {
-    const payload = {
-      userId: req.user?._id, // если есть мидлварь аутентификации
-      fullName: req.body.fullName,
-      email: req.body.email,
+    // 1) берем userId из аутентификации, если есть
+    let userId = req.user?._id;
+
+    // 2) если нет — пробуем найти по email из тела
+    let userDoc = null;
+    if (!userId && req.body.email) {
+      userDoc = await User.findOne({ email: req.body.email }).lean();
+      if (userDoc) userId = userDoc._id;
+    } else if (userId) {
+      userDoc = await User.findById(userId).lean();
+    }
+
+    // Сформируем фулнейм
+    const userFullName = userDoc
+      ? `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim()
+      : (req.body.fullName || '');
+
+    const app = await CareerApplication.create({
+      user: userId || undefined,
+      fullName: userFullName || undefined,
+      email: userDoc?.email || req.body.email,
       experience: req.body.experience,
       ageGroup: req.body.ageGroup,
       requestText: req.body.requestText,
-      aboutText: req.body.aboutText,
-    };
-    const doc = await CareerApplication.create(payload);
-    res.status(201).json({ ok: true, application: doc });
+      aboutText: req.body.aboutText
+    });
+
+    res.json({ ok: true, id: app._id });
   } catch (e) {
-    console.error("createApplication error:", e);
-    res.status(500).json({ ok: false, message: "Server error" });
+    console.error('create career application failed:', e);
+    res.status(500).json({ ok: false, message: 'Server error' });
   }
 };
 
-exports.listMyApplications = async (req, res) => {
+exports.list = async (req, res) => {
   try {
-    const filter = req.user?._id
-      ? { userId: req.user._id }
-      : { email: req.query.email }; // fallback без авторизации
-    const rows = await CareerApplication.find(filter).sort({ createdAt: -1 });
-    res.json({ ok: true, rows });
-  } catch (e) {
-    console.error("listMyApplications error:", e);
-    res.status(500).json({ ok: false, message: "Server error" });
-  }
-};
+    const apps = await CareerApplication.find()
+      .populate('user', 'firstName lastName') // берём только имя и фамилию
+      .sort({ createdAt: -1 });
 
-exports.getApplication = async (req, res) => {
-  try {
-    const row = await CareerApplication.findById(req.params.id);
-    if (!row) return res.status(404).json({ ok: false, message: "Not found" });
-    res.json({ ok: true, row });
-  } catch (e) {
-    res.status(500).json({ ok: false, message: "Server error" });
+    res.json({ ok: true, rows: apps });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
   }
 };

@@ -11,11 +11,15 @@ exports.registerUser = async (req, res) => {
     await user.save();
 
     // 1) Ответ клиенту сразу
-    res.status(201).json({ message: "User registered successfully.", user });
+    res.status(201).json({ message: "User registered successfully.", user, emailEnqueued: true });
 
     // 2) Письмо — fire-and-forget
     Promise.resolve()
-      .then(() => sendRegistrationEmail(user.email, user.firstName, user.lastName))
+      .then(() => {
+        console.log("▶️ Triggering sendRegistrationEmail for:", user.email);
+        return sendRegistrationEmail(user.email, user.firstName, user.lastName);
+      })
+      .then((r) => console.log("📬 sendRegistrationEmail result:", r))
       .catch((e) => console.error("⚠️ sendRegistrationEmail failed:", e?.message || e));
   } catch (error) {
     console.error("❌ Registration error:", error);
@@ -120,15 +124,18 @@ exports.sendRecoveryCode = async (req, res) => {
 
     // Email отправка остаётся активной, если хочешь — её тоже можно закомментировать
     const transporter = nodemailer.createTransport({
-      service: "Gmail",
+      host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
+      secure: (process.env.SMTP_SECURE || "false") === "true",
       auth: {
-        user: process.env.EMAIL_FROM,
-        pass: process.env.EMAIL_PASS
-      }
+        user: process.env.BREVO_USER || process.env.EMAIL_FROM,
+        pass: process.env.BREVO_PASS || process.env.EMAIL_PASS,
+      },
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
+      from: process.env.BREVO_USER || process.env.EMAIL_FROM,
+      replyTo: "profsupervision@gmail.com",
       to: email,
       subject: "Код для відновлення паролю",
       text: `Ваш код для відновлення паролю: ${code}`

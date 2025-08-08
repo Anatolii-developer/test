@@ -13,9 +13,11 @@ const transporter = nodemailer.createTransport({
   tls: { ciphers: "SSLv3" }
 });
 
-transporter.verify().catch(err => {
-  console.warn("Warning: Could not establish SMTP connection:", err);
-});
+transporter.verify()
+  .then(() => console.log("✅ SMTP verify: OK"))
+  .catch(err => {
+    console.warn("⚠️ SMTP verify failed:", err?.message || err);
+  });
 
 async function sendRegistrationEmail(to, firstName = "", lastName = "") {
   const fullName = `${firstName} ${lastName}`.trim();
@@ -52,8 +54,8 @@ async function sendRegistrationEmail(to, firstName = "", lastName = "") {
       `
     
     });
-    const info = await transporter.sendMail({ /* ... */ });
-return { ok: true, messageId: info.messageId, response: info.response };
+    console.log("📧 sendRegistrationEmail invoked:", { to, fullName });
+    return { ok: true };
   } catch (error) {
     console.error("Failed to send registration email:", error);
     return { ok: false, error: error?.message || String(error) };

@@ -122,35 +122,30 @@ if (coursesTextarea && coursesCheckIcon) {
 
 
 function saveLoginAndContinue() {
-  
-const username = localStorage.getItem("registrationUsername");
-const password = localStorage.getItem("registrationPassword");
-
-if (!username || !password) {
-  alert("Дані входу не знайдені. Будь ласка, перейдіть на попередню сторінку та введіть логін і пароль.");
-  window.location.href = "index.html"; // или та страница, где saveLoginAndContinue
-  return;
-}
-
-  const confirmPassword = document.getElementById("confirm-password").value.trim();
+  // Read values directly from the current page
+  const username = (document.getElementById("username")?.value || "").trim();
+  const password = document.getElementById("password")?.value || "";
+  const confirmPassword = document.getElementById("confirm-password")?.value || "";
 
   if (!username || !password || !confirmPassword) {
     alert("Будь ласка, заповніть всі поля.");
     return;
   }
 
-  // Проверка: не email ли это
+  // Username must not be an email
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (emailPattern.test(username)) {
     alert("Придумайте username, а не email.");
     return;
   }
 
+  // Passwords must match
   if (password !== confirmPassword) {
     alert("Паролі не співпадають.");
     return;
   }
 
+  // Persist for the next step and continue
   localStorage.setItem("registrationUsername", username);
   localStorage.setItem("registrationPassword", password);
   window.location.href = "registration.html";

@@ -25,6 +25,10 @@ async function login() {
   }
 }
 
+function safeSetValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || "";
+}
 
 window.addEventListener("DOMContentLoaded", async () => {
   // проверяем, если это profile.html
@@ -58,8 +62,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (videoTextarea) {
       videoTextarea.value = user.videoLink || "";
       }
-      document.getElementById("profileQualifications").value = user.qualifications || "";
-      document.getElementById("profileExperienceExtra").value = user.experienceExtra || "";
+      safeSetValue("profileQualificationsTextarea", user.qualifications);
+      safeSetValue("profileExperienceExtraTextarea", user.experienceExtra);
       document.getElementById("profileLanguage").value = user.language || "";
       document.getElementById("profileFormat").value = user.format || "";
       

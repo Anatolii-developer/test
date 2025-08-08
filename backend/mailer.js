@@ -1,13 +1,16 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
+  logger: true,
+  debug: true,
   host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   auth: {
     user: process.env.BREVO_USER,
     pass: process.env.BREVO_PASS
-  }
+  },
+  tls: { ciphers: "SSLv3" }
 });
 
 transporter.verify().catch(err => {
@@ -19,7 +22,9 @@ async function sendRegistrationEmail(to, firstName = "", lastName = "") {
 
   try {
     await transporter.sendMail({
-      from: '"Інститут Професійної Супервізії" <no-reply@ips.com>', // або підтверджена адреса
+      from: `Інститут Професійної Супервізії <${process.env.BREVO_USER}>`,
+      replyTo: "profsupervision@gmail.com",
+      envelope: { from: process.env.BREVO_USER, to },
       to,
       subject: "Підтвердження отримання заявки на реєстрацію",
       html: `
@@ -45,9 +50,13 @@ async function sendRegistrationEmail(to, firstName = "", lastName = "") {
           </p>
         </div>
       `
+    
     });
+    const info = await transporter.sendMail({ /* ... */ });
+return { ok: true, messageId: info.messageId, response: info.response };
   } catch (error) {
     console.error("Failed to send registration email:", error);
+    return { ok: false, error: error?.message || String(error) };
   }
 }
 

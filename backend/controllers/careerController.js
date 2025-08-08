@@ -1,4 +1,4 @@
-// backend/controllers/careerApplicationsController.js
+// controllers/careerApplicationsController.js
 const CareerApplication = require('../models/CareerApplication');
 const User = require('../models/User');
 
@@ -15,9 +15,9 @@ module.exports = {
         userDoc = await User.findById(userId).lean();
       }
 
-      const userFullName = userDoc
-        ? `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim()
-        : (req.body.fullName || '');
+      const userFullName =
+        userDoc ? `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim()
+                : (req.body.fullName || '').trim();
 
       const app = await CareerApplication.create({
         user: userId || undefined,
@@ -39,7 +39,7 @@ module.exports = {
   list: async (_req, res) => {
     try {
       const apps = await CareerApplication.find()
-        .populate('user', 'firstName lastName')
+        .populate('user', 'firstName lastName email')
         .sort({ createdAt: -1 });
 
       res.json({ ok: true, rows: apps });

@@ -2,79 +2,102 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Мої заявки</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Подати заявку</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <style>
-    body { margin:0; font-family:Poppins, sans-serif; background:#97C194; color:#414141; }
+    body { margin:0; font-family:'Poppins', sans-serif; background:#97C194; color:#414141; }
 
-    .page-wrap { width:1110px; margin:40px auto; }
-    .header-card {
-      height:212px; background:#fff; border-radius:24px; padding:40px 100px;
-      display:flex; align-items:center; justify-content:space-between;
+    .apply-header{
+      width:1110px;height:212px;background:#fff;border-radius:24px;
+      margin:40px auto 20px;padding:40px 100px;display:flex;align-items:center;justify-content:space-between;
     }
-    .header-title { font-size:40px; font-weight:600; }
-    .list-card { margin-top:24px; background:#fff; border-radius:24px; padding:40px 100px; }
+    .apply-title{ font-size:40px;font-weight:600;color:#414141; }
+    .apply-image{ width:284px;height:164px; }
+    .apply-arrow{ width:64px;height:64px; }
 
-    /* Рядок заявки */
-    .req-row {
-      width:910px; height:52px; background:#FFEED9;
-      border-radius:16px; padding:10px 32px; /* top/bottom 10; left/right 32 */
-      display:flex; align-items:center; justify-content:space-between;
-      gap:16px; box-sizing:border-box; margin:14px auto; /* відступ між рядками */
-    }
-    .req-left { display:flex; align-items:center; gap:16px; min-width:0; }
-
-    .req-num {
-      width:36px; height:36px; border-radius:8px; background:#fff;
-      display:flex; align-items:center; justify-content:center; font-weight:600;
-      flex:0 0 36px;
-    }
-    .req-name {
-      font-weight:500; font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      max-width:380px;
-    }
-    .req-date { font-weight:500; font-size:18px; color:#555; }
-
-    .btn-more {
-      height:32px; border-radius:8px; padding:10px 53px; border:0; cursor:pointer;
-      background:#275D2B; color:#fff; font-weight:600; white-space:nowrap;
+    .back-button{
+      width:196px;height:48px;background:#275D2B;border-radius:24px;color:#fff;
+      padding:10px 53px;margin:0 auto 40px;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;
+      text-decoration:none;
     }
 
-    .top-actions { display:flex; justify-content:center; margin:18px 0 8px; }
-    .back-btn {
-      width:196px; height:48px; border-radius:24px; background:#275D2B; color:#fff;
-      display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none;
+    .apply-form{
+      width:1110px;background:#fff;border-radius:24px;padding:60px 100px;margin:0 auto;
     }
 
-    .empty { text-align:center; color:#6b6b6b; padding:24px 0; }
+    /* Список заявок */
+    #list{ margin-top:10px; }
 
-    @media (max-width:1200px) {
-      .page-wrap, .header-card, .list-card { width:90%; padding:30px; }
-      .req-row { width:100%; }
-      .req-name { max-width:40vw; }
+    .req-row{
+      width:910px;height:52px;background:#FFEED9;border-radius:16px;
+      padding:10px 32px; box-sizing:border-box;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      margin:14px auto;
+    }
+    .req-left{ display:flex; align-items:center; gap:16px; min-width:0; }
+    .req-num{
+      width:36px;height:36px;border-radius:8px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;
+      font-weight:600;flex:0 0 36px;
+    }
+    .req-name{ font-weight:500;font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:380px; }
+    .req-date{ font-weight:500; font-size:18px; color:#555; }
+
+    .btn-more{
+      width:136px;height:32px;border-radius:8px;border:none;cursor:pointer;background:#275D2B;color:#fff;font-weight:600;
+      padding:10px 53px; /* как просили */
+      line-height:12px; /* чтобы 32px не разъезжалась */
+      white-space:nowrap;
+    }
+
+    .empty{ text-align:center; color:#6b6b6b; margin-top:8px; }
+
+    @media (max-width:1200px){
+      .apply-header,.apply-form{ width:90%; padding:40px 30px; }
+      .req-row{ width:100%; }
+      .req-name{ max-width:40vw; }
     }
   </style>
 </head>
 <body>
-  <!-- сайдбар, якщо потрібно, можеш підключити як на інших сторінках -->
-  <div class="page-wrap">
-    <div class="header-card">
-      <div class="header-title">Подані заявки</div>
-      <img src="./assets/career-apply.png" alt="" style="width:284px;height:164px;object-fit:contain">
+  <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
     </div>
+    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+    <nav>
+      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
+      <a href="#"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
+      <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
+      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
+      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
+      <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
+      <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
+      <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
+      <a href="#"><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a>
+    </nav>
+    <div class="logout">
+      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+      <span>Вийти з акаунту</span>
+    </div>
+  </aside>
 
-    <div class="top-actions">
-      <a class="back-btn" href="career-faq.html">
-        <img src="./assets/library/arrow-main.svg" alt="" /> Головна
-      </a>
-    </div>
+  <div class="apply-header">
+    <div class="apply-title">Подати заявку</div> <!-- текст оставил таким же -->
+    <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
+    <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
+  </div>
 
-    <div class="list-card">
-      <div id="list"></div>
-      <div id="empty" class="empty" style="display:none;">Поки що немає заявок.</div>
-    </div>
+  <a href="career-faq.html" class="back-button">
+    <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
+  </a>
+
+  <div class="apply-form">
+    <div id="list"></div>
+    <div id="empty" class="empty" style="display:none;">Поки що немає заявок.</div>
   </div>
 
   <script>
@@ -83,17 +106,15 @@
     const listEl = document.getElementById('list');
     const emptyEl = document.getElementById('empty');
 
-    function formatDate(iso) {
+    const pad = n => String(n).padStart(2,'0');
+    function formatDate(iso){
       const d = new Date(iso);
-      // dd-mm-yyyy hh:mm
-      const pad = n => String(n).padStart(2,'0');
       return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
-    function rowTemplate(idx, item) {
-      const fullName = item.fullName || item.name || 'Без імені';
-      const created = item.createdAt ? formatDate(item.createdAt) : '';
-      const id = item._id;
+    function rowTemplate(i, item){
+      const fullName = item.fullName || item.name || "Без імені";
+      const created  = item.createdAt ? formatDate(item.createdAt) : "";
 
       const row = document.createElement('div');
       row.className = 'req-row';
@@ -103,7 +124,7 @@
 
       const num = document.createElement('div');
       num.className = 'req-num';
-      num.textContent = idx;
+      num.textContent = i;
 
       const name = document.createElement('div');
       name.className = 'req-name';
@@ -119,30 +140,30 @@
       more.className = 'btn-more';
       more.textContent = 'Дізнатись більше';
       more.addEventListener('click', () => {
-        // перейти на сторінку деталей
-        window.location.href = `career-request.html?id=${encodeURIComponent(id)}`;
+        // откроем страницу деталей (сделаем по желанию)
+        window.location.href = `career-request.html?id=${encodeURIComponent(item._id)}`;
       });
 
       row.append(left, more);
       return row;
     }
 
-    async function load() {
-      try {
-        const res = await fetch(API, { method: 'GET' });
+    async function load(){
+      try{
+        const res = await fetch(API);
         const data = await res.json();
-
         const items = Array.isArray(data) ? data : (data.items || []);
-        if (!items.length) {
+
+        if(!items.length){
           emptyEl.style.display = 'block';
           return;
         }
-        items
-          .sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0))
-          .forEach((item, i) => listEl.appendChild(rowTemplate(i+1, item)));
 
-      } catch (e) {
-        console.error(e);
+        items
+          .sort((a,b)=> new Date(b.createdAt||0) - new Date(a.createdAt||0))
+          .forEach((it, idx)=> listEl.appendChild(rowTemplate(idx+1, it)));
+      }catch(err){
+        console.error(err);
         emptyEl.textContent = 'Не вдалося завантажити заявки.';
         emptyEl.style.display = 'block';
       }
@@ -150,5 +171,7 @@
 
     load();
   </script>
+
+  <script src="script.js"></script>
 </body>
 </html>

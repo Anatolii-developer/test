@@ -4,6 +4,21 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   display: none;
 }
 
+#mainContentWrapper {
+  margin-left: 250px; /* место под фиксированный сайдбар (ширина 220 + зазор) */
+}
+
+#admin-main,
+.admin-main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* центрирует внутренние блоки типа .create-course-content */
+  padding: 40px 0;
+  box-sizing: border-box;
+}
+
+
 body {
     margin: 0;
     padding: 0;
@@ -191,6 +206,8 @@ body {
     background-color: #cf6108;
   }
 
+
+  
 
   .materials-top-buttons {
     display: flex;
@@ -681,12 +698,9 @@ body {
   transform: scale(1.05);
 }
 
-
 .completed-nav-buttons {
-  display: flex;
-  flex-direction: column;
+  width: 100%;
   align-items: center;
-  gap: 20px;
 }
 
 .top-buttons {

@@ -273,13 +273,14 @@
       }
     }
 
-const userRole = (localStorage.getItem("role") || "").toLowerCase();
+const userRoleRaw = localStorage.getItem("role") || "";
+const userRole = String(userRoleRaw).toLowerCase().trim();
 
 console.log("Роль в localStorage:", localStorage.getItem("role"));
-if (userRole === "ментор" || userRole === "mentor") {
+if (userRole.startsWith("ментор") || userRole.startsWith("mentor")) {
   document.getElementById("mentorButton").style.display = "flex";
 }
-if (userRole === "супервізор" || userRole === "supervisor") {
+if (userRole.startsWith("супервізор") || userRole.startsWith("supervisor")) {
   document.getElementById("supervisorButton").style.display = "flex";
 }
 
@@ -289,10 +290,15 @@ fetch("http://157.230.121.24:5050/api/users/profile", {
 })
   .then(res => res.json())
   .then(user => {
-    if (user.role && user.role.toLowerCase() === "ментор") {
+    const roleStr = Array.isArray(user.role)
+      ? user.role.join(" ")
+      : String(user.role || "");
+    const roleLc = roleStr.toLowerCase().trim();
+
+    if (roleLc.startsWith("ментор") || roleLc.startsWith("mentor")) {
       document.getElementById("mentorButton").style.display = "flex";
     }
-    if (user.role && user.role.toLowerCase().startsWith("супервізор")) {
+    if (roleLc.startsWith("супервізор") || roleLc.startsWith("supervisor")) {
       document.getElementById("supervisorButton").style.display = "flex";
     }
   })

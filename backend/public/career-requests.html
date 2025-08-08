@@ -162,6 +162,7 @@ console.log('Career applications payload →', data);
 // универсально вытащим массив независимо от формы ответа
 const items =
   Array.isArray(data) ? data :
+  Array.isArray(data.rows) ? data.rows :     // 👈 добавили rows
   Array.isArray(data.items) ? data.items :
   Array.isArray(data.data) ? data.data :
   (data.ok && Array.isArray(data.result)) ? data.result :

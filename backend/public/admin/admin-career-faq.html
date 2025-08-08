@@ -220,22 +220,38 @@
     function closeModal(){ $modal.style.display='none'; }
 
     // ==== API ====
-  async function load(){
-  try {
-    const r = await fetch(API.list);
-    if (!r.ok) throw new Error('no api');
-    const data = await r.json();
-    items = Array.isArray(data) ? data : (data.rows || []);
-  } catch {
-    // Мок-дані для тесту
-    items = [
-      {_id:'1', question:'Що таке кар\'єрне планування?', answer:'Процес визначення цілей та шляхів розвитку у професійній сфері.'},
-      {_id:'2', question:'Як знайти ментора?', answer:'Шукайте в профільних спільнотах, через колег або на спеціалізованих платформах.'},
-      {_id:'3', question:'Чи потрібен план розвитку?', answer:'Так, план допоможе чітко бачити кроки та вимірювати прогрес.'}
-    ];
+ // ==== SAVE / DELETE (моки) ====
+async function save(){
+  const payload = { question: $q.value.trim(), answer: $a.value.trim() };
+  if (!payload.question || !payload.answer) return alert('Заповніть питання та відповідь');
+
+  if (editingId){
+    // редагування в мок-масиві
+    const i = items.findIndex(x => x._id === editingId);
+    if (i !== -1) items[i] = { ...items[i], ...payload };
+  } else {
+    // створення в мок-масиві
+    items.unshift({ _id: String(Date.now()), ...payload });
   }
+  closeModal();
   render();
 }
+
+async function removeItem(id){
+  // видалення в мок-масиві
+  if (!confirm('Видалити питання?')) return;
+  items = items.filter(x => x._id !== id);
+  render();
+}
+
+// ==== EVENTS ====
+$btnAdd.addEventListener('click', openCreate);
+$btnCancel.addEventListener('click', closeModal);
+$btnSave.addEventListener('click', save);
+$modal.addEventListener('click', e => { if (e.target === $modal) closeModal(); });
+
+// ==== INIT ====
+load();
   </script>
 </body>
 </html>

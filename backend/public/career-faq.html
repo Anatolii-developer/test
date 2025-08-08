@@ -292,7 +292,7 @@ fetch("http://157.230.121.24:5050/api/users/profile", {
     if (user.role && user.role.toLowerCase() === "ментор") {
       document.getElementById("mentorButton").style.display = "flex";
     }
-    if (user.role && user.role.toLowerCase() === "супервізор") {
+    if (user.role && user.role.toLowerCase().startsWith("супервізор")) {
       document.getElementById("supervisorButton").style.display = "flex";
     }
   })

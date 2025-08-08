@@ -64,8 +64,14 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
       safeSetValue("profileQualificationsTextarea", user.qualifications);
       safeSetValue("profileExperienceExtraTextarea", user.experienceExtra);
-      document.getElementById("profileLanguage").value = user.language || "";
-      document.getElementById("profileFormat").value = user.format || "";
+      const languageTextarea = document.getElementById("profileLanguageTextarea");
+if (languageTextarea) {
+  languageTextarea.value = user.language || "";
+}
+      const formatTextarea = document.getElementById("profileFormatTextarea");
+if (formatTextarea) {
+  formatTextarea.value = user.format || "";
+}
       
       window.currentUser = user;
       // ✅ Инициализация textarea "Про мене"

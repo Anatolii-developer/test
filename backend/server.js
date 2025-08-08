@@ -41,6 +41,8 @@ app.use("/api/roles", roleRoutes);
 const libraryRoutes = require("./routes/library");
 app.use("/api/library", libraryRoutes); 
 
+app.use("/api/career-applications", require("./routes/careerRoutes"));
+
 
 app.listen(5050, '0.0.0.0', () => {
   console.log('🚀 Server running on port 5050 and accessible externally');

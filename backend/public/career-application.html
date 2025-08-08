@@ -251,6 +251,48 @@
 
     <button class="submit-button">Подати заявку</button>
   </div>
+  <script>
+const API = "http://157.230.121.24:5050/api/career-applications";
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  const exp = document.querySelector('input[name="experience"]:checked')?.value;
+  const age = document.querySelector('input[name="age"]:checked')?.value;
+  const requestText = document.getElementById("requestText").value.trim();
+  const aboutText = document.getElementById("aboutText").value.trim();
+
+  if (!exp || !age || !requestText) {
+    alert("Заповніть, будь ласка, обовʼязкові поля (досвід, вік, запит).");
+    return;
+  }
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // credentials: "include", // если нужна cookie-сессия
+      body: JSON.stringify({
+        experience: exp,
+        ageGroup: age,
+        requestText,
+        aboutText,
+
+        // Если нет логина — можешь отправить имя/email из localStorage или отдельными полями формы:
+        fullName: localStorage.getItem("fullName") || undefined,
+        email: localStorage.getItem("email") || undefined,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.message || "Помилка збереження");
+
+    // Успех: на страницу со списком заявок
+    window.location.href = "career-requests.html";
+  } catch (e) {
+    console.error(e);
+    alert("Не вдалося надіслати заявку. Спробуйте ще раз.");
+  }
+});
+</script>
  <script src="script.js"></script>
 </body>
 </html>

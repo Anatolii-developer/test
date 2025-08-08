@@ -10,10 +10,13 @@ exports.registerUser = async (req, res) => {
     const user = new User(req.body);
     await user.save();
 
-    // ✅ Надсилання email після успішної реєстрації
-    await sendRegistrationEmail(user.email, user.firstName, user.lastName);
+    // 1) Ответ клиенту сразу
+    res.status(201).json({ message: "User registered successfully.", user });
 
-    res.status(201).json({ message: "User registered successfully." });
+    // 2) Письмо — fire-and-forget
+    Promise.resolve()
+      .then(() => sendRegistrationEmail(user.email, user.firstName, user.lastName))
+      .catch((e) => console.error("⚠️ sendRegistrationEmail failed:", e?.message || e));
   } catch (error) {
     console.error("❌ Registration error:", error);
     res.status(500).json({ error: error.message });
@@ -101,20 +104,6 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Email transporter (оставлен, но не используется)
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.EMAIL_FROM,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-async function sendMail(to, subject, html) {
-  // Временно отключено
-  console.log(`📭 Email отключен. Не отправлен на: ${to}`);
-  return;
-}
 
 exports.sendRecoveryCode = async (req, res) => {
   const { email } = req.body;

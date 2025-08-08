@@ -188,17 +188,17 @@
     <div class="form-group">
       <p>Скільки років у вас практики:</p>
       <label class="custom-radio">
-        <input type="radio" name="experience" />
+        <input type="radio" name="experience" value="<7" />
         <span class="radio-icon"></span>
         зовсім початківець/студент або практикуючий до 7 років
       </label>
       <label class="custom-radio">
-        <input type="radio" name="experience" />
+        <input type="radio" name="experience" value="7-15" />
         <span class="radio-icon"></span>
         практикуючий від 7 до 15 років
       </label>
       <label class="custom-radio">
-        <input type="radio" name="experience" />
+        <input type="radio" name="experience" value=">15" />
         <span class="radio-icon"></span>
         від 15 і більше років практики
       </label>
@@ -207,27 +207,27 @@
     <div class="form-group">
       <p>До якої категорії людей за віком Ви відноситесь:</p>
       <label class="custom-radio">
-        <input type="radio" name="age" />
+        <input type="radio" name="age" value="до 32" />
         <span class="radio-icon"></span>
         до 32 років
       </label>
       <label class="custom-radio">
-        <input type="radio" name="age" />
+        <input type="radio" name="age" value="32-42" />
         <span class="radio-icon"></span>
         від 32 до 42 років
       </label>
       <label class="custom-radio">
-        <input type="radio" name="age" />
+        <input type="radio" name="age" value="42-52" />
         <span class="radio-icon"></span>
         від 42 до 52 років
       </label>
       <label class="custom-radio">
-        <input type="radio" name="age" />
+        <input type="radio" name="age" value="52-65" />
         <span class="radio-icon"></span>
         від 52 до 65 років
       </label>
       <label class="custom-radio">
-        <input type="radio" name="age" />
+        <input type="radio" name="age" value=">65" />
         <span class="radio-icon"></span>
         за 65 років
       </label>
@@ -236,7 +236,7 @@
     <div class="form-group">
       <p>Напишіть, будь ласка, Ваш запит, з яким Ви звертаєтесь до ментора:</p>
       <div class="input-wrapper">
-        <input type="text" placeholder="Ваш запит..." />
+        <input id="requestText" type="text" placeholder="Ваш запит..." />
         <img class="edit-icon" src="./assets/edit-icon.svg" alt="Edit" />
       </div>
     </div>
@@ -244,12 +244,12 @@
     <div class="form-group">
       <p>Напишіть про себе те, що вважаєте за потрібним знати ментору про себе та ситуацію:</p>
       <div class="input-wrapper">
-        <input type="text" placeholder="Інформація про себе..." />
+        <input id="aboutText" type="text" placeholder="Інформація про себе..." />
         <img class="edit-icon" src="./assets/edit-icon.svg" alt="Edit" />
       </div>
     </div>
 
-    <button class="submit-button">Подати заявку</button>
+    <button id="submitBtn" type="button" class="submit-button">Подати заявку</button>
   </div>
   <script>
 const API = "http://157.230.121.24:5050/api/career-applications";

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мої заявки</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { margin:0; font-family:Poppins, sans-serif; background:#97C194; color:#414141; }
+
+    .page-wrap { width:1110px; margin:40px auto; }
+    .header-card {
+      height:212px; background:#fff; border-radius:24px; padding:40px 100px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .header-title { font-size:40px; font-weight:600; }
+    .list-card { margin-top:24px; background:#fff; border-radius:24px; padding:40px 100px; }
+
+    /* Рядок заявки */
+    .req-row {
+      width:910px; height:52px; background:#FFEED9;
+      border-radius:16px; padding:10px 32px; /* top/bottom 10; left/right 32 */
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; box-sizing:border-box; margin:14px auto; /* відступ між рядками */
+    }
+    .req-left { display:flex; align-items:center; gap:16px; min-width:0; }
+
+    .req-num {
+      width:36px; height:36px; border-radius:8px; background:#fff;
+      display:flex; align-items:center; justify-content:center; font-weight:600;
+      flex:0 0 36px;
+    }
+    .req-name {
+      font-weight:500; font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      max-width:380px;
+    }
+    .req-date { font-weight:500; font-size:18px; color:#555; }
+
+    .btn-more {
+      height:32px; border-radius:8px; padding:10px 53px; border:0; cursor:pointer;
+      background:#275D2B; color:#fff; font-weight:600; white-space:nowrap;
+    }
+
+    .top-actions { display:flex; justify-content:center; margin:18px 0 8px; }
+    .back-btn {
+      width:196px; height:48px; border-radius:24px; background:#275D2B; color:#fff;
+      display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none;
+    }
+
+    .empty { text-align:center; color:#6b6b6b; padding:24px 0; }
+
+    @media (max-width:1200px) {
+      .page-wrap, .header-card, .list-card { width:90%; padding:30px; }
+      .req-row { width:100%; }
+      .req-name { max-width:40vw; }
+    }
+  </style>
+</head>
+<body>
+  <!-- сайдбар, якщо потрібно, можеш підключити як на інших сторінках -->
+  <div class="page-wrap">
+    <div class="header-card">
+      <div class="header-title">Подані заявки</div>
+      <img src="./assets/career-apply.png" alt="" style="width:284px;height:164px;object-fit:contain">
+    </div>
+
+    <div class="top-actions">
+      <a class="back-btn" href="career-faq.html">
+        <img src="./assets/library/arrow-main.svg" alt="" /> Головна
+      </a>
+    </div>
+
+    <div class="list-card">
+      <div id="list"></div>
+      <div id="empty" class="empty" style="display:none;">Поки що немає заявок.</div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://157.230.121.24:5050/api/career-applications";
+
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('empty');
+
+    function formatDate(iso) {
+      const d = new Date(iso);
+      // dd-mm-yyyy hh:mm
+      const pad = n => String(n).padStart(2,'0');
+      return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function rowTemplate(idx, item) {
+      const fullName = item.fullName || item.name || 'Без імені';
+      const created = item.createdAt ? formatDate(item.createdAt) : '';
+      const id = item._id;
+
+      const row = document.createElement('div');
+      row.className = 'req-row';
+
+      const left = document.createElement('div');
+      left.className = 'req-left';
+
+      const num = document.createElement('div');
+      num.className = 'req-num';
+      num.textContent = idx;
+
+      const name = document.createElement('div');
+      name.className = 'req-name';
+      name.textContent = fullName;
+
+      const date = document.createElement('div');
+      date.className = 'req-date';
+      date.textContent = created;
+
+      left.append(num, name, date);
+
+      const more = document.createElement('button');
+      more.className = 'btn-more';
+      more.textContent = 'Дізнатись більше';
+      more.addEventListener('click', () => {
+        // перейти на сторінку деталей
+        window.location.href = `career-request.html?id=${encodeURIComponent(id)}`;
+      });
+
+      row.append(left, more);
+      return row;
+    }
+
+    async function load() {
+      try {
+        const res = await fetch(API, { method: 'GET' });
+        const data = await res.json();
+
+        const items = Array.isArray(data) ? data : (data.items || []);
+        if (!items.length) {
+          emptyEl.style.display = 'block';
+          return;
+        }
+        items
+          .sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0))
+          .forEach((item, i) => listEl.appendChild(rowTemplate(i+1, item)));
+
+      } catch (e) {
+        console.error(e);
+        emptyEl.textContent = 'Не вдалося завантажити заявки.';
+        emptyEl.style.display = 'block';
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

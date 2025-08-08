@@ -109,12 +109,13 @@
     const pad = n => String(n).padStart(2,'0');
     function formatDate(iso){
       const d = new Date(iso);
+      if (isNaN(d)) return '';
       return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
     function rowTemplate(i, item){
-      const fullName = item.fullName || item.name || "Без імені";
-      const created  = item.createdAt ? formatDate(item.createdAt) : "";
+      const fullName = item.fullName || item.name || item.userName || "Без імені";
+      const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
 
       const row = document.createElement('div');
       row.className = 'req-row';
@@ -140,8 +141,7 @@
       more.className = 'btn-more';
       more.textContent = 'Дізнатись більше';
       more.addEventListener('click', () => {
-        // откроем страницу деталей (сделаем по желанию)
-        window.location.href = `career-request.html?id=${encodeURIComponent(item._id)}`;
+        window.location.href = `career-request.html?id=${encodeURIComponent(item._id || item.id || '')}`;
       });
 
       row.append(left, more);
@@ -150,20 +150,38 @@
 
     async function load(){
       try{
-        const res = await fetch(API);
-        const data = await res.json();
-        const items = Array.isArray(data) ? data : (data.items || []);
+        const res = await fetch(API, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          credentials: 'include' // на случай cookie-сессии
+        });
 
-        if(!items.length){
+        const raw = await res.text();
+        let data;
+        try { data = JSON.parse(raw); } catch (_) { data = raw; }
+        if (!res.ok) {
+          console.warn('Career applications API error status', res.status, data);
+          emptyEl.textContent = 'Не вдалося завантажити заявки.';
+          emptyEl.style.display = 'block';
+          return;
+        }
+
+        // Разные возможные формы payload
+        const items = Array.isArray(data) ? data
+          : data.items || data.data || data.results || data.applications || data.docs || data.list || [];
+
+        console.log('Career applications payload →', data);
+
+        if(!items || !items.length){
           emptyEl.style.display = 'block';
           return;
         }
 
         items
-          .sort((a,b)=> new Date(b.createdAt||0) - new Date(a.createdAt||0))
+          .sort((a,b)=> new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
           .forEach((it, idx)=> listEl.appendChild(rowTemplate(idx+1, it)));
       }catch(err){
-        console.error(err);
+        console.error('Career applications load failed:', err);
         emptyEl.textContent = 'Не вдалося завантажити заявки.';
         emptyEl.style.display = 'block';
       }

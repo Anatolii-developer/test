@@ -150,36 +150,31 @@
 
     async function load(){
       try{
-        const res = await fetch(API, {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' },
-          credentials: 'include' // на случай cookie-сессии
-        });
+const res = await fetch(API, {
+  method: 'GET',
+  headers: { 'Accept': 'application/json' },
+  credentials: 'include' // если есть сессии, оставь
+});
 
-        const raw = await res.text();
-        let data;
-        try { data = JSON.parse(raw); } catch (_) { data = raw; }
-        if (!res.ok) {
-          console.warn('Career applications API error status', res.status, data);
-          emptyEl.textContent = 'Не вдалося завантажити заявки.';
-          emptyEl.style.display = 'block';
-          return;
-        }
+const data = await res.json();
+console.log('Career applications payload →', data);
 
-        // Разные возможные формы payload
-        const items = Array.isArray(data) ? data
-          : data.items || data.data || data.results || data.applications || data.docs || data.list || [];
+// универсально вытащим массив независимо от формы ответа
+const items =
+  Array.isArray(data) ? data :
+  Array.isArray(data.items) ? data.items :
+  Array.isArray(data.data) ? data.data :
+  (data.ok && Array.isArray(data.result)) ? data.result :
+  [];
 
-        console.log('Career applications payload →', data);
+if (!items.length) {
+  emptyEl.style.display = 'block';
+  return;
+}
 
-        if(!items || !items.length){
-          emptyEl.style.display = 'block';
-          return;
-        }
-
-        items
-          .sort((a,b)=> new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
-          .forEach((it, idx)=> listEl.appendChild(rowTemplate(idx+1, it)));
+items
+  .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
+  .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
       }catch(err){
         console.error('Career applications load failed:', err);
         emptyEl.textContent = 'Не вдалося завантажити заявки.';

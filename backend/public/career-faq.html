@@ -254,6 +254,12 @@
   <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
 </div>
 
+<div class="apply-button" id="supervisorButton" style="display: none;" onclick="location.href='supervisor-dashboard.html'">
+  <div class="apply-text">Супервізія</div>
+  <img src="./assets/career-supervisor.png" alt="Supervisor Image" class="apply-img" />
+  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+</div>
+
 
   <script>
     function toggleFAQ(item) {
@@ -273,15 +279,21 @@ console.log("Роль в localStorage:", localStorage.getItem("role"));
 if (userRole === "ментор" || userRole === "mentor") {
   document.getElementById("mentorButton").style.display = "flex";
 }
+if (userRole === "супервізор" || userRole === "supervisor") {
+  document.getElementById("supervisorButton").style.display = "flex";
+}
 
 fetch("http://157.230.121.24:5050/api/users/profile", {
   method: "GET",
-  credentials: "include" // если сессии, иначе убери
+  credentials: "include"
 })
   .then(res => res.json())
   .then(user => {
     if (user.role && user.role.toLowerCase() === "ментор") {
       document.getElementById("mentorButton").style.display = "flex";
+    }
+    if (user.role && user.role.toLowerCase() === "супервізор") {
+      document.getElementById("supervisorButton").style.display = "flex";
     }
   })
   .catch(err => console.error("Error loading user role:", err));

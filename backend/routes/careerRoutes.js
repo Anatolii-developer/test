@@ -1,10 +1,8 @@
-// backend/routes/careerRoutes.js
-const express = require("express");
-const { createApplication, listMyApplications, getApplication } = require("../controllers/careerController");
+const express = require('express');
 const router = express.Router();
+const career = require('../controllers/careerApplicationsController');
 
-router.post("/", createApplication);
-router.get("/", listMyApplications);
-router.get("/:id", getApplication);
+router.post('/', career.create); // не вызываем!
+router.get('/', career.list);
 
 module.exports = router;

@@ -4,6 +4,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser'); // 👈
 const path = require('path');
+console.log('MONGO_URI =', (process.env.MONGO_URI || 'undefined').replace(/\/\/.*?:.*?@/, '//***:***@'));
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 10000,
+  socketTimeoutMS: 20000,
+}).then(()=>console.log('✅ MongoDB connected'))
+  .catch(err=>console.error('❌ MongoDB connect error:', err));
+
 
 mongoose.connect(process.env.MONGO_URI);
 

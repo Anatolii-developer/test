@@ -1,184 +1,253 @@
 <script>
-  const API = "/api/career-applications?mine=1";
+    // --- constants / state ---
+    const API_MINE = "/api/career-applications?mine=1";
+    const API_ALL  = "/api/career-applications";
+    const SCOPE_KEY = "careerScope"; // 'mine' | 'all' (for admin only)
 
-  // --- helpers ---
-  function getAuthToken(){
-    // try several common keys + nested user object
-    const direct =
-      localStorage.getItem('token') ||
-      localStorage.getItem('authToken') ||
-      localStorage.getItem('jwt') ||
-      localStorage.getItem('accessToken') ||
-      localStorage.getItem('bearer') ||
-      null;
-
-    if (direct) return direct;
-
-    try{
-      const u = JSON.parse(localStorage.getItem('user') || '{}');
-      return u.token || u.accessToken || null;
-    }catch(_){ return null; }
-  }
-
-  function debugAuthLog(prefix, res, body){
-    try{
-      console.log(prefix, {
-        status: res && res.status,
-        ok: res && res.ok,
-        url: res && res.url,
-        body: body
-      });
-    }catch(e){}
-  }
-
-  // Show a friendly inline notice instead of auto-redirect loop
-  function showLoginNotice(msg){
-    const emptyEl = document.getElementById('empty');
-    if (emptyEl){
-      emptyEl.textContent = msg || 'Щоб переглянути заявки — увійдіть у систему.';
-      emptyEl.style.display = 'block';
+    // --- helpers ---
+    function getAuthToken(){
+      const direct =
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken') ||
+        localStorage.getItem('jwt') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('bearer') ||
+        null;
+      if (direct) return direct;
+      try{
+        const u = JSON.parse(localStorage.getItem('user') || '{}');
+        return u.token || u.accessToken || null;
+      }catch(_){ return null; }
     }
-    const listEl = document.getElementById('list');
-    if (listEl) listEl.innerHTML = '';
-    // Add quick login button
-    const btn = document.createElement('a');
-    btn.href = 'index.html';
-    btn.textContent = 'Увійти';
-    btn.style.cssText = 'display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;';
-    emptyEl?.appendChild(btn);
-  }
 
-  async function ensureAuth(){
-    const token = getAuthToken();
-    try{
-      const res = await fetch('/api/users/profile', {
-        method: 'GET',
-        credentials: 'include',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
+    function debugAuthLog(prefix, res, body){
+      try{
+        console.log(prefix, {
+          status: res && res.status,
+          ok: res && res.ok,
+          url: res && res.url,
+          body: body
+        });
+      }catch(e){}
+    }
 
-      let payload = null;
-      try{ payload = await res.clone().json(); } catch(_){ /* ignore */ }
-      debugAuthLog('Profile check →', res, payload);
+    // Show a friendly inline notice instead of auto-redirect loop
+    function showLoginNotice(msg){
+      const emptyEl = document.getElementById('empty');
+      if (emptyEl){
+        emptyEl.textContent = msg || 'Щоб переглянути заявки — увійдіть у систему.';
+        emptyEl.style.display = 'block';
+      }
+      const listEl = document.getElementById('list');
+      if (listEl) listEl.innerHTML = '';
+      // Add quick login button
+      const btn = document.createElement('a');
+      btn.href = 'index.html';
+      btn.textContent = 'Увійти';
+      btn.style.cssText = 'display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;';
+      emptyEl?.appendChild(btn);
+    }
 
-      // Accept 200 or a payload that looks like a valid user (ok true or has _id/email)
-      if (res.ok) return payload || { ok:true };
+    async function ensureAuth(){
+      const token = getAuthToken();
+      try{
+        const res = await fetch('/api/users/profile', {
+          method: 'GET',
+          credentials: 'include',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
 
-      // Some backends respond 200 with {ok:false,message:'Unauthorized'}
-      if (payload && payload.ok === false){
+        let payload = null;
+        try{ payload = await res.clone().json(); } catch(_){ /* ignore */ }
+        debugAuthLog('Profile check →', res, payload);
+
+        if (!res.ok) return null;
+
+        // normalize
+        const user = payload?.user || payload;
+        if (!user) return null;
+
+        const role = (user.role || '').toLowerCase();
+        const isAdmin = role === 'admin' || role === 'адмін';
+        return { user, isAdmin, token };
+      } catch (e){
+        console.warn('ensureAuth failed:', e);
         return null;
       }
-
-      if (res.status === 401 || res.status === 403) return null;
-
-      // Unknown failure — don't redirect automatically
-      return null;
-    } catch (e){
-      console.warn('ensureAuth failed:', e);
-      return null;
     }
-  }
 
-  const listEl = document.getElementById('list');
-  const emptyEl = document.getElementById('empty');
+    // --- DOM refs ---
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('empty');
 
-  const pad = n => String(n).padStart(2,'0');
-  function formatDate(iso){
-    const d = new Date(iso);
-    if (isNaN(d)) return '';
-    return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
+    const pad = n => String(n).padStart(2,'0');
+    function formatDate(iso){
+      const d = new Date(iso);
+      if (isNaN(d)) return '';
+      return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
 
-  function rowTemplate(i, item){
-    const fullName =
-      (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
-      (item.fullName && item.fullName.trim()) ||
-      (item.email || '').trim() ||
-      'Без імені';
+    function rowTemplate(i, item){
+      const fullName =
+        (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
+        (item.fullName && item.fullName.trim()) ||
+        (item.email || '').trim() ||
+        'Без імені';
 
-    const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
+      const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
 
-    const row = document.createElement('div');
-    row.className = 'req-row';
+      const row = document.createElement('div');
+      row.className = 'req-row';
 
-    const left = document.createElement('div');
-    left.className = 'req-left';
+      const left = document.createElement('div');
+      left.className = 'req-left';
 
-    const num = document.createElement('div');
-    num.className = 'req-num';
-    num.textContent = i;
+      const num = document.createElement('div');
+      num.className = 'req-num';
+      num.textContent = i;
 
-    const name = document.createElement('div');
-    name.className = 'req-name';
-    name.textContent = fullName;
+      const name = document.createElement('div');
+      name.className = 'req-name';
+      name.textContent = fullName;
 
-    const date = document.createElement('div');
-    date.className = 'req-date';
-    date.textContent = created;
+      const date = document.createElement('div');
+      date.className = 'req-date';
+      date.textContent = created;
 
-    left.append(num, name, date);
+      left.append(num, name, date);
 
-    const more = document.createElement('button');
-    more.className = 'btn-more';
-    more.textContent = 'Дізнатись більше';
-    more.addEventListener('click', () => {
-      window.location.href = `career-request.html?id=${encodeURIComponent(item._id || item.id || '')}`;
-    });
-
-    row.append(left, more);
-    return row;
-  }
-
-  async function load(){
-    try{
-      const user = await ensureAuth();
-      if (!user){
-        // stop redirecting; show message and exit
-        showLoginNotice('Щоб переглянути власні заявки — увійдіть у систему.');
-        return;
-      }
-
-      const token = getAuthToken();
-      const res = await fetch(API, {
-        method: 'GET',
-        headers: Object.assign(
-          { 'Accept': 'application/json' },
-          token ? { 'Authorization': `Bearer ${token}` } : {}
-        ),
-        credentials: 'include'
+      const more = document.createElement('button');
+      more.className = 'btn-more';
+      more.textContent = 'Дізнатись більше';
+      more.addEventListener('click', () => {
+        window.location.href = `career-request.html?id=${encodeURIComponent(item._id || item.id || '')}`;
       });
 
-      let data = null;
-      try{ data = await res.clone().json(); } catch(_){}
-      debugAuthLog('Career apps →', res, data);
-
-      if (res.status === 401 || (data && data.ok === false && /unauthorized/i.test(data.message || ''))){
-        showLoginNotice('Сеанс закінчився. Будь ласка, увійдіть ще раз.');
-        return;
-      }
-
-      const items =
-        Array.isArray(data) ? data :
-        Array.isArray(data?.rows) ? data.rows :
-        Array.isArray(data?.items) ? data.items :
-        Array.isArray(data?.data) ? data.data :
-        (data?.ok && Array.isArray(data?.result)) ? data.result :
-        [];
-
-      if (!items.length) {
-        emptyEl.style.display = 'block';
-        return;
-      }
-
-      items
-        .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
-        .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
-    }catch(err){
-      console.error('Career applications load failed:', err);
-      emptyEl.textContent = 'Не вдалося завантажити заявки.';
-      emptyEl.style.display = 'block';
+      row.append(left, more);
+      return row;
     }
-  }
 
-  load();
-</script>
+    // --- admin toolbar (scope toggle) ---
+    function ensureAdminToolbar(){
+      let bar = document.getElementById('adminScopeBar');
+      if (bar) return bar;
+
+      const applyForm = document.querySelector('.apply-form');
+      if (!applyForm) return null;
+
+      bar = document.createElement('div');
+      bar.id = 'adminScopeBar';
+      bar.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px;';
+
+      const btnMine = document.createElement('button');
+      btnMine.textContent = 'Мої заявки';
+      btnMine.className = 'btn-more';
+      btnMine.style.height = '32px';
+
+      const btnAll = document.createElement('button');
+      btnAll.textContent = 'Всі заявки';
+      btnAll.className = 'btn-more';
+      btnAll.style.height = '32px';
+      btnAll.style.background = '#414141';
+
+      bar.append(btnMine, btnAll);
+      applyForm.insertBefore(bar, applyForm.firstChild);
+
+      btnMine.addEventListener('click', () => setScope('mine'));
+      btnAll.addEventListener('click',  () => setScope('all'));
+
+      return bar;
+    }
+
+    function highlightScope(scope){
+      const bar = document.getElementById('adminScopeBar');
+      if (!bar) return;
+      const [btnMine, btnAll] = bar.querySelectorAll('button');
+      if (!btnMine || !btnAll) return;
+      if (scope === 'all'){
+        btnAll.style.opacity = '1'; btnAll.disabled = true;
+        btnMine.style.opacity = '.65'; btnMine.disabled = false;
+      }else{
+        btnMine.style.opacity = '1'; btnMine.disabled = true;
+        btnAll.style.opacity = '.65'; btnAll.disabled = false;
+      }
+    }
+
+    function setScope(scope){
+      localStorage.setItem(SCOPE_KEY, scope);
+      // re-load
+      load();
+    }
+
+    // --- main loader ---
+    async function load(){
+      try{
+        // 1) auth
+        const auth = await ensureAuth();
+        if (!auth){
+          showLoginNotice('Щоб переглянути власні заявки — увійдіть у систему.');
+          return;
+        }
+
+        // 2) admin extras
+        let apiUrl = API_MINE;
+        if (auth.isAdmin){
+          ensureAdminToolbar();
+          const scope = localStorage.getItem(SCOPE_KEY) || 'all';
+          apiUrl = scope === 'all' ? API_ALL : API_MINE;
+          highlightScope(scope);
+        }
+
+        // 3) fetch items
+        const headers = { 'Accept': 'application/json' };
+        if (auth.token) headers['Authorization'] = `Bearer ${auth.token}`;
+
+        const res = await fetch(apiUrl, {
+          method: 'GET',
+          headers,
+          credentials: 'include'
+        });
+
+        let data = null;
+        try{ data = await res.clone().json(); } catch(_){}
+        debugAuthLog('Career apps →', res, data);
+
+        if (res.status === 401 || (data && data.ok === false && /unauthorized/i.test(data.message || ''))){
+          showLoginNotice('Сеанс закінчився. Будь ласка, увійдіть ще раз.');
+          return;
+        }
+
+        // 4) normalize
+        const items =
+          Array.isArray(data) ? data :
+          Array.isArray(data?.rows) ? data.rows :
+          Array.isArray(data?.items) ? data.items :
+          Array.isArray(data?.data) ? data.data :
+          (data?.ok && Array.isArray(data?.result)) ? data.result :
+          [];
+
+        // 5) render
+        if (!items.length) {
+          if (emptyEl) emptyEl.style.display = 'block';
+          if (listEl) listEl.innerHTML = '';
+          return;
+        }
+
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (listEl) listEl.innerHTML = '';
+
+        items
+          .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
+          .forEach((it, idx) => listEl && listEl.appendChild(rowTemplate(idx+1, it)));
+      }catch(err){
+        console.error('Career applications load failed:', err);
+        if (emptyEl){
+          emptyEl.textContent = 'Не вдалося завантажити заявки.';
+          emptyEl.style.display = 'block';
+        }
+      }
+    }
+
+    // init
+    load();
+  </script>

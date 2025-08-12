@@ -77,8 +77,29 @@
     }
 
     // --- DOM refs ---
-    const listEl = document.getElementById('list');
-    const emptyEl = document.getElementById('empty');
+    function ensureContainers(){
+      const applyForm = document.querySelector('.apply-form') || document.body;
+      let list = document.getElementById('list');
+      let empty = document.getElementById('empty');
+
+      if (!list){
+        list = document.createElement('div');
+        list.id = 'list';
+        applyForm.insertBefore(list, applyForm.firstChild);
+      }
+      if (!empty){
+        empty = document.createElement('div');
+        empty.id = 'empty';
+        empty.className = 'empty';
+        empty.style.display = 'none';
+        empty.textContent = 'Поки що немає заявок.';
+        applyForm.appendChild(empty);
+      }
+      return { listEl: list, emptyEl: empty };
+    }
+
+    let listEl = null;
+    let emptyEl = null;
 
     const pad = n => String(n).padStart(2,'0');
     function formatDate(iso){
@@ -249,5 +270,10 @@
     }
 
     // init
-    load();
+    document.addEventListener('DOMContentLoaded', () => {
+      const refs = ensureContainers();
+      listEl = refs.listEl;
+      emptyEl = refs.emptyEl;
+      load();
+    });
   </script>

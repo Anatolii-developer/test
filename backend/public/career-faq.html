@@ -290,19 +290,22 @@ fetch("http://157.230.121.24:5050/api/users/profile", {
 })
   .then(res => res.json())
   .then(user => {
-    const roleStr = Array.isArray(user.role)
-      ? user.role.join(" ")
-      : String(user.role || "");
-    const roleLc = roleStr.toLowerCase().trim();
+    let rolesStr = "";
 
-    if (roleLc.startsWith("ментор") || roleLc.startsWith("mentor")) {
+    if (Array.isArray(user.roles)) {
+      rolesStr = user.roles.join(" ").toLowerCase();
+    } else {
+      rolesStr = String(user.roles || "").toLowerCase();
+    }
+
+    if (rolesStr.includes("ментор") || rolesStr.includes("mentor")) {
       document.getElementById("mentorButton").style.display = "flex";
     }
-    if (roleLc.startsWith("супервізор") || roleLc.startsWith("supervisor")) {
+    if (rolesStr.includes("супервізор") || rolesStr.includes("supervisor")) {
       document.getElementById("supervisorButton").style.display = "flex";
     }
   })
-  .catch(err => console.error("Error loading user role:", err));
+  .catch(err => console.error("Error loading user roles:", err));
 
   </script>
  <script src="script.js"></script>

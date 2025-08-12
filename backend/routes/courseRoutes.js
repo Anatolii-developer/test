@@ -8,7 +8,7 @@ router.get('/:id/participants', getCourseParticipants);
 router.get('/current-course-participants', getCurrentCourseParticipants);
 router.get('/:id', getCourseById);
 router.put('/:id', updateCourse);
-router.put('/:id/approve', approveCourse)
+router.put('/:id/approve', approveCourse);
 const { getCourseParticipants } = require('../controllers/courseController');
 
 

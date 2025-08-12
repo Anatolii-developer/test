@@ -206,7 +206,7 @@ items
   .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
       }catch(err){
         if (err && (err.message || '').toLowerCase().includes('unauthorized')) {
-          window.location.href = 'login.html';
+          window.location.href = 'index.html';
           return;
         }
         console.error('Career applications load failed:', err);

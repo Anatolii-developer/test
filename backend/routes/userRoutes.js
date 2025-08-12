@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require("path");
 const multer = require("multer");
 const mongoose = require("mongoose");
+const jwt = require('jsonwebtoken');
 
 const {
   registerUser,
@@ -47,6 +48,24 @@ router.post('/register', async (req, res) => {
   }
 });
 
+function auth(req, res, next) {
+  const token =
+    req.cookies?.token ||
+    (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+
+  if (!token) {
+    return res.status(401).json({ ok: false, message: 'Unauthorized' });
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+    // положим минимум, что нужно дальше
+    req.user = { _id: payload.id, role: payload.role };
+    next();
+  } catch (e) {
+    return res.status(401).json({ ok: false, message: 'Invalid token' });
+  }
+}
 
 router.get("/users-with-roles", async (req, res) => {
   try {
@@ -99,24 +118,19 @@ router.get('/approved', async (req, res) => {
   }
 });
 
-router.get("/profile", async (req, res) => {
+router.get("/profile", auth, async (req, res) => {
   try {
-    const userId = req.session?.userId || req.user?._id || req.query.id; // или другой способ получить ID текущего юзера
-
-    if (!userId) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-
-    const user = await User.findById(userId).select("firstName lastName email role status");
+    const user = await User.findById(req.user._id)
+      .select("firstName lastName email role status username");
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ ok: false, message: "User not found" });
     }
 
-    res.json(user);
+    res.json({ ok: true, user });
   } catch (err) {
     console.error("❌ Profile fetch error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ ok: false, message: "Server error" });
   }
 });
 

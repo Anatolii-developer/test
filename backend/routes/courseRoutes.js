@@ -4,12 +4,13 @@ const { createCourse, getCourses, getCourseById, updateCourse, approveCourse, ge
 
 router.post('/', createCourse);
 router.get('/', getCourses);
+router.get('/:id/participants', getCourseParticipants);
+router.get('/current-course-participants', getCurrentCourseParticipants);
 router.get('/:id', getCourseById);
 router.put('/:id', updateCourse);
 router.put('/:id/approve', approveCourse)
 const { getCourseParticipants } = require('../controllers/courseController');
-router.get('/:id/participants', getCourseParticipants);
-router.get('/current-course-participants', getCurrentCourseParticipants);
+
 
     
 

@@ -1,28 +1,48 @@
 const Course = require('../models/Course');
 
 // POST /api/courses
+// POST /api/courses
 exports.createCourse = async (req, res) => {
   try {
-    const { courseDates } = req.body;
+    const startRaw = req.body.courseDates?.start || req.body.startDate;
+    const endRaw   = req.body.courseDates?.end   || req.body.endDate;
 
-    const startDate = new Date(`${courseDates.start}T00:00:00`);
-    const endDate = new Date(`${courseDates.end}T23:59:59`);
+    if (!startRaw || !endRaw) {
+      return res.status(400).json({ message: 'Вкажіть дати початку і завершення курсу' });
+    }
+
+    const startDate = new Date(`${startRaw}T00:00:00Z`);
+    const endDate   = new Date(`${endRaw}T23:59:59Z`);
+    if (isNaN(startDate) || isNaN(endDate)) {
+      return res.status(400).json({ message: 'Некоректний формат дат' });
+    }
+
+    const timeStart = req.body.courseTime?.start || req.body.startTime || '';
+    const timeEnd   = req.body.courseTime?.end   || req.body.endTime   || '';
 
     const course = new Course({
-      ...req.body,
-      courseDates: {
-        start: startDate,
-        end: endDate,
-      },
-      status: "WAITING_FOR_APPROVAL" // ⬅ статус заявки
+      eventType: req.body.eventType,
+      courseTitle: req.body.courseTitle,
+      courseSubtitle: req.body.courseSubtitle,
+      courseDescription: req.body.courseDescription,
+      courseDates: { start: startDate, end: endDate },
+      courseDays: Array.isArray(req.body.courseDays) ? req.body.courseDays : [],
+      courseTime: { start: timeStart, end: timeEnd },
+      accessType: req.body.accessType,
+      closedGroupMembers: req.body.closedGroupMembers || [],
+      participants: req.body.participants || [],
+      courseDuration: req.body.courseDuration,
+      coursePrice: req.body.coursePrice,
+      zoomLink: req.body.zoomLink,
+      status: 'WAITING_FOR_APPROVAL',
     });
 
     await course.save();
     res.status(201).json({ success: true, course });
 
   } catch (err) {
-    console.error("❌ Error:", err.message);
-    res.status(500).json({ message: "Помилка при створенні курсу", error: err.message });
+    console.error('❌ Error creating course:', err);
+    res.status(500).json({ message: 'Помилка при створенні курсу', error: err.message });
   }
 };
 

@@ -2,27 +2,54 @@ const API_BASE = "http://157.230.121.24:5050";
 
 
 async function login() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  console.log("[LOGIN] Введено:", { username, password });
 
   try {
     const res = await fetch(`${API_BASE}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",    
+      credentials: "include",
       body: JSON.stringify({ username, password }),
     });
 
+    console.log("[LOGIN] Ответ от /login:", res.status, res.statusText);
     const result = await res.json();
-    if (res.ok) {
-      localStorage.setItem("user", JSON.stringify(result.user));
+    console.log("[LOGIN] Тело ответа:", result);
+
+    if (!res.ok) {
+      alert("Помилка: " + (result.message || "Невідома"));
+      return;
+    }
+
+    // Сохраняем пользователя
+    localStorage.setItem("user", JSON.stringify(result.user));
+    console.log("[LOGIN] Пользователь сохранён в localStorage");
+
+    // Проверим, реально ли куки установились
+    console.log("[LOGIN] Делаю проверочный запрос /profile...");
+    const profileRes = await fetch(`${API_BASE}/api/users/profile`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    console.log("[LOGIN] Ответ от /profile:", profileRes.status, profileRes.statusText);
+    const profileData = await profileRes.json();
+    console.log("[LOGIN] Данные профиля:", profileData);
+
+    if (profileRes.ok) {
+      console.log("[LOGIN] Авторизация успешна → редирект на profile.html");
       window.location.href = "profile.html";
     } else {
-      alert("Помилка: " + result.message);
+      console.warn("[LOGIN] Авторизация не подтверждена, 401. Куки не установились или истекли.");
+      alert("Авторизация не подтверждена — проверь настройки cookies на сервере.");
     }
+
   } catch (err) {
+    console.error("[LOGIN] Ошибка запроса:", err);
     alert("Server error");
-    console.error(err);
   }
 }
 

@@ -1,14 +1,15 @@
 const { Schema, model, Types } = require('mongoose');
 
-const careerApplicationSchema = new Schema({
-  user: { type: Types.ObjectId, ref: 'User', required: false },
+// models/CareerApplication.js
+const CareerApplicationSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  username: { type: String, index: true }, // 👈
   fullName: String,
   email: String,
   experience: String,
   ageGroup: String,
   requestText: String,
   aboutText: String,
-  createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps:true });
 
-module.exports = model('CareerApplication', careerApplicationSchema);
+module.exports = model('CareerApplication', CareerApplicationSchema);

@@ -1,115 +1,26 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Подати заявку</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body { margin:0; font-family:'Poppins', sans-serif; background:#97C194; color:#414141; }
-
-    .apply-header{
-      width:1110px;height:212px;background:#fff;border-radius:24px;
-      margin:40px auto 20px;padding:40px 100px;display:flex;align-items:center;justify-content:space-between;
-    }
-    .apply-title{ font-size:40px;font-weight:600;color:#414141; }
-    .apply-image{ width:284px;height:164px; }
-    .apply-arrow{ width:64px;height:64px; }
-
-    .back-button{
-      width:196px;height:48px;background:#275D2B;border-radius:24px;color:#fff;
-      padding:10px 53px;margin:0 auto 40px;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;
-      text-decoration:none;
-    }
-
-    .apply-form{
-      width:1110px;background:#fff;border-radius:24px;padding:60px 100px;margin:0 auto;
-    }
-
-    /* Список заявок */
-    #list{ margin-top:10px; }
-
-    .req-row{
-      width:910px;height:52px;background:#FFEED9;border-radius:16px;
-      padding:10px 32px; box-sizing:border-box;
-      display:flex; align-items:center; justify-content:space-between; gap:16px;
-      margin:14px auto;
-    }
-    .req-left{ display:flex; align-items:center; gap:16px; min-width:0; }
-    .req-num{
-      width:36px;height:36px;border-radius:8px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;
-      font-weight:600;flex:0 0 36px;
-    }
-    .req-name{ font-weight:500;font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:380px; }
-    .req-date{ font-weight:500; font-size:18px; color:#555; }
-
-    .btn-more{
-      width:136px;height:32px;border-radius:8px;border:none;cursor:pointer;background:#275D2B;color:#fff;font-weight:600;
-      padding:10px 53px; /* как просили */
-      line-height:12px; /* чтобы 32px не разъезжалась */
-      white-space:nowrap;
-    }
-
-    .empty{ text-align:center; color:#6b6b6b; margin-top:8px; }
-
-    @media (max-width:1200px){
-      .apply-header,.apply-form{ width:90%; padding:40px 30px; }
-      .req-row{ width:100%; }
-      .req-name{ max-width:40vw; }
-    }
-  </style>
-</head>
-<body>
-  <aside class="sidebar collapsed" id="sidebar">
-    <div class="toggle-button" onclick="toggleSidebar()">
-      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
-    </div>
-    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
-    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
-    <nav>
-      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
-      <a href="#"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
-      <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
-      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
-      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
-      <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
-      <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
-      <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
-      <a href="#"><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a>
-    </nav>
-    <div class="logout">
-      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
-      <span>Вийти з акаунту</span>
-    </div>
-  </aside>
-
-  <div class="apply-header">
-    <div class="apply-title">Подати заявку</div> <!-- текст оставил таким же -->
-    <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
-    <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
-  </div>
-
-  <a href="career-faq.html" class="back-button">
-    <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
-  </a>
-
-  <div class="apply-form">
-    <div id="list"></div>
-    <div id="empty" class="empty" style="display:none;">Поки що немає заявок.</div>
-  </div>
-
-  <script>
+<script>
     const API = "/api/career-applications?mine=1";
 
+    // Read token from localStorage if you use token-based auth
+    function getAuthToken(){
+      return localStorage.getItem('token')
+          || localStorage.getItem('authToken')
+          || localStorage.getItem('jwt')
+          || null;
+    }
+
     async function ensureAuth() {
+      const token = getAuthToken();
       try {
-        const r = await fetch('/api/users/profile', { credentials: 'include' });
+        // Try with both cookie (credentials: include) and Authorization header (if present)
+        const r = await fetch('/api/users/profile', {
+          credentials: 'include',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
         if (!r.ok) throw new Error('unauthorized');
         return await r.json();
       } catch (e) {
-        // Not logged in → redirect to login
+        // If neither cookie nor token worked — redirect to login
         window.location.href = 'index.html';
         throw e;
       }
@@ -126,14 +37,12 @@
     }
 
     function rowTemplate(i, item){
-       const fullName =
-   
-    (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
-   
-    (item.fullName && item.fullName.trim()) ||
-   
-    (item.email || '').trim() ||
-    'Без імені';
+      const fullName =
+        (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
+        (item.fullName && item.fullName.trim()) ||
+        (item.email || '').trim() ||
+        'Без імені';
+
       const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
 
       const row = document.createElement('div');
@@ -169,41 +78,43 @@
 
     async function load(){
       try{
-        // ensure user is authenticated; redirects to login.html if 401
+        // ensure user is authenticated; redirects to login.html if 401/unauthorized
         await ensureAuth();
 
-const res = await fetch(API, {
-  method: 'GET',
-  headers: { 'Accept': 'application/json' },
-  credentials: 'include' // если есть сессии, оставь
-});
+        const token = getAuthToken();
+        const res = await fetch(API, {
+          method: 'GET',
+          headers: Object.assign(
+            { 'Accept': 'application/json' },
+            token ? { 'Authorization': `Bearer ${token}` } : {}
+          ),
+          credentials: 'include'
+        });
 
-if (res.status === 401) {
-  // Backend requires auth for this endpoint
-  window.location.href = 'index.html';
-  return;
-}
+        if (res.status === 401) {
+          window.location.href = 'index.html';
+          return;
+        }
 
-const data = await res.json();
-console.log('Career applications payload →', data);
+        const data = await res.json();
+        console.log('Career applications payload →', data);
 
-// универсально вытащим массив независимо от формы ответа
-const items =
-  Array.isArray(data) ? data :
-  Array.isArray(data.rows) ? data.rows :     // 👈 добавили rows
-  Array.isArray(data.items) ? data.items :
-  Array.isArray(data.data) ? data.data :
-  (data.ok && Array.isArray(data.result)) ? data.result :
-  [];
+        const items =
+          Array.isArray(data) ? data :
+          Array.isArray(data.rows) ? data.rows :
+          Array.isArray(data.items) ? data.items :
+          Array.isArray(data.data) ? data.data :
+          (data.ok && Array.isArray(data.result)) ? data.result :
+          [];
 
-if (!items.length) {
-  emptyEl.style.display = 'block';
-  return;
-}
+        if (!items.length) {
+          emptyEl.style.display = 'block';
+          return;
+        }
 
-items
-  .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
-  .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
+        items
+          .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
+          .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
       }catch(err){
         if (err && (err.message || '').toLowerCase().includes('unauthorized')) {
           window.location.href = 'index.html';
@@ -217,7 +128,3 @@ items
 
     load();
   </script>
-
-  <script src="script.js"></script>
-</body>
-</html>

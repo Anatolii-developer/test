@@ -37,24 +37,31 @@ module.exports = {
   },
 
   list: async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ ok: false, message: 'Unauthorized' });
-    }
+    try {
+      if (!req.user) {
+        return res.status(401).json({ ok: false, message: 'Unauthorized' });
+      }
 
     const role = (req.user.role || '').toLowerCase();
     const isAdmin = role === 'admin' || role === 'адмін';
     const mine = ['1', 'true', 'yes'].includes(String(req.query.mine || '').toLowerCase());
 
-    // Админ по умолчанию видит всё; ?mine=1 покажет только его.
-    // Не-админ видит только свои.
-    const filter = (isAdmin && !mine) ? {} : { user: req.user._id };
+    let filter = {};
+    if (!(isAdmin && !mine)) {
+      // для звичайного користувача або admin з ?mine=1 показуємо його заявки
+      filter = {
+    $or: [
+      { user: req.user._id },
+      { email: req.user.email }   // ← підхопить старі заявки без user
+    ]
+  };
+}
 
-    const apps = await CareerApplication.find(filter)
-      .populate('user', 'firstName lastName email')
-      .sort({ createdAt: -1 });
+const apps = await CareerApplication.find(filter)
+  .populate('user', 'firstName lastName email')
+  .sort({ createdAt: -1 });
 
-    res.json({ ok: true, rows: apps });
+res.json({ ok: true, rows: apps });
   } catch (err) {
     console.error('career applications list failed:', err);
     res.status(500).json({ ok: false, error: err.message });

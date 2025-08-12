@@ -147,6 +147,31 @@
       border-radius: 24px;
       cursor: pointer;
     }
+
+    .view-requests-button {
+  width: 260px;
+  height: 48px;
+  background-color: #ECF5EB;
+  border: 1px solid #275D2B;
+  border-radius: 24px;
+  color: #275D2B;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px 20px;
+  margin: 0 auto 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.view-requests-button:hover {
+  background-color: #d9ebd7;
+}
+
   </style>
 </head>
 <body>
@@ -184,9 +209,10 @@
     <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
   </a>
 
-  <a href="career-requests.html" class="back-button">
-    <img src="./assets/library/arrow-main.svg" alt="Back" /> Переглянути подані заявки
-  </a>
+<a href="career-requests.html" class="view-requests-button">
+  <img alt="Back" /> Переглянути подані заявки
+</a>
+
 
   <div class="apply-form">
     <div class="form-group">

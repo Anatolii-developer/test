@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const careerCtrl = require('../controllers/careerController'); // або твій файл
+const careerCtrl = require(path.join(__dirname, '..', 'controllers', 'careerController.js'));
 const jwt = require('jsonwebtoken');
 
 function auth(req,res,next){

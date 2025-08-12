@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 
 // ⚠️ правильный контроллер
-const careerCtrl = require('../controllers/careerApplicationsController');
+const careerCtrl = require('../controllers/careerController');
 
 // тот же auth, что и в userRoutes
 function auth(req, res, next) {

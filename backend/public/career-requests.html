@@ -1,130 +1,184 @@
 <script>
-    const API = "/api/career-applications?mine=1";
+  const API = "/api/career-applications?mine=1";
 
-    // Read token from localStorage if you use token-based auth
-    function getAuthToken(){
-      return localStorage.getItem('token')
-          || localStorage.getItem('authToken')
-          || localStorage.getItem('jwt')
-          || null;
-    }
+  // --- helpers ---
+  function getAuthToken(){
+    // try several common keys + nested user object
+    const direct =
+      localStorage.getItem('token') ||
+      localStorage.getItem('authToken') ||
+      localStorage.getItem('jwt') ||
+      localStorage.getItem('accessToken') ||
+      localStorage.getItem('bearer') ||
+      null;
 
-    async function ensureAuth() {
-      const token = getAuthToken();
-      try {
-        // Try with both cookie (credentials: include) and Authorization header (if present)
-        const r = await fetch('/api/users/profile', {
-          credentials: 'include',
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
-        if (!r.ok) throw new Error('unauthorized');
-        return await r.json();
-      } catch (e) {
-        // If neither cookie nor token worked — redirect to login
-        window.location.href = 'index.html';
-        throw e;
-      }
-    }
+    if (direct) return direct;
 
-    const listEl = document.getElementById('list');
+    try{
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      return u.token || u.accessToken || null;
+    }catch(_){ return null; }
+  }
+
+  function debugAuthLog(prefix, res, body){
+    try{
+      console.log(prefix, {
+        status: res && res.status,
+        ok: res && res.ok,
+        url: res && res.url,
+        body: body
+      });
+    }catch(e){}
+  }
+
+  // Show a friendly inline notice instead of auto-redirect loop
+  function showLoginNotice(msg){
     const emptyEl = document.getElementById('empty');
-
-    const pad = n => String(n).padStart(2,'0');
-    function formatDate(iso){
-      const d = new Date(iso);
-      if (isNaN(d)) return '';
-      return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    if (emptyEl){
+      emptyEl.textContent = msg || 'Щоб переглянути заявки — увійдіть у систему.';
+      emptyEl.style.display = 'block';
     }
+    const listEl = document.getElementById('list');
+    if (listEl) listEl.innerHTML = '';
+    // Add quick login button
+    const btn = document.createElement('a');
+    btn.href = 'index.html';
+    btn.textContent = 'Увійти';
+    btn.style.cssText = 'display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;';
+    emptyEl?.appendChild(btn);
+  }
 
-    function rowTemplate(i, item){
-      const fullName =
-        (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
-        (item.fullName && item.fullName.trim()) ||
-        (item.email || '').trim() ||
-        'Без імені';
-
-      const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
-
-      const row = document.createElement('div');
-      row.className = 'req-row';
-
-      const left = document.createElement('div');
-      left.className = 'req-left';
-
-      const num = document.createElement('div');
-      num.className = 'req-num';
-      num.textContent = i;
-
-      const name = document.createElement('div');
-      name.className = 'req-name';
-      name.textContent = fullName;
-
-      const date = document.createElement('div');
-      date.className = 'req-date';
-      date.textContent = created;
-
-      left.append(num, name, date);
-
-      const more = document.createElement('button');
-      more.className = 'btn-more';
-      more.textContent = 'Дізнатись більше';
-      more.addEventListener('click', () => {
-        window.location.href = `career-request.html?id=${encodeURIComponent(item._id || item.id || '')}`;
+  async function ensureAuth(){
+    const token = getAuthToken();
+    try{
+      const res = await fetch('/api/users/profile', {
+        method: 'GET',
+        credentials: 'include',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
 
-      row.append(left, more);
-      return row;
-    }
+      let payload = null;
+      try{ payload = await res.clone().json(); } catch(_){ /* ignore */ }
+      debugAuthLog('Profile check →', res, payload);
 
-    async function load(){
-      try{
-        // ensure user is authenticated; redirects to login.html if 401/unauthorized
-        await ensureAuth();
+      // Accept 200 or a payload that looks like a valid user (ok true or has _id/email)
+      if (res.ok) return payload || { ok:true };
 
-        const token = getAuthToken();
-        const res = await fetch(API, {
-          method: 'GET',
-          headers: Object.assign(
-            { 'Accept': 'application/json' },
-            token ? { 'Authorization': `Bearer ${token}` } : {}
-          ),
-          credentials: 'include'
-        });
-
-        if (res.status === 401) {
-          window.location.href = 'index.html';
-          return;
-        }
-
-        const data = await res.json();
-        console.log('Career applications payload →', data);
-
-        const items =
-          Array.isArray(data) ? data :
-          Array.isArray(data.rows) ? data.rows :
-          Array.isArray(data.items) ? data.items :
-          Array.isArray(data.data) ? data.data :
-          (data.ok && Array.isArray(data.result)) ? data.result :
-          [];
-
-        if (!items.length) {
-          emptyEl.style.display = 'block';
-          return;
-        }
-
-        items
-          .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
-          .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
-      }catch(err){
-        if (err && (err.message || '').toLowerCase().includes('unauthorized')) {
-          window.location.href = 'index.html';
-          return;
-        }
-        console.error('Career applications load failed:', err);
-        emptyEl.textContent = 'Не вдалося завантажити заявки.';
-        emptyEl.style.display = 'block';
+      // Some backends respond 200 with {ok:false,message:'Unauthorized'}
+      if (payload && payload.ok === false){
+        return null;
       }
-    }
 
-    load();
-  </script>
+      if (res.status === 401 || res.status === 403) return null;
+
+      // Unknown failure — don't redirect automatically
+      return null;
+    } catch (e){
+      console.warn('ensureAuth failed:', e);
+      return null;
+    }
+  }
+
+  const listEl = document.getElementById('list');
+  const emptyEl = document.getElementById('empty');
+
+  const pad = n => String(n).padStart(2,'0');
+  function formatDate(iso){
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function rowTemplate(i, item){
+    const fullName =
+      (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
+      (item.fullName && item.fullName.trim()) ||
+      (item.email || '').trim() ||
+      'Без імені';
+
+    const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
+
+    const row = document.createElement('div');
+    row.className = 'req-row';
+
+    const left = document.createElement('div');
+    left.className = 'req-left';
+
+    const num = document.createElement('div');
+    num.className = 'req-num';
+    num.textContent = i;
+
+    const name = document.createElement('div');
+    name.className = 'req-name';
+    name.textContent = fullName;
+
+    const date = document.createElement('div');
+    date.className = 'req-date';
+    date.textContent = created;
+
+    left.append(num, name, date);
+
+    const more = document.createElement('button');
+    more.className = 'btn-more';
+    more.textContent = 'Дізнатись більше';
+    more.addEventListener('click', () => {
+      window.location.href = `career-request.html?id=${encodeURIComponent(item._id || item.id || '')}`;
+    });
+
+    row.append(left, more);
+    return row;
+  }
+
+  async function load(){
+    try{
+      const user = await ensureAuth();
+      if (!user){
+        // stop redirecting; show message and exit
+        showLoginNotice('Щоб переглянути власні заявки — увійдіть у систему.');
+        return;
+      }
+
+      const token = getAuthToken();
+      const res = await fetch(API, {
+        method: 'GET',
+        headers: Object.assign(
+          { 'Accept': 'application/json' },
+          token ? { 'Authorization': `Bearer ${token}` } : {}
+        ),
+        credentials: 'include'
+      });
+
+      let data = null;
+      try{ data = await res.clone().json(); } catch(_){}
+      debugAuthLog('Career apps →', res, data);
+
+      if (res.status === 401 || (data && data.ok === false && /unauthorized/i.test(data.message || ''))){
+        showLoginNotice('Сеанс закінчився. Будь ласка, увійдіть ще раз.');
+        return;
+      }
+
+      const items =
+        Array.isArray(data) ? data :
+        Array.isArray(data?.rows) ? data.rows :
+        Array.isArray(data?.items) ? data.items :
+        Array.isArray(data?.data) ? data.data :
+        (data?.ok && Array.isArray(data?.result)) ? data.result :
+        [];
+
+      if (!items.length) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+
+      items
+        .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
+        .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
+    }catch(err){
+      console.error('Career applications load failed:', err);
+      emptyEl.textContent = 'Не вдалося завантажити заявки.';
+      emptyEl.style.display = 'block';
+    }
+  }
+
+  load();
+</script>

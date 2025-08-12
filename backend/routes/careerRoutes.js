@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');  
 const router = express.Router();
 const careerCtrl = require(path.join(__dirname, '..', 'controllers', 'careerController.js'));
 const jwt = require('jsonwebtoken');

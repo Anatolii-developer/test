@@ -1061,3 +1061,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
+const LOCKED_FIELDS = new Set(['profileCoursesTextarea','profileRoleTextarea']);
+
+  // Проставити readonly і підказку
+  function lockField(id){
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('readonly','readonly');
+    el.classList.add('locked');
+    el.title = 'Це поле редагувати не можна';
+  }
+  ['profileCoursesTextarea','profileRoleTextarea'].forEach(lockField);
+
+  // Якщо у вас є функція типу enableEdit(...) — підстрахуємось
+  const _enableEdit = window.enableEdit;
+  window.enableEdit = function(id, key){
+    if (LOCKED_FIELDS.has(id)) return; // блокуємо
+    if (typeof _enableEdit === 'function') return _enableEdit(id, key);
+  };
+
+  // Якщо є універсальна функція, що знімає readonly з textarea — теж блокуємо
+  const _enableCheckboxEdit = window.enableCheckboxEdit;
+  window.enableCheckboxEdit = function(id, key, opts){
+    if (LOCKED_FIELDS.has(id)) return;
+    if (typeof _enableCheckboxEdit === 'function') return _enableCheckboxEdit(id, key, opts);
+  };

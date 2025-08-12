@@ -161,16 +161,23 @@
 </div>
 
 
-     <p class="label-with-textarea">Курси, які були пройдені в компанії:</p>
+   <p class="label-with-textarea">Курси, які були пройдені в компанії:</p>
 <div class="textarea-wrapper">
-  <textarea id="profileCoursesTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
+  <textarea id="profileCoursesTextarea"
+            class="edit-textarea locked"
+            placeholder="Введіть інформацію..."
+            readonly
+            aria-readonly="true"></textarea>
 </div>
 
-
-      
+<!-- Роль (незмінне) -->
 <p class="label-with-textarea">Роль в компанії:</p>
 <div class="textarea-wrapper">
-  <textarea id="profileRoleTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
+  <textarea id="profileRoleTextarea"
+            class="edit-textarea locked"
+            placeholder="Введіть інформацію..."
+            readonly
+            aria-readonly="true"></textarea>
 </div>
 
 

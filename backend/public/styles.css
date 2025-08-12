@@ -1310,6 +1310,13 @@
     .nav-button.secondary:active {
       background-color: #3BBA44;
     }
+
+    .edit-textarea[readonly],
+.edit-textarea.locked {
+  background: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+}
     
     
     .library-content {

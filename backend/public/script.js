@@ -9,6 +9,7 @@ async function login() {
     const res = await fetch(`${API_BASE}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",    
       body: JSON.stringify({ username, password }),
     });
 
@@ -41,7 +42,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`);
+     const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, { credentials: "include" });
       const user = await res.json();
       document.getElementById("profileUsername").textContent = user.username || "";
       document.getElementById("profileFirstName").textContent = user.firstName || "";
@@ -92,6 +93,7 @@ if (coursesTextarea && coursesCheckIcon) {
       const res = await fetch(`${API_BASE}/api/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ courses: newValue }),
       });
 
@@ -236,11 +238,12 @@ function enableEdit(fieldId, mongoKey) {
 
     try {
       const payload = { [mongoKey]: updatedProfileData[mongoKey] };
-      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+     const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify(payload),
+});
 
       const result = await res.json();
       if (res.ok) {
@@ -552,10 +555,11 @@ if (saveChangesBtn) {
 
     try {
       const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedProfileData),
-      });
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify(updatedProfileData),
+});
 
       const result = await res.json();
       if (res.ok) {
@@ -799,10 +803,11 @@ function editField(fieldId, mongoKey) {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     try {
       const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [mongoKey]: newValue }),
-      });
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify({ [mongoKey]: newValue }),
+});
 
       const result = await res.json();
 
@@ -908,9 +913,10 @@ async function uploadProfilePhoto(file) {
 
   try {
     const res = await fetch(`${API_BASE}/api/users/${storedUser._id}/photo`, {
-      method: "POST",
-      body: formData,
-    });
+  method: "POST",
+  credentials: "include",
+  body: formData,
+});
 
     const result = await res.json();
     if (res.ok) {

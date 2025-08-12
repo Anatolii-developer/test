@@ -1,4 +1,5 @@
-const { Schema, model, Types } = require('mongoose');
+const mongoose = require('mongoose');
+const { Schema, model } = mongoose;
 
 // models/CareerApplication.js
 const CareerApplicationSchema = new mongoose.Schema({

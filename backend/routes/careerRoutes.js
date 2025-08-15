@@ -3,6 +3,7 @@ const path = require('path');
 const router = express.Router();
 const careerCtrl = require(path.join(__dirname, '..', 'controllers', 'careerController.js'));
 const jwt = require('jsonwebtoken');
+
 function auth(req,res,next){
   const token = (req.cookies?.token) || (req.headers.authorization||'').replace(/^Bearer\s+/i,'');
   if(!token) return res.status(401).json({ok:false,message:'Unauthorized'});

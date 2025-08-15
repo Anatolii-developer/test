@@ -1,301 +1,469 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Подати заявку</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body { margin:0; font-family:'Poppins', sans-serif; background:#97C194; color:#414141; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Подати заявку</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #97c194;
+        color: #414141;
+      }
 
-    .apply-header{
-      width:1110px;height:212px;background:#fff;border-radius:24px;
-      margin:40px auto 20px;padding:40px 100px;display:flex;align-items:center;justify-content:space-between;
-    }
-    .apply-title{ font-size:40px;font-weight:600;color:#414141; }
-    .apply-image{ width:284px;height:164px; }
-    .apply-arrow{ width:64px;height:64px; }
+      .apply-header {
+        width: 1110px;
+        height: 212px;
+        background: #fff;
+        border-radius: 24px;
+        margin: 40px auto 20px;
+        padding: 40px 100px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .apply-title {
+        font-size: 40px;
+        font-weight: 600;
+        color: #414141;
+      }
+      .apply-image {
+        width: 284px;
+        height: 164px;
+      }
+      .apply-arrow {
+        width: 64px;
+        height: 64px;
+      }
 
-    .back-button{
-      width:196px;height:48px;background:#275D2B;border-radius:24px;color:#fff;
-      padding:10px 53px;margin:0 auto 40px;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;
-      text-decoration:none;
-    }
+      .back-button {
+        width: 196px;
+        height: 48px;
+        background: #275d2b;
+        border-radius: 24px;
+        color: #fff;
+        padding: 10px 53px;
+        margin: 0 auto 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        cursor: pointer;
+        text-decoration: none;
+      }
 
-    .apply-form{
-      width:1110px;background:#fff;border-radius:24px;padding:60px 100px;margin:0 auto;
-    }
+      .apply-form {
+        width: 1110px;
+        background: #fff;
+        border-radius: 24px;
+        padding: 60px 100px;
+        margin: 0 auto;
+      }
 
-    /* Список заявок */
-    #list{ margin-top:10px; }
+      /* Список заявок */
+      #list {
+        margin-top: 10px;
+      }
 
-    .req-row{
-      width:910px;height:52px;background:#FFEED9;border-radius:16px;
-      padding:10px 32px; box-sizing:border-box;
-      display:flex; align-items:center; justify-content:space-between; gap:16px;
-      margin:14px auto;
-    }
-    .req-left{ display:flex; align-items:center; gap:16px; min-width:0; }
-    .req-num{
-      width:36px;height:36px;border-radius:8px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;
-      font-weight:600;flex:0 0 36px;
-    }
-    .req-name{ font-weight:500;font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:380px; }
-    .req-date{ font-weight:500; font-size:18px; color:#555; }
+      req-row {
+        width: 910px;
+        height: 52px;
+        background: #ffeed9;
+        border-radius: 16px;
+        padding: 10px 16px; /* чуть меньше, чтобы не упираться в края */
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 14px auto;
+      }
 
-    .btn-more{
-      width:136px;height:32px;border-radius:8px;border:none;cursor:pointer;background:#275D2B;color:#fff;font-weight:600;
-      padding:10px 53px; /* как просили */
-      line-height:12px; /* чтобы 32px не разъезжалась */
-      white-space:nowrap;
-    }
+      /* Левая часть растягивается, внутри можно сжиматься */
+      .req-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0; /* ВАЖНО: даёт право детям сжиматься */
+        flex: 1 1 auto;
+      }
 
-    .empty{ text-align:center; color:#6b6b6b; margin-top:8px; }
+      .req-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        flex: 0 0 36px;
+      }
 
-    @media (max-width:1200px){
-      .apply-header,.apply-form{ width:90%; padding:40px 30px; }
-      .req-row{ width:100%; }
-      .req-name{ max-width:40vw; }
-    }
-  </style>
-</head>
-<body>
-  <aside class="sidebar collapsed" id="sidebar">
-    <div class="toggle-button" onclick="toggleSidebar()">
-      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+      /* Имя обрезаем многоточием */
+      .req-name {
+        font-weight: 500;
+        font-size: 20px;
+        min-width: 0; /* ВАЖНО: иначе ellipsis не сработает */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .req-date {
+        font-weight: 500;
+        font-size: 18px;
+        color: #555;
+        white-space: nowrap;
+        flex: 0 0 auto;
+      }
+
+      .btn-more {
+        height: 32px;
+        padding: 0 16px; /* было 10px 53px и фиксированная ширина — от этого “уезжала” */
+        border-radius: 24px;
+        border: none;
+        cursor: pointer;
+        background: #275d2b;
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        flex: 0 0 auto; /* не растягиваем */
+        white-space: nowrap;
+      }
+
+      .empty {
+        text-align: center;
+        color: #6b6b6b;
+        margin-top: 8px;
+      }
+
+      @media (max-width: 1200px) {
+        .apply-header,
+        .apply-form {
+          width: 90%;
+          padding: 40px 30px;
+        }
+        .req-row {
+          width: 100%;
+        }
+        .req-name {
+          max-width: 50vw;
+        } /* можно подрегулировать */
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar collapsed" id="sidebar">
+      <div class="toggle-button" onclick="toggleSidebar()">
+        <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+      </div>
+      <img
+        class="logo"
+        src="assets/sidebar/IPS Logo (2).svg"
+        alt="Logo"
+        id="logoExpanded"
+      />
+      <img
+        class="logo-collapsed"
+        src="assets/sidebar/IPS Logo (1).svg"
+        alt="Logo Small"
+        id="logoCollapsed"
+      />
+      <img
+        class="profile"
+        src="assets/profile-photo.png"
+        alt="User"
+        width="40"
+        height="40"
+      />
+      <nav>
+        <a href="profile.html"
+          ><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a
+        >
+        <a href="#"
+          ><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a
+        >
+        <a href="career-faq.html"
+          ><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a
+        >
+        <a href="library.html"
+          ><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a
+        >
+        <a href="my-courses.html"
+          ><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a
+        >
+        <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
+        <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
+        <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
+        <a href="#"
+          ><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a
+        >
+      </nav>
+      <div class="logout">
+        <img
+          src="assets/sidebar/log-out.svg"
+          alt="Logout Icon"
+          width="20"
+          height="20"
+        />
+        <span>Вийти з акаунту</span>
+      </div>
+    </aside>
+
+    <div class="apply-header">
+      <div class="apply-title">Подати заявку</div>
+      <!-- текст оставил таким же -->
+      <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
+      <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
     </div>
-    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
-    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
-    <nav>
-      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
-      <a href="#"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
-      <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
-      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
-      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
-      <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
-      <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
-      <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
-      <a href="#"><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a>
-    </nav>
-    <div class="logout">
-      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
-      <span>Вийти з акаунту</span>
+
+    <a href="career-faq.html" class="back-button">
+      <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
+    </a>
+
+    <div class="apply-form">
+      <div id="list"></div>
+      <div id="empty" class="empty" style="display: none">
+        Поки що немає заявок.
+      </div>
     </div>
-  </aside>
 
-  <div class="apply-header">
-    <div class="apply-title">Подати заявку</div> <!-- текст оставил таким же -->
-    <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
-    <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
-  </div>
+    <script>
+      const API = "/api/career-applications?mine=1";
 
-  <a href="career-faq.html" class="back-button">
-    <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
-  </a>
+      // Get token from various possible keys
+      function getAuthToken() {
+        const direct =
+          localStorage.getItem("token") ||
+          localStorage.getItem("authToken") ||
+          localStorage.getItem("jwt") ||
+          localStorage.getItem("accessToken") ||
+          localStorage.getItem("bearer") ||
+          null;
 
-  <div class="apply-form">
-    <div id="list"></div>
-    <div id="empty" class="empty" style="display:none;">Поки що немає заявок.</div>
-  </div>
+        if (direct) return direct;
 
-<script>
-  const API = "/api/career-applications?mine=1";
-
-  // Get token from various possible keys
-  function getAuthToken(){
-    const direct =
-      localStorage.getItem('token') ||
-      localStorage.getItem('authToken') ||
-      localStorage.getItem('jwt') ||
-      localStorage.getItem('accessToken') ||
-      localStorage.getItem('bearer') ||
-      null;
-
-    if (direct) return direct;
-
-    try{
-      const u = JSON.parse(localStorage.getItem('user') || '{}');
-      return u.token || u.accessToken || null;
-    }catch(_){ return null; }
-  }
-
-  function debugLog(prefix, res, body){
-    try{
-      console.log(prefix, {
-        status: res && res.status,
-        ok: res && res.ok,
-        url: res && res.url,
-        body
-      });
-    }catch(e){}
-  }
-
-  // Ensure containers exist even if markup changes
-  function ensureContainers(){
-    let form = document.querySelector('.apply-form') || document.body;
-
-    let list = document.getElementById('list');
-    if (!list){
-      list = document.createElement('div');
-      list.id = 'list';
-      form.appendChild(list);
-    }
-
-    let empty = document.getElementById('empty');
-    if (!empty){
-      empty = document.createElement('div');
-      empty.id = 'empty';
-      empty.className = 'empty';
-      empty.style.display = 'none';
-      empty.textContent = 'Поки що немає заявок.';
-      form.appendChild(empty);
-    }
-    return { listEl: list, emptyEl: empty };
-  }
-
-  // Friendly notice instead of redirect loop
-  function showLoginNotice(msg){
-    const { emptyEl, listEl } = ensureContainers();
-    emptyEl.textContent = msg || 'Щоб переглянути заявки — увійдіть у систему.';
-    emptyEl.style.display = 'block';
-    if (listEl) listEl.innerHTML = '';
-    const btn = document.createElement('a');
-    btn.href = 'index.html';
-    btn.textContent = 'Увійти';
-    btn.style.cssText = 'display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;';
-    emptyEl.appendChild(btn);
-  }
-
-  async function ensureAuth(){
-    const token = getAuthToken();
-    try{
-      const res = await fetch('/api/users/profile', {
-        method: 'GET',
-        credentials: 'include',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
-      let payload = null;
-      try{ payload = await res.clone().json(); } catch(_){}
-      debugLog('Profile check →', res, payload);
-      if (res.ok) return payload;
-      return null;
-    } catch (e){
-      console.warn('ensureAuth failed:', e);
-      return null;
-    }
-  }
-
-  const pad = n => String(n).padStart(2,'0');
-  function formatDate(iso){
-    const d = new Date(iso);
-    if (isNaN(d)) return '';
-    return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
-
-  function rowTemplate(i, item){
-    const fullName =
-      (item.user && `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim()) ||
-      (item.fullName && item.fullName.trim()) ||
-      (item.email || '').trim() ||
-      'Без імені';
-
-    const created  = item.createdAt ? formatDate(item.createdAt) : (item.created_at ? formatDate(item.created_at) : "");
-
-    const row = document.createElement('div');
-    row.className = 'req-row';
-
-    const left = document.createElement('div');
-    left.className = 'req-left';
-
-    const num = document.createElement('div');
-    num.className = 'req-num';
-    num.textContent = i;
-
-    const name = document.createElement('div');
-    name.className = 'req-name';
-    name.textContent = fullName;
-
-    const date = document.createElement('div');
-    date.className = 'req-date';
-    date.textContent = created;
-
-    left.append(num, name, date);
-
-    const more = document.createElement('button');
-    more.className = 'btn-more';
-    more.textContent = 'Дізнатись більше';
-    more.addEventListener('click', () => {
-      window.location.href = `career-request.html?id=${encodeURIComponent(item._id || item.id || '')}`;
-    });
-
-    row.append(left, more);
-    return row;
-  }
-
-  async function load(){
-    const { listEl, emptyEl } = ensureContainers();
-
-    try{
-      const user = await ensureAuth();
-      if (!user){
-        showLoginNotice('Щоб переглянути власні заявки — увійдіть у систему.');
-        return;
+        try {
+          const u = JSON.parse(localStorage.getItem("user") || "{}");
+          return u.token || u.accessToken || null;
+        } catch (_) {
+          return null;
+        }
       }
 
-      const token = getAuthToken();
-      const res = await fetch(API, {
-        method: 'GET',
-        headers: Object.assign(
-          { 'Accept': 'application/json' },
-          token ? { 'Authorization': `Bearer ${token}` } : {}
-        ),
-        credentials: 'include'
-      });
-
-      let data = null;
-      try{ data = await res.clone().json(); } catch(_){}
-      debugLog('Career apps →', res, data);
-
-      if (res.status === 401 || (data && data.ok === false && /unauthorized/i.test(data.message || ''))){
-        showLoginNotice('Сеанс закінчився. Будь ласка, увійдіть ще раз.');
-        return;
+      function debugLog(prefix, res, body) {
+        try {
+          console.log(prefix, {
+            status: res && res.status,
+            ok: res && res.ok,
+            url: res && res.url,
+            body,
+          });
+        } catch (e) {}
       }
 
-      const items =
-        Array.isArray(data) ? data :
-        Array.isArray(data?.rows) ? data.rows :
-        Array.isArray(data?.items) ? data.items :
-        Array.isArray(data?.data) ? data.data :
-        (data?.ok && Array.isArray(data?.result)) ? data.result :
-        [];
+      // Ensure containers exist even if markup changes
+      function ensureContainers() {
+        let form = document.querySelector(".apply-form") || document.body;
 
-      listEl.innerHTML = '';
+        let list = document.getElementById("list");
+        if (!list) {
+          list = document.createElement("div");
+          list.id = "list";
+          form.appendChild(list);
+        }
 
-      if (!items.length) {
-        emptyEl.style.display = 'block';
-        emptyEl.textContent = 'Поки що немає заявок.';
-        return;
+        let empty = document.getElementById("empty");
+        if (!empty) {
+          empty = document.createElement("div");
+          empty.id = "empty";
+          empty.className = "empty";
+          empty.style.display = "none";
+          empty.textContent = "Поки що немає заявок.";
+          form.appendChild(empty);
+        }
+        return { listEl: list, emptyEl: empty };
       }
 
-      emptyEl.style.display = 'none';
+      // Friendly notice instead of redirect loop
+      function showLoginNotice(msg) {
+        const { emptyEl, listEl } = ensureContainers();
+        emptyEl.textContent =
+          msg || "Щоб переглянути заявки — увійдіть у систему.";
+        emptyEl.style.display = "block";
+        if (listEl) listEl.innerHTML = "";
+        const btn = document.createElement("a");
+        btn.href = "index.html";
+        btn.textContent = "Увійти";
+        btn.style.cssText =
+          "display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;";
+        emptyEl.appendChild(btn);
+      }
 
-      items
-        .sort((a,b) => new Date(b.createdAt||b.created_at||0) - new Date(a.createdAt||a.created_at||0))
-        .forEach((it, idx) => listEl.appendChild(rowTemplate(idx+1, it)));
-    }catch(err){
-      console.error('Career applications load failed:', err);
-      const { emptyEl } = ensureContainers();
-      emptyEl.textContent = 'Не вдалося завантажити заявки.';
-      emptyEl.style.display = 'block';
-    }
-  }
+      async function ensureAuth() {
+        const token = getAuthToken();
+        try {
+          const res = await fetch("/api/users/profile", {
+            method: "GET",
+            credentials: "include",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+          let payload = null;
+          try {
+            payload = await res.clone().json();
+          } catch (_) {}
+          debugLog("Profile check →", res, payload);
+          if (res.ok) return payload;
+          return null;
+        } catch (e) {
+          console.warn("ensureAuth failed:", e);
+          return null;
+        }
+      }
 
-  // Run after DOM is ready
-  document.addEventListener('DOMContentLoaded', load);
-</script>
+      const pad = (n) => String(n).padStart(2, "0");
+      function formatDate(iso) {
+        const d = new Date(iso);
+        if (isNaN(d)) return "";
+        return `${pad(d.getDate())}-${pad(
+          d.getMonth() + 1
+        )}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
 
-  <script src="script.js"></script>
-</body>
+      function rowTemplate(i, item) {
+        const fullName =
+          (item.user &&
+            `${item.user.firstName || ""} ${
+              item.user.lastName || ""
+            }`.trim()) ||
+          (item.fullName && item.fullName.trim()) ||
+          (item.email || "").trim() ||
+          "Без імені";
+
+        const created = item.createdAt
+          ? formatDate(item.createdAt)
+          : item.created_at
+          ? formatDate(item.created_at)
+          : "";
+
+        const row = document.createElement("div");
+        row.className = "req-row";
+
+        const left = document.createElement("div");
+        left.className = "req-left";
+
+        const num = document.createElement("div");
+        num.className = "req-num";
+        num.textContent = i;
+
+        const name = document.createElement("div");
+        name.className = "req-name";
+        name.textContent = fullName;
+
+        const date = document.createElement("div");
+        date.className = "req-date";
+        date.textContent = created;
+
+        left.append(num, name, date);
+
+        const more = document.createElement("button");
+        more.className = "btn-more";
+        more.textContent = "Дізнатись більше";
+        more.addEventListener("click", () => {
+          window.location.href = `career-request.html?id=${encodeURIComponent(
+            item._id || item.id || ""
+          )}`;
+        });
+
+        row.append(left, more);
+        return row;
+      }
+
+      async function load() {
+        const { listEl, emptyEl } = ensureContainers();
+
+        try {
+          const user = await ensureAuth();
+          if (!user) {
+            showLoginNotice(
+              "Щоб переглянути власні заявки — увійдіть у систему."
+            );
+            return;
+          }
+
+          const token = getAuthToken();
+          const res = await fetch(API, {
+            method: "GET",
+            headers: Object.assign(
+              { Accept: "application/json" },
+              token ? { Authorization: `Bearer ${token}` } : {}
+            ),
+            credentials: "include",
+          });
+
+          let data = null;
+          try {
+            data = await res.clone().json();
+          } catch (_) {}
+          debugLog("Career apps →", res, data);
+
+          if (
+            res.status === 401 ||
+            (data &&
+              data.ok === false &&
+              /unauthorized/i.test(data.message || ""))
+          ) {
+            showLoginNotice("Сеанс закінчився. Будь ласка, увійдіть ще раз.");
+            return;
+          }
+
+          const items = Array.isArray(data)
+            ? data
+            : Array.isArray(data?.rows)
+            ? data.rows
+            : Array.isArray(data?.items)
+            ? data.items
+            : Array.isArray(data?.data)
+            ? data.data
+            : data?.ok && Array.isArray(data?.result)
+            ? data.result
+            : [];
+
+          listEl.innerHTML = "";
+
+          if (!items.length) {
+            emptyEl.style.display = "block";
+            emptyEl.textContent = "Поки що немає заявок.";
+            return;
+          }
+
+          emptyEl.style.display = "none";
+
+          items
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt || b.created_at || 0) -
+                new Date(a.createdAt || a.created_at || 0)
+            )
+            .forEach((it, idx) => listEl.appendChild(rowTemplate(idx + 1, it)));
+        } catch (err) {
+          console.error("Career applications load failed:", err);
+          const { emptyEl } = ensureContainers();
+          emptyEl.textContent = "Не вдалося завантажити заявки.";
+          emptyEl.style.display = "block";
+        }
+      }
+
+      // Run after DOM is ready
+      document.addEventListener("DOMContentLoaded", load);
+    </script>
+
+    <script src="script.js"></script>
+  </body>
 </html>

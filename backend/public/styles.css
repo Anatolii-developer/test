@@ -2707,3 +2707,10 @@ input:checked + .slider:before {
 .view-btn:hover {
   background: #cf5d00;
 }
+
+.sidebar.expanded nav a:nth-child(3) span {
+  white-space: normal;   /* allow wrapping */
+  max-width: 100px;      /* force two lines */
+  line-height: 1.1;      /* tighter line spacing */
+  text-align: center;    /* nicer alignment */
+}

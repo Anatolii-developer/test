@@ -93,6 +93,7 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    .submit-btn.danger { background:#A31D1D; }
   </style>
 </head>
 <body>
@@ -137,11 +138,8 @@
     </div>
 
     <div class="editable-block">
-      <label>Тип</label>
+      <label>Тип (інфо)</label>
       <textarea id="eventType" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('eventType')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
     </div>
 
     <div class="editable-block">
@@ -217,13 +215,23 @@
     </div>
 
     <div class="editable-block">
-      <label>Статус</label>
-      <select id="statusSel" style="padding:12px;border:2px solid #E37009;border-radius:8px;background:#fffef9;min-height:48px;">
-        <option value="WAITING_FOR_APPROVAL">Очікує підтвердження</option>
-        <option value="Запланований">Запланований</option>
-        <option value="Поточний">Поточний</option>
-        <option value="Пройдений">Пройдений</option>
+      <label>Вид курсу</label>
+      <select id="eventTypeSel" style="padding:12px;border:2px solid #E37009;border-radius:8px;background:#fffef9;min-height:48px;">
+        <option value="Курс">Курс</option>
+        <option value="Група">Група</option>
+        <option value="Супервізія">Супервізія</option>
+        <option value="Лекція">Лекція</option>
+        <option value="Семінар">Семінар</option>
       </select>
+    </div>
+
+    <div class="editable-block" id="moderationBlock">
+      <label>Модерація</label>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="submit-btn" id="approveBtn" onclick="approveCourse()">✅ Підтвердити</button>
+        <button type="button" class="submit-btn" id="rejectBtn" onclick="rejectCourse()" style="background:#A31D1D;">❌ Відхилити</button>
+        <span id="statusHint" style="align-self:center; color:#8F8F8F; font-weight:500;"></span>
+      </div>
     </div>
 
     <button class="submit-btn" onclick="saveChanges()">Зберегти</button>
@@ -273,9 +281,24 @@ async function loadCourseDetails() {
     document.getElementById('dateRange').value = range;
     document.getElementById('groupType').value = group;
 
-    if (course.status) {
-      const sel = document.getElementById('statusSel');
-      if (sel) sel.value = course.status;
+    // Виставляємо "Вид курсу" селект
+    const typeSel = document.getElementById('eventTypeSel');
+    if (typeSel && course.eventType) typeSel.value = course.eventType;
+
+    const et = document.getElementById('eventType');
+    if (et) et.value = course.eventType || '';
+
+    // Підказка по статусу + доступність модерації
+    const mod = document.getElementById('moderationBlock');
+    const hint = document.getElementById('statusHint');
+    if (hint) hint.textContent = course.status ? `Поточний статус: ${course.status}` : '';
+    if (mod) {
+      // Якщо вже не очікує підтвердження — показуємо, але блокуємо кнопки
+      const isWaiting = (course.status === 'WAITING_FOR_APPROVAL');
+      const approveBtn = document.getElementById('approveBtn');
+      const rejectBtn  = document.getElementById('rejectBtn');
+      if (approveBtn) approveBtn.disabled = !isWaiting;
+      if (rejectBtn)  rejectBtn.disabled  = !isWaiting;
     }
 
     updateParticipantsUI();
@@ -302,15 +325,14 @@ function enableEdit(id) {
 async function saveChanges() {
   const updated = {
     courseTitle: document.getElementById("title").value,
-    eventType: document.getElementById("eventType").value,
+    eventType: document.getElementById("eventTypeSel") ? document.getElementById("eventTypeSel").value : document.getElementById("eventType").value,
     courseSubtitle: document.getElementById("subtitle").value,
     courseDescription: document.getElementById("description").value,
     accessType: document.getElementById("access").value,
     courseDuration: document.getElementById("duration").value,
     coursePrice: document.getElementById("price").value,
     zoomLink: document.getElementById("zoom").value,
-    participants: selectedParticipantIds,
-    status: document.getElementById('statusSel').value
+    participants: selectedParticipantIds
   };
 
   try {
@@ -324,12 +346,47 @@ async function saveChanges() {
       alert("Дані оновлено успішно");
       document.querySelectorAll("textarea").forEach(t => t.disabled = true);
       document.querySelectorAll("input[type='text']").forEach(i => i.disabled = true);
-      document.getElementById('statusSel').disabled = true;
+      // оновити підказку статусу (раптом змінилася десь ще)
+      try { loadCourseDetails(); } catch(_) {}
     } else {
       alert("Помилка при збереженні");
     }
   } catch (err) {
     console.error("Помилка при збереженні:", err);
+  }
+}
+
+async function approveCourse(){
+  if (!courseId) return;
+  try{
+    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/approve`, { method:'PUT' });
+    const data = await r.json().catch(()=>({}));
+    if (!r.ok) throw new Error(data.message || 'Не вдалося підтвердити курс');
+    alert('Курс підтверджено');
+    loadCourseDetails();
+  }catch(e){
+    console.error(e);
+    alert(e.message || 'Помилка підтвердження');
+  }
+}
+
+async function rejectCourse(){
+  if (!courseId) return;
+  // опційно: попросити причину
+  const reason = prompt('Причина відхилення (необовʼязково):','');
+  try{
+    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/reject`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ reason })
+    });
+    const data = await r.json().catch(()=>({}));
+    if (!r.ok) throw new Error(data.message || 'Не вдалося відхилити курс');
+    alert('Курс відхилено');
+    loadCourseDetails();
+  }catch(e){
+    console.error(e);
+    alert(e.message || 'Помилка відхилення');
   }
 }
 

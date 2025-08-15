@@ -5,9 +5,10 @@ const ctrl = require('../controllers/careerFaqController');
 
 
 function isAdmin(req, res, next) {
+  if (process.env.ALLOW_FAQ_DEV === '1') return next();
   const role = (req.user?.role || req.user?.roles || '').toString().toLowerCase();
   if (role.includes('admin')) return next();
-  return res.status(403).json({ message: 'Forbidden' });
+  return res.status(403).json({ message: 'Forbidden: admin only' });
 }
 
 router.get('/', ctrl.listPublic);

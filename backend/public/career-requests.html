@@ -82,6 +82,7 @@
   align-items: center;
   gap: 16px;
   margin: 14px auto;
+  justify-content: space-between; 
 }
 
       /* Левая часть растягивается, внутри можно сжиматься */
@@ -124,18 +125,18 @@
       }
 
       .btn-more {
-        height: 32px;
-        padding: 0 16px; /* было 10px 53px и фиксированная ширина — от этого “уезжала” */
-        border-radius: 24px;
-        border: none;
-        cursor: pointer;
-        background: #275d2b;
-        color: #fff;
-        font-weight: 600;
-        font-size: 14px;
-        flex: 0 0 auto; /* не растягиваем */
-        white-space: nowrap;
-      }
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  background: #275d2b;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  flex: 0 0 auto; /* кнопка не растягивается */
+}
 
       .empty {
         text-align: center;

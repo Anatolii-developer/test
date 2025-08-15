@@ -18,6 +18,17 @@ exports.listAdmin = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error' }); }
 };
 
+exports.reorder = async (req, res) => {
+  const items = Array.isArray(req.body.items) ? req.body.items : [];
+  if (!items.length) return res.json({ ok: true, updated: 0 });
+
+  const ops = items.map(it => ({
+    updateOne: { filter: { _id: it.id }, update: { $set: { order: it.order } } }
+  }));
+  const result = await CareerFaq.bulkWrite(ops);
+  res.json({ ok: true, updated: result?.nModified || result?.modifiedCount || 0 });
+};
+
 exports.create = async (req, res) => {
   try {
     const { question, answer, order = 0, isActive = true } = req.body;
@@ -45,3 +56,4 @@ exports.remove = async (req, res) => {
     res.json({ ok: true });
   } catch (e) { res.status(400).json({ message: 'Bad request' }); }
 };
+

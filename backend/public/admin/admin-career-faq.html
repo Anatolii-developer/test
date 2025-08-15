@@ -209,32 +209,93 @@ async function load(){
     }
 
     function render(){
-      $list.innerHTML = '';
-      if (!items.length){ $empty.style.display='block'; return; }
-      $empty.style.display='none';
+  $list.innerHTML = '';
+  if (!items.length){ $empty.style.display='block'; return; }
+  $empty.style.display='none';
 
-      items.forEach(it=>{
-        const el = document.createElement('div');
-        el.className = 'faq-item';
-        el.innerHTML = `
-          <div class="faq-actions">
-            <button class="icon-btn js-edit" title="Редагувати" data-id="${it._id}">${iconPencil()}</button>
-            <button class="icon-btn js-del" title="Видалити" data-id="${it._id}">${iconTrash()}</button>
-          </div>
-          <h4 class="faq-q">${escapeHtml(it.question)}</h4>
-          <p class="faq-a">${nl2br(escapeHtml(it.answer))}</p>
-        `;
-        $list.appendChild(el);
-      });
+  items.forEach(it=>{
+    const el = document.createElement('div');
+    el.className = 'faq-item';
+    el.dataset.id = it._id;           // ← понадобится для сохранения порядка
+    el.setAttribute('draggable','true'); // ← включаем drag
 
-      // bind actions
-      $list.querySelectorAll('.js-edit').forEach(btn=>{
-        btn.addEventListener('click',()=>openEdit(btn.dataset.id));
-      });
-      $list.querySelectorAll('.js-del').forEach(btn=>{
-        btn.addEventListener('click',()=>removeItem(btn.dataset.id));
-      });
+    el.innerHTML = `
+      <div class="faq-actions">
+        <button class="icon-btn js-edit" title="Редагувати" data-id="${it._id}">${iconPencil()}</button>
+        <button class="icon-btn js-del" title="Видалити" data-id="${it._id}">${iconTrash()}</button>
+      </div>
+      <h4 class="faq-q">${escapeHtml(it.question)}</h4>
+      <p class="faq-a">${nl2br(escapeHtml(it.answer))}</p>
+    `;
+
+    // DnD handlers
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.effectAllowed = 'move';
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', async () => {
+      el.classList.remove('dragging');
+      await persistOrder(); // сохраняем новый порядок
+    });
+
+    $list.appendChild(el);
+  });
+
+  // клики по иконкам (как у тебя было)
+  $list.querySelectorAll('.js-edit').forEach(btn=>{
+    btn.addEventListener('click', e => { e.stopPropagation(); openEdit(btn.dataset.id); });
+  });
+  $list.querySelectorAll('.js-del').forEach(btn=>{
+    btn.addEventListener('click', e => { e.stopPropagation(); removeItem(btn.dataset.id); });
+  });
+}
+
+
+// Позволяем бросать внутрь списка и рассчитываем позицию
+$list.addEventListener('dragover', e => {
+  e.preventDefault(); // иначе drop не сработает
+  const dragging = $list.querySelector('.dragging');
+  if (!dragging) return;
+
+  const afterEl = getDragAfterElement($list, e.clientY);
+  if (afterEl == null) {
+    $list.appendChild(dragging);
+  } else {
+    $list.insertBefore(dragging, afterEl);
+  }
+});
+
+function getDragAfterElement(container, y) {
+  const els = [...container.querySelectorAll('.faq-item:not(.dragging)')];
+  let closest = { offset: Number.NEGATIVE_INFINITY, element: null };
+
+  for (const child of els) {
+    const box = child.getBoundingClientRect();
+    const offset = y - (box.top + box.height / 2);
+    // нам нужен ближайший элемент, находящийся ниже курсора (offset < 0), но максимально близкий к 0
+    if (offset < 0 && offset > closest.offset) {
+      closest = { offset, element: child };
     }
+  }
+  return closest.element;
+}
+
+
+async function persistOrder(){
+  const nodes = [...$list.querySelectorAll('.faq-item')];
+  const items = nodes.map((node, idx) => ({ id: node.dataset.id, order: idx }));
+  const r = await fetch('/api/career-faq/reorder', {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items })
+  });
+  if (!r.ok) {
+    const t = await r.text().catch(()=> '');
+    throw new Error('Bulk reorder failed: ' + t);
+  }
+  await load();
+}
 
     function escapeHtml(s=''){
       return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));

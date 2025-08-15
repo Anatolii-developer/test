@@ -1358,3 +1358,10 @@ label[for="courseSelect"] {
   justify-content: flex-end;
   gap: 10px;
 }
+
+.faq-item { 
+  cursor: grab; 
+}
+.faq-item.dragging { 
+  opacity: .6; cursor: grabbing; 
+}

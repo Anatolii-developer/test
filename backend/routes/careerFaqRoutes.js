@@ -15,7 +15,9 @@ router.get('/', ctrl.listPublic);
 
 router.get('/admin', isAdmin, ctrl.listAdmin);
 router.post('/', isAdmin, ctrl.create);
+router.put('/reorder', isAdmin, ctrl.reorder);
 router.put('/:id', isAdmin, ctrl.update);
 router.delete('/:id', isAdmin, ctrl.remove);
+
 
 module.exports = router;

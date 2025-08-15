@@ -31,73 +31,54 @@
         color: #8f8f8f;
         margin: 0 0 24px;
       }
-      #list {
-        margin-top: 10px;
+      /* ==== TABLE (admin requests) ==== */
+      .req-table-wrap{ margin-top:16px; }
+      .req-table{
+        width:100%;
+        border-collapse:separate;
+        border-spacing:0;
+        border:1.5px solid #E8812E;
+        border-radius:16px;
+        overflow:hidden;
+        font-size:16px;
       }
-      .req-row {
-        width: 910px;
-        height: 52px;
-        background: #ffeed9;
-        border-radius: 16px;
-        padding: 10px 16px;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin: 14px auto;
-        justify-content: space-between;
+      .req-table thead th{
+        background:#E8812E;
+        color:#fff;
+        text-align:left;
+        padding:16px 18px;
+        font-weight:600;
+        font-size:18px;
       }
-      .req-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        min-width: 0;
-        flex: 1 1 auto;
+      .req-table thead th:first-child{ width:60px; text-align:center; }
+      .req-table tbody td{
+        background:#fff;
+        border-top:1px solid #E8812E;
+        border-left:1px solid #E8812E;
+        padding:14px 18px;
+        vertical-align:middle;
       }
-      .req-num {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        flex: 0 0 36px;
+      .req-table tbody td:first-child{
+        text-align:center;
+        border-left:none;
+        width:60px;
+        font-weight:600;
       }
-      .req-name {
-        font-weight: 500;
-        font-size: 20px;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+      .req-name-cell{
+        font-size:18px;
+        font-weight:500;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        max-width:420px;
       }
-      .req-date {
-        font-weight: 500;
-        font-size: 18px;
-        color: #555;
-        white-space: nowrap;
-        flex: 0 0 auto;
+      .req-email-cell{
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        max-width:360px;
       }
-      .btn-more {
-        height: 32px;
-        padding: 0 16px;
-        border-radius: 24px;
-        border: none;
-        cursor: pointer;
-        background: #275d2b;
-        color: #fff;
-        font-weight: 600;
-        font-size: 14px;
-        white-space: nowrap;
-        flex: 0 0 auto;
+      .btn-view{
+        background:#E8812E; color:#fff; border:none; cursor:pointer;
+        border-radius:24px; padding:8px 18px; font-weight:600;
       }
-      .empty {
-        text-align: center;
-        color: #6b6b6b;
-        margin-top: 8px;
-      }
+      .empty{ text-align:center; color:#6b6b6b; margin-top:8px }
       .req-modal-backdrop {
         position: fixed;
         inset: 0;
@@ -178,9 +159,6 @@
           width: 90%;
           padding: 40px 30px;
         }
-        .req-row {
-          width: 100%;
-        }
         .req-name {
           max-width: 50vw;
         }
@@ -220,9 +198,19 @@
     <div class="wrap">
       <h1>Заявки всіх учасників</h1>
       <p class="muted">Клік по «Дізнатись більше» відкриває деталі.</p>
-      <div id="list"></div>
-      <div id="empty" class="empty" style="display: none">
-        Поки що немає заявок.
+      <div class="req-table-wrap">
+        <table class="req-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name and surname</th>
+              <th>Email</th>
+              <th>Review</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+        <div id="empty" class="empty" style="display:none">Поки що немає заявок.</div>
       </div>
     </div>
 
@@ -294,32 +282,36 @@
           ? `${first} ${last}`.trim()
           : item.fullName || item.email || "Без імені";
       }
+      function emailFrom(item){
+        return (item.user?.email || item.email || '').trim();
+      }
 
-      const $list = document.getElementById("list");
+      const $tbody = document.getElementById("tblBody");
       const $empty = document.getElementById("empty");
 
-      function rowTemplate(i, item) {
-        const row = document.createElement("div");
-        row.className = "req-row";
-        const left = document.createElement("div");
-        left.className = "req-left";
-        const num = document.createElement("div");
-        num.className = "req-num";
-        num.textContent = i;
-        const name = document.createElement("div");
-        name.className = "req-name";
-        name.textContent = fullNameFrom(item);
-        const date = document.createElement("div");
-        date.className = "req-date";
-        const created = item.createdAt || item.created_at || item.created;
-        date.textContent = created ? formatDate(created) : "";
-        left.append(num, name, date);
-        const more = document.createElement("button");
-        more.className = "btn-more";
-        more.textContent = "Дізнатись більше";
-        more.addEventListener("click", () => openReqModal(item));
-        row.append(left, more);
-        return row;
+      function rowTemplate(i, item){
+        const tr = document.createElement('tr');
+
+        const tdNum = document.createElement('td');
+        tdNum.textContent = i;
+
+        const tdName = document.createElement('td');
+        tdName.className = 'req-name-cell';
+        tdName.textContent = fullNameFrom(item);
+
+        const tdEmail = document.createElement('td');
+        tdEmail.className = 'req-email-cell';
+        tdEmail.textContent = emailFrom(item);
+
+        const tdAction = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.className = 'btn-view';
+        btn.textContent = 'Переглянути';
+        btn.addEventListener('click', ()=>openReqModal(item));
+        tdAction.appendChild(btn);
+
+        tr.append(tdNum, tdName, tdEmail, tdAction);
+        return tr;
       }
 
       function getReqEls() {
@@ -424,7 +416,7 @@
             data = await res.clone().json();
           } catch (_) {}
           if (res.status === 401) {
-            $list.innerHTML = "";
+            $tbody.innerHTML = "";
             $empty.textContent = "Потрібно увійти як адмін.";
             $empty.style.display = "block";
             return;
@@ -440,7 +432,7 @@
             : data?.ok && Array.isArray(data?.result)
             ? data.result
             : [];
-          $list.innerHTML = "";
+          $tbody.innerHTML = "";
           if (!items.length) {
             $empty.style.display = "block";
             return;
@@ -452,7 +444,7 @@
                 new Date(b.createdAt || b.created_at || 0) -
                 new Date(a.createdAt || a.created_at || 0)
             )
-            .forEach((it, idx) => $list.appendChild(rowTemplate(idx + 1, it)));
+            .forEach((it, idx) => $tbody.appendChild(rowTemplate(idx + 1, it)));
         } catch (e) {
           console.error(e);
           $empty.textContent = "Не вдалося завантажити заявки.";

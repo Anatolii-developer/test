@@ -563,8 +563,8 @@ function openReqModal(item){
       const row = document.createElement('div');
       row.className = 'row';
       row.innerHTML = `
-        &lt;div class="q"&gt;${esc(r.q)}&lt;/div&gt;
-        &lt;div class="a"&gt;${esc(String(r.a))}&lt;/div&gt;
+        <div class="q">${esc(r.q)}</div>
+        <div class="a">${esc(String(r.a))}</div>
       `;
       qa.appendChild(row);
     });

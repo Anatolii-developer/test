@@ -2712,5 +2712,5 @@ input:checked + .slider:before {
   white-space: normal;   /* allow wrapping */
   max-width: 100px;      /* force two lines */
   line-height: 1.1;      /* tighter line spacing */
-  text-align: center;    /* nicer alignment */
+  text-align: left;    /* nicer alignment */
 }

@@ -1340,3 +1340,21 @@ label[for="courseSelect"] {
   overflow: auto;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
+
+/* ==== FAQ admin modal: vertical stack ==== */
+.modal-backdrop .modal {
+  display: flex;             /* override generic .modal (row) */
+  flex-direction: column;    /* stack children vertically */
+  align-items: stretch;      /* make fields full width */
+  gap: 12px;                 /* spacing between blocks */
+}
+
+.modal-backdrop .modal .field { /* ensure fields are block-level */
+  width: 100%;
+}
+
+.modal-backdrop .modal .modal-actions { /* buttons row, right aligned */
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

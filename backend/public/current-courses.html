@@ -5,30 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Поточні курси</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    /* --- Sidebar hover-to-open --- */
-    .sidebar { transition: width .25s ease; }
-    #mainContent { transition: margin-left .25s ease; }
-
-    /* When collapsed, expand on hover */
-    .sidebar.collapsed:hover { width: 260px; }
-
-    /* Reveal text & big logo only while hovered (or expanded) */
-    .sidebar.collapsed nav span { display: none; }
-    .sidebar.expanded nav span,
-    .sidebar.collapsed:hover nav span { display: inline; }
-
-    #logoExpanded { display: none; }
-    .sidebar.expanded #logoExpanded,
-    .sidebar.collapsed:hover #logoExpanded { display: block; }
-
-    #logoCollapsed { display: block; }
-    .sidebar.expanded #logoCollapsed,
-    .sidebar.collapsed:hover #logoCollapsed { display: none; }
-
-    /* Push main content when sidebar is hovered open */
-    .sidebar.collapsed:hover ~ #mainContent { margin-left: 260px; }
-  </style>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>

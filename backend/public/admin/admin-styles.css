@@ -1317,3 +1317,26 @@ label[for="courseSelect"] {
       margin: 10px 0;
       line-height: 1.6;
     }
+/* ==== FAQ admin modal overrides (prevent class name collision) ==== */
+/* When the HTML uses <div id="modal" class="modal-backdrop"><div class="modal"> ... */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;            /* will be set to flex from JS when opened */
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;            /* above sidebar */
+}
+
+/* Ensure inner .modal is treated as content, not fullscreen overlay */
+.modal-backdrop .modal {
+  position: static;         /* cancel fixed from generic .modal rule */
+  background-color: #FFFFF9;
+  border-radius: 16px;
+  padding: 20px;
+  width: 560px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow: auto;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}

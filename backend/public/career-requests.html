@@ -377,9 +377,7 @@
         more.className = "btn-more";
         more.textContent = "Дізнатись більше";
         more.addEventListener("click", () => {
-          window.location.href = `career-request.html?id=${encodeURIComponent(
-            item._id || item.id || ""
-          )}`;
+          openReqModal(item);
         });
 
         row.append(left, more);
@@ -463,8 +461,95 @@
 
       // Run after DOM is ready
       document.addEventListener("DOMContentLoaded", load);
+
+
+      function esc(s=''){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function fullNameFrom(item){
+  // имя/фамилия
+  const u = item.user || {};
+  const first = u.firstName || item.firstName || '';
+  const last  = u.lastName  || item.lastName  || '';
+  return (first || last) ? `${first} ${last}`.trim() :
+         (item.fullName || item.email || 'Без імені');
+}
+
+
+const $reqModal   = document.getElementById('reqModal');
+const $reqMeta    = document.getElementById('reqMeta');
+const $reqQA      = document.getElementById('reqQA');
+const $reqCloseX  = document.getElementById('reqCloseX');
+const $reqCloseBtn= document.getElementById('reqCloseBtn');
+
+function openReqModal(item){
+  // Заголовок + мета
+  const fio = fullNameFrom(item);
+  const when = item.createdAt || item.created_at || item.created || null;
+  const whenStr = when ? formatDate(when) : '';
+  document.getElementById('reqModalTitle').textContent = `Заявка — ${fio}`;
+  $reqMeta.textContent = whenStr ? `Дата подання: ${whenStr}` : '';
+
+  // Q&A блок
+  $reqQA.innerHTML = '';
+
+  const rows = [
+    { q: 'Імʼя',                  a: (item.user?.firstName || item.firstName || '').trim() },
+    { q: 'Прізвище',              a: (item.user?.lastName  || item.lastName  || '').trim() },
+    { q: 'Дата подання заявки',   a: whenStr },
+    { q: 'Скільки років у вас практики', a: item.experience || item.exp || '' },
+    { q: 'До якої вікової категорії Ви відноситесь', a: item.ageGroup || item.age || '' },
+    { q: 'Ваш запит до ментора',  a: item.requestText || item.request || '' },
+    { q: 'Про себе / деталі ситуації', a: item.aboutText || item.about || '' },
+  ];
+
+  // также поддержим, если на бэке есть массив вопросов: item.answers = [{question, answer}]
+  if (Array.isArray(item.answers)) {
+    item.answers.forEach(x=>{
+      rows.push({ q: x.question || 'Питання', a: x.answer || '' });
+    });
+  }
+
+  rows
+    .filter(r => (r.a && String(r.a).trim().length))
+    .forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `
+        <div class="q">${esc(r.q)}</div>
+        <div class="a">${esc(String(r.a))}</div>
+      `;
+      $reqQA.appendChild(row);
+    });
+
+  // показать
+  $reqModal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeReqModal(){
+  $reqModal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+$reqCloseX.addEventListener('click', closeReqModal);
+$reqCloseBtn.addEventListener('click', closeReqModal);
+$reqModal.addEventListener('click', (e)=>{ if (e.target === $reqModal) closeReqModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeReqModal(); });
     </script>
 
     <script src="script.js"></script>
+
+    <!-- MODAL: детали заявки -->
+<div id="reqModal" class="req-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle">
+  <div class="req-modal">
+    <div class="req-close-x" id="reqCloseX">×</div>
+    <h3 id="reqModalTitle">Заявка</h3>
+    <div class="req-meta" id="reqMeta"></div>
+    <div class="req-qa" id="reqQA"></div>
+    <div class="req-actions">
+      <button class="req-btn close" id="reqCloseBtn">Закрити</button>
+      <!-- при необходимости добавь сюда primary-кнопку -->
+    </div>
+  </div>
+</div>
   </body>
 </html>

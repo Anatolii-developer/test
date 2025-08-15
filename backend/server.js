@@ -32,5 +32,6 @@ app.use('/api/courses', require('./routes/courseRoutes'));
 app.use('/api/roles', require('./routes/roleRoutes'));
 app.use('/api/library', require('./routes/library'));
 app.use('/api/career-applications', require('./routes/careerRoutes'));
+app.use('/api/career-faq', require('./routes/careerFaqRoutes'));
 
 app.listen(5050, '0.0.0.0');

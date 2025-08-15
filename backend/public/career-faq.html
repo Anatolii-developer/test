@@ -257,23 +257,62 @@
 
 
 <script>
+/* ---------- FAQ: загрузка и рендер ---------- */
+(function () {
+  const FAQ_API = '/api/career-faq'; // публичный список (isActive=true)
+  let didRender = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Навешиваем обработчик на все .faq-item
-  document.querySelectorAll('.faq-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      // чтобы клики по внутреннему тексту тоже работали
-      item.classList.toggle('open');
+  // Экранирование и переносы
+  const escapeHtml = (s='') =>
+    s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const nl2br = (s='') => s.replace(/\n/g, '<br/>');
+
+  async function loadFaq() {
+    try {
+      const res = await fetch(FAQ_API, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to load FAQ');
+      const items = await res.json();
+      renderFaq(Array.isArray(items) ? items : []);
+    } catch (err) {
+      console.error('FAQ load error:', err);
+    }
+  }
+
+  function renderFaq(items) {
+    if (didRender) return; // защита от двойного рендера
+    didRender = true;
+
+    const section = document.querySelector('.faq-section');
+    if (!section) return;
+
+    // Удалим старые .faq-item (если были размечены статически)
+    section.querySelectorAll('.faq-item').forEach(n => n.remove());
+
+    items.forEach(it => {
+      const wrap = document.createElement('div');
+      wrap.className = 'faq-item';
+      wrap.innerHTML = `
+        ${escapeHtml(it.question || '')}
+        <div class="faq-answer">${nl2br(escapeHtml(it.answer || ''))}</div>
+      `;
+      section.appendChild(wrap);
     });
-  });
-});
 
+    // Делегирование кликов: открытие/закрытие ответа
+    section.addEventListener('click', (e) => {
+      const item = e.target.closest('.faq-item');
+      if (item && section.contains(item)) item.classList.toggle('open');
+    });
+  }
 
+  document.addEventListener('DOMContentLoaded', loadFaq);
+})();
+
+/* ---------- Роли: показать нужные кнопки ---------- */
 function showRoleButtonsByRoles(roles) {
   const text = Array.isArray(roles) ? roles.join(' ') : String(roles || '');
   const lc = text.toLowerCase();
 
-  // дебаг
   console.log('🧩 roles (flattened):', lc);
 
   if (lc.includes('ментор') || lc.includes('mentor')) {
@@ -286,42 +325,34 @@ function showRoleButtonsByRoles(roles) {
   }
 }
 
-// 1) Спробуємо localStorage (часто фронт там кладе)
+// 1) Пробуем localStorage
 (function fromLocalStorage() {
-  const lsCandidates = [
-    'roles', 'role',
-    'userRoles', 'userRole',
-    'user' // буває, що весь юзер лежить рядком JSON
-  ];
+  const lsCandidates = ['roles','role','userRoles','userRole','user'];
   for (const key of lsCandidates) {
     const raw = localStorage.getItem(key);
     if (!raw) continue;
     try {
       const maybeObj = JSON.parse(raw);
-      // якщо це об’єкт і має roles/role
       if (maybeObj && (maybeObj.roles || maybeObj.role)) {
         showRoleButtonsByRoles(maybeObj.roles || maybeObj.role);
         break;
       }
-    } catch(_) {
-      // не JSON — добре, значить це просто строка ролей
+    } catch {
       showRoleButtonsByRoles(raw);
       break;
     }
   }
 })();
 
-// 2) Тепер профіль із бекенду
+// 2) Профиль из бекенда
 fetch("/api/users/profile", { method: "GET", credentials: "include" })
   .then(async (res) => {
     let data = null;
-    try { data = await res.clone().json(); } catch(_) {}
+    try { data = await res.clone().json(); } catch {}
     console.log('👤 /api/users/profile status=', res.status, 'payload=', data);
 
     if (!res.ok) return;
 
-    // Підтримуємо різні структури:
-    // {roles: "..."} або {role: "..."} або {user:{roles:"..."}}
     const candidateRoles =
       (data && (data.roles || data.role)) ||
       (data && data.user && (data.user.roles || data.user.role)) ||

@@ -326,7 +326,10 @@ function showRoleButtonsByRoles(roles) {
     if (el) el.style.display = 'flex';
   }
   if (Array.isArray(roles)) {
-    if (roles.some(r => String(r).toLowerCase().startsWith('супервізор'))) {
+    if (roles.some(r => {
+      const s = String(r).toLowerCase();
+      return s.startsWith('супервізор') || s.startsWith('supervisor');
+    })) {
       const el = document.getElementById('supervisorButton');
       if (el) el.style.display = 'flex';
     }

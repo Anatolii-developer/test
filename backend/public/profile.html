@@ -167,7 +167,8 @@
             class="edit-textarea locked"
             placeholder="Введіть інформацію..."
             readonly
-            aria-readonly="true"></textarea>
+            aria-readonly="true"
+            style="height:auto; overflow:hidden; resize:none;"></textarea>
 </div>
 
 <!-- Роль (незмінне) -->
@@ -319,20 +320,26 @@
   <script src="script.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      const autoResize = (el) => {
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+      };
       const coursesField = document.getElementById('profileCoursesTextarea');
       if (!coursesField) return;
       // Ensure field is locked/read-only in case attributes change elsewhere
       coursesField.readOnly = true;
       coursesField.setAttribute('aria-readonly', 'true');
       coursesField.classList.add('locked');
-  
+
       const rawUser = localStorage.getItem('user');
       if (!rawUser) {
         coursesField.value = 'Будь ласка, увійдіть до акаунту.';
+        autoResize(coursesField);
         return;
       }
       const user = JSON.parse(rawUser);
-  
+      setTimeout(() => autoResize(coursesField), 0);
       try {
         const [resUser, resCourses] = await Promise.all([
           fetch(`${API_BASE}/api/users/${user._id}`),
@@ -340,7 +347,7 @@
         ]);
         const freshUser = await resUser.json();
         const allCourses = await resCourses.json();
-  
+
         // Вибираємо лише "Пройдений" і доступні користувачу курси
         const completedCourses = allCourses.filter(c => {
           if (c.status !== 'Пройдений') return false;
@@ -348,19 +355,22 @@
           const isParticipant = Array.isArray(c.participants) && c.participants.includes(user._id);
           return isOpen || isParticipant;
         });
-  
+
         const titles = completedCourses
           .map(c => c.courseTitle)
           .filter(Boolean);
-  
+
         coursesField.value = titles.length
           ? titles.join('\n')
           : 'Наразі немає пройдених курсів';
+        autoResize(coursesField);
       } catch (e) {
         console.error('Помилка завантаження списку пройдених курсів:', e);
         coursesField.value = 'Не вдалося завантажити список пройдених курсів.';
+        autoResize(coursesField);
       }
     });
+    window.addEventListener('resize', () => autoResize(document.getElementById('profileCoursesTextarea')));
   </script>
 </body>
 </html>

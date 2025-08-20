@@ -161,7 +161,7 @@
 </div>
 
 
-   <p class="label-with-textarea">Курси, які були пройдені в компанії:</p>
+   <p class="label-with-textarea">Курси, які були пройдені в IPS:</p>
 <div class="textarea-wrapper">
   <textarea id="profileCoursesTextarea"
             class="edit-textarea locked"
@@ -317,5 +317,50 @@
   </main>
 
   <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const coursesField = document.getElementById('profileCoursesTextarea');
+      if (!coursesField) return;
+      // Ensure field is locked/read-only in case attributes change elsewhere
+      coursesField.readOnly = true;
+      coursesField.setAttribute('aria-readonly', 'true');
+      coursesField.classList.add('locked');
+  
+      const rawUser = localStorage.getItem('user');
+      if (!rawUser) {
+        coursesField.value = 'Будь ласка, увійдіть до акаунту.';
+        return;
+      }
+      const user = JSON.parse(rawUser);
+  
+      try {
+        const [resUser, resCourses] = await Promise.all([
+          fetch(`${API_BASE}/api/users/${user._id}`),
+          fetch(`${API_BASE}/api/courses`)
+        ]);
+        const freshUser = await resUser.json();
+        const allCourses = await resCourses.json();
+  
+        // Вибираємо лише "Пройдений" і доступні користувачу курси
+        const completedCourses = allCourses.filter(c => {
+          if (c.status !== 'Пройдений') return false;
+          const isOpen = c.accessType === 'Відкрита група';
+          const isParticipant = Array.isArray(c.participants) && c.participants.includes(user._id);
+          return isOpen || isParticipant;
+        });
+  
+        const titles = completedCourses
+          .map(c => c.courseTitle)
+          .filter(Boolean);
+  
+        coursesField.value = titles.length
+          ? titles.join('\n')
+          : 'Наразі немає пройдених курсів';
+      } catch (e) {
+        console.error('Помилка завантаження списку пройдених курсів:', e);
+        coursesField.value = 'Не вдалося завантажити список пройдених курсів.';
+      }
+    });
+  </script>
 </body>
 </html>

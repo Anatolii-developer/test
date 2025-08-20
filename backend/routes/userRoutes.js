@@ -69,7 +69,7 @@ function auth(req, res, next) {
 
 router.get("/users-with-roles", async (req, res) => {
   try {
-    const users = await User.find({}, "firstName lastName email role status");
+    const users = await User.find({}, "firstName lastName email roles status");
     res.json(users);
   } catch (err) {
     console.error("Ошибка при получении пользователей:", err);
@@ -121,7 +121,7 @@ router.get('/approved', async (req, res) => {
 router.get("/profile", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .select("firstName lastName email role status username");
+     .select("firstName lastName email username status roles");
 
     if (!user) {
       return res.status(404).json({ ok: false, message: "User not found" });

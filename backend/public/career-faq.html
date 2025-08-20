@@ -255,6 +255,12 @@
   <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
 </div>
 
+<div class="apply-button" id="supervisorButton" style="display: none;" onclick="location.href='supervisor-dashboard.html'">
+  <div class="apply-text">Супервізори</div>
+  <img src="./assets/career-supervisor.png" alt="Supervisor Image" class="apply-img" />
+  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+</div>
+
 
 <script>
 /* ---------- FAQ: загрузка и рендер ---------- */
@@ -319,7 +325,12 @@ function showRoleButtonsByRoles(roles) {
     const el = document.getElementById('mentorButton');
     if (el) el.style.display = 'flex';
   }
-  if (lc.includes('супервізор') || lc.includes('supervisor')) {
+  if (Array.isArray(roles)) {
+    if (roles.some(r => String(r).toLowerCase().startsWith('супервізор'))) {
+      const el = document.getElementById('supervisorButton');
+      if (el) el.style.display = 'flex';
+    }
+  } else if (lc.startsWith('супервізор') || lc.startsWith('supervisor')) {
     const el = document.getElementById('supervisorButton');
     if (el) el.style.display = 'flex';
   }

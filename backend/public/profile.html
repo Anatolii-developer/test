@@ -5,6 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Профіль</title>
   <link rel="stylesheet" href="styles.css"/>
+  <style>
+    /* Make all profile textareas comfortably tall and readable by default */
+    .textarea-wrapper { width: 100%; }
+    .edit-textarea{
+      width:100%;
+      min-height:56px;             /* base height so text isn't squished */
+      line-height:1.5;
+      padding:12px 16px;
+      border:1px solid #D9D9D9;
+      border-radius:12px;
+      box-sizing:border-box;
+      background:#FFFFFF;
+      white-space:pre-wrap;         /* keep line breaks */
+      overflow:hidden;              /* allow JS autoResize to expand height */
+      resize:none;                  /* user doesn't drag; it grows automatically */
+      font-family: 'Poppins', sans-serif;
+      font-size:14px;
+      color:#222;
+    }
+    .edit-textarea.locked{
+      background:#F5F6F7;           /* read-only look */
+      color:#333;
+    }
+    /* Larger default for the courses block we already auto-fill */
+    #profileCoursesTextarea{
+      min-height:120px;
+    }
+  </style>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -410,6 +438,7 @@
       }
       const user = JSON.parse(rawUser);
       // ensure initial sizing
+      setTimeout(() => autoResize(coursesField), 0);
 
       try {
         const [resUser, resCourses] = await Promise.all([
@@ -439,6 +468,14 @@
     // Initial load
     document.addEventListener('DOMContentLoaded', populateCompletedCoursesTextarea);
     document.addEventListener('DOMContentLoaded', populateStep2FromUser);
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.edit-textarea').forEach(t => {
+        // initial sizing (in case some values are pre-rendered)
+        setTimeout(() => autoResize(t), 0);
+        // keep growing while user types
+        t.addEventListener('input', () => autoResize(t));
+      });
+    });
     // When coming back via browser back/forward cache
     window.addEventListener('pageshow', (ev) => {
       // run on normal navigation and on bfcache restore

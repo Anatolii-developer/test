@@ -314,6 +314,45 @@
   document.addEventListener('DOMContentLoaded', loadFaq);
 })();
 
+// ---------- Helpers: extract roles from various payload shapes ----------
+function extractRolesFromPayload(payload) {
+  // 1) Straight fields
+  if (!payload) return null;
+  const direct =
+    (payload.roles || payload.role) ||
+    (payload.user && (payload.user.roles || payload.user.role));
+  if (direct) return direct;
+
+  // 2) Common alternates
+  const alt =
+    (payload.roleTitles || payload.roleTitle || payload.userRole || payload.userRoles);
+  if (alt) return alt;
+
+  // 3) Deep scan for arrays/strings that look like roles
+  const acc = [];
+  (function walk(x) {
+    if (x == null) return;
+    if (Array.isArray(x)) {
+      x.forEach(walk);
+      return;
+    }
+    if (typeof x === 'object') {
+      for (const k in x) walk(x[k]);
+      return;
+    }
+    if (typeof x === 'string') {
+      const s = x.toLowerCase();
+      if (
+        s.includes('ментор') || s.includes('mentor') ||
+        s.startsWith('супервізор') || s.startsWith('supervisor')
+      ) {
+        acc.push(x);
+      }
+    }
+  })(payload);
+  return acc.length ? acc : null;
+}
+
 /* ---------- Роли: показать нужные кнопки ---------- */
 function showRoleButtonsByRoles(roles) {
   const text = Array.isArray(roles) ? roles.join(' ') : String(roles || '');
@@ -364,18 +403,30 @@ fetch("/api/users/profile", { method: "GET", credentials: "include" })
     let data = null;
     try { data = await res.clone().json(); } catch {}
     console.log('👤 /api/users/profile status=', res.status, 'payload=', data);
-
     if (!res.ok) return;
 
-    const candidateRoles =
-      (data && (data.roles || data.role)) ||
-      (data && data.user && (data.user.roles || data.user.role)) ||
-      null;
+    // Try to extract roles from this payload first
+    let candidateRoles = extractRolesFromPayload(data);
+
+    // If not found but have user id, try a second fetch to the user resource
+    if (!candidateRoles && data && data.user && data.user._id) {
+      try {
+        const res2 = await fetch(`/api/users/${data.user._id}`, { credentials: 'include' });
+        let data2 = null;
+        try { data2 = await res2.clone().json(); } catch {}
+        console.log('🔎 /api/users/:id status=', res2.status, 'payload=', data2);
+        if (res2.ok) {
+          candidateRoles = extractRolesFromPayload(data2);
+        }
+      } catch (e) {
+        console.warn('⚠️ secondary roles fetch failed:', e);
+      }
+    }
 
     if (candidateRoles) {
       showRoleButtonsByRoles(candidateRoles);
     } else {
-      console.warn('⚠️ roles не знайдено у відповіді профілю');
+      console.warn('⚠️ roles не знайдено у відповіді профілю (ні в /profile, ні в /users/:id)');
     }
   })
   .catch(err => console.error("❌ fetch profile error:", err));

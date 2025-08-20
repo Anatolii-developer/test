@@ -34,19 +34,131 @@
   <main class="cert-page">
 
      <div class="main-header">
-      <h2>Проходження конференцій</h2>
+      <h2>Проходження курсів</h2>
       <img src="assets/certificates/certificate1.png" alt="Main Image" />
     </div>
     <!-- Навигация -->
     <div class="cert-nav">
       <a href="./mycertificates.html" class="cert-btn back"><span>&larr;</span> Головна</a>
-      <a href="./certificate-upgrade.html" class="cert-btn active">Підвищення кваліфікації</a>
-      <a href="./certificate-completing.html" class="cert-btn">Проходження курсів</a>
+      <a href="./certificate-upgrade.html" class="cert-btn">Підвищення кваліфікації</a>
+      <a href="./certificate-completing.html" class="cert-btn active">Проходження курсів</a>
       <a href="./certificate-conference.html" class="cert-btn">Проходження конференцій</a>
     </div>
 
-   
+   <!-- Сертификаты -->
+    <div class="cert-grid" id="certGrid"></div>
   </main>
     <script src="script.js"></script>
+  <script>
+    // Base API
+    const API_BASE = "http://157.230.121.24:5050";
+
+    /**
+     * Render a single certificate card
+     */
+    function renderCertCard({ course, uaUrl, engUrl, index }) {
+      const hasUA = !!uaUrl;
+      const hasEN = !!engUrl;
+      const initialUrl = uaUrl || engUrl || null;
+
+      return `
+        <div class="cert-card" data-course="${course._id}">
+          <img src="assets/certificates/certificate1.png" alt="Certificate placeholder" class="cert-image" />
+          <h3 class="cert-title">${course.courseTitle || "Без назви"}</h3>
+          <p class="cert-dates">
+            ${(course.courseDates?.start ? new Date(course.courseDates.start).toLocaleDateString("uk-UA") : "")}
+            ${course.courseDates?.end ? " – " + new Date(course.courseDates.end).toLocaleDateString("uk-UA") : ""}
+          </p>
+          <div class="cert-footer">
+            <div class="lang-switch">
+              <span>UA</span>
+              <label class="switch">
+                <input type="checkbox" ${hasUA ? "" : hasEN ? "checked" : "disabled"} onchange="switchUserCert(this, '${course._id}', '${uaUrl || ""}', '${engUrl || ""}')"/>
+                <span class="slider round"></span>
+              </label>
+              <span>EN</span>
+            </div>
+            ${initialUrl ? `<a href="${initialUrl}" target="_blank" class="view-btn" id="view-btn-${course._id}">Переглянути</a>` : `<span class="view-btn" style="pointer-events:none;opacity:.6">Немає сертифікату</span>`}
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Toggle UA/EN link
+     */
+    function switchUserCert(toggle, courseId, uaUrl, enUrl) {
+      const btn = document.getElementById('view-btn-' + courseId);
+      if (!btn) return;
+      const url = toggle.checked ? (enUrl || uaUrl) : (uaUrl || enUrl);
+      if (url) {
+        btn.href = url;
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+      } else {
+        btn.removeAttribute('href');
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '.6';
+      }
+    }
+
+    /**
+     * Load all certificates of completed courses for the current user
+     */
+    async function loadUserCompletedCertificates() {
+      const grid = document.getElementById('certGrid');
+      if (!grid) return;
+
+      const rawUser = localStorage.getItem('user');
+      if (!rawUser) {
+        grid.innerHTML = '<p>Щоб переглянути сертифікати, увійдіть у систему.</p>';
+        return;
+      }
+      const user = JSON.parse(rawUser);
+
+      try {
+        // 1) Refresh user to get up-to-date certificates
+        const resUser = await fetch(`${API_BASE}/api/users/${user._id}`);
+        const freshUser = await resUser.json();
+
+        // 2) Get all courses and filter completed + accessible for the user
+        const resCourses = await fetch(`${API_BASE}/api/courses`);
+        const allCourses = await resCourses.json();
+
+        const completed = allCourses.filter(c => {
+          if (c.status !== 'Пройдений') return false;
+          const isOpen = c.accessType === 'Відкрита група';
+          const isParticipant = Array.isArray(c.participants) && c.participants.includes(user._id);
+          return isOpen || isParticipant;
+        });
+
+        // 3) Build cards for the courses that actually have a certificate uploaded for the user
+        const cards = [];
+        completed.forEach((course, i) => {
+          const cert = freshUser.certificates?.[course._id];
+          const uaUrl = cert?.ua?.url || "";
+          const engUrl = cert?.eng?.url || "";
+
+          // Show the card if at least one language is present.
+          if (uaUrl || engUrl) {
+            cards.push(renderCertCard({ course, uaUrl, engUrl, index: i }));
+          }
+        });
+
+        if (cards.length === 0) {
+          grid.innerHTML = '<p>Поки що немає доданих сертифікатів за пройденими курсами.</p>';
+          return;
+        }
+
+        grid.innerHTML = cards.join('');
+      } catch (e) {
+        console.error('Помилка завантаження сертифікатів користувача:', e);
+        const grid = document.getElementById('certGrid');
+        if (grid) grid.innerHTML = '<p>Сталася помилка під час завантаження сертифікатів.</p>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUserCompletedCertificates);
+  </script>
 </body>
 </html>

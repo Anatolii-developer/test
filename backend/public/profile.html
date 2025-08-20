@@ -410,7 +410,6 @@
       }
       const user = JSON.parse(rawUser);
       // ensure initial sizing
-      setTimeout(() => autoResize(coursesField), 0);
 
       try {
         const [resUser, resCourses] = await Promise.all([

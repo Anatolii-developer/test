@@ -417,24 +417,6 @@ function showRoleButtonsByRoles(roles) {
   }
 }
 
-// 1) Пробуем localStorage
-(function fromLocalStorage() {
-  const lsCandidates = ['roles','role','userRoles','userRole','user'];
-  for (const key of lsCandidates) {
-    const raw = localStorage.getItem(key);
-    if (!raw) continue;
-    try {
-      const maybeObj = JSON.parse(raw);
-      if (maybeObj && (maybeObj.roles || maybeObj.role)) {
-        showRoleButtonsByRoles(maybeObj.roles || maybeObj.role);
-        break;
-      }
-    } catch {
-      showRoleButtonsByRoles(raw);
-      break;
-    }
-  }
-})();
 
 // 2) Профиль из бекенда
 fetch("/api/users/profile", { method: "GET", credentials: "include" })

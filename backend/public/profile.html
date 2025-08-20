@@ -319,15 +319,17 @@
 
   <script src="script.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const autoResize = (el) => {
-        if (!el) return;
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-      };
+    // Make autoResize available globally
+    function autoResize(el) {
+      if (!el) return;
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    async function populateCompletedCoursesTextarea() {
       const coursesField = document.getElementById('profileCoursesTextarea');
       if (!coursesField) return;
-      // Ensure field is locked/read-only in case attributes change elsewhere
+      // lock field
       coursesField.readOnly = true;
       coursesField.setAttribute('aria-readonly', 'true');
       coursesField.classList.add('locked');
@@ -339,7 +341,9 @@
         return;
       }
       const user = JSON.parse(rawUser);
+      // ensure initial sizing
       setTimeout(() => autoResize(coursesField), 0);
+
       try {
         const [resUser, resCourses] = await Promise.all([
           fetch(`${API_BASE}/api/users/${user._id}`),
@@ -348,7 +352,6 @@
         const freshUser = await resUser.json();
         const allCourses = await resCourses.json();
 
-        // Вибираємо лише "Пройдений" і доступні користувачу курси
         const completedCourses = allCourses.filter(c => {
           if (c.status !== 'Пройдений') return false;
           const isOpen = c.accessType === 'Відкрита група';
@@ -356,20 +359,26 @@
           return isOpen || isParticipant;
         });
 
-        const titles = completedCourses
-          .map(c => c.courseTitle)
-          .filter(Boolean);
-
-        coursesField.value = titles.length
-          ? titles.join('\n')
-          : 'Наразі немає пройдених курсів';
+        const titles = completedCourses.map(c => c.courseTitle).filter(Boolean);
+        coursesField.value = titles.length ? titles.join('\n') : 'Наразі немає пройдених курсів';
         autoResize(coursesField);
       } catch (e) {
         console.error('Помилка завантаження списку пройдених курсів:', e);
         coursesField.value = 'Не вдалося завантажити список пройдених курсів.';
         autoResize(coursesField);
       }
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', populateCompletedCoursesTextarea);
+    // When coming back via browser back/forward cache
+    window.addEventListener('pageshow', (ev) => {
+      // run on normal navigation and on bfcache restore
+      if (ev.persisted || document.visibilityState === 'visible') {
+        populateCompletedCoursesTextarea();
+      }
     });
+    // Keep height in sync on viewport changes
     window.addEventListener('resize', () => autoResize(document.getElementById('profileCoursesTextarea')));
   </script>
 </body>

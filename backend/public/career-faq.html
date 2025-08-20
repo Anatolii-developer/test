@@ -337,6 +337,18 @@ function extractRolesFromPayload(payload) {
       return;
     }
     if (typeof x === 'object') {
+      // try common string fields first
+      const candidate = x.name || x.title || x.label || x.role || x.value;
+      if (typeof candidate === 'string') {
+        const s = candidate.toLowerCase();
+        if (
+          s.includes('ментор') || s.includes('mentor') ||
+          s.startsWith('супервізор') || s.startsWith('супервизор') || s.startsWith('supervisor')
+        ) {
+          acc.push(candidate);
+          return;
+        }
+      }
       for (const k in x) walk(x[k]);
       return;
     }
@@ -353,26 +365,53 @@ function extractRolesFromPayload(payload) {
   return acc.length ? acc : null;
 }
 
+// Normalize any roles shape to an array of strings
+function normalizeRolesToStrings(input) {
+  const acc = [];
+  const pushStr = (s) => {
+    if (!s) return;
+    // split combined values like "Ментор; Супервізор ІІ категорії"
+    String(s).split(/[|,;/]+/).forEach(p => {
+      const t = String(p).trim();
+      if (t) acc.push(t);
+    });
+  };
+  if (Array.isArray(input)) {
+    input.forEach(r => {
+      if (typeof r === 'string') {
+        pushStr(r);
+      } else if (r && typeof r === 'object') {
+        pushStr(r.name || r.title || r.label || r.role || r.value);
+      } else {
+        pushStr(r);
+      }
+    });
+  } else if (input && typeof input === 'object') {
+    // single role object
+    pushStr(input.name || input.title || input.label || input.role || input.value);
+  } else {
+    pushStr(input);
+  }
+  return acc;
+}
+
 /* ---------- Роли: показать нужные кнопки ---------- */
 function showRoleButtonsByRoles(roles) {
-  const text = Array.isArray(roles) ? roles.join(' ') : String(roles || '');
-  const lc = text.toLowerCase();
+  const list = normalizeRolesToStrings(roles).map(s => s.toLowerCase().trim());
+  const flattened = list.join(' | ');
+  console.log('🧩 roles (normalized):', flattened);
 
-  console.log('🧩 roles (flattened):', lc);
+  const hasMentor = list.some(s => s.includes('ментор') || s.includes('mentor'));
+  const hasSupervisor = list.some(s => {
+    const t = s.replace(/^[\s\-–—]+/, ''); // trim leading symbols
+    return t.startsWith('супервізор') || t.startsWith('супервизор') || t.startsWith('supervisor');
+  });
 
-  if (lc.includes('ментор') || lc.includes('mentor')) {
+  if (hasMentor) {
     const el = document.getElementById('mentorButton');
     if (el) el.style.display = 'flex';
   }
-  if (Array.isArray(roles)) {
-    if (roles.some(r => {
-      const s = String(r).toLowerCase();
-      return s.startsWith('супервізор') || s.startsWith('supervisor');
-    })) {
-      const el = document.getElementById('supervisorButton');
-      if (el) el.style.display = 'flex';
-    }
-  } else if (lc.startsWith('супервізор') || lc.startsWith('supervisor')) {
+  if (hasSupervisor) {
     const el = document.getElementById('supervisorButton');
     if (el) el.style.display = 'flex';
   }

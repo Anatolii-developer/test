@@ -326,6 +326,74 @@
       el.style.height = el.scrollHeight + 'px';
     }
 
+    // --- Inserted helpers for Step 2 population ---
+    async function fetchFreshUser() {
+      const rawUser = localStorage.getItem('user');
+      if (!rawUser) return null;
+      const user = JSON.parse(rawUser);
+      try {
+        const res = await fetch(`${API_BASE}/api/users/${user._id}`);
+        if (!res.ok) throw new Error('Failed to load user');
+        return await res.json();
+      } catch (e) {
+        console.error('fetchFreshUser error:', e);
+        return null;
+      }
+    }
+
+    function setIfExists(el, val) {
+      if (!el) return;
+      const value = (val === undefined || val === null) ? '' : (Array.isArray(val) ? val.join(', ') : String(val));
+      el.value = value;
+      autoResize(el);
+    }
+
+    async function populateStep2FromUser() {
+      // Pull fresh user from API
+      const freshUser = await fetchFreshUser();
+      if (!freshUser) return;
+
+      // Photo (if exists)
+      const photoEl = document.getElementById('profilePhoto');
+      if (photoEl && freshUser.photoUrl) {
+        photoEl.src = freshUser.photoUrl;
+      }
+
+      // Step 2 textareas
+      setIfExists(document.getElementById('profileAboutTextarea'), freshUser.about);
+      // Courses textarea is filled by populateCompletedCoursesTextarea(), skip direct set
+      setIfExists(document.getElementById('profileRoleTextarea'), (freshUser.roles && freshUser.roles.length ? freshUser.roles.join(', ') : freshUser.role));
+      setIfExists(document.getElementById('profileCostTextarea'), freshUser.cost);
+      setIfExists(document.getElementById('profileVideoTextarea'), freshUser.videoLink);
+      setIfExists(document.getElementById('profileQualificationsTextarea'), freshUser.qualifications);
+      setIfExists(document.getElementById('profileExperienceExtraTextarea'), freshUser.experienceExtra);
+      setIfExists(document.getElementById('profileLanguageTextarea'), freshUser.language);
+      setIfExists(document.getElementById('profileFormatTextarea'), freshUser.format);
+
+      // Optional: fill step 1 spans if they are empty (defensive)
+      const fillSpan = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && (!el.textContent || el.textContent === 'test' || el.textContent === '')) {
+          el.textContent = (val === undefined || val === null) ? '' : String(val);
+        }
+      };
+      fillSpan('profileUsername', freshUser.username);
+      fillSpan('profileFirstName', freshUser.firstName);
+      fillSpan('profileLastName', freshUser.lastName);
+      fillSpan('profileMiddleName', freshUser.middleName);
+      fillSpan('profileEmail', freshUser.email);
+      fillSpan('profilePhone', freshUser.phone);
+      fillSpan('profileGender', freshUser.gender);
+      fillSpan('profileExperience', freshUser.experience);
+      fillSpan('profileEducation', freshUser.education);
+
+      // Directions & topics (arrays) to spans if present
+      const dirSpan = document.getElementById('profileDirections');
+      if (dirSpan && Array.isArray(freshUser.directions)) dirSpan.textContent = freshUser.directions.join(', ');
+      const topicsSpan = document.getElementById('profileTopics');
+      if (topicsSpan && Array.isArray(freshUser.topics)) topicsSpan.textContent = freshUser.topics.join(', ');
+    }
+
     async function populateCompletedCoursesTextarea() {
       const coursesField = document.getElementById('profileCoursesTextarea');
       if (!coursesField) return;
@@ -371,11 +439,13 @@
 
     // Initial load
     document.addEventListener('DOMContentLoaded', populateCompletedCoursesTextarea);
+    document.addEventListener('DOMContentLoaded', populateStep2FromUser);
     // When coming back via browser back/forward cache
     window.addEventListener('pageshow', (ev) => {
       // run on normal navigation and on bfcache restore
       if (ev.persisted || document.visibilityState === 'visible') {
         populateCompletedCoursesTextarea();
+        populateStep2FromUser();
       }
     });
     // Keep height in sync on viewport changes

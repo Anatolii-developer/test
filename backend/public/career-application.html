@@ -208,6 +208,11 @@
   <a href="career-faq.html" class="back-button">
     <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
   </a>
+  <a id="applyBtn" href="career-application.html"
+   class="view-requests-button"
+   style="display:none; margin-top:-20px;">
+  Менторство
+</a>
 
 <a href="career-requests.html" class="view-requests-button">
   Переглянути подані заявки
@@ -323,6 +328,32 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
     alert("Не вдалося надіслати заявку. Спробуйте ще раз.");
   }
 });
+
+(function showMentorButtonIfNeeded(){
+  fetch("/api/users/profile", { credentials: "include" })
+    .then(r => r.json().catch(()=>null).then(body => ({ ok:r.ok, body })))
+    .then(({ok, body})=>{
+      if (!ok || !body || !body.user) return;
+      const roles = body.user.roles || [];
+      const hasMentor = Array.isArray(roles) &&
+        roles.some(s => String(s).toLowerCase().includes('ментор') ||
+                        String(s).toLowerCase().includes('mentor'));
+
+      if (hasMentor) {
+        const mentorBtn = document.getElementById('mentorViewBtn'); // уже существующая
+        if (mentorBtn) {
+          mentorBtn.style.display = 'flex';
+          if ((new URLSearchParams(location.search)).get('view') === 'all') {
+            mentorBtn.textContent = 'Менторство (мої заявки)';
+            mentorBtn.href = 'career-requests.html?view=mine';
+          }
+        }
+        const applyBtn = document.getElementById('applyBtn'); // НОВАЯ
+        if (applyBtn) applyBtn.style.display = 'flex';
+      }
+    })
+    .catch(()=>{});
+})();
 </script>
  <script src="script.js"></script>
 </body>

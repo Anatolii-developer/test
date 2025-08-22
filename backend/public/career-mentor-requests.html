@@ -560,62 +560,96 @@
         return row;
       }
 
+      // ===== Auth token (optional) =====
+      function getAuthToken() {
+        const keys = ["token","authToken","jwt","accessToken","bearer"]; 
+        for (const k of keys) { const v = localStorage.getItem(k); if (v) return v; }
+        try { const u = JSON.parse(localStorage.getItem('user')||'{}'); return u.token || u.accessToken || null; } catch(_) { return null; }
+      }
+
+      // ===== Fetch ALL applications (handles pagination variants) =====
+      async function fetchAllApplications() {
+        const token = getAuthToken();
+        const base = '/api/career-applications';
+
+        // try to request a large page size up front
+        let page = 1;
+        let pageSize = 200; // adjust if backend caps it
+        let nextToken = null;
+        const all = [];
+
+        for (let guard = 0; guard < 25; guard++) { // hard cap to avoid infinite loops
+          const url = new URL(base, location.origin);
+          url.searchParams.set('all', '1');
+          if (pageSize) url.searchParams.set('limit', String(pageSize));
+          // Support multiple pagination styles simultaneously
+          url.searchParams.set('page', String(page));
+          if (nextToken) url.searchParams.set('pageToken', nextToken);
+
+          const res = await fetch(url.pathname + url.search, {
+            method: 'GET',
+            credentials: 'include',
+            headers: Object.assign({ 'Accept': 'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {}),
+          });
+          let body = null; try { body = await res.clone().json(); } catch(_) {}
+          debugLog('Fetch page →', res, body);
+          if (!res.ok) break;
+
+          // Normalize to items array
+          const chunk = Array.isArray(body) ? body
+                     : Array.isArray(body?.rows) ? body.rows
+                     : Array.isArray(body?.items) ? body.items
+                     : Array.isArray(body?.data) ? body.data
+                     : (body?.ok && Array.isArray(body?.result)) ? body.result
+                     : [];
+          all.push(...chunk);
+
+          // Detect next-page indicators
+          const hasMore = !!(body?.hasMore || body?.has_next || body?.next || body?.nextPage || body?.next_page || body?.next_page_token);
+          const total = body?.total || body?.count || null;
+          const nextPage = body?.nextPage || (body?.page && body?.pages && body.page < body.pages ? (body.page + 1) : null);
+          const tokenCandidate = body?.next_page_token || body?.nextPageToken || body?.pageToken || null;
+
+          if (tokenCandidate) { nextToken = tokenCandidate; page += 1; continue; }
+          if (nextPage) { page = nextPage; continue; }
+          if (hasMore && chunk.length > 0) { page += 1; continue; }
+          if (total && all.length < total) { page += 1; continue; }
+
+          // No signs of more pages
+          break;
+        }
+
+        return all;
+      }
+
       async function load() {
         const { listEl, emptyEl } = ensureContainers();
         const user = await ensureMentor();
         if (!user) {
-          showLoginNotice("Доступ лише для менторів.");
+          showLoginNotice('Доступ лише для менторів.');
           return;
         }
+
         try {
-          const res = await fetch("/api/career-applications?all=1", {
-            method: "GET",
-            credentials: "include",
-            headers: { Accept: "application/json" },
-          });
-          let data = null;
-          try {
-            data = await res.clone().json();
-          } catch (_) {}
-          debugLog("Career apps (all) →", res, data);
-          if (
-            res.status === 401 ||
-            (data &&
-              data.ok === false &&
-              /unauthorized/i.test(data.message || ""))
-          ) {
-            showLoginNotice("Сеанс закінчився. Будь ласка, увійдіть ще раз.");
-            return;
-          }
-          const items = Array.isArray(data)
-            ? data
-            : Array.isArray(data?.rows)
-            ? data.rows
-            : Array.isArray(data?.items)
-            ? data.items
-            : Array.isArray(data?.data)
-            ? data.data
-            : data?.ok && Array.isArray(data?.result)
-            ? data.result
-            : [];
-          listEl.innerHTML = "";
+          const items = await fetchAllApplications();
+          debugLog('Aggregated apps (count) →', { status: 200, ok: true, url: '/api/career-applications?all=1' }, { count: items.length });
+
+          listEl.innerHTML = '';
           if (!items.length) {
-            emptyEl.style.display = "block";
-            emptyEl.textContent = "Поки що немає заявок учасників.";
+            emptyEl.style.display = 'block';
+            emptyEl.textContent = 'Поки що немає заявок учасників.';
             return;
           }
-          emptyEl.style.display = "none";
+
+          emptyEl.style.display = 'none';
           items
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt || b.created_at || 0) -
-                new Date(a.createdAt || a.created_at || 0)
-            )
+            .sort((a,b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0))
             .forEach((it, idx) => listEl.appendChild(rowTemplate(idx + 1, it)));
         } catch (err) {
-          console.error("Career applications load failed:", err);
-          emptyEl.textContent = "Не вдалося завантажити заявки.";
-          emptyEl.style.display = "block";
+          console.error('Career applications load failed:', err);
+          const { emptyEl } = ensureContainers();
+          emptyEl.textContent = 'Не вдалося завантажити заявки.';
+          emptyEl.style.display = 'block';
         }
       }
 

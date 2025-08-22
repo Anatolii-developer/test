@@ -60,7 +60,7 @@ list: async (req, res) => {
     }
 
     const apps = await CareerApplication.find(filter)
-      .populate('user', 'firstName lastName email username')
+      .populate('user', 'firstName lastName middleName email username photoUrl')
       .sort({ createdAt: -1 });
 
     res.json({ ok:true, rows: apps });

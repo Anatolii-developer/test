@@ -97,6 +97,10 @@
         padding: 24px 24px 20px;
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
         position: relative;
+        max-height: 90vh;              /* allow the modal to fit viewport height */
+        overflow: auto;                /* enable scrolling inside the modal */
+        -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+        overscroll-behavior: contain;  /* prevent background scroll bounce */
       }
       .req-modal h3 {
         margin: 0 0 12px;

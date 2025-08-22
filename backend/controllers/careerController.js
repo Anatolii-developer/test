@@ -35,19 +35,27 @@ create: async (req, res) => {
 },
 
 
- // controllers/careerApplicationsController.js → list
+// внутри controllers/careerController.js
 list: async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ ok:false, message:'Unauthorized' });
 
-    const role = String(req.user.role || '').toLowerCase();
-    const isAdmin = role === 'admin' || role === 'адмін';
-    const mine = ['1','true','yes'].includes(String(req.query.mine||'').toLowerCase());
+    const me = await User.findById(req.user._id).select('roles username').lean();
+    const iAmMentor = Array.isArray(me?.roles) &&
+      me.roles.some(r => String(r).toLowerCase().includes('ментор') || String(r).toLowerCase().includes('mentor'));
+    const isAdmin = ['admin','адмін'].includes(String(req.user.role||'').toLowerCase());
+
+    const wantAll = ['1','true','yes'].includes(String(req.query.all||'').toLowerCase());
 
     let filter = {};
-    if (!(isAdmin && !mine)) {
+    if (wantAll && (iAmMentor || isAdmin)) {
+      filter = {}; // все заявки
+    } else {
+      // только свои
       const or = [{ user: req.user._id }];
-      if (req.user.username) or.push({ username: req.user.username }); // 👈 основной фильтр
+      if (req.user.username || me?.username) {
+        or.push({ username: (req.user.username || me?.username) });
+      }
       filter = { $or: or };
     }
 
@@ -58,7 +66,7 @@ list: async (req, res) => {
     res.json({ ok:true, rows: apps });
   } catch (err) {
     console.error('career applications list failed:', err);
-    res.status(500).json({ ok:false, error: err.message });
+    res.status(500).json({ ok:false, message:'Server error' });
   }
 }
 

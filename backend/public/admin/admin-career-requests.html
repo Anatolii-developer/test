@@ -155,6 +155,20 @@
       .req-close-x:hover {
         opacity: 1;
       }
+      /* === Mentors/Admin modal redesign === */
+      .mentor-modal { display:grid; grid-template-columns: 1fr 360px; gap:20px; }
+      .mentor-left { display:flex; flex-direction:column; gap:14px; }
+      .mentor-right { display:flex; flex-direction:column; gap:14px; }
+      .mentor-photo { width:160px; height:200px; border-radius:12px; object-fit:cover; background:#eef1ee; border:1px dashed #7aa978; }
+      .field { display:flex; flex-direction:column; gap:6px; }
+      .field label { font-size:14px; color:#6b6b6b; }
+      .field input, .field textarea, .note textarea { width:100%; box-sizing:border-box; border:1px solid #D9D9D9; border-radius:12px; padding:10px 12px; font-family: Poppins, sans-serif; font-size:14px; color:#222; background:#FFFFFF; }
+      .field textarea { min-height:90px; resize:vertical; }
+      .note { display:flex; flex-direction:column; gap:6px; }
+      .note label { font-size:14px; font-weight:600; color:#275D2B; }
+      .note textarea { min-height:54px; background:#F5F6F7; }
+      .modal-actions-bar { display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+      .btn-primary { background:#275D2B; color:#fff; border:none; border-radius:10px; padding:10px 16px; font-weight:600; cursor:pointer; }
       @media (max-width: 1200px) {
         .wrap {
           width: 90%;
@@ -226,9 +240,76 @@
         <div class="req-close-x" id="reqCloseX">×</div>
         <h3 id="reqModalTitle">Заявка</h3>
         <div class="req-meta" id="reqMeta"></div>
-        <div class="req-qa" id="reqQA"></div>
-        <div class="req-actions">
+
+        <div class="mentor-modal">
+          <div class="mentor-left">
+            <img id="reqPhoto" class="mentor-photo" src="/assets/profile-photo.png" alt="Фото" />
+
+            <div class="field">
+              <label>Прізвище</label>
+              <input id="fLastName" readonly />
+            </div>
+            <div class="field">
+              <label>Імʼя</label>
+              <input id="fFirstName" readonly />
+            </div>
+            <div class="field">
+              <label>По-батькові</label>
+              <input id="fMiddleName" readonly />
+            </div>
+            <div class="field">
+              <label>Дата подання заявки</label>
+              <input id="fSubmittedAt" readonly />
+            </div>
+            <div class="field">
+              <label>Скільки років у вас практики</label>
+              <input id="fExperience" readonly />
+            </div>
+            <div class="field">
+              <label>До якої категорії людей за віком Ви відноситесь</label>
+              <input id="fAge" readonly />
+            </div>
+            <div class="field">
+              <label>Напишіть запит до ментора</label>
+              <textarea id="fRequest" readonly></textarea>
+            </div>
+            <div class="field">
+              <label>Про себе / ситуація</label>
+              <textarea id="fAbout" readonly></textarea>
+            </div>
+            <div class="field">
+              <label>Психологічна освіта</label>
+              <textarea id="fEducation" readonly></textarea>
+            </div>
+            <div class="field">
+              <label>Тематики/теми</label>
+              <textarea id="fTopics" readonly></textarea>
+            </div>
+          </div>
+
+          <div class="mentor-right">
+            <div class="note">
+              <label>Нотатка</label>
+              <textarea id="nNote1" placeholder="Ваші нотатки..."></textarea>
+            </div>
+            <div class="note">
+              <label>Нотатка</label>
+              <textarea id="nNote2" placeholder="Ваші нотатки..."></textarea>
+            </div>
+            <div class="note">
+              <label>Нотатка</label>
+              <textarea id="nNote3" placeholder="Ваші нотатки..."></textarea>
+            </div>
+            <div class="note">
+              <label>Нотатка</label>
+              <textarea id="nNote4" placeholder="Ваші нотатки..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions-bar">
           <button class="req-btn close" id="reqCloseBtn">Закрити</button>
+          <button class="btn-primary" id="reqSaveNotes">Зберегти</button>
         </div>
       </div>
     </div>
@@ -370,9 +451,24 @@
           modal: document.getElementById("reqModal"),
           title: document.getElementById("reqModalTitle"),
           meta: document.getElementById("reqMeta"),
-          qa: document.getElementById("reqQA"),
           closeX: document.getElementById("reqCloseX"),
           closeBtn: document.getElementById("reqCloseBtn"),
+          saveBtn: document.getElementById("reqSaveNotes"),
+          photo: document.getElementById("reqPhoto"),
+          fLast: document.getElementById("fLastName"),
+          fFirst: document.getElementById("fFirstName"),
+          fMiddle: document.getElementById("fMiddleName"),
+          fSubmitted: document.getElementById("fSubmittedAt"),
+          fExp: document.getElementById("fExperience"),
+          fAge: document.getElementById("fAge"),
+          fReq: document.getElementById("fRequest"),
+          fAbout: document.getElementById("fAbout"),
+          fEdu: document.getElementById("fEducation"),
+          fTopics: document.getElementById("fTopics"),
+          n1: document.getElementById("nNote1"),
+          n2: document.getElementById("nNote2"),
+          n3: document.getElementById("nNote3"),
+          n4: document.getElementById("nNote4"),
         };
       }
       function bindReqModalEvents() {
@@ -388,60 +484,68 @@
         });
         window.__reqModalBound = true;
       }
+
+      function fillModalFields(item){
+        const { photo, fLast, fFirst, fMiddle, fSubmitted, fExp, fAge, fReq, fAbout, fEdu, fTopics, n1, n2, n3, n4 } = getReqEls();
+        const u = item.user || {};
+        const photoUrl = u.photoUrl || item.photoUrl || '/assets/profile-photo.png';
+        if (photo) photo.src = photoUrl;
+        if (fLast) fLast.value = (u.lastName || item.lastName || '').trim();
+        if (fFirst) fFirst.value = (u.firstName || item.firstName || '').trim();
+        if (fMiddle) fMiddle.value = (u.middleName || item.middleName || '').trim();
+        const when = item.createdAt || item.created_at || item.created || null;
+        if (fSubmitted) fSubmitted.value = when ? formatDate(when) : '';
+        if (fExp) fExp.value = item.experience || item.exp || '';
+        if (fAge) fAge.value = item.ageGroup || item.age || '';
+        if (fReq) fReq.value = item.requestText || item.request || '';
+        if (fAbout) fAbout.value = item.aboutText || item.about || '';
+        if (fEdu) fEdu.value = item.education || '';
+        if (fTopics) fTopics.value = Array.isArray(item.topics) ? item.topics.join(', ') : (item.topics || '');
+
+        const notes = item.adminNotes || item.notes || {};
+        if (n1) n1.value = notes.n1 || notes.note1 || '';
+        if (n2) n2.value = notes.n2 || notes.note2 || '';
+        if (n3) n3.value = notes.n3 || notes.note3 || '';
+        if (n4) n4.value = notes.n4 || notes.note4 || '';
+      }
+
+      async function saveAdminNotes(item){
+        const { n1, n2, n3, n4 } = getReqEls();
+        const payload = { notes: { n1: n1?.value||'', n2: n2?.value||'', n3: n3?.value||'', n4: n4?.value||'' } };
+        try{
+          const token = getAuthToken && getAuthToken();
+          const res = await fetch(`/api/career-applications/${item._id}/notes`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: Object.assign({ 'Content-Type':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {}),
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('Failed');
+          alert('Нотатки збережено');
+        }catch(e){
+          console.warn('Save notes failed:', e);
+          alert('Не вдалося зберегти нотатки.');
+        }
+      }
+
       function openReqModal(item) {
         bindReqModalEvents();
-        const { modal, title, meta, qa } = getReqEls();
+        const { modal, title, meta, saveBtn } = getReqEls();
         if (!modal) return;
         const fio = fullNameFrom(item);
         const when = item.createdAt || item.created_at || item.created;
-        const whenStr = when ? formatDate(when) : "";
-        title.textContent = `Заявка — ${fio}`;
-        meta.textContent = whenStr ? `Дата подання: ${whenStr}` : "";
-        qa.innerHTML = "";
-        const rows = [
-          {
-            q: "Імʼя",
-            a: (item.user?.firstName || item.firstName || "").trim(),
-          },
-          {
-            q: "Прізвище",
-            a: (item.user?.lastName || item.lastName || "").trim(),
-          },
-          { q: "Дата подання заявки", a: whenStr },
-          {
-            q: "Скільки років у вас практики",
-            a: item.experience || item.exp || "",
-          },
-          {
-            q: "До якої вікової категорії Ви відноситесь",
-            a: item.ageGroup || item.age || "",
-          },
-          {
-            q: "Ваш запит до ментора",
-            a: item.requestText || item.request || "",
-          },
-          {
-            q: "Про себе / деталі ситуації",
-            a: item.aboutText || item.about || "",
-          },
-        ];
-        if (Array.isArray(item.answers)) {
-          item.answers.forEach((x) =>
-            rows.push({ q: x.question || "Питання", a: x.answer || "" })
-          );
+        const whenStr = when ? formatDate(when) : '';
+        if (title) title.textContent = `Заявка — ${fio}`;
+        if (meta)  meta.textContent  = whenStr ? `Дата подання: ${whenStr}` : '';
+
+        fillModalFields(item);
+
+        if (saveBtn) {
+          saveBtn.onclick = () => saveAdminNotes(item);
         }
-        rows
-          .filter((r) => String(r.a || "").trim().length)
-          .forEach((r) => {
-            const div = document.createElement("div");
-            div.className = "row";
-            div.innerHTML = `<div class="q">${esc(
-              r.q
-            )}</div><div class="a">${esc(String(r.a))}</div>`;
-            qa.appendChild(div);
-          });
-        modal.style.display = "flex";
-        document.body.style.overflow = "hidden";
+
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
       }
       function closeReqModal() {
         const { modal } = getReqEls();

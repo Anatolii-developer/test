@@ -606,6 +606,21 @@ if (saveChangesBtn) {
 const saveBtn = document.getElementById("saveBtn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
+    // Work directions: if "Інше" checked, save ONLY textarea text
+    const otherDirCheckbox = document.getElementById('directionOtherCheckbox');
+    const otherDirText = (document.getElementById('directionOther')?.value || '').trim();
+
+    let directions = [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')]
+      .map(c => c.parentElement.textContent.trim())
+      .filter(v => v !== 'Інше');
+
+    if (otherDirCheckbox && otherDirCheckbox.checked) {
+      directions = otherDirText ? [otherDirText] : [];
+    }
+
+    const topics = [...document.querySelectorAll('.work-topics input[type="checkbox"]:checked')]
+      .map(c => c.parentElement.textContent.trim());
+
     const payload = {
       username: localStorage.getItem("registrationUsername") || "",
       password: localStorage.getItem("registrationPassword") || "",
@@ -618,34 +633,32 @@ if (saveBtn) {
       gender: document.querySelector('input[name="gender"]:checked')?.value || "",
       experience: document.getElementById("experience").value,
       education: document.getElementById("education").value,
-    directions: [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
-topics: [...document.querySelectorAll('.work-topics input[type="checkbox"]:checked')].map(c => c.parentElement.textContent.trim()),
-
+      directions,
+      topics,
       createdAt: new Date(),
       status: "WAIT FOR REVIEW"
     };
 
     try {
-  console.log("📤 Payload:", payload);
-  const res = await fetch(`${API_BASE}/api/users/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+      console.log("📤 Payload:", payload);
+      const res = await fetch(`${API_BASE}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-  const result = await res.json();
-  console.log("📩 Response:", result); // 👈 Добавь это
+      const result = await res.json();
+      console.log("📩 Response:", result); // 👈 Добавь это
 
-  if (res.ok) {
-    window.location.href = "registration-success.html";
-  } else {
-    alert("❌ Error: " + result.message);
-  }
-} catch (err) {
-  console.error("❌ Server error:", err);
-  alert("Server error");
-}
-
+      if (res.ok) {
+        window.location.href = "registration-success.html";
+      } else {
+        alert("❌ Error: " + result.message);
+      }
+    } catch (err) {
+      console.error("❌ Server error:", err);
+      alert("Server error");
+    }
   });
 }
 
@@ -737,6 +750,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 function handleSubmit() {
+  const _otherDirCheckbox = document.getElementById('directionOtherCheckbox');
+  const _otherDirText = (document.getElementById('directionOther')?.value || '').trim();
+  let _directions = Array.from(document.querySelectorAll('.work-direction input[type="checkbox"]:checked'))
+    .map(cb => cb.parentElement.textContent.trim())
+    .filter(v => v !== 'Інше');
+  if (_otherDirCheckbox && _otherDirCheckbox.checked) {
+    _directions = _otherDirText ? [_otherDirText] : [];
+  }
   const data = {
     firstName: document.getElementById("firstName").value,
     lastName: document.getElementById("lastName").value,
@@ -746,8 +767,7 @@ function handleSubmit() {
     gender: document.querySelector('input[name="gender"]:checked')?.value || "",
     experience: document.getElementById("experience").value,
     education: document.getElementById("education").value,
-    directions: Array.from(document.querySelectorAll('.work-direction input[type="checkbox"]:checked')).map(cb => cb.parentElement.textContent.trim()),
-    directionOther: document.getElementById("directionOther")?.value || "",
+    directions: _directions,
     topics: Array.from(document.querySelectorAll('.work-topics input[type="checkbox"]:checked')).map(cb => cb.parentElement.textContent.trim()),
   };
 
@@ -1175,3 +1195,18 @@ const LOCKED_FIELDS = new Set(['profileCoursesTextarea','profileRoleTextarea']);
     if (LOCKED_FIELDS.has(id)) return;
     if (typeof _enableCheckboxEdit === 'function') return _enableCheckboxEdit(id, key, opts);
   };
+
+// Toggle visibility of "Інше" textarea for directions on checkbox state
+document.addEventListener('DOMContentLoaded', () => {
+  const otherDirCheckbox = document.getElementById('directionOtherCheckbox');
+  const otherDirTextarea = document.getElementById('directionOther');
+  if (!otherDirCheckbox || !otherDirTextarea) return;
+
+  const syncOtherDir = () => {
+    otherDirTextarea.style.display = otherDirCheckbox.checked ? 'block' : 'none';
+    if (!otherDirCheckbox.checked) otherDirTextarea.value = '';
+  };
+
+  syncOtherDir();
+  otherDirCheckbox.addEventListener('change', syncOtherDir);
+});

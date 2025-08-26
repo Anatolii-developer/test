@@ -350,6 +350,16 @@ const topicsOptions = [
 function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   const container = document.getElementById(fieldId).parentNode;
   const selectedValues = (window.currentUser[mongoKey] || []);
+ 
+const customOthers = selectedValues.filter(v => !optionsArray.includes(v));
+if (customOthers.length) {
+  const otherBadge = document.createElement('div');
+  otherBadge.style.margin = '8px 0';
+  otherBadge.style.fontSize = '14px';
+  otherBadge.style.opacity = '0.8';
+  otherBadge.textContent = 'Інше: ' + customOthers[0];
+  checkboxContainer.appendChild(otherBadge);
+}
 
   // Удаляем старый span
   const oldSpan = document.getElementById(fieldId);
@@ -609,6 +619,10 @@ if (saveBtn) {
     // Work directions: if "Інше" checked, save ONLY textarea text
     const otherDirCheckbox = document.getElementById('directionOtherCheckbox');
     const otherDirText = (document.getElementById('directionOther')?.value || '').trim();
+    if (otherDirCheckbox && otherDirCheckbox.checked && !otherDirText) {
+  alert('Будь ласка, заповніть поле "Інше" або зніміть вибір.');
+  return;
+}
 
     let directions = [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')]
       .map(c => c.parentElement.textContent.trim())
@@ -1196,7 +1210,9 @@ const LOCKED_FIELDS = new Set(['profileCoursesTextarea','profileRoleTextarea']);
     if (typeof _enableCheckboxEdit === 'function') return _enableCheckboxEdit(id, key, opts);
   };
 
-// Toggle visibility of "Інше" textarea for directions on checkbox state
+
+  
+
 document.addEventListener('DOMContentLoaded', () => {
   const otherDirCheckbox = document.getElementById('directionOtherCheckbox');
   const otherDirTextarea = document.getElementById('directionOther');

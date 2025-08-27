@@ -524,90 +524,76 @@
       }
       // Fetch ALL career applications with robust pagination
       async function fetchAllAdminApplications() {
-        const token = getAuthToken();
-        const base = "/api/career-applications";
+  const token = getAuthToken();
+  const base = "/api/career-applications";
 
-        let page = 1;
-        let pageSize = 200; // try to pull many at once; backend may cap
-        let nextToken = null;
-        const all = [];
+  let page = 1;
+  let pageSize = 200;
+  let nextToken = null;
+  const all = [];
 
-        for (let guard = 0; guard < 25; guard++) {
-          const url = new URL(base, location.origin);
-          url.searchParams.set("all", "1");
-          url.searchParams.set("limit", String(pageSize));
-          url.searchParams.set("page", String(page));
-          if (nextToken) url.searchParams.set("pageToken", nextToken);
+  for (let guard = 0; guard < 25; guard++) {
+    const url = new URL(base, location.origin);
+    url.searchParams.set("all", "1");
+    url.searchParams.set("limit", String(pageSize));
+    url.searchParams.set("page", String(page));
+    if (nextToken) url.searchParams.set("pageToken", nextToken);
 
-          const res = await fetch(url.pathname + url.search, {
-            method: "GET",
-            credentials: "include",
-            headers: Object.assign(
-              { Accept: "application/json" },
-              token ? { Authorization: `Bearer ${token}` } : {}
-            ),
-          });
-          let body = null;
-          try {
-            body = await res.clone().json();
-          } catch (_) {}
-          if (!res.ok) break;
+    const res = await fetch(url.pathname + url.search, {
+      method: "GET",
+      credentials: "include",
+      headers: Object.assign(
+        { Accept: "application/json" },
+        token ? { Authorization: `Bearer ${token}` } : {}
+      ),
+    });
 
-          const chunk = Array.isArray(body)
-            ? body
-            : Array.isArray(body?.rows)
-            ? body.rows
-            : Array.isArray(body?.items)
-            ? body.items
-            : Array.isArray(body?.data)
-            ? body.data
-            : body?.ok && Array.isArray(body?.result)
-            ? body.result
-            : [];
-          all.push(...chunk);
+    // 👇 ЛОГ
+    const raw = await res.clone().text();
+    console.log("[ADMIN/APPS]", res.status, raw);
 
-          const hasMore = !!(
-            body?.hasMore ||
-            body?.has_next ||
-            body?.next ||
-            body?.nextPage ||
-            body?.next_page ||
-            body?.next_page_token
-          );
-          const total = body?.total || body?.count || null;
-          const nextPage =
-            body?.nextPage ||
-            (body?.page && body?.pages && body.page < body.pages
-              ? body.page + 1
-              : null);
-          const tokenCandidate =
-            body?.next_page_token ||
-            body?.nextPageToken ||
-            body?.pageToken ||
-            null;
+    // явная обработка статусов
+    if (res.status === 401) throw new Error("401 Unauthorized — не зашла кука/токен");
+    if (res.status === 403) throw new Error("403 Forbidden — нужен admin login");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-          if (tokenCandidate) {
-            nextToken = tokenCandidate;
-            page += 1;
-            continue;
-          }
-          if (nextPage) {
-            page = nextPage;
-            continue;
-          }
-          if (hasMore && chunk.length > 0) {
-            page += 1;
-            continue;
-          }
-          if (total && all.length < total) {
-            page += 1;
-            continue;
-          }
-          break;
-        }
+    let body = {};
+    try { body = JSON.parse(raw); } catch {}
 
-        return all;
-      }
+    const chunk = Array.isArray(body)
+      ? body
+      : Array.isArray(body?.rows)
+      ? body.rows
+      : Array.isArray(body?.items)
+      ? body.items
+      : Array.isArray(body?.data)
+      ? body.data
+      : body?.ok && Array.isArray(body?.result)
+      ? body.result
+      : [];
+
+    all.push(...chunk);
+
+    const hasMore = !!(
+      body?.hasMore || body?.has_next || body?.next || body?.nextPage ||
+      body?.next_page || body?.next_page_token
+    );
+    const total = body?.total || body?.count || null;
+    const nextPage =
+      body?.nextPage ||
+      (body?.page && body?.pages && body.page < body.pages ? body.page + 1 : null);
+    const tokenCandidate =
+      body?.next_page_token || body?.nextPageToken || body?.pageToken || null;
+
+    if (tokenCandidate) { nextToken = tokenCandidate; page += 1; continue; }
+    if (nextPage)       { page = nextPage;          continue; }
+    if (hasMore && chunk.length > 0) { page += 1; continue; }
+    if (total && all.length < total) { page += 1; continue; }
+    break;
+  }
+
+  return all;
+}
 
       const pad = (n) => String(n).padStart(2, "0");
       function formatDate(iso) {
@@ -924,29 +910,24 @@ function closeOnOutsideOnce(e){
       }
 
       async function load() {
-        try {
-          const items = await fetchAllAdminApplications();
-          $tbody.innerHTML = "";
-          if (!items.length) {
-            $empty.style.display = "block";
-            $empty.textContent = "Поки що немає заявок.";
-            return;
-          }
-          $empty.style.display = "none";
-          items
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt || b.created_at || 0) -
-                new Date(a.createdAt || a.created_at || 0)
-            )
-            .forEach((it, idx) => $tbody.appendChild(rowTemplate(idx + 1, it)));
-        } catch (e) {
-          console.error(e);
-          $tbody.innerHTML = "";
-          $empty.textContent = "Не вдалося завантажити заявки.";
-          $empty.style.display = "block";
-        }
-      }
+  try {
+    const items = await fetchAllAdminApplications();
+    $tbody.innerHTML = "";
+    if (!items.length) {
+      $empty.style.display = "block";
+      $empty.textContent = "Поки що немає заявок.";
+      return;
+    }
+    $empty.style.display = "none";
+    items.sort((a,b)=> new Date(b.createdAt||0) - new Date(a.createdAt||0))
+         .forEach((it, idx)=> $tbody.appendChild(rowTemplate(idx+1, it)));
+  } catch (e) {
+    console.error(e);
+    $tbody.innerHTML = "";
+    $empty.style.display = "block";
+    $empty.textContent = String(e.message || e)  // 👈 покажем 401/403 и т.д.
+  }
+}
       document.addEventListener("DOMContentLoaded", () => {
         bindReqModalEvents();
         load();

@@ -447,30 +447,38 @@
         renderMentorMenu(__MENTORS, assignedId);
       }
 
-     async function save() {
+    async function save() {
   console.log('[save] start');
+
   const mentorId = (qs("#mentorSelectValue").value || "").trim();
-  if (!mentorId) {
-    alert("Оберіть ментора");
-    return;
+  if (!mentorId) { alert("Оберіть ментора"); return; }
+
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+  try {
+    const r = await fetch(`/api/career-applications/${ID}/assign`, {
+      method: "PUT",
+      credentials: "include",
+      headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+      body: JSON.stringify({ mentorId }),
+      signal: controller.signal,
+    });
+    clearTimeout(t);
+    console.log('[save] response status:', r.status);
+
+    if (!r.ok) {
+      const txt = await r.text().catch(()=> '');
+      alert("Помилка: " + (txt || r.status));
+      return;
+    }
+    alert("Ментор призначений");
+    history.back();
+  } catch (e) {
+    clearTimeout(t);
+    console.error('[save] fetch failed:', e);
+    alert('Failed to fetch (мережа/CORS/HTTPS): ' + (e?.message || e));
   }
-  const r = await fetch(`/api/career-applications/${ID}/assign`, {
-    method: "PUT",
-    credentials: "include",
-    headers: Object.assign(
-      { "Content-Type": "application/json" },
-      authHeaders()
-    ),
-    body: JSON.stringify({ mentorId }),
-  });
-  console.log('[save] response status:', r.status);
-  if (!r.ok) {
-    const t = await r.text().catch(()=> '');
-    alert("Помилка: " + (t || r.status));
-    return;
-  }
-  alert("Ментор призначений");
-  history.back();
 }
 
       document.addEventListener('DOMContentLoaded', () => {

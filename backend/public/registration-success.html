@@ -33,6 +33,34 @@
 }
 
 
+/* --- Fix header overlap and make image responsive on this page --- */
+header{
+  position: sticky !important; /* override possible global fixed header */
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+}
+
+/* If a global fixed header is still applied elsewhere, reserve space as a fallback */
+body{
+  padding-top: 72px;           /* approximate header height */
+}
+@media (min-width: 640px){
+  body{ padding-top: 84px; }   /* slightly more on wider screens */
+}
+
+/* Keep the success image contained and centered */
+.success-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+.success-image{
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
   </style>
 </head>
 <body>

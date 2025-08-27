@@ -41,5 +41,6 @@ router.post('/', auth, careerCtrl.create);
 
 // назначить ментора — только админ
 router.put('/:id/assign', auth, adminOnly, careerCtrl.assignMentor);
+router.get('/:id', auth, careerCtrl.getOneAdmin);  
 
 module.exports = router;

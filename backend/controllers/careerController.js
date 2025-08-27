@@ -19,6 +19,26 @@ async function isAdminUser(req) {
       .some(r => r.includes('admin') || r.includes('адмін'));
 }
 
+
+async function getOneAdmin(req, res) {
+  try {
+    const roles = (req.user?.roles || []).map(r=>String(r).toLowerCase());
+    const isAdmin = roles.some(r => r.includes('admin') || r.includes('адмін'));
+    if (!isAdmin) return res.status(403).json({ ok:false, message:'Forbidden: admin only' });
+
+    const app = await CareerApplication.findById(req.params.id)
+      .populate('user', 'firstName lastName middleName email username photoUrl')
+      .populate('assignedMentor', 'firstName lastName email username');
+
+    if (!app) return res.status(404).json({ ok:false, message:'Not found' });
+    res.json({ ok:true, application: app });
+  } catch (e) {
+    console.error('getOneAdmin failed:', e);
+    res.status(500).json({ ok:false, message:'Server error' });
+  }
+}
+module.exports.getOneAdmin = getOneAdmin;
+
 module.exports = {
   // звичайний список (для користувача або ментора — лише свої/призначені)
   list: async (req, res) => {

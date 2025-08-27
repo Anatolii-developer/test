@@ -663,7 +663,9 @@
         const btn = document.createElement("button");
         btn.className = "btn-view";
         btn.textContent = "Переглянути";
-        btn.addEventListener("click", () => openReqModal(item));
+       btn.addEventListener("click", () => {
+  window.location.href = `admin-request-details.html?id=${item._id}`;
+});
         tdAction.appendChild(btn);
 
         tr.append(tdNum, tdName, tdEmail, tdAction);

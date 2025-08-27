@@ -134,6 +134,33 @@ router.get("/profile", auth, async (req, res) => {
   }
 });
 
+function auth(req,res,next){
+  const token =
+    (req.cookies && req.cookies.token) ||
+    (req.headers.authorization || '').replace(/^Bearer\s+/i,'');
+  if (!token) return res.status(401).json({ ok:false, message:'Unauthorized' });
+  try {
+    const p = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+    req.user = p; // { id, roles, email, username }
+    next();
+  } catch (e) {
+    return res.status(401).json({ ok:false, message:'Invalid token' });
+  }
+}
+
+function adminOnly(req,res,next){
+  const roles = Array.isArray(req.user?.roles) ? req.user.roles.map(r=>String(r).toLowerCase()) : [];
+  if (roles.includes('admin')) return next();
+  return res.status(403).json({ ok:false, message:'Forbidden: admin only' });
+}
+
+// РОУТЫ
+router.post('/login', userCtrl.loginUser);
+router.post('/admin/login', userCtrl.adminLogin);
+router.get('/profile', auth, userCtrl.profile);       // проверка куки/JWT
+router.get('/admin/profile', auth, adminOnly, userCtrl.profile); // профайл админа
+
+
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 router.put('/:id/status', updateUserStatus);

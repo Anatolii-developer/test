@@ -5,6 +5,82 @@ const path = require("path");
 const sendRegistrationEmail = require("../mailer");
 
 
+
+function signUser(user){
+  return jwt.sign(
+    {
+      id: user._id,
+      // важно: передаём МАССИВ ролей, а не user.role
+      roles: Array.isArray(user.roles) ? user.roles : [],
+      email: user.email,
+      username: user.username,
+    },
+    process.env.JWT_SECRET || 'dev_secret',
+    { expiresIn: '7d' }
+  );
+}
+
+exports.loginUser = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.status !== "APPROVED") return res.status(403).json({ message: "Account not approved" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = signUser(user);
+
+    res.cookie('token', token, {
+      httpOnly: true, sameSite: 'lax', secure: false, path: '/', maxAge: 7*24*60*60*1000
+    });
+
+    return res.status(200).json({ ok: true, message: "Login successful", user });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// отдельный логин для админки (проверяем роль)
+exports.adminLogin = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.status !== "APPROVED") return res.status(403).json({ message: "Account not approved" });
+
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+
+    const roles = Array.isArray(user.roles) ? user.roles.map(r=>String(r).toLowerCase()) : [];
+    if (!roles.includes('admin')) {
+      return res.status(403).json({ message: "Admin role required" });
+    }
+
+    const token = signUser(user);
+    res.cookie('token', token, {
+      httpOnly: true, sameSite: 'lax', secure: false, path: '/', maxAge: 7*24*60*60*1000
+    });
+
+    return res.status(200).json({ ok: true, message: "Admin login successful", user });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// профиль для проверки авторизации (будем вызывать с админ-страниц)
+exports.profile = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ ok:false, message: 'Unauthorized' });
+    const user = await User.findById(req.user.id).lean();
+    if (!user) return res.status(404).json({ ok:false, message: 'User not found' });
+    res.json({ ok:true, user });
+  } catch (e) {
+    res.status(500).json({ ok:false, message: e.message });
+  }
+};
+
 exports.registerUser = async (req, res) => {
   try {
     const user = new User(req.body);

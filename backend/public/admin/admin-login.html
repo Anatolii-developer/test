@@ -2,81 +2,100 @@
 <html lang="uk">
   <head>
     <meta charset="UTF-8" />
-    <title>Admin — Вхід</title>
-    <link rel="stylesheet" href="/admin/admin.css" />
-  </head>
-  <body style="font-family: Poppins, sans-serif">
-    <div
-      style="
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="admin-styles.css" />
+    <style>
+      body {
+        font-family: Poppins, sans-serif;
+        background: #97c194;
+        margin: 0;
+      }
+      .card {
         max-width: 420px;
         margin: 80px auto;
         background: #fff;
         border-radius: 16px;
-        padding: 24px;
+        padding: 28px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      "
-    >
-      <h2>Вхід адміністратора</h2>
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          margin-top: 12px;
-        "
-      >
-        <input
-          id="u"
-          placeholder="Username"
-          style="padding: 12px; border: 1px solid #ddd; border-radius: 10px"
-        />
-        <input
-          id="p"
-          placeholder="Пароль"
-          type="password"
-          style="padding: 12px; border: 1px solid #ddd; border-radius: 10px"
-        />
-        <button
-          id="loginBtn"
-          style="
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #275d2b;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-          "
-        >
-          Увійти
-        </button>
+      }
+      h1 {
+        margin: 0 0 16px;
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      input {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+      }
+      button {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: none;
+        background: #275d2b;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .muted {
+        opacity: 0.7;
+        font-size: 14px;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Вхід до адмінки</h1>
+      <div class="row">
+        <label>Username</label>
+        <input id="u" autocomplete="username" />
       </div>
+      <div class="row">
+        <label>Password</label>
+        <input id="p" type="password" autocomplete="current-password" />
+      </div>
+      <button id="btn">Увійти</button>
+      <div class="muted">Потрібна роль <b>admin</b></div>
     </div>
 
     <script>
-      document
-        .getElementById("loginBtn")
-        .addEventListener("click", async () => {
-          const username = document.getElementById("u").value.trim();
-          const password = document.getElementById("p").value.trim();
-          if (!username || !password) return alert("Заповніть поля");
-
-          const res = await fetch("/api/users/login", {
+      const API = "";
+      document.getElementById("btn").addEventListener("click", async () => {
+        const username = document.getElementById("u").value.trim();
+        const password = document.getElementById("p").value;
+        if (!username || !password) {
+          alert("Введіть логін і пароль");
+          return;
+        }
+        try {
+          const res = await fetch(`${API}/api/users/admin/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify({ username, password }),
           });
-          const out = await res.json();
-          if (!res.ok) return alert(out.message || "Помилка входу");
-
-          const role = (out?.user?.role || "").toString().toLowerCase();
-          if (!role.includes("admin"))
-            return alert("Ця сторінка лише для адміністратора");
-
-          localStorage.setItem("user", JSON.stringify(out.user));
-          location.href = "/admin-career-requests.html";
-        });
+          const data = await res.json();
+          if (!res.ok) {
+            alert(data.message || "Login failed");
+            return;
+          }
+          // збережемо користувача (зручно для клієнтської перевірки)
+          localStorage.setItem("user", JSON.stringify(data.user || {}));
+          // редірект в адмін-розділ
+          location.href = "admin-career-requests.html";
+        } catch (e) {
+          alert("Server error");
+          console.error(e);
+        }
+      });
     </script>
   </body>
 </html>

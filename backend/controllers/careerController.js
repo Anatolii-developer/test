@@ -1,16 +1,64 @@
-// controllers/careerController.js
 const CareerApplication = require('../models/CareerApplication');
 const User = require('../models/User');
 
+// маленький хелпер без middleware
+function isAdminUser(req) {
+  const role = (req.user?.role || '').toString().toLowerCase();
+  return role.includes('admin') || role.includes('адмін');
+}
+
 module.exports = {
+  // звичайний список (для користувача або ментора — лише свої/призначені)
+  list: async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ ok:false, message:'Unauthorized' });
+
+      // ментор бачить тільки призначені
+      const me = await User.findById(req.user._id).select('roles').lean();
+      const isMentor = Array.isArray(me?.roles) &&
+        me.roles.some(r => String(r).toLowerCase().includes('mentor') || String(r).toLowerCase().includes('ментор'));
+
+      const filter = isMentor
+        ? { assignedMentor: req.user._id }
+        : { user: req.user._id };
+
+      const apps = await CareerApplication.find(filter)
+        .populate('user', 'firstName lastName email username')
+        .populate('assignedMentor', 'firstName lastName email username')
+        .sort({ createdAt: -1 });
+
+      res.json({ ok:true, rows: apps });
+    } catch (err) {
+      console.error('career list failed:', err);
+      res.status(500).json({ ok:false, message:'Server error' });
+    }
+  },
+
+  // **адмін**: усі заявки
+  listAdmin: async (req, res) => {
+    try {
+      if (!isAdminUser(req)) return res.status(403).json({ ok:false, message:'Forbidden: admin only' });
+
+      const apps = await CareerApplication.find({})
+        .populate('user', 'firstName lastName email username')
+        .populate('assignedMentor', 'firstName lastName email username')
+        .sort({ createdAt: -1 });
+
+      res.json({ ok:true, rows: apps });
+    } catch (err) {
+      console.error('career listAdmin failed:', err);
+      res.status(500).json({ ok:false, message:'Server error' });
+    }
+  },
+
+  // створення (як було)
   create: async (req, res) => {
     try {
       let userId = req.user?._id;
       let userDoc = null;
 
-      if (userId) {
-        userDoc = await User.findById(userId).lean();
-      } else if (req.body.username) {
+      if (userId) userDoc = await User.findById(userId).lean();
+      else if (req.body.username) {
         userDoc = await User.findOne({ username: req.body.username }).lean();
         if (userDoc) userId = userDoc._id;
       }
@@ -33,29 +81,14 @@ module.exports = {
     }
   },
 
-  list: async (req, res) => {
-  try {
-    // 👉 прибираємо вимогу авторизації
-    const apps = await CareerApplication.find({})
-      .populate('user', 'firstName lastName middleName email username photoUrl')
-      .populate('assignedMentor', 'firstName lastName email username')
-      .sort({ createdAt: -1 });
-
-    res.json({ ok:true, rows: apps });
-  } catch (err) {
-    console.error('career applications list failed:', err);
-    res.status(500).json({ ok:false, message:'Server error' });
-  }
-},
-
+  // призначення ментора — **тільки адмін**
   assignMentor: async (req, res) => {
     try {
+      if (!isAdminUser(req)) return res.status(403).json({ ok:false, message:'Forbidden: admin only' });
+
       const { id } = req.params;
       const { mentorId } = req.body;
-
-      if (!mentorId) {
-        return res.status(400).json({ ok: false, message: 'mentorId required' });
-      }
+      if (!mentorId) return res.status(400).json({ ok:false, message:'mentorId required' });
 
       const app = await CareerApplication.findByIdAndUpdate(
         id,
@@ -63,14 +96,11 @@ module.exports = {
         { new: true }
       ).populate('assignedMentor', 'firstName lastName email username');
 
-      if (!app) {
-        return res.status(404).json({ ok: false, message: 'Application not found' });
-      }
-
-      res.json({ ok: true, application: app });
+      if (!app) return res.status(404).json({ ok:false, message:'Application not found' });
+      res.json({ ok:true, application: app });
     } catch (err) {
       console.error('assignMentor failed:', err);
-      res.status(500).json({ ok: false, message: 'Server error' });
+      res.status(500).json({ ok:false, message:'Server error' });
     }
   }
 };

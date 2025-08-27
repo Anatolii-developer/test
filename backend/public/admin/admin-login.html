@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin — Вхід</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body style="font-family: Poppins, sans-serif">
+    <div
+      style="
+        max-width: 420px;
+        margin: 80px auto;
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <h2>Вхід адміністратора</h2>
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-top: 12px;
+        "
+      >
+        <input
+          id="u"
+          placeholder="Username"
+          style="padding: 12px; border: 1px solid #ddd; border-radius: 10px"
+        />
+        <input
+          id="p"
+          placeholder="Пароль"
+          type="password"
+          style="padding: 12px; border: 1px solid #ddd; border-radius: 10px"
+        />
+        <button
+          id="loginBtn"
+          style="
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #275d2b;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+          "
+        >
+          Увійти
+        </button>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("loginBtn")
+        .addEventListener("click", async () => {
+          const username = document.getElementById("u").value.trim();
+          const password = document.getElementById("p").value.trim();
+          if (!username || !password) return alert("Заповніть поля");
+
+          const res = await fetch("/api/users/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ username, password }),
+          });
+          const out = await res.json();
+          if (!res.ok) return alert(out.message || "Помилка входу");
+
+          const role = (out?.user?.role || "").toString().toLowerCase();
+          if (!role.includes("admin"))
+            return alert("Ця сторінка лише для адміністратора");
+
+          localStorage.setItem("user", JSON.stringify(out.user));
+          location.href = "/admin-career-requests.html";
+        });
+    </script>
+  </body>
+</html>

@@ -256,7 +256,10 @@ main {
 }
 
 /* ========== Registration Page Card Layout ========== */
-
+/* фон только для страницы успеха */
+body.success-page {
+  background: #2F832F80;
+}
 
 .registration-card {
   background-color: transparent;

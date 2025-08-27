@@ -9,12 +9,20 @@ function auth(req,res,next){
   if(!token) return res.status(401).json({ok:false,message:'Unauthorized'});
   try{
     const p = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
-    req.user = { _id: p.id, role: p.role, email: p.email, username: p.username }; // 👈
+    req.user = { _id: p.id, role: p.role, email: p.email, username: p.username };
     next();
   }catch(e){ return res.status(401).json({ok:false,message:'Invalid token'}); }
 }
 
+function isAdmin(req,res,next){
+  if (!req.user) return res.status(401).json({ ok:false, message:'Unauthorized' });
+  const role = (req.user.role||'').toString().toLowerCase();
+  if (role.includes('admin') || role.includes('адмін')) return next();
+  return res.status(403).json({ ok:false, message:'Forbidden' });
+}
+
 router.post('/', auth, careerCtrl.create);
 router.get('/',  auth, careerCtrl.list);
+router.put('/:id/assign', auth, isAdmin, careerCtrl.assignMentor); // 👈 назначение ментора
 
 module.exports = router;

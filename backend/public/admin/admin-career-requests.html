@@ -824,48 +824,30 @@ function closeOnOutsideOnce(e){
             : item.topics || "";
       }
 
-      async function assignMentorIfChanged(item){
-        const mentorId = (document.getElementById('mentorSelectValue')?.value || '').trim();
-        const current  = item.assignedMentorId || item.assignedMentor?._id || '';
-        if (!mentorId || mentorId === current) return; // нічого не міняли
+      async function assignMentorIfChanged(item) {
+  const mentorId = (document.getElementById('mentorSelectValue')?.value || '').trim();
+  const current  = item.assignedMentorId || item.assignedMentor?._id || '';
+  if (!mentorId || mentorId === current) return;
 
-        const token = getAuthToken && getAuthToken();
-        const headersBase = Object.assign({ 'Content-Type':'application/json', 'Accept':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {});
+  const token = getAuthToken && getAuthToken();
+  const headersBase = Object.assign(
+    { 'Content-Type':'application/json', 'Accept':'application/json' },
+    token ? { 'Authorization': `Bearer ${token}` } : {}
+  );
 
-        async function tryReq(url, method, body){
-          const res = await fetch(url, { method, credentials:'include', headers: headersBase, body: JSON.stringify(body) });
-          try { const dbg = await res.clone().json(); console.log('Assign attempt:', {url, method, body}, '→', res.status, dbg); } catch(_) { console.log('Assign attempt:', {url, method, body}, '→', res.status); }
-          return res;
-        }
+  const id = item._id;
+  const res = await fetch(`/api/career-applications/${id}/assign`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: headersBase,
+    body: JSON.stringify({ mentorId })
+  });
 
-        const id = item._id;
-        const attempts = [
-          // path param
-          { url: `/api/career-applications/${id}/assign`, method:'PUT',  body:{ mentorId } },
-          { url: `/api/career-applications/${id}/assign`, method:'POST', body:{ mentorId } },
-          { url: `/api/career-applications/${id}`,         method:'PATCH', body:{ assignedMentorId: mentorId } },
-          { url: `/api/career-applications/${id}`,         method:'PUT',   body:{ assignedMentorId: mentorId } },
-          // query param variants
-          { url: `/api/career-applications/assign?id=${encodeURIComponent(id)}`, method:'POST', body:{ mentorId } },
-          { url: `/api/career-applications/assign?id=${encodeURIComponent(id)}`, method:'PUT',  body:{ mentorId } },
-          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,        method:'PATCH', body:{ assignedMentorId: mentorId } },
-          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,        method:'PUT',   body:{ assignedMentorId: mentorId } },
-          // collection-level with id in body
-          { url: `/api/career-applications/assign`,        method:'POST',  body:{ id, mentorId } },
-          { url: `/api/career-applications/assign`,        method:'PUT',   body:{ id, mentorId } },
-          { url: `/api/career-applications`,               method:'PATCH', body:{ id, assignedMentorId: mentorId } },
-        ];
-
-        let ok = false, lastErr = null;
-        for (const a of attempts){
-          try{
-            const res = await tryReq(a.url, a.method, a.body);
-            if (res.ok){ ok = true; break; }
-            lastErr = new Error(`HTTP ${res.status}`);
-          }catch(e){ lastErr = e; }
-        }
-        if (!ok) throw lastErr || new Error('Assign mentor failed');
-      }
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`HTTP ${res.status} – ${txt}`);
+  }
+}
 
       // saveAdminNotes function removed
 

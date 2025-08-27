@@ -21,8 +21,8 @@ function isAdmin(req,res,next){
   return res.status(403).json({ ok:false, message:'Forbidden' });
 }
 
-router.post('/', auth, careerCtrl.create);
-router.get('/',  auth, careerCtrl.list);
-router.put('/:id/assign', auth, isAdmin, careerCtrl.assignMentor); // 👈 назначение ментора
+router.post('/', careerCtrl.create);
+router.get('/',  careerCtrl.list);
+router.put('/:id/assign', careerCtrl.assignMentor);
 
 module.exports = router;

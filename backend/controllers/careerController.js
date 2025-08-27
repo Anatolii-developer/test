@@ -1,4 +1,4 @@
-// controllers/careerController.js
+const mongoose = require('mongoose');   // ← ЭТОГО НЕ ХВАТАЛО
 const CareerApplication = require("../models/CareerApplication");
 const User = require("../models/User");
 
@@ -160,40 +160,35 @@ async function assignMentor(req, res) {
     const { mentorId } = req.body || {};
 
     if (!mongoose.isValidObjectId(appId)) {
-      return res.status(400).json({ ok: false, message: 'Invalid application id' });
+      return res.status(400).json({ ok:false, message:'Invalid application id' });
     }
     if (!mongoose.isValidObjectId(mentorId)) {
-      return res.status(400).json({ ok: false, message: 'Invalid mentor id' });
+      return res.status(400).json({ ok:false, message:'Invalid mentor id' });
     }
 
-    // проверим, что пользователь существует и он ментор
     const mentor = await User.findById(mentorId).select('roles firstName lastName email');
-    if (!mentor) {
-      return res.status(404).json({ ok: false, message: 'Mentor not found' });
-    }
+    if (!mentor) return res.status(404).json({ ok:false, message:'Mentor not found' });
+
     const isMentor = Array.isArray(mentor.roles) &&
       mentor.roles.map(r => String(r).toLowerCase())
-            .some(r => r.includes('mentor') || r.includes('ментор'));
-    if (!isMentor) {
-      return res.status(400).json({ ok: false, message: 'User is not a mentor' });
-    }
+                  .some(r => r.includes('mentor') || r.includes('ментор'));
+    if (!isMentor) return res.status(400).json({ ok:false, message:'User is not a mentor' });
 
     const app = await CareerApplication.findByIdAndUpdate(
       appId,
-      { $set: { assignedMentor: mentor._id } }, // или assignedMentorId, если такое поле у тебя
+      { $set: { assignedMentor: mentor._id } },
       { new: true }
     )
       .populate('user', 'firstName lastName email username photoUrl')
       .populate('assignedMentor', 'firstName lastName email username');
 
-    if (!app) {
-      return res.status(404).json({ ok: false, message: 'Application not found' });
-    }
+    if (!app) return res.status(404).json({ ok:false, message:'Application not found' });
 
-    return res.json({ ok: true, application: app });
+    return res.json({ ok:true, application: app });
   } catch (e) {
     console.error('[assignMentor] failed:', e);
-    return res.status(500).json({ ok: false, message: 'Server error' });
+    // временно отдаем текст ошибки, чтобы увидеть причину в браузере
+    return res.status(500).json({ ok:false, message: e?.message || 'Server error' });
   }
 }
 

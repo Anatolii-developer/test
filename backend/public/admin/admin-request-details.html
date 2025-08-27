@@ -290,9 +290,8 @@
       </div>
 
       <div class="actions">
-        <button id="saveBtn" class="btn">Зберегти</button>
-      </div>
-    </div>
+  <button id="saveBtn" class="btn" type="button">Зберегти</button>
+</div>
 
     <script>
       // --- small helpers ---
@@ -448,32 +447,53 @@
         renderMentorMenu(__MENTORS, assignedId);
       }
 
-      async function save() {
-        const mentorId = (qs("#mentorSelectValue").value || "").trim();
-        if (!mentorId) {
-          alert("Оберіть ментора");
-          return;
-        }
-        const r = await fetch(`/api/career-applications/${ID}/assign`, {
-          method: "PUT",
-          credentials: "include",
-          headers: Object.assign(
-            { "Content-Type": "application/json" },
-            authHeaders()
-          ),
-          body: JSON.stringify({ mentorId }),
-        });
-        if (!r.ok) {
-          const t = await r.text();
-          alert("Помилка: " + t);
-          return;
-        }
-        alert("Ментор призначений");
-        history.back(); // повертаємося до списку
-      }
+     async function save() {
+  console.log('[save] start');
+  const mentorId = (qs("#mentorSelectValue").value || "").trim();
+  if (!mentorId) {
+    alert("Оберіть ментора");
+    return;
+  }
+  const r = await fetch(`/api/career-applications/${ID}/assign`, {
+    method: "PUT",
+    credentials: "include",
+    headers: Object.assign(
+      { "Content-Type": "application/json" },
+      authHeaders()
+    ),
+    body: JSON.stringify({ mentorId }),
+  });
+  console.log('[save] response status:', r.status);
+  if (!r.ok) {
+    const t = await r.text().catch(()=> '');
+    alert("Помилка: " + (t || r.status));
+    return;
+  }
+  alert("Ментор призначений");
+  history.back();
+}
 
-      document.getElementById("saveBtn").addEventListener("click", save);
-      loadApplication();
+      document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('saveBtn');
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      console.log('[UI] save clicked');
+      save().catch(err => {
+        console.error('[save] failed:', err);
+        alert('Помилка мережі або CORS: ' + (err?.message || err));
+      });
+    });
+  } else {
+    console.error('saveBtn not found in DOM');
+  }
+  loadApplication().catch(e=>{
+    console.error('[loadApplication] failed:', e);
+    alert('Помилка завантаження заявки');
+  });
+});
+
+
+
     </script>
   </body>
 </html>

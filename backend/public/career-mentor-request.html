@@ -348,8 +348,9 @@
         qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
 
         // meta
-        const when = a.createdAt ? fmtDate(a.createdAt) : "";
-        if (when) qs("#submittedMeta").textContent = "Дата подання: " + when;
+        const when = a.createdAt ? fmt(a.createdAt) : "";
+const metaEl = qs("#submittedMeta");
+if (when && metaEl) metaEl.textContent = "Дата подання: " + when;
 
         // show page
         qs("#page").style.display = "flex";

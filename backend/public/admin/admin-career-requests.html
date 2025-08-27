@@ -886,40 +886,65 @@ function closeOnOutsideOnce(e){
 
       async function saveAdminNotes(item) {
         const { n1, n2, n3, n4 } = getReqEls();
-        const payload = {
-          notes: {
-            n1: n1?.value || "",
-            n2: n2?.value || "",
-            n3: n3?.value || "",
-            n4: n4?.value || "",
-          },
+        const notesObj = {
+          n1: n1?.value || "",
+          n2: n2?.value || "",
+          n3: n3?.value || "",
+          n4: n4?.value || "",
         };
-        try {
-          const token = getAuthToken && getAuthToken();
-          const res = await fetch(
-            `/api/career-applications/${item._id}/notes`,
-            {
-              method: "PUT",
-              credentials: "include",
-              headers: Object.assign(
-                { "Content-Type": "application/json" },
-                token ? { Authorization: `Bearer ${token}` } : {}
-              ),
-              body: JSON.stringify(payload),
-            }
-          );
-          if (!res.ok) throw new Error("Notes failed");
 
-          // Призначення ментора (якщо змінили)
+        const token = getAuthToken && getAuthToken();
+        const baseHeaders = Object.assign(
+          { "Content-Type": "application/json" },
+          token ? { Authorization: `Bearer ${token}` } : {}
+        );
+
+        async function trySave(url, method, body){
+          const res = await fetch(url, {
+            method,
+            credentials: "include",
+            headers: baseHeaders,
+            body: JSON.stringify(body)
+          });
+          return res;
+        }
+
+        // Try a series of endpoints/methods because backend route may differ
+        const id = item._id;
+        const attempts = [
+          { url: `/api/career-applications/${id}/notes`, method: 'PUT', body: { notes: notesObj } },
+          { url: `/api/career-applications/${id}`,        method: 'PUT', body: { notes: notesObj } },
+          { url: `/api/career-applications/${id}`,        method: 'PATCH', body: { notes: notesObj } },
+          { url: `/api/career-applications/${id}`,        method: 'PUT', body: { adminNotes: notesObj } },
+          { url: `/api/career-applications/${id}`,        method: 'PATCH', body: { adminNotes: notesObj } },
+        ];
+
+        let saved = false;
+        let lastError = null;
+        for (const att of attempts){
+          try{
+            const res = await trySave(att.url, att.method, att.body);
+            // Debug log for troubleshooting
+            try { const dbg = await res.clone().json(); console.log('Notes save attempt:', att, '→', res.status, dbg); } catch(_) { console.log('Notes save attempt:', att, '→', res.status); }
+            if (res.ok){ saved = true; break; }
+            lastError = new Error(`HTTP ${res.status}`);
+            // if 404/405 -> continue to next attempt automatically
+          }catch(e){ lastError = e; }
+        }
+
+        try {
+          if (!saved) throw lastError || new Error('Notes failed');
+
+          // Назначение ментора (если изменили)
           await assignMentorIfChanged(item);
 
           alert("Збережено");
           closeReqModal();
-          // при необхідності оновити таблицю без повного перезавантаження
+          // опционально: перезагрузить список
           // location.reload();
         } catch (e) {
           console.warn("Save failed:", e);
-          alert("Не вдалося зберегти.");
+          alert("Не вдалося зберегти (нотатки або призначення). Перевірте бекенд-роути.");
         }
       }
 

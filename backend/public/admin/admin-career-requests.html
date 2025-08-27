@@ -861,27 +861,34 @@ function closeOnOutsideOnce(e){
         if (!mentorId || mentorId === current) return; // нічого не міняли
 
         const token = getAuthToken && getAuthToken();
-        const headersBase = Object.assign({ 'Content-Type':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {});
+        const headersBase = Object.assign({ 'Content-Type':'application/json', 'Accept':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {});
 
-        // основний шлях
-        try{
-          const res = await fetch(`/api/career-applications/${item._id}/assign`, {
-            method:'PUT',
-            credentials:'include',
-            headers: headersBase,
-            body: JSON.stringify({ mentorId })
-          });
-          if (res.ok) return;
-        }catch(_){ }
+        async function tryReq(url, method, body){
+          const res = await fetch(url, { method, credentials:'include', headers: headersBase, body: JSON.stringify(body) });
+          try { const dbg = await res.clone().json(); console.log('Assign attempt:', {url, method, body}, '→', res.status, dbg); } catch(_) { console.log('Assign attempt:', {url, method, body}, '→', res.status); }
+          return res;
+        }
 
-        // фолбек (PATCH assignedMentorId)
-        const res2 = await fetch(`/api/career-applications/${item._id}`, {
-          method:'PATCH',
-          credentials:'include',
-          headers: headersBase,
-          body: JSON.stringify({ assignedMentorId: mentorId })
-        });
-        if (!res2.ok) throw new Error('Assign mentor failed');
+        const id = item._id;
+        const attempts = [
+          { url: `/api/career-applications/${id}/assign`, method:'PUT',  body:{ mentorId } },
+          { url: `/api/career-applications/${id}/assign`, method:'POST', body:{ mentorId } },
+          { url: `/api/career-applications/${id}`,         method:'PATCH', body:{ assignedMentorId: mentorId } },
+          { url: `/api/career-applications/${id}`,         method:'PUT',   body:{ assignedMentorId: mentorId } },
+          { url: `/api/career-applications/assign`,        method:'POST',  body:{ id, mentorId } },
+          { url: `/api/career-applications/assign`,        method:'PUT',   body:{ id, mentorId } },
+          { url: `/api/career-applications`,               method:'PATCH', body:{ id, assignedMentorId: mentorId } },
+        ];
+
+        let ok = false, lastErr = null;
+        for (const a of attempts){
+          try{
+            const res = await tryReq(a.url, a.method, a.body);
+            if (res.ok){ ok = true; break; }
+            lastErr = new Error(`HTTP ${res.status}`);
+          }catch(e){ lastErr = e; }
+        }
+        if (!ok) throw lastErr || new Error('Assign mentor failed');
       }
 
       async function saveAdminNotes(item) {
@@ -895,53 +902,72 @@ function closeOnOutsideOnce(e){
 
         const token = getAuthToken && getAuthToken();
         const baseHeaders = Object.assign(
-          { "Content-Type": "application/json" },
+          { "Content-Type": "application/json", "Accept": "application/json" },
           token ? { Authorization: `Bearer ${token}` } : {}
         );
 
-        async function trySave(url, method, body){
+        async function tryReq(url, method, body) {
           const res = await fetch(url, {
             method,
             credentials: "include",
             headers: baseHeaders,
-            body: JSON.stringify(body)
+            body: body != null ? JSON.stringify(body) : undefined,
           });
+          // best-effort debug
+          try {
+            const dbg = await res.clone().json();
+            console.log("Notes save attempt:", { url, method, body }, "→", res.status, dbg);
+          } catch (_) {
+            console.log("Notes save attempt:", { url, method, body }, "→", res.status);
+          }
           return res;
         }
 
-        // Try a series of endpoints/methods because backend route may differ
         const id = item._id;
+        const payloadNotes = { notes: notesObj };
+        const payloadAdminNotes = { adminNotes: notesObj };
+
+        // Try a wide set of common REST variants
         const attempts = [
-          { url: `/api/career-applications/${id}/notes`, method: 'PUT', body: { notes: notesObj } },
-          { url: `/api/career-applications/${id}`,        method: 'PUT', body: { notes: notesObj } },
-          { url: `/api/career-applications/${id}`,        method: 'PATCH', body: { notes: notesObj } },
-          { url: `/api/career-applications/${id}`,        method: 'PUT', body: { adminNotes: notesObj } },
-          { url: `/api/career-applications/${id}`,        method: 'PATCH', body: { adminNotes: notesObj } },
+          // With explicit /notes path
+          { url: `/api/career-applications/${id}/notes`, method: "PUT", body: payloadNotes },
+          { url: `/api/career-applications/${id}/notes`, method: "POST", body: payloadNotes },
+
+          // Plain resource update (id in path)
+          { url: `/api/career-applications/${id}`, method: "PUT", body: payloadNotes },
+          { url: `/api/career-applications/${id}`, method: "PATCH", body: payloadNotes },
+          { url: `/api/career-applications/${id}`, method: "PUT", body: payloadAdminNotes },
+          { url: `/api/career-applications/${id}`, method: "PATCH", body: payloadAdminNotes },
+
+          // Collection-level helpers (id in body)
+          { url: `/api/career-applications/notes`, method: "POST", body: { id, ...payloadNotes } },
+          { url: `/api/career-applications/update`, method: "POST", body: { id, ...payloadNotes } },
+          { url: `/api/career-applications/notes`, method: "PUT", body: { id, ...payloadNotes } },
+          { url: `/api/career-applications`, method: "PUT", body: { id, ...payloadNotes } },
+          { url: `/api/career-applications`, method: "PATCH", body: { id, ...payloadNotes } },
+
+          // AdminNotes variants at collection level
+          { url: `/api/career-applications/notes`, method: "POST", body: { id, ...payloadAdminNotes } },
+          { url: `/api/career-applications/update`, method: "POST", body: { id, ...payloadAdminNotes } },
         ];
 
-        let saved = false;
-        let lastError = null;
-        for (const att of attempts){
-          try{
-            const res = await trySave(att.url, att.method, att.body);
-            // Debug log for troubleshooting
-            try { const dbg = await res.clone().json(); console.log('Notes save attempt:', att, '→', res.status, dbg); } catch(_) { console.log('Notes save attempt:', att, '→', res.status); }
-            if (res.ok){ saved = true; break; }
-            lastError = new Error(`HTTP ${res.status}`);
-            // if 404/405 -> continue to next attempt automatically
-          }catch(e){ lastError = e; }
+        let ok = false, lastErr = null;
+        for (const a of attempts) {
+          try {
+            const res = await tryReq(a.url, a.method, a.body);
+            if (res.ok) { ok = true; break; }
+            lastErr = new Error(`HTTP ${res.status}`);
+            // continue to next attempt
+          } catch (e) {
+            lastErr = e;
+          }
         }
 
         try {
-          if (!saved) throw lastError || new Error('Notes failed');
-
-          // Назначение ментора (если изменили)
-          await assignMentorIfChanged(item);
-
+          if (!ok) throw lastErr || new Error("Notes failed");
+          await assignMentorIfChanged(item); // assign, if changed
           alert("Збережено");
           closeReqModal();
-          // опционально: перезагрузить список
-          // location.reload();
         } catch (e) {
           console.warn("Save failed:", e);
           alert("Не вдалося зберегти (нотатки або призначення). Перевірте бекенд-роути.");

@@ -2,9 +2,21 @@ const CareerApplication = require('../models/CareerApplication');
 const User = require('../models/User');
 
 // маленький хелпер без middleware
-function isAdminUser(req) {
-  const role = (req.user?.role || '').toString().toLowerCase();
-  return role.includes('admin') || role.includes('адмін');
+async function isAdminUser(req) {
+  // з JWT
+  const rolesFromToken = Array.isArray(req.user?.roles) ? req.user.roles : [];
+  const isAdminFromToken = rolesFromToken
+    .map(r => String(r).toLowerCase())
+    .some(r => r.includes('admin') || r.includes('адмін'));
+  if (isAdminFromToken) return true;
+
+  // фолбек по БД (якщо треба)
+  const uid = req.user?._id || req.user?.id;
+  if (!uid) return false;
+  const me = await User.findById(uid).select('roles').lean();
+  return Array.isArray(me?.roles) &&
+    me.roles.map(r=>String(r).toLowerCase())
+      .some(r => r.includes('admin') || r.includes('адмін'));
 }
 
 module.exports = {

@@ -101,6 +101,24 @@ async function getOne(req, res) {
   }
 }
 
+async function listAdmin(req, res) {
+  try {
+    if (!(await isAdminUser(req))) {
+      return res.status(403).json({ ok:false, message:'Forbidden: admin only' });
+    }
+
+    const apps = await CareerApplication.find({})
+      .populate('user', 'firstName lastName email username')
+      .populate('assignedMentor', 'firstName lastName email username')
+      .sort({ createdAt: -1 });
+
+    res.json({ ok:true, rows: apps });
+  } catch (err) {
+    console.error('career listAdmin failed:', err);
+    res.status(500).json({ ok:false, message:'Server error' });
+  }
+}
+
 async function list(req, res) {
   try {
     if (!req.user)

@@ -9,7 +9,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="admin-styles.css" />
-    <link rel="icon" type="image/svg+xml" href="/assets/sidebar/IPS Logo (1).svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/assets/sidebar/IPS Logo (1).svg"
+    />
     <style>
       body {
         margin: 0;
@@ -33,53 +37,71 @@
         margin: 0 0 24px;
       }
       /* ==== TABLE (admin requests) ==== */
-      .req-table-wrap{ margin-top:16px; }
-      .req-table{
-        width:100%;
-        border-collapse:separate;
-        border-spacing:0;
-        border:1.5px solid #E8812E;
-        border-radius:16px;
-        overflow:hidden;
-        font-size:16px;
+      .req-table-wrap {
+        margin-top: 16px;
       }
-      .req-table thead th{
-        background:#E8812E;
-        color:#fff;
-        text-align:left;
-        padding:16px 18px;
-        font-weight:600;
-        font-size:18px;
+      .req-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1.5px solid #e8812e;
+        border-radius: 16px;
+        overflow: hidden;
+        font-size: 16px;
       }
-      .req-table thead th:first-child{ width:60px; text-align:center; }
-      .req-table tbody td{
-        background:#fff;
-        border-top:1px solid #E8812E;
-        border-left:1px solid #E8812E;
-        padding:14px 18px;
-        vertical-align:middle;
+      .req-table thead th {
+        background: #e8812e;
+        color: #fff;
+        text-align: left;
+        padding: 16px 18px;
+        font-weight: 600;
+        font-size: 18px;
       }
-      .req-table tbody td:first-child{
-        text-align:center;
-        border-left:none;
-        width:60px;
-        font-weight:600;
+      .req-table thead th:first-child {
+        width: 60px;
+        text-align: center;
       }
-      .req-name-cell{
-        font-size:18px;
-        font-weight:500;
-        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-        max-width:420px;
+      .req-table tbody td {
+        background: #fff;
+        border-top: 1px solid #e8812e;
+        border-left: 1px solid #e8812e;
+        padding: 14px 18px;
+        vertical-align: middle;
       }
-      .req-email-cell{
-        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-        max-width:360px;
+      .req-table tbody td:first-child {
+        text-align: center;
+        border-left: none;
+        width: 60px;
+        font-weight: 600;
       }
-      .btn-view{
-        background:#E8812E; color:#fff; border:none; cursor:pointer;
-        border-radius:24px; padding:8px 18px; font-weight:600;
+      .req-name-cell {
+        font-size: 18px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 420px;
       }
-      .empty{ text-align:center; color:#6b6b6b; margin-top:8px }
+      .req-email-cell {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 360px;
+      }
+      .btn-view {
+        background: #e8812e;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 24px;
+        padding: 8px 18px;
+        font-weight: 600;
+      }
+      .empty {
+        text-align: center;
+        color: #6b6b6b;
+        margin-top: 8px;
+      }
       .req-modal-backdrop {
         position: fixed;
         inset: 0;
@@ -97,10 +119,10 @@
         padding: 24px 24px 20px;
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
         position: relative;
-        max-height: 90vh;              /* allow the modal to fit viewport height */
-        overflow: auto;                /* enable scrolling inside the modal */
+        max-height: 90vh; /* allow the modal to fit viewport height */
+        overflow: auto; /* enable scrolling inside the modal */
         -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
-        overscroll-behavior: contain;  /* prevent background scroll bounce */
+        overscroll-behavior: contain; /* prevent background scroll bounce */
       }
       .req-modal h3 {
         margin: 0 0 12px;
@@ -160,19 +182,131 @@
         opacity: 1;
       }
       /* === Mentors/Admin modal redesign === */
-      .mentor-modal { display:grid; grid-template-columns: 1fr 360px; gap:20px; }
-      .mentor-left { display:flex; flex-direction:column; gap:14px; }
-      .mentor-right { display:flex; flex-direction:column; gap:14px; }
-      .mentor-photo { width:160px; height:200px; border-radius:12px; object-fit:cover; background:#eef1ee; border:1px dashed #7aa978; }
-      .field { display:flex; flex-direction:column; gap:6px; }
-      .field label { font-size:14px; color:#6b6b6b; }
-      .field input, .field textarea, .note textarea { width:100%; box-sizing:border-box; border:1px solid #D9D9D9; border-radius:12px; padding:10px 12px; font-family: Poppins, sans-serif; font-size:14px; color:#222; background:#FFFFFF; }
-      .field textarea { min-height:90px; resize:vertical; }
-      .note { display:flex; flex-direction:column; gap:6px; }
-      .note label { font-size:14px; font-weight:600; color:#275D2B; }
-      .note textarea { min-height:54px; background:#F5F6F7; }
-      .modal-actions-bar { display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
-      .btn-primary { background:#275D2B; color:#fff; border:none; border-radius:10px; padding:10px 16px; font-weight:600; cursor:pointer; }
+      .mentor-modal {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 20px;
+      }
+      .mentor-left {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .mentor-right {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .mentor-photo {
+        width: 160px;
+        height: 200px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #eef1ee;
+        border: 1px dashed #7aa978;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field label {
+        font-size: 14px;
+        color: #6b6b6b;
+      }
+      .field input,
+      .field textarea,
+      .note textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #d9d9d9;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-family: Poppins, sans-serif;
+        font-size: 14px;
+        color: #222;
+        background: #ffffff;
+      }
+      .field textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+      .note {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .note label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #275d2b;
+      }
+      .note textarea {
+        min-height: 54px;
+        background: #f5f6f7;
+      }
+      .modal-actions-bar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .btn-primary {
+        background: #275d2b;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Кнопка-дропдаун по ТЗ */
+      .mentor-select {
+        width: 456px;
+        height: 48px;
+        background: #ffeed9;
+        border-radius: 5px;
+        padding: 12px 21px 12px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        user-select: none;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .mentor-select:focus {
+        outline: 2px solid #e8812e33;
+      }
+      .mentor-select .mentor-caret {
+        width: 16px;
+        height: 16px;
+        opacity: 0.9;
+      }
+
+      .mentor-menu {
+        width: 456px;
+        max-height: 240px;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid #e8812e;
+        border-radius: 8px;
+        margin-top: 8px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+      }
+      .mentor-option {
+        padding: 10px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mentor-option:hover {
+        background: #fff4ea;
+      }
+      .mentor-option.active {
+        background: #ffe5cc;
+      }
       @media (max-width: 1200px) {
         .wrap {
           width: 90%;
@@ -186,33 +320,61 @@
   </head>
   <body>
     <aside class="sidebar" id="sidebar">
-  <!-- Логотип -->
-  <img class="logo" src="/assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-  
-  <p style="margin-left: 12px; font-weight: 600;">Admin</p>
+      <!-- Логотип -->
+      <img
+        class="logo"
+        src="/assets/sidebar/IPS Logo (2).svg"
+        alt="Logo"
+        id="logoExpanded"
+      />
 
-  <!-- Навигация -->
-  <nav>
-    <a href="admin-requests.html"><img src="/assets/sidebar/profile.svg" /><span>Профайли</span></a>
-    <a href="admin-certificate.html"><img src="/assets/sidebar/news.svg" /><span>Сертифікати</span></a>
-    <a href="admin-career-faq.html"><img src="/assets/sidebar/3.svg" /><span>Планування кар'єри</span></a>
-    <a href="admin-library.html"><img src="/assets/sidebar/4.svg" /><span>Бібліотека</span></a>
-    <a href="admin-all-courses.html"><img src="/assets/sidebar/5.svg" /><span>Курси</span></a>
-    <a href="#"><img src="/assets/sidebar/6.svg" /><span>Облік практики</span></a>
-    <a href="#"><img src="/assets/sidebar/7.svg" /><span>Здоров’я</span></a>
-    <a href="#"><img src="/assets/sidebar/8.svg" /><span>Фінанси</span></a>
-    <a href="#"><img src="/assets/sidebar/9.svg" /><span>Нерухомість</span></a>
-  </nav>
+      <p style="margin-left: 12px; font-weight: 600">Admin</p>
 
-  <!-- Настройки + выход -->
-  <div style="margin-top: auto;">
-    <a href="#"><img src="/assets/sidebar/settings.svg" /><span>Налаштування</span></a>
-    <div class="logout" onclick="logoutUser()">
-      <img src="/assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
-      <span>Logout Account</span>
-    </div>
-  </div>
-</aside>
+      <!-- Навигация -->
+      <nav>
+        <a href="admin-requests.html"
+          ><img src="/assets/sidebar/profile.svg" /><span>Профайли</span></a
+        >
+        <a href="admin-certificate.html"
+          ><img src="/assets/sidebar/news.svg" /><span>Сертифікати</span></a
+        >
+        <a href="admin-career-faq.html"
+          ><img src="/assets/sidebar/3.svg" /><span>Планування кар'єри</span></a
+        >
+        <a href="admin-library.html"
+          ><img src="/assets/sidebar/4.svg" /><span>Бібліотека</span></a
+        >
+        <a href="admin-all-courses.html"
+          ><img src="/assets/sidebar/5.svg" /><span>Курси</span></a
+        >
+        <a href="#"
+          ><img src="/assets/sidebar/6.svg" /><span>Облік практики</span></a
+        >
+        <a href="#"><img src="/assets/sidebar/7.svg" /><span>Здоров’я</span></a>
+        <a href="#"><img src="/assets/sidebar/8.svg" /><span>Фінанси</span></a>
+        <a href="#"
+          ><img src="/assets/sidebar/9.svg" /><span>Нерухомість</span></a
+        >
+      </nav>
+
+      <!-- Настройки + выход -->
+      <div style="margin-top: auto">
+        <a href="#"
+          ><img src="/assets/sidebar/settings.svg" /><span
+            >Налаштування</span
+          ></a
+        >
+        <div class="logout" onclick="logoutUser()">
+          <img
+            src="/assets/sidebar/log-out.svg"
+            alt="Logout Icon"
+            width="20"
+            height="20"
+          />
+          <span>Logout Account</span>
+        </div>
+      </div>
+    </aside>
 
     <div class="wrap">
       <h1>Заявки всіх учасників</h1>
@@ -228,7 +390,9 @@
           </thead>
           <tbody id="tblBody"></tbody>
         </table>
-        <div id="empty" class="empty" style="display:none">Поки що немає заявок.</div>
+        <div id="empty" class="empty" style="display: none">
+          Поки що немає заявок.
+        </div>
       </div>
     </div>
 
@@ -247,7 +411,12 @@
 
         <div class="mentor-modal">
           <div class="mentor-left">
-            <img id="reqPhoto" class="mentor-photo" src="/assets/profile-photo.png" alt="Фото" />
+            <img
+              id="reqPhoto"
+              class="mentor-photo"
+              src="/assets/profile-photo.png"
+              alt="Фото"
+            />
 
             <div class="field">
               <label>Прізвище</label>
@@ -315,6 +484,38 @@
           <button class="req-btn close" id="reqCloseBtn">Закрити</button>
           <button class="btn-primary" id="reqSaveNotes">Зберегти</button>
         </div>
+
+        <div class="field">
+          <label>Призначити ментора</label>
+
+          <!-- Кнопка-«селект» -->
+          <div
+            id="mentorSelectBtn"
+            class="mentor-select"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            tabindex="0"
+          >
+            <span id="mentorSelectLabel">Оберіть ментора</span>
+            <img
+              class="mentor-caret"
+              src="/assets/icons/caret-down-orange.png"
+              alt=""
+            />
+          </div>
+
+          <!-- Дропдаун-меню -->
+          <div
+            id="mentorMenu"
+            class="mentor-menu"
+            role="listbox"
+            tabindex="-1"
+            style="display: none"
+          ></div>
+
+          <!-- Сюда кладем выбранный id -->
+          <input type="hidden" id="mentorSelectValue" />
+        </div>
       </div>
     </div>
 
@@ -350,39 +551,75 @@
 
         for (let guard = 0; guard < 25; guard++) {
           const url = new URL(base, location.origin);
-          url.searchParams.set('all', '1');
-          url.searchParams.set('limit', String(pageSize));
-          url.searchParams.set('page', String(page));
-          if (nextToken) url.searchParams.set('pageToken', nextToken);
+          url.searchParams.set("all", "1");
+          url.searchParams.set("limit", String(pageSize));
+          url.searchParams.set("page", String(page));
+          if (nextToken) url.searchParams.set("pageToken", nextToken);
 
           const res = await fetch(url.pathname + url.search, {
-            method: 'GET',
-            credentials: 'include',
+            method: "GET",
+            credentials: "include",
             headers: Object.assign(
-              { 'Accept': 'application/json' },
-              token ? { 'Authorization': `Bearer ${token}` } : {}
+              { Accept: "application/json" },
+              token ? { Authorization: `Bearer ${token}` } : {}
             ),
           });
-          let body = null; try { body = await res.clone().json(); } catch(_) {}
+          let body = null;
+          try {
+            body = await res.clone().json();
+          } catch (_) {}
           if (!res.ok) break;
 
-          const chunk = Array.isArray(body) ? body
-                    : Array.isArray(body?.rows) ? body.rows
-                    : Array.isArray(body?.items) ? body.items
-                    : Array.isArray(body?.data) ? body.data
-                    : (body?.ok && Array.isArray(body?.result)) ? body.result
-                    : [];
+          const chunk = Array.isArray(body)
+            ? body
+            : Array.isArray(body?.rows)
+            ? body.rows
+            : Array.isArray(body?.items)
+            ? body.items
+            : Array.isArray(body?.data)
+            ? body.data
+            : body?.ok && Array.isArray(body?.result)
+            ? body.result
+            : [];
           all.push(...chunk);
 
-          const hasMore = !!(body?.hasMore || body?.has_next || body?.next || body?.nextPage || body?.next_page || body?.next_page_token);
+          const hasMore = !!(
+            body?.hasMore ||
+            body?.has_next ||
+            body?.next ||
+            body?.nextPage ||
+            body?.next_page ||
+            body?.next_page_token
+          );
           const total = body?.total || body?.count || null;
-          const nextPage = body?.nextPage || (body?.page && body?.pages && body.page < body.pages ? (body.page + 1) : null);
-          const tokenCandidate = body?.next_page_token || body?.nextPageToken || body?.pageToken || null;
+          const nextPage =
+            body?.nextPage ||
+            (body?.page && body?.pages && body.page < body.pages
+              ? body.page + 1
+              : null);
+          const tokenCandidate =
+            body?.next_page_token ||
+            body?.nextPageToken ||
+            body?.pageToken ||
+            null;
 
-          if (tokenCandidate) { nextToken = tokenCandidate; page += 1; continue; }
-          if (nextPage) { page = nextPage; continue; }
-          if (hasMore && chunk.length > 0) { page += 1; continue; }
-          if (total && all.length < total) { page += 1; continue; }
+          if (tokenCandidate) {
+            nextToken = tokenCandidate;
+            page += 1;
+            continue;
+          }
+          if (nextPage) {
+            page = nextPage;
+            continue;
+          }
+          if (hasMore && chunk.length > 0) {
+            page += 1;
+            continue;
+          }
+          if (total && all.length < total) {
+            page += 1;
+            continue;
+          }
           break;
         }
 
@@ -418,38 +655,122 @@
           ? `${first} ${last}`.trim()
           : item.fullName || item.email || "Без імені";
       }
-      function emailFrom(item){
-        return (item.user?.email || item.email || '').trim();
+      function emailFrom(item) {
+        return (item.user?.email || item.email || "").trim();
       }
 
       const $tbody = document.getElementById("tblBody");
       const $empty = document.getElementById("empty");
 
-      function rowTemplate(i, item){
-        const tr = document.createElement('tr');
+      function rowTemplate(i, item) {
+        const tr = document.createElement("tr");
 
-        const tdNum = document.createElement('td');
+        const tdNum = document.createElement("td");
         tdNum.textContent = i;
 
-        const tdName = document.createElement('td');
-        tdName.className = 'req-name-cell';
+        const tdName = document.createElement("td");
+        tdName.className = "req-name-cell";
         tdName.textContent = fullNameFrom(item);
 
-        const tdEmail = document.createElement('td');
-        tdEmail.className = 'req-email-cell';
+        const tdEmail = document.createElement("td");
+        tdEmail.className = "req-email-cell";
         tdEmail.textContent = emailFrom(item);
 
-        const tdAction = document.createElement('td');
-        const btn = document.createElement('button');
-        btn.className = 'btn-view';
-        btn.textContent = 'Переглянути';
-        btn.addEventListener('click', ()=>openReqModal(item));
+        const tdAction = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.className = "btn-view";
+        btn.textContent = "Переглянути";
+        btn.addEventListener("click", () => openReqModal(item));
         tdAction.appendChild(btn);
 
         tr.append(tdNum, tdName, tdEmail, tdAction);
         return tr;
       }
 
+
+      let __MENTORS = []; // кэш списка менторов
+
+function getAuthTokenAdmin(){
+  try{
+    const u = JSON.parse(localStorage.getItem('user')||'{}');
+    return u.token || u.accessToken || localStorage.getItem('token') || null;
+  }catch(_){ return null; }
+}
+
+async function fetchMentors(){
+  // основной путь
+  const token = getAuthTokenAdmin();
+  const headers = Object.assign({ 'Accept':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {});
+  try{
+    let res = await fetch('/api/users?role=mentor', { credentials:'include', headers });
+    if (res.ok){
+      const users = await res.json();
+      return (Array.isArray(users) ? users : []).filter(Boolean);
+    }
+  }catch(_){}
+  // фолбэк — тянем всех и фильтруем по роли
+  try{
+    let res = await fetch('/api/users', { credentials:'include', headers });
+    if (!res.ok) return [];
+    const all = await res.json();
+    return (Array.isArray(all) ? all : []).filter(u=>{
+      const roles = (u.roles||[]).map(s=>String(s).toLowerCase());
+      return roles.some(r=> r.includes('ментор') || r.includes('mentor'));
+    });
+  }catch(_){ return []; }
+}
+
+function renderMentorMenu(list, preselectedId){
+  const menu = document.getElementById('mentorMenu');
+  if (!menu) return;
+  menu.innerHTML = '';
+  if (!Array.isArray(list) || !list.length){
+    const empty = document.createElement('div');
+    empty.className = 'mentor-option';
+    empty.textContent = 'Немає доступних менторів';
+    menu.appendChild(empty);
+    return;
+  }
+  list.forEach(m=>{
+    const opt = document.createElement('div');
+    opt.className = 'mentor-option' + (preselectedId && preselectedId === m._id ? ' active':'');
+    opt.setAttribute('role','option');
+    opt.dataset.id = m._id;
+    const name = `${m.firstName||''} ${m.lastName||''}`.trim() || (m.username || m.email || 'Без імені');
+    opt.textContent = name;
+    opt.addEventListener('click', ()=>{
+      const label = document.getElementById('mentorSelectLabel');
+      const hidden = document.getElementById('mentorSelectValue');
+      if (label) label.textContent = name;
+      if (hidden) hidden.value = m._id;
+      closeMentorMenu();
+    });
+    menu.appendChild(opt);
+  });
+}
+
+function openMentorMenu(){
+  const menu = document.getElementById('mentorMenu');
+  const btn  = document.getElementById('mentorSelectBtn');
+  if (!menu || !btn) return;
+  btn.setAttribute('aria-expanded','true');
+  menu.style.display = 'block';
+  // клик вне — закрыть
+  window.addEventListener('click', closeOnOutsideOnce, { once:true });
+}
+function closeMentorMenu(){
+  const menu = document.getElementById('mentorMenu');
+  const btn  = document.getElementById('mentorSelectBtn');
+  if (!menu || !btn) return;
+  btn.setAttribute('aria-expanded','false');
+  menu.style.display = 'none';
+}
+function closeOnOutsideOnce(e){
+  const btn = document.getElementById('mentorSelectBtn');
+  const menu= document.getElementById('mentorMenu');
+  if (!btn || !menu) return;
+  if (!btn.contains(e.target) && !menu.contains(e.target)) closeMentorMenu();
+}
       function getReqEls() {
         return {
           modal: document.getElementById("reqModal"),
@@ -489,46 +810,116 @@
         window.__reqModalBound = true;
       }
 
-      function fillModalFields(item){
-        const { photo, fLast, fFirst, fMiddle, fSubmitted, fExp, fAge, fReq, fAbout, fEdu, fTopics, n1, n2, n3, n4 } = getReqEls();
+      function fillModalFields(item) {
+        const {
+          photo,
+          fLast,
+          fFirst,
+          fMiddle,
+          fSubmitted,
+          fExp,
+          fAge,
+          fReq,
+          fAbout,
+          fEdu,
+          fTopics,
+          n1,
+          n2,
+          n3,
+          n4,
+        } = getReqEls();
         const u = item.user || {};
-        const photoUrl = u.photoUrl || item.photoUrl || '/assets/profile-photo.png';
+        const photoUrl =
+          u.photoUrl || item.photoUrl || "/assets/profile-photo.png";
         if (photo) photo.src = photoUrl;
-        if (fLast) fLast.value = (u.lastName || item.lastName || '').trim();
-        if (fFirst) fFirst.value = (u.firstName || item.firstName || '').trim();
-        if (fMiddle) fMiddle.value = (u.middleName || item.middleName || '').trim();
+        if (fLast) fLast.value = (u.lastName || item.lastName || "").trim();
+        if (fFirst) fFirst.value = (u.firstName || item.firstName || "").trim();
+        if (fMiddle)
+          fMiddle.value = (u.middleName || item.middleName || "").trim();
         const when = item.createdAt || item.created_at || item.created || null;
-        if (fSubmitted) fSubmitted.value = when ? formatDate(when) : '';
-        if (fExp) fExp.value = item.experience || item.exp || '';
-        if (fAge) fAge.value = item.ageGroup || item.age || '';
-        if (fReq) fReq.value = item.requestText || item.request || '';
-        if (fAbout) fAbout.value = item.aboutText || item.about || '';
-        if (fEdu) fEdu.value = item.education || '';
-        if (fTopics) fTopics.value = Array.isArray(item.topics) ? item.topics.join(', ') : (item.topics || '');
+        if (fSubmitted) fSubmitted.value = when ? formatDate(when) : "";
+        if (fExp) fExp.value = item.experience || item.exp || "";
+        if (fAge) fAge.value = item.ageGroup || item.age || "";
+        if (fReq) fReq.value = item.requestText || item.request || "";
+        if (fAbout) fAbout.value = item.aboutText || item.about || "";
+        if (fEdu) fEdu.value = item.education || "";
+        if (fTopics)
+          fTopics.value = Array.isArray(item.topics)
+            ? item.topics.join(", ")
+            : item.topics || "";
 
         const notes = item.adminNotes || item.notes || {};
-        if (n1) n1.value = notes.n1 || notes.note1 || '';
-        if (n2) n2.value = notes.n2 || notes.note2 || '';
-        if (n3) n3.value = notes.n3 || notes.note3 || '';
-        if (n4) n4.value = notes.n4 || notes.note4 || '';
+        if (n1) n1.value = notes.n1 || notes.note1 || "";
+        if (n2) n2.value = notes.n2 || notes.note2 || "";
+        if (n3) n3.value = notes.n3 || notes.note3 || "";
+        if (n4) n4.value = notes.n4 || notes.note4 || "";
       }
 
-      async function saveAdminNotes(item){
-        const { n1, n2, n3, n4 } = getReqEls();
-        const payload = { notes: { n1: n1?.value||'', n2: n2?.value||'', n3: n3?.value||'', n4: n4?.value||'' } };
+      async function assignMentorIfChanged(item){
+        const mentorId = (document.getElementById('mentorSelectValue')?.value || '').trim();
+        const current  = item.assignedMentorId || item.assignedMentor?._id || '';
+        if (!mentorId || mentorId === current) return; // нічого не міняли
+
+        const token = getAuthToken && getAuthToken();
+        const headersBase = Object.assign({ 'Content-Type':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {});
+
+        // основний шлях
         try{
-          const token = getAuthToken && getAuthToken();
-          const res = await fetch(`/api/career-applications/${item._id}/notes`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: Object.assign({ 'Content-Type':'application/json' }, token ? { 'Authorization': `Bearer ${token}` } : {}),
-            body: JSON.stringify(payload)
+          const res = await fetch(`/api/career-applications/${item._id}/assign`, {
+            method:'PUT',
+            credentials:'include',
+            headers: headersBase,
+            body: JSON.stringify({ mentorId })
           });
-          if (!res.ok) throw new Error('Failed');
-          alert('Нотатки збережено');
-        }catch(e){
-          console.warn('Save notes failed:', e);
-          alert('Не вдалося зберегти нотатки.');
+          if (res.ok) return;
+        }catch(_){ }
+
+        // фолбек (PATCH assignedMentorId)
+        const res2 = await fetch(`/api/career-applications/${item._id}`, {
+          method:'PATCH',
+          credentials:'include',
+          headers: headersBase,
+          body: JSON.stringify({ assignedMentorId: mentorId })
+        });
+        if (!res2.ok) throw new Error('Assign mentor failed');
+      }
+
+      async function saveAdminNotes(item) {
+        const { n1, n2, n3, n4 } = getReqEls();
+        const payload = {
+          notes: {
+            n1: n1?.value || "",
+            n2: n2?.value || "",
+            n3: n3?.value || "",
+            n4: n4?.value || "",
+          },
+        };
+        try {
+          const token = getAuthToken && getAuthToken();
+          const res = await fetch(
+            `/api/career-applications/${item._id}/notes`,
+            {
+              method: "PUT",
+              credentials: "include",
+              headers: Object.assign(
+                { "Content-Type": "application/json" },
+                token ? { Authorization: `Bearer ${token}` } : {}
+              ),
+              body: JSON.stringify(payload),
+            }
+          );
+          if (!res.ok) throw new Error("Notes failed");
+
+          // Призначення ментора (якщо змінили)
+          await assignMentorIfChanged(item);
+
+          alert("Збережено");
+          closeReqModal();
+          // при необхідності оновити таблицю без повного перезавантаження
+          // location.reload();
+        } catch (e) {
+          console.warn("Save failed:", e);
+          alert("Не вдалося зберегти.");
         }
       }
 
@@ -538,18 +929,52 @@
         if (!modal) return;
         const fio = fullNameFrom(item);
         const when = item.createdAt || item.created_at || item.created;
-        const whenStr = when ? formatDate(when) : '';
+        const whenStr = when ? formatDate(when) : "";
         if (title) title.textContent = `Заявка — ${fio}`;
-        if (meta)  meta.textContent  = whenStr ? `Дата подання: ${whenStr}` : '';
+        if (meta) meta.textContent = whenStr ? `Дата подання: ${whenStr}` : "";
 
         fillModalFields(item);
+        // ==== Ментори: загрузка и пресеlect ====
+(async ()=>{
+  try{
+    // лениво кэшируем
+    if (!__MENTORS.length) __MENTORS = await fetchMentors();
+    const hidden = document.getElementById('mentorSelectValue');
+    const label  = document.getElementById('mentorSelectLabel');
+
+    // пресеlect из заявки, если уже назначен
+    const assignedId = item.assignedMentorId || item.assignedMentor?._id || null;
+    if (hidden) hidden.value = assignedId || '';
+    if (label){
+      const found = __MENTORS.find(m=> m._id === assignedId);
+      label.textContent = found ? `${found.firstName||''} ${found.lastName||''}`.trim() || (found.username || found.email || 'Без імені') : 'Оберіть ментора';
+    }
+    renderMentorMenu(__MENTORS, assignedId);
+
+    // биндим кнопку
+    const btn = document.getElementById('mentorSelectBtn');
+    if (btn && !btn.__bound){
+      btn.__bound = true;
+      btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); 
+        const menu = document.getElementById('mentorMenu');
+        if (!menu) return;
+        const isOpen = menu.style.display !== 'none';
+        if (isOpen) closeMentorMenu(); else openMentorMenu();
+      });
+      btn.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMentorMenu(); }
+        if (e.key === 'Escape') { e.preventDefault(); closeMentorMenu(); }
+      });
+    }
+  }catch(e){ console.warn('Mentors init failed', e); }
+})();
 
         if (saveBtn) {
           saveBtn.onclick = () => saveAdminNotes(item);
         }
 
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
       }
       function closeReqModal() {
         const { modal } = getReqEls();
@@ -570,7 +995,11 @@
           }
           $empty.style.display = "none";
           items
-            .sort((a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0))
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt || b.created_at || 0) -
+                new Date(a.createdAt || a.created_at || 0)
+            )
             .forEach((it, idx) => $tbody.appendChild(rowTemplate(idx + 1, it)));
         } catch (e) {
           console.error(e);

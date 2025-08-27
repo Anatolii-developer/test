@@ -84,10 +84,17 @@
         display: block;
       }
 
-      .grid {
+      .grid.grid-names {
         display: grid;
-        grid-template-columns: 1fr 320px;
+        grid-template-columns: 1fr 1fr;
         gap: 24px 32px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px; /* left content wide + optional future notes column */
+        gap: 24px 32px;
+        margin-top: 16px;
       }
 
       .field {
@@ -103,7 +110,6 @@
       textarea[readonly] {
         background: #f6fbf6;
       }
-      .note-area[readonly] { background: #ecf5eb; }
       input,
       textarea {
         width: 100%;
@@ -168,7 +174,8 @@
         }
         .card { grid-template-columns: 1fr; }
         .photo-wrap { width: 200px; height: 200px; }
-        .grid { grid-template-columns: 1fr; }
+        .grid.grid-names { grid-template-columns: 1fr; }
+        .info-grid { grid-template-columns: 1fr; }
         .back-row { flex-direction: column; align-items: flex-start; gap: 8px; }
       }
     </style>
@@ -190,96 +197,56 @@
           <img id="photo" class="photo" src="/assets/profile-photo.png" alt="Фото" />
         </div>
 
-        <div class="grid">
+        <div class="grid grid-names">
           <div class="field">
             <label>Прізвище</label>
             <input id="lastName" readonly />
           </div>
           <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note1" readonly></textarea>
-          </div>
-
-          <div class="field">
             <label>Імʼя</label>
             <input id="firstName" readonly />
           </div>
           <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note2" readonly></textarea>
-          </div>
-
-          <div class="field">
             <label>По-батькові</label>
             <input id="middleName" readonly />
           </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note3" readonly></textarea>
-          </div>
+        </div>
+      </div>
 
-          <div class="field">
-            <label>Дата подання заявки</label>
-            <input id="submittedAt" readonly />
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note4" readonly></textarea>
-          </div>
+      <div class="info-grid">
+        <div class="field">
+          <label>Дата подання заявки</label>
+          <input id="submittedAt" readonly />
+        </div>
 
-          <div class="field">
-            <label>Скільки років у вас практики</label>
-            <input id="experience" readonly />
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note5" readonly></textarea>
-          </div>
+        <div class="field">
+          <label>Скільки років у вас практики</label>
+          <input id="experience" readonly />
+        </div>
 
-          <div class="field">
-            <label>Категорія за віком</label>
-            <input id="age" readonly />
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note6" readonly></textarea>
-          </div>
+        <div class="field">
+          <label>Категорія за віком</label>
+          <input id="age" readonly />
+        </div>
 
-          <div class="field">
-            <label>Запит до ментора</label>
-            <textarea id="requestText" readonly></textarea>
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note7" class="note-area" readonly></textarea>
-          </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Запит до ментора</label>
+          <textarea id="requestText" readonly></textarea>
+        </div>
 
-          <div class="field">
-            <label>Про себе / ситуація</label>
-            <textarea id="aboutText" readonly></textarea>
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note8" class="note-area" readonly></textarea>
-          </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Про себе / ситуація</label>
+          <textarea id="aboutText" readonly></textarea>
+        </div>
 
-          <div class="field">
-            <label>Психологічна освіта</label>
-            <textarea id="education" readonly></textarea>
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note9" class="note-area" readonly></textarea>
-          </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Психологічна освіта</label>
+          <textarea id="education" readonly></textarea>
+        </div>
 
-          <div class="field">
-            <label>Тематики/теми</label>
-            <textarea id="topics" readonly></textarea>
-          </div>
-          <div class="field">
-            <label>Нотатка:</label>
-            <textarea id="note10" class="note-area" readonly></textarea>
-          </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Тематики/теми</label>
+          <textarea id="topics" readonly></textarea>
         </div>
       </div>
     </div>

@@ -67,16 +67,42 @@ async function profile(req, res) {
   }
 }
 
-// ------- Users
+function toArray(val) {
+  if (Array.isArray(val)) return val.map(String).map(s => s.trim()).filter(Boolean);
+  if (typeof val === 'string') {
+    const s = val.trim();
+    return s ? [s] : [];
+  }
+  return [];
+}
+
 async function registerUser(req, res) {
   try {
-    const user = new User(req.body);
-    await user.save();
+    const body = req.body || {};
+    const user = new User({
+      username: body.username,
+      password: body.password,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      middleName: body.middleName,
+      dateOfBirth: body.dateOfBirth,
+      email: body.email,
+      phone: body.phone,
+      gender: body.gender,
+      experience: body.experience,
+      education: body.education,
 
-    // ответ сразу
+      // ⬇️ критично
+      directions: toArray(body.directions),
+      topics: toArray(body.topics),
+
+      status: body.status || 'WAIT FOR REVIEW',
+      createdAt: body.createdAt || new Date()
+    });
+
+    await user.save();
     res.status(201).json({ message: 'User registered successfully.', user, emailEnqueued: true });
 
-    // письмо — fire-and-forget
     Promise.resolve()
       .then(() => sendRegistrationEmail(user.email, user.firstName, user.lastName))
       .catch(err => console.error('sendRegistrationEmail failed:', err?.message || err));

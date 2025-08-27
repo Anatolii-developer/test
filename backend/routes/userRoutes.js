@@ -93,6 +93,23 @@ router.get("/roles-with-users", async (_req, res) => {
   }
 });
 
+async function updateUser(req, res) {
+  try {
+    const body = req.body || {};
+    const update = { ...body };
+
+    // ⬇️ якщо поля прийшли — приводимо до масиву
+    if (body.directions !== undefined) update.directions = toArray(body.directions);
+    if (body.topics !== undefined) update.topics = toArray(body.topics);
+
+    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
 router.post("/forgot-password", userCtrl.sendRecoveryCode);
 
 // ===== CRUD порядок: спец-роуты ДО /:id

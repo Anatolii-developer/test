@@ -6,7 +6,9 @@
   <title>Успішна реєстрація</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-  .nav-buttons {
+body{ margin:0; }
+
+.nav-buttons {
   display: flex;
   gap: 16px;
   justify-content: center;
@@ -17,36 +19,36 @@
 .nav-btn {
   border-radius: 24px;
   padding: 10px 30px;
-  background-color: #D97A1C;
-  color: white;
+  background-color: #ECF5EB;   /* light green */
+  color: #275D2B;              /* green text */
   font-weight: 500;
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
   text-align: center;
   text-decoration: none;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease, color 0.2s ease;
   min-width: 180px;
 }
 
 .nav-btn:hover {
-  background-color: #b26218;
+  background-color: #d9ebd7; /* slightly darker */
+  color: #275D2B;
 }
 
 
 /* --- Fix header overlap and make image responsive on this page --- */
 header{
-  position: sticky !important; /* override possible global fixed header */
+  position: fixed !important;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
-  background: #fff;
+  background: #275D2B;
 }
 
-/* If a global fixed header is still applied elsewhere, reserve space as a fallback */
+/* Reserve space for fixed header so content isn't covered */
 body{
-  padding-top: 72px;           /* approximate header height */
-}
-@media (min-width: 640px){
-  body{ padding-top: 84px; }   /* slightly more on wider screens */
+  padding-top: 80px; /* header height */
 }
 
 /* Keep the success image contained and centered */

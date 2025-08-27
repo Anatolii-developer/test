@@ -460,24 +460,7 @@
             </div>
           </div>
 
-          <div class="mentor-right">
-            <div class="note">
-              <label>Нотатка</label>
-              <textarea id="nNote1" placeholder="Ваші нотатки..."></textarea>
-            </div>
-            <div class="note">
-              <label>Нотатка</label>
-              <textarea id="nNote2" placeholder="Ваші нотатки..."></textarea>
-            </div>
-            <div class="note">
-              <label>Нотатка</label>
-              <textarea id="nNote3" placeholder="Ваші нотатки..."></textarea>
-            </div>
-            <div class="note">
-              <label>Нотатка</label>
-              <textarea id="nNote4" placeholder="Ваші нотатки..."></textarea>
-            </div>
-          </div>
+          <!-- mentor-right section for notes removed -->
         </div>
 
         <div class="modal-actions-bar">
@@ -790,10 +773,6 @@ function closeOnOutsideOnce(e){
           fAbout: document.getElementById("fAbout"),
           fEdu: document.getElementById("fEducation"),
           fTopics: document.getElementById("fTopics"),
-          n1: document.getElementById("nNote1"),
-          n2: document.getElementById("nNote2"),
-          n3: document.getElementById("nNote3"),
-          n4: document.getElementById("nNote4"),
         };
       }
       function bindReqModalEvents() {
@@ -823,10 +802,6 @@ function closeOnOutsideOnce(e){
           fAbout,
           fEdu,
           fTopics,
-          n1,
-          n2,
-          n3,
-          n4,
         } = getReqEls();
         const u = item.user || {};
         const photoUrl =
@@ -847,12 +822,6 @@ function closeOnOutsideOnce(e){
           fTopics.value = Array.isArray(item.topics)
             ? item.topics.join(", ")
             : item.topics || "";
-
-        const notes = item.adminNotes || item.notes || {};
-        if (n1) n1.value = notes.n1 || notes.note1 || "";
-        if (n2) n2.value = notes.n2 || notes.note2 || "";
-        if (n3) n3.value = notes.n3 || notes.note3 || "";
-        if (n4) n4.value = notes.n4 || notes.note4 || "";
       }
 
       async function assignMentorIfChanged(item){
@@ -898,96 +867,7 @@ function closeOnOutsideOnce(e){
         if (!ok) throw lastErr || new Error('Assign mentor failed');
       }
 
-      async function saveAdminNotes(item) {
-        const { n1, n2, n3, n4 } = getReqEls();
-        const notesObj = {
-          n1: n1?.value || "",
-          n2: n2?.value || "",
-          n3: n3?.value || "",
-          n4: n4?.value || "",
-        };
-
-        const token = getAuthToken && getAuthToken();
-        const baseHeaders = Object.assign(
-          { "Content-Type": "application/json", "Accept": "application/json" },
-          token ? { Authorization: `Bearer ${token}` } : {}
-        );
-
-        async function tryReq(url, method, body) {
-          const res = await fetch(url, {
-            method,
-            credentials: "include",
-            headers: baseHeaders,
-            body: body != null ? JSON.stringify(body) : undefined,
-          });
-          // best-effort debug
-          try {
-            const dbg = await res.clone().json();
-            console.log("Notes save attempt:", { url, method, body }, "→", res.status, dbg);
-          } catch (_) {
-            console.log("Notes save attempt:", { url, method, body }, "→", res.status);
-          }
-          return res;
-        }
-
-        const id = item._id;
-        const payloadNotes = { notes: notesObj };
-        const payloadAdminNotes = { adminNotes: notesObj };
-
-        // Try a wide set of common REST variants
-        const attempts = [
-          // With explicit /notes path (id in path)
-          { url: `/api/career-applications/${id}/notes`, method: 'PUT',  body: payloadNotes },
-          { url: `/api/career-applications/${id}/notes`, method: 'POST', body: payloadNotes },
-
-          // Plain resource update (id in path)
-          { url: `/api/career-applications/${id}`, method: 'PUT',   body: payloadNotes },
-          { url: `/api/career-applications/${id}`, method: 'PATCH', body: payloadNotes },
-          { url: `/api/career-applications/${id}`, method: 'PUT',   body: payloadAdminNotes },
-          { url: `/api/career-applications/${id}`, method: 'PATCH', body: payloadAdminNotes },
-
-          // Query param variants
-          { url: `/api/career-applications/notes?id=${encodeURIComponent(id)}`, method: 'PUT',  body: payloadNotes },
-          { url: `/api/career-applications/notes?id=${encodeURIComponent(id)}`, method: 'POST', body: payloadNotes },
-          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PUT',  body: payloadNotes },
-          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PATCH',body: payloadNotes },
-          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PUT',  body: payloadAdminNotes },
-          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PATCH',body: payloadAdminNotes },
-
-          // Collection-level helpers (id in body)
-          { url: `/api/career-applications/notes`,  method: 'POST', body: { id, ...payloadNotes } },
-          { url: `/api/career-applications/update`, method: 'POST', body: { id, ...payloadNotes } },
-          { url: `/api/career-applications/notes`,  method: 'PUT',  body: { id, ...payloadNotes } },
-          { url: `/api/career-applications`,        method: 'PUT',  body: { id, ...payloadNotes } },
-          { url: `/api/career-applications`,        method: 'PATCH',body: { id, ...payloadNotes } },
-
-          // AdminNotes variants at collection level
-          { url: `/api/career-applications/notes`,  method: 'POST', body: { id, ...payloadAdminNotes } },
-          { url: `/api/career-applications/update`, method: 'POST', body: { id, ...payloadAdminNotes } },
-        ];
-
-        let ok = false, lastErr = null;
-        for (const a of attempts) {
-          try {
-            const res = await tryReq(a.url, a.method, a.body);
-            if (res.ok) { ok = true; break; }
-            lastErr = new Error(`HTTP ${res.status}`);
-            // continue to next attempt
-          } catch (e) {
-            lastErr = e;
-          }
-        }
-
-        try {
-          if (!ok) throw lastErr || new Error("Notes failed");
-          await assignMentorIfChanged(item); // assign, if changed
-          alert("Збережено");
-          closeReqModal();
-        } catch (e) {
-          console.warn("Save failed:", e);
-          alert("Не вдалося зберегти (нотатки або призначення). Перевірте бекенд-роути.");
-        }
-      }
+      // saveAdminNotes function removed
 
       function openReqModal(item) {
         bindReqModalEvents();
@@ -1001,42 +881,51 @@ function closeOnOutsideOnce(e){
 
         fillModalFields(item);
         // ==== Ментори: загрузка и пресеlect ====
-(async ()=>{
-  try{
-    // лениво кэшируем
-    if (!__MENTORS.length) __MENTORS = await fetchMentors();
-    const hidden = document.getElementById('mentorSelectValue');
-    const label  = document.getElementById('mentorSelectLabel');
+        (async ()=>{
+          try{
+            // лениво кэшируем
+            if (!__MENTORS.length) __MENTORS = await fetchMentors();
+            const hidden = document.getElementById('mentorSelectValue');
+            const label  = document.getElementById('mentorSelectLabel');
 
-    // пресеlect из заявки, если уже назначен
-    const assignedId = item.assignedMentorId || item.assignedMentor?._id || null;
-    if (hidden) hidden.value = assignedId || '';
-    if (label){
-      const found = __MENTORS.find(m=> m._id === assignedId);
-      label.textContent = found ? `${found.firstName||''} ${found.lastName||''}`.trim() || (found.username || found.email || 'Без імені') : 'Оберіть ментора';
-    }
-    renderMentorMenu(__MENTORS, assignedId);
+            // пресеlect из заявки, если уже назначен
+            const assignedId = item.assignedMentorId || item.assignedMentor?._id || null;
+            if (hidden) hidden.value = assignedId || '';
+            if (label){
+              const found = __MENTORS.find(m=> m._id === assignedId);
+              label.textContent = found ? `${found.firstName||''} ${found.lastName||''}`.trim() || (found.username || found.email || 'Без імені') : 'Оберіть ментора';
+            }
+            renderMentorMenu(__MENTORS, assignedId);
 
-    // биндим кнопку
-    const btn = document.getElementById('mentorSelectBtn');
-    if (btn && !btn.__bound){
-      btn.__bound = true;
-      btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); 
-        const menu = document.getElementById('mentorMenu');
-        if (!menu) return;
-        const isOpen = menu.style.display !== 'none';
-        if (isOpen) closeMentorMenu(); else openMentorMenu();
-      });
-      btn.addEventListener('keydown', (e)=>{
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMentorMenu(); }
-        if (e.key === 'Escape') { e.preventDefault(); closeMentorMenu(); }
-      });
-    }
-  }catch(e){ console.warn('Mentors init failed', e); }
-})();
+            // биндим кнопку
+            const btn = document.getElementById('mentorSelectBtn');
+            if (btn && !btn.__bound){
+              btn.__bound = true;
+              btn.addEventListener('click', (ev)=>{ ev.stopPropagation(); 
+                const menu = document.getElementById('mentorMenu');
+                if (!menu) return;
+                const isOpen = menu.style.display !== 'none';
+                if (isOpen) closeMentorMenu(); else openMentorMenu();
+              });
+              btn.addEventListener('keydown', (e)=>{
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMentorMenu(); }
+                if (e.key === 'Escape') { e.preventDefault(); closeMentorMenu(); }
+              });
+            }
+          }catch(e){ console.warn('Mentors init failed', e); }
+        })();
 
         if (saveBtn) {
-          saveBtn.onclick = () => saveAdminNotes(item);
+          saveBtn.onclick = () =>
+            assignMentorIfChanged(item)
+              .then(() => {
+                alert("Ментор призначений");
+                closeReqModal();
+              })
+              .catch((e) => {
+                alert("Помилка призначення ментора");
+                console.error(e);
+              });
         }
 
         modal.style.display = "flex";

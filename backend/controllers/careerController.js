@@ -35,6 +35,33 @@ create: async (req, res) => {
 },
 
 
+
+
+assignMentor: async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { mentorId } = req.body;
+
+    if (!mentorId) {
+      return res.status(400).json({ ok: false, message: 'mentorId required' });
+    }
+
+    const app = await CareerApplication.findByIdAndUpdate(
+      id,
+      { assignedMentor: mentorId },
+      { new: true }
+    ).populate('assignedMentor', 'firstName lastName email username');
+
+    if (!app) {
+      return res.status(404).json({ ok: false, message: 'Application not found' });
+    }
+
+    res.json({ ok: true, application: app });
+  } catch (err) {
+    console.error('assignMentor failed:', err);
+    res.status(500).json({ ok: false, message: 'Server error' });
+  }
+},
 // внутри controllers/careerController.js
 list: async (req, res) => {
   try {
@@ -69,5 +96,7 @@ list: async (req, res) => {
     res.status(500).json({ ok:false, message:'Server error' });
   }
 }
+
+
 
 };

@@ -21,6 +21,21 @@ async function isAdminUser(req) {
   );
 }
 
+async function isMentorUser(req) {
+  const rolesFromToken = Array.isArray(req.user?.roles) ? req.user.roles : [];
+  const isMentorFromToken = rolesFromToken
+    .map(r => String(r).toLowerCase())
+    .some(r => r.includes('mentor') || r.includes('ментор'));
+  if (isMentorFromToken) return true;
+
+  const uid = req.user?._id || req.user?.id;
+  if (!uid) return false;
+  const me = await User.findById(uid).select('roles').lean();
+  return Array.isArray(me?.roles) && me.roles
+    .map(r => String(r).toLowerCase())
+    .some(r => r.includes('mentor') || r.includes('ментор'));
+}
+
 function hasMentorRole(roles) {
   return (
     Array.isArray(roles) &&
@@ -39,24 +54,21 @@ function hasMentorRole(roles) {
 async function canViewApplication(req, app) {
   if (await isAdminUser(req)) return true;
 
-  const myId = String(req.user?._id || req.user?.id || "");
-  const myRoles = req.user?.roles || [];
-  const isMentor = hasMentorRole(myRoles);
+  const myId = String(req.user?._id || req.user?.id || '');
 
-  // ментор: только своя заявка
-  if (isMentor) {
-    const assignedId = String(
-      app.assignedMentor?._id ||
-        app.assignedMentor ||
-        app.assignedMentorId ||
-        ""
-    );
-    if (assignedId && assignedId === myId) return true;
-  }
+  // Если заявка назначена на меня — разрешаем независимо от ролей в токене
+  const assignedId = String(
+    app.assignedMentor?._id ||
+    app.assignedMentor ||
+    app.assignedMentorId ||
+    ''
+  );
+  if (assignedId && assignedId === myId) return true;
 
-  // заявитель видит свою заявку (если нужно — оставь; если нет, удали этот блок)
+  // Заявитель видит свою заявку
   if (String(app.user?._id || app.user) === myId) return true;
 
+  // Иначе — запрет
   return false;
 }
 

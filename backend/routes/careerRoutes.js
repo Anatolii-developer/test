@@ -5,24 +5,25 @@ const jwt = require("jsonwebtoken");
 const careerCtrl = require("../controllers/careerController");
 
 // auth — как у тебя
-function auth(req, res, next) {
-  const token =
-    req.cookies?.token ||
-    (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  if (!token)
-    return res.status(401).json({ ok: false, message: "Unauthorized" });
+async function auth(req, res, next) {
+  const token = req.cookies?.token ||
+    (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (!token) return res.status(401).json({ ok:false, message:'Unauthorized' });
   try {
-    const p = jwt.verify(token, process.env.JWT_SECRET || "dev_secret");
+    const p = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
     req.user = {
       _id: p.id || p._id,
-      id: p.id || p._id,
-      roles: Array.isArray(p.roles) ? p.roles : p.role ? [p.role] : [],
+      id:  p.id || p._id,
+      roles: Array.isArray(p.roles) ? p.roles : (p.role ? [p.role] : []),
       email: p.email,
       username: p.username,
     };
+    // 🔽 ДОБИРАЕМ РОЛИ ИЗ БД
+    const me = await require('../models/User').findById(req.user._id).select('roles').lean();
+    if (me?.roles) req.user.roles = me.roles;
     next();
   } catch (e) {
-    return res.status(401).json({ ok: false, message: "Invalid token" });
+    return res.status(401).json({ ok:false, message:'Invalid token' });
   }
 }
 

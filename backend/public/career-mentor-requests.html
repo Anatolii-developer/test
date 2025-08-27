@@ -568,8 +568,6 @@
           { 'Accept': 'application/json' },
           token ? { 'Authorization': `Bearer ${token}` } : {}
         );
-
-        // === Основний шлях: бекенд сам повертає тільки призначені мені заявки ===
         try {
           const res = await fetch('/api/career-applications?mine=1', {
             method: 'GET',
@@ -586,32 +584,7 @@
             if (body?.ok && Array.isArray(body?.result)) return body.result;
           }
         } catch (_) {}
-
-        // === Фолбэк: тягнемо всі заявки та фільтруємо по assignedMentorId ===
-        const me = await ensureMentor();
-        if (!me) return [];
-        try {
-          const res = await fetch('/api/career-applications?all=1', {
-            method: 'GET',
-            credentials: 'include',
-            headers
-          });
-          let body = null; try { body = await res.clone().json(); } catch(_) {}
-          debugLog('Mentor fallback all=1 →', res, body);
-          if (!res.ok) return [];
-          const all = Array.isArray(body) ? body
-                   : Array.isArray(body?.items) ? body.items
-                   : Array.isArray(body?.rows)  ? body.rows
-                   : Array.isArray(body?.data)  ? body.data
-                   : (body?.ok && Array.isArray(body?.result)) ? body.result
-                   : [];
-          return all.filter(it => {
-            const assigned = it.assignedMentorId || it.assignedMentor?._id || null;
-            return assigned && assigned === me._id;
-          });
-        } catch (_) {
-          return [];
-        }
+        return [];
       }
 
       async function load() {

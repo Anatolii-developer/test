@@ -34,36 +34,19 @@ module.exports = {
   },
 
   list: async (req, res) => {
-    try {
-      if (!req.user) return res.status(401).json({ ok:false, message:'Unauthorized' });
+  try {
+    // 👉 прибираємо вимогу авторизації
+    const apps = await CareerApplication.find({})
+      .populate('user', 'firstName lastName middleName email username photoUrl')
+      .populate('assignedMentor', 'firstName lastName email username')
+      .sort({ createdAt: -1 });
 
-      const me = await User.findById(req.user._id).select('roles username').lean();
-      const iAmMentor = Array.isArray(me?.roles) &&
-        me.roles.some(r => String(r).toLowerCase().includes('ментор') || String(r).toLowerCase().includes('mentor'));
-      const isAdmin = ['admin','адмін'].includes(String(req.user.role||'').toLowerCase());
-
-      const wantAll = ['1','true','yes'].includes(String(req.query.all||'').toLowerCase());
-
-      let filter = {};
-      if (isAdmin && wantAll) {
-        filter = {}; // админ видит все
-      } else if (iAmMentor) {
-        filter = { assignedMentor: req.user._id }; // ментор видит только назначенные заявки
-      } else {
-        filter = { user: req.user._id }; // обычный пользователь — только свои
-      }
-
-      const apps = await CareerApplication.find(filter)
-        .populate('user', 'firstName lastName middleName email username photoUrl')
-        .populate('assignedMentor', 'firstName lastName email username')
-        .sort({ createdAt: -1 });
-
-      res.json({ ok:true, rows: apps });
-    } catch (err) {
-      console.error('career applications list failed:', err);
-      res.status(500).json({ ok:false, message:'Server error' });
-    }
-  },
+    res.json({ ok:true, rows: apps });
+  } catch (err) {
+    console.error('career applications list failed:', err);
+    res.status(500).json({ ok:false, message:'Server error' });
+  }
+},
 
   assignMentor: async (req, res) => {
     try {

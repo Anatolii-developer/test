@@ -146,6 +146,9 @@
         flex: 0 0 auto;
       }
       .btn-more {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         height: 32px;
         padding: 0 16px;
         border-radius: 24px;
@@ -157,6 +160,7 @@
         font-size: 14px;
         white-space: nowrap;
         flex: 0 0 auto;
+        text-decoration: none;
       }
       .empty {
         text-align: center;
@@ -309,24 +313,6 @@
       </div>
     </div>
 
-    <!-- MODAL: деталі заявки -->
-    <div
-      id="reqModal"
-      class="req-modal-backdrop"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="reqModalTitle"
-    >
-      <div class="req-modal">
-        <div class="req-close-x" id="reqCloseX">×</div>
-        <h3 id="reqModalTitle">Заявка</h3>
-        <div class="req-meta" id="reqMeta"></div>
-        <div class="req-qa" id="reqQA"></div>
-        <div class="req-actions">
-          <button class="req-btn close" id="reqCloseBtn">Закрити</button>
-        </div>
-      </div>
-    </div>
 
 <script src="script.js"></script>
     <script>
@@ -371,91 +357,6 @@
           : item.fullName || item.email || "Без імені";
       }
 
-      function getReqEls() {
-        return {
-          modal: document.getElementById("reqModal"),
-          title: document.getElementById("reqModalTitle"),
-          meta: document.getElementById("reqMeta"),
-          qa: document.getElementById("reqQA"),
-          closeX: document.getElementById("reqCloseX"),
-          closeBtn: document.getElementById("reqCloseBtn"),
-        };
-      }
-      function bindReqModalEvents() {
-        const { modal, closeX, closeBtn } = getReqEls();
-        if (!modal || window.__reqModalBound) return;
-        if (closeX) closeX.addEventListener("click", closeReqModal);
-        if (closeBtn) closeBtn.addEventListener("click", closeReqModal);
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) closeReqModal();
-        });
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") closeReqModal();
-        });
-        window.__reqModalBound = true;
-      }
-      function openReqModal(item) {
-        bindReqModalEvents();
-        const { modal, title, meta, qa } = getReqEls();
-        if (!modal || !title || !meta || !qa) return;
-        const fio = fullNameFrom(item);
-        const when = item.createdAt || item.created_at || item.created || null;
-        const whenStr = when ? formatDate(when) : "";
-        title.textContent = `Заявка — ${fio}`;
-        meta.textContent = whenStr ? `Дата подання: ${whenStr}` : "";
-        qa.innerHTML = "";
-        const rows = [
-          {
-            q: "Імʼя",
-            a: (item.user?.firstName || item.firstName || "").trim(),
-          },
-          {
-            q: "Прізвище",
-            a: (item.user?.lastName || item.lastName || "").trim(),
-          },
-          { q: "Дата подання заявки", a: whenStr },
-          {
-            q: "Скільки років у вас практики",
-            a: item.experience || item.exp || "",
-          },
-          {
-            q: "До якої вікової категорії Ви відноситесь",
-            a: item.ageGroup || item.age || "",
-          },
-          {
-            q: "Ваш запит до ментора",
-            a: item.requestText || item.request || "",
-          },
-          {
-            q: "Про себе / деталі ситуації",
-            a: item.aboutText || item.about || "",
-          },
-        ];
-        if (Array.isArray(item.answers)) {
-          item.answers.forEach((x) =>
-            rows.push({ q: x.question || "Питання", a: x.answer || "" })
-          );
-        }
-        rows
-          .filter((r) => r.a && String(r.a).trim().length)
-          .forEach((r) => {
-            const row = document.createElement("div");
-            row.className = "row";
-            row.innerHTML = `<div class="q">${esc(
-              r.q
-            )}</div><div class="a">${esc(String(r.a))}</div>`;
-            qa.appendChild(row);
-          });
-        modal.style.display = "flex";
-        document.body.style.overflow = "hidden";
-      }
-      function closeReqModal() {
-        const { modal } = getReqEls();
-        if (modal) {
-          modal.style.display = "none";
-          document.body.style.overflow = "";
-        }
-      }
 
       function ensureContainers() {
         let form = document.querySelector(".apply-form") || document.body;
@@ -546,10 +447,12 @@
         date.className = "req-date";
         date.textContent = created;
         left.append(num, name, date);
-        const more = document.createElement("button");
+        const id = item._id || item.id || (item.application && (item.application._id || item.application.id)) || "";
+        const more = document.createElement("a");
         more.className = "btn-more";
         more.textContent = "Дізнатись більше";
-        more.addEventListener("click", () => openReqModal(item));
+        more.href = `career-mentor-request.html?id=${encodeURIComponent(id)}`;
+        more.setAttribute("aria-label", "Відкрити заявку детально");
         row.append(left, more);
         return row;
       }
@@ -619,7 +522,6 @@
       }
 
       document.addEventListener("DOMContentLoaded", load);
-      document.addEventListener("DOMContentLoaded", bindReqModalEvents);
     </script>
 
     <script src="script.js"></script>

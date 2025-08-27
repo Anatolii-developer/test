@@ -345,32 +345,30 @@ const topicsOptions = [
   "Кризи та травми"
 ];
 
-
-
 function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
   const container = document.getElementById(fieldId).parentNode;
-  const selectedValues = (window.currentUser[mongoKey] || []);
- 
-const customOthers = selectedValues.filter(v => !optionsArray.includes(v));
-if (customOthers.length) {
-  const otherBadge = document.createElement('div');
-  otherBadge.style.margin = '8px 0';
-  otherBadge.style.fontSize = '14px';
-  otherBadge.style.opacity = '0.8';
-  otherBadge.textContent = 'Інше: ' + customOthers[0];
-  checkboxContainer.appendChild(otherBadge);
-}
+  const selectedValues = (window.currentUser?.[mongoKey] || []);
 
-  // Удаляем старый span
+  // 1) Прибрати старий span
   const oldSpan = document.getElementById(fieldId);
-  oldSpan.remove();
+  if (oldSpan) oldSpan.remove();
 
-  // Создаём div с плитками
+  // 2) Контейнер з плитками
   const checkboxContainer = document.createElement("div");
   checkboxContainer.className = "checkbox-group";
 
-  const checkboxes = [];
+  // Показати “Інше”, якщо воно є в уже збережених значеннях
+  const customOthers = selectedValues.filter(v => !optionsArray.includes(v));
+  if (customOthers.length) {
+    const otherBadge = document.createElement('div');
+    otherBadge.style.margin = '8px 0';
+    otherBadge.style.fontSize = '14px';
+    otherBadge.style.opacity = '0.8';
+    otherBadge.textContent = 'Інше: ' + customOthers[0];
+    checkboxContainer.appendChild(otherBadge);
+  }
 
+  const checkboxes = [];
   optionsArray.forEach(option => {
     const tile = document.createElement("div");
     tile.className = "checkbox-tile";
@@ -388,7 +386,6 @@ if (customOthers.length) {
     tile.appendChild(label);
     checkboxContainer.appendChild(tile);
 
-    // логика переключения
     square.addEventListener("click", () => {
       square.classList.toggle("checked");
     });
@@ -396,7 +393,7 @@ if (customOthers.length) {
     checkboxes.push({ square, value: option });
   });
 
-  // Кнопка сохранить
+  // Кнопка зберегти
   const checkIcon = document.createElement("img");
   checkIcon.src = "assets/check-icon.svg";
   checkIcon.className = "check-icon";
@@ -415,22 +412,32 @@ if (customOthers.length) {
     updatedProfileData[mongoKey] = selected;
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    fetch(`${API_BASE}/api/users/${storedUser._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [mongoKey]: selected }),
-    });
+    if (!storedUser?._id) return;
 
-    if (res.ok) {
-      const newSpan = document.createElement("span");
-      newSpan.id = fieldId;
-      newSpan.textContent = selected.join(", ");
-      checkboxContainer.remove();
-      checkIcon.remove();
-      container.appendChild(newSpan);
-      alert("Збережено!");
-    } else {
-      alert("Помилка при збереженні");
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ [mongoKey]: selected }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        const newSpan = document.createElement("span");
+        newSpan.id = fieldId;
+        newSpan.textContent = selected.join(", ");
+        checkboxContainer.remove();
+        checkIcon.remove();
+        container.appendChild(newSpan);
+        alert("Збережено!");
+      } else {
+        alert("Помилка при збереженні: " + (result.message || "невідома"));
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Серверна помилка.");
     }
   });
 }
@@ -618,19 +625,20 @@ if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     // Work directions: if "Інше" checked, save ONLY textarea text
     const otherDirCheckbox = document.getElementById('directionOtherCheckbox');
-    const otherDirText = (document.getElementById('directionOther')?.value || '').trim();
-    if (otherDirCheckbox && otherDirCheckbox.checked && !otherDirText) {
+const otherDirText = (document.getElementById('directionOther')?.value || '').trim();
+
+if (otherDirCheckbox && otherDirCheckbox.checked && !otherDirText) {
   alert('Будь ласка, заповніть поле "Інше" або зніміть вибір.');
   return;
 }
 
-    let directions = [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')]
-      .map(c => c.parentElement.textContent.trim())
-      .filter(v => v !== 'Інше');
+let directions = [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')]
+  .map(c => c.parentElement.textContent.trim())
+  .filter(v => v !== 'Інше');
 
-    if (otherDirCheckbox && otherDirCheckbox.checked) {
-      directions = otherDirText ? [otherDirText] : [];
-    }
+if (otherDirCheckbox && otherDirCheckbox.checked) {
+  directions = otherDirText ? [otherDirText] : []; // <-- зберігаємо саме текст з textarea
+}
 
     const topics = [...document.querySelectorAll('.work-topics input[type="checkbox"]:checked')]
       .map(c => c.parentElement.textContent.trim());

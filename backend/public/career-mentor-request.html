@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ментор — Заявка</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="icon" type="image/svg+xml" href="/assets/sidebar/IPS Logo (1).svg" />
+    <style>
+      :root {
+        --green: #275d2b;
+        --bg: #97c194;
+        --orange: #e8812e;
+        --light: #ecf5eb;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg);
+        color: #414141;
+      }
+
+      /* Page card */
+      .page {
+        width: 890px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 24px;
+        padding: 60px 100px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .tab {
+        min-width: 220px;
+        height: 48px;
+        padding: 0 22px;
+        border-radius: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .tab.light {
+        background: var(--light);
+        color: var(--green);
+        border: 1px solid var(--green);
+      }
+      .tab.dark {
+        background: var(--green);
+        color: #fff;
+      }
+
+      .title {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .card {
+        display: grid;
+        grid-template-columns: 248px 1fr;
+        gap: 32px;
+      }
+
+      .photo-wrap {
+        position: relative;
+        width: 248px;
+        height: 250px;
+      }
+      .photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid var(--orange);
+        background: #eef1ee;
+        display: block;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px 32px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      label {
+        font-size: 14px;
+        color: #6b6b6b;
+      }
+      input[readonly],
+      textarea[readonly] {
+        background: #f6fbf6;
+      }
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid #d9d9d9;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: 14px/1.4 Poppins, sans-serif;
+        color: #222;
+      }
+      textarea {
+        min-height: 92px;
+        resize: vertical;
+        white-space: pre-wrap;
+      }
+
+      .back-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        background: var(--green);
+        color: #fff;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .meta {
+        font-size: 14px;
+        color: #6b6b6b;
+      }
+
+      .empty, .guard {
+        text-align: center;
+        color: #2a2a2a;
+        padding: 24px;
+        background: #fff;
+        border-radius: 16px;
+        width: min(920px, 92vw);
+        margin: 40px auto;
+      }
+      .guard a {
+        display: inline-block;
+        margin-top: 10px;
+        background: var(--green);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+      }
+
+      @media (max-width: 980px) {
+        .page {
+          width: 92%;
+          padding: 28px;
+          margin: 16px auto;
+        }
+        .card { grid-template-columns: 1fr; }
+        .photo-wrap { width: 200px; height: 200px; }
+        .grid { grid-template-columns: 1fr; }
+        .back-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="guard" class="guard" style="display:none">
+      Доступ лише для менторів.
+      <div><a href="career-mentor-requests.html">Повернутися</a></div>
+    </div>
+
+    <div id="page" class="page" style="display:none">
+      <div class="back-row">
+        <a href="career-mentor-requests.html" class="back-btn">
+          <img src="./assets/library/arrow-main.svg" alt="" width="18" height="18" />
+          Назад до заявок
+        </a>
+        <div class="meta" id="submittedMeta"></div>
+      </div>
+
+      <div class="title">Заявка учасника</div>
+
+      <div class="card">
+        <div class="photo-wrap">
+          <img id="photo" class="photo" src="/assets/profile-photo.png" alt="Фото" />
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label>Прізвище</label>
+            <input id="lastName" readonly />
+          </div>
+          <div class="field">
+            <label>Імʼя</label>
+            <input id="firstName" readonly />
+          </div>
+
+          <div class="field">
+            <label>По-батькові</label>
+            <input id="middleName" readonly />
+          </div>
+          <div class="field">
+            <label>Категорія за віком</label>
+            <input id="age" readonly />
+          </div>
+
+          <div class="field">
+            <label>Дата подання заявки</label>
+            <input id="submittedAt" readonly />
+          </div>
+          <div class="field">
+            <label>Скільки років у вас практики</label>
+            <input id="experience" readonly />
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <label>Психологічна освіта</label>
+            <textarea id="education" readonly></textarea>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <label>Тематики/теми</label>
+            <textarea id="topics" readonly></textarea>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <label>Запит до ментора</label>
+            <textarea id="requestText" readonly></textarea>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <label>Про себе / ситуація</label>
+            <textarea id="aboutText" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- helpers ---
+      const qs = (s) => document.querySelector(s);
+      const pad = (n) => String(n).padStart(2, "0");
+      const fmtDate = (iso) => {
+        const d = new Date(iso);
+        if (isNaN(d)) return "";
+        return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+      };
+      const params = new URLSearchParams(location.search);
+      const ID = params.get("id");
+
+      function getToken() {
+        try {
+          const u = JSON.parse(localStorage.getItem("user") || "{}");
+          return u.token || u.accessToken || localStorage.getItem("token") || null;
+        } catch (_) {
+          return localStorage.getItem("token") || null;
+        }
+      }
+      const authHeaders = () => {
+        const t = getToken();
+        return Object.assign(
+          { Accept: "application/json" },
+          t ? { Authorization: "Bearer " + t } : {}
+        );
+      };
+
+      async function ensureMentor() {
+        try {
+          const r = await fetch("/api/users/profile", {
+            credentials: "include",
+            headers: authHeaders(),
+          });
+          const body = await r.json().catch(() => ({}));
+          if (!r.ok || !body?.user) return null;
+          const roles = body.user.roles || [];
+          const ok = Array.isArray(roles) && roles.some((s) => {
+            const v = String(s).toLowerCase();
+            return v.includes("ментор") || v.includes("mentor");
+          });
+          return ok ? body.user : null;
+        } catch {
+          return null;
+        }
+      }
+
+      async function loadApplication() {
+        if (!ID) {
+          qs("#guard").style.display = "block";
+          qs("#guard").textContent = "Не передано id заявки.";
+          return;
+        }
+        const r = await fetch(`/api/career-applications/${ID}`, {
+          credentials: "include",
+          headers: authHeaders(),
+        });
+        const body = await r.json().catch(() => ({}));
+        if (!r.ok || !body?.ok) {
+          qs("#guard").style.display = "block";
+          qs("#guard").textContent = body?.message || "Помилка завантаження заявки.";
+          return;
+        }
+        const a = body.application || {};
+        const u = a.user || {};
+
+        qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
+        qs("#lastName").value   = u.lastName || "";
+        qs("#firstName").value  = u.firstName || "";
+        qs("#middleName").value = u.middleName || "";
+        qs("#submittedAt").value = fmtDate(a.createdAt);
+        qs("#experience").value  = a.experience || a.exp || "";
+        qs("#age").value         = a.ageGroup || a.age || "";
+        qs("#requestText").value = a.requestText || a.request || "";
+        qs("#aboutText").value   = a.aboutText || a.about || "";
+        qs("#education").value   = a.education || "";
+
+        const topics = Array.isArray(a.topics) ? a.topics.filter(Boolean) : (a.topics || "");
+        qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
+
+        // meta
+        const when = a.createdAt ? fmtDate(a.createdAt) : "";
+        if (when) qs("#submittedMeta").textContent = "Дата подання: " + when;
+
+        // show page
+        qs("#page").style.display = "flex";
+      }
+
+      (async () => {
+        const me = await ensureMentor();
+        if (!me) {
+          qs("#guard").style.display = "block";
+          return;
+        }
+        qs("#guard").style.display = "none";
+        await loadApplication();
+      })();
+    </script>
+  </body>
+</html>

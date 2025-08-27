@@ -871,10 +871,17 @@ function closeOnOutsideOnce(e){
 
         const id = item._id;
         const attempts = [
+          // path param
           { url: `/api/career-applications/${id}/assign`, method:'PUT',  body:{ mentorId } },
           { url: `/api/career-applications/${id}/assign`, method:'POST', body:{ mentorId } },
           { url: `/api/career-applications/${id}`,         method:'PATCH', body:{ assignedMentorId: mentorId } },
           { url: `/api/career-applications/${id}`,         method:'PUT',   body:{ assignedMentorId: mentorId } },
+          // query param variants
+          { url: `/api/career-applications/assign?id=${encodeURIComponent(id)}`, method:'POST', body:{ mentorId } },
+          { url: `/api/career-applications/assign?id=${encodeURIComponent(id)}`, method:'PUT',  body:{ mentorId } },
+          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,        method:'PATCH', body:{ assignedMentorId: mentorId } },
+          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,        method:'PUT',   body:{ assignedMentorId: mentorId } },
+          // collection-level with id in body
           { url: `/api/career-applications/assign`,        method:'POST',  body:{ id, mentorId } },
           { url: `/api/career-applications/assign`,        method:'PUT',   body:{ id, mentorId } },
           { url: `/api/career-applications`,               method:'PATCH', body:{ id, assignedMentorId: mentorId } },
@@ -929,26 +936,34 @@ function closeOnOutsideOnce(e){
 
         // Try a wide set of common REST variants
         const attempts = [
-          // With explicit /notes path
-          { url: `/api/career-applications/${id}/notes`, method: "PUT", body: payloadNotes },
-          { url: `/api/career-applications/${id}/notes`, method: "POST", body: payloadNotes },
+          // With explicit /notes path (id in path)
+          { url: `/api/career-applications/${id}/notes`, method: 'PUT',  body: payloadNotes },
+          { url: `/api/career-applications/${id}/notes`, method: 'POST', body: payloadNotes },
 
           // Plain resource update (id in path)
-          { url: `/api/career-applications/${id}`, method: "PUT", body: payloadNotes },
-          { url: `/api/career-applications/${id}`, method: "PATCH", body: payloadNotes },
-          { url: `/api/career-applications/${id}`, method: "PUT", body: payloadAdminNotes },
-          { url: `/api/career-applications/${id}`, method: "PATCH", body: payloadAdminNotes },
+          { url: `/api/career-applications/${id}`, method: 'PUT',   body: payloadNotes },
+          { url: `/api/career-applications/${id}`, method: 'PATCH', body: payloadNotes },
+          { url: `/api/career-applications/${id}`, method: 'PUT',   body: payloadAdminNotes },
+          { url: `/api/career-applications/${id}`, method: 'PATCH', body: payloadAdminNotes },
+
+          // Query param variants
+          { url: `/api/career-applications/notes?id=${encodeURIComponent(id)}`, method: 'PUT',  body: payloadNotes },
+          { url: `/api/career-applications/notes?id=${encodeURIComponent(id)}`, method: 'POST', body: payloadNotes },
+          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PUT',  body: payloadNotes },
+          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PATCH',body: payloadNotes },
+          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PUT',  body: payloadAdminNotes },
+          { url: `/api/career-applications?id=${encodeURIComponent(id)}`,       method: 'PATCH',body: payloadAdminNotes },
 
           // Collection-level helpers (id in body)
-          { url: `/api/career-applications/notes`, method: "POST", body: { id, ...payloadNotes } },
-          { url: `/api/career-applications/update`, method: "POST", body: { id, ...payloadNotes } },
-          { url: `/api/career-applications/notes`, method: "PUT", body: { id, ...payloadNotes } },
-          { url: `/api/career-applications`, method: "PUT", body: { id, ...payloadNotes } },
-          { url: `/api/career-applications`, method: "PATCH", body: { id, ...payloadNotes } },
+          { url: `/api/career-applications/notes`,  method: 'POST', body: { id, ...payloadNotes } },
+          { url: `/api/career-applications/update`, method: 'POST', body: { id, ...payloadNotes } },
+          { url: `/api/career-applications/notes`,  method: 'PUT',  body: { id, ...payloadNotes } },
+          { url: `/api/career-applications`,        method: 'PUT',  body: { id, ...payloadNotes } },
+          { url: `/api/career-applications`,        method: 'PATCH',body: { id, ...payloadNotes } },
 
           // AdminNotes variants at collection level
-          { url: `/api/career-applications/notes`, method: "POST", body: { id, ...payloadAdminNotes } },
-          { url: `/api/career-applications/update`, method: "POST", body: { id, ...payloadAdminNotes } },
+          { url: `/api/career-applications/notes`,  method: 'POST', body: { id, ...payloadAdminNotes } },
+          { url: `/api/career-applications/update`, method: 'POST', body: { id, ...payloadAdminNotes } },
         ];
 
         let ok = false, lastErr = null;

@@ -348,7 +348,7 @@
         qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
 
         // meta
-        const when = a.createdAt ? fmt(a.createdAt) : "";
+        const when = a.createdAt ? fmtDate(a.createdAt) : "";
 const metaEl = qs("#submittedMeta");
 if (when && metaEl) metaEl.textContent = "Дата подання: " + when;
 

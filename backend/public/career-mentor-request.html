@@ -36,15 +36,12 @@
       .tabs {
         display: flex;
         gap: 16px;
-        align-items: center;
-        flex-wrap: wrap;
       }
       .tab {
-        min-width: 220px;
-        height: 48px;
-        padding: 0 22px;
-        border-radius: 24px;
-        display: inline-flex;
+        width: 326px;
+        height: 152px;
+        border-radius: 16px;
+        display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
@@ -53,8 +50,8 @@
       }
       .tab.light {
         background: var(--light);
-        color: var(--green);
-        border: 1px solid var(--green);
+        color: inherit;
+        border: none;
       }
       .tab.dark {
         background: var(--green);
@@ -182,15 +179,10 @@
     </div>
 
     <div id="page" class="page" style="display:none">
-      <div class="back-row">
-        <a href="career-mentor-requests.html" class="back-btn">
-          <img src="./assets/library/arrow-main.svg" alt="" width="18" height="18" />
-          Назад до заявок
-        </a>
-        <div class="meta" id="submittedMeta"></div>
+      <div class="tabs">
+        <a class="tab light" href="career-mentor-requests.html">Повернутися</a>
+        <div class="tab dark">Налаштування ментора</div>
       </div>
-
-      <div class="title">Заявка учасника</div>
 
       <div class="card">
         <div class="photo-wrap">
@@ -203,8 +195,17 @@
             <input id="lastName" readonly />
           </div>
           <div class="field">
+            <label>Нотатка:</label>
+            <textarea id="note1" readonly></textarea>
+          </div>
+
+          <div class="field">
             <label>Імʼя</label>
             <input id="firstName" readonly />
+          </div>
+          <div class="field">
+            <label>Нотатка:</label>
+            <textarea id="note2" readonly></textarea>
           </div>
 
           <div class="field">
@@ -212,8 +213,8 @@
             <input id="middleName" readonly />
           </div>
           <div class="field">
-            <label>Категорія за віком</label>
-            <input id="age" readonly />
+            <label>Нотатка:</label>
+            <textarea id="note3" readonly></textarea>
           </div>
 
           <div class="field">
@@ -221,18 +222,26 @@
             <input id="submittedAt" readonly />
           </div>
           <div class="field">
+            <label>Нотатка:</label>
+            <textarea id="note4" readonly></textarea>
+          </div>
+
+          <div class="field">
             <label>Скільки років у вас практики</label>
             <input id="experience" readonly />
           </div>
-
-          <div class="field" style="grid-column:1/-1">
-            <label>Психологічна освіта</label>
-            <textarea id="education" readonly></textarea>
+          <div class="field">
+            <label>Нотатка:</label>
+            <textarea id="note5" readonly></textarea>
           </div>
 
-          <div class="field" style="grid-column:1/-1">
-            <label>Тематики/теми</label>
-            <textarea id="topics" readonly></textarea>
+          <div class="field">
+            <label>Категорія за віком</label>
+            <input id="age" readonly />
+          </div>
+          <div class="field">
+            <label>Нотатка:</label>
+            <textarea id="note6" readonly></textarea>
           </div>
 
           <div class="field" style="grid-column:1/-1">
@@ -243,6 +252,16 @@
           <div class="field" style="grid-column:1/-1">
             <label>Про себе / ситуація</label>
             <textarea id="aboutText" readonly></textarea>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <label>Психологічна освіта</label>
+            <textarea id="education" readonly></textarea>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <label>Тематики/теми</label>
+            <textarea id="topics" readonly></textarea>
           </div>
         </div>
       </div>

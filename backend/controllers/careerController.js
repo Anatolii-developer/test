@@ -151,9 +151,6 @@ async function list(req, res) {
   }
 }
 
-async function listAdmin(req, res) {
-  /* без изменений */
-}
 async function create(req, res) {
   /* без изменений */
 }

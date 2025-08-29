@@ -86,7 +86,7 @@
       }
       input[readonly],
       textarea[readonly] {
-        background: #f6fbf6;
+        background: #fff;
       }
       input,
       textarea {
@@ -180,6 +180,38 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* === Design overrides for names and sizing === */
+      /* Tabs typography */
+      .tab { font-family: Inter, Poppins, sans-serif; font-weight: 600; font-size: 24px; text-align: center; }
+
+      /* Make right column wide enough for notes */
+      .grid { grid-template-columns: 1fr 514px; }
+
+      /* Name fields special styling */
+      #lastName, #firstName, #middleName {
+        width: 251px;
+        height: 36px;
+        background: #DDF3DC;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 1px 1px 4px 0px #00000040;
+        font-family: Poppins, sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        color: #275D2B;
+        padding: 6px 10px;
+      }
+
+      /* Other single-line inputs */
+      #submittedAt { width: 250px; height: 36px; border-radius: 8px; }
+      #experience, #age { width: 456px; height: 36px; border-radius: 8px; }
+
+      /* Notes column textareas height */
+      #note1, #note2, #note3, #note4, #note5, #note6 { height: 144px; }
+
+      /* Full-width long text blocks */
+      #requestText, #aboutText, #education, #topics { min-height: 144px; }
     </style>
   </head>
   <body>

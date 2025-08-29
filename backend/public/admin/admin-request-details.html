@@ -62,6 +62,19 @@
         grid-template-columns: 248px 1fr;
         gap: 32px;
       }
+
+      .names{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+  align-items:flex-start;
+}
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:24px 32px;
+  margin-top:24px;
+}
       .photo {
         width: 248px;
         height: 250px;
@@ -70,11 +83,7 @@
         border: 2px solid var(--orange);
         background: #eef1ee;
       }
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr 320px;
-        gap: 28px 32px;
-      }
+      
       .field {
         display: flex;
         flex-direction: column;
@@ -176,9 +185,7 @@
         .mentor-menu {
           width: 100%;
         }
-        .grid {
-          grid-template-columns: 1fr;
-        }
+      
       }
 
       /* === Design overrides for names and sizing === */
@@ -190,8 +197,7 @@
         text-align: center;
       }
 
-      /* Make right column wide enough for notes */
-      .grid { grid-template-columns: 1fr 514px; }
+
 
       /* Name fields special styling */
       #lastName,
@@ -281,89 +287,57 @@
           alt="Фото"
         />
 
-        <div class="grid">
-          <div class="field">
-            <label>Прізвище</label><input id="lastName" readonly />
-          </div>
-    
-
-          <div class="field">
-            <label>Імʼя</label><input id="firstName" readonly />
-          </div>
-         
-
-          <div class="field">
-            <label>По-батькові</label><input id="middleName" readonly />
-          </div>
+       <div class="names">
+  <div class="field">
+    <label>Прізвище</label><input id="lastName" readonly />
+  </div>
+  <div class="field">
+    <label>Імʼя</label><input id="firstName" readonly />
+  </div>
+  <div class="field">
+    <label>По-батькові</label><input id="middleName" readonly />
+  </div>
+</div>
           
 
-          <div class="field">
-            <label>Дата подання заявки</label
-            ><input id="submittedAt" readonly />
-          </div>
-         
+         <div class="info-grid">
+  <div class="field">
+    <label>Дата подання заявки</label><input id="submittedAt" readonly />
+  </div>
+  <div class="field">
+    <label>Скільки років у вас практики</label><input id="experience" readonly />
+  </div>
+  <div class="field">
+    <label>Категорія за віком</label><input id="age" readonly />
+  </div>
 
-          <div class="field">
-            <label>Скільки років у вас практики</label
-            ><input id="experience" readonly />
-          </div>
-         
+  <div class="field" style="grid-column:1/-1">
+    <label>Запит до ментора</label><textarea id="requestText" readonly></textarea>
+  </div>
+  <div class="field" style="grid-column:1/-1">
+    <label>Про себе / ситуація</label><textarea id="aboutText" readonly></textarea>
+  </div>
+  <div class="field" style="grid-column:1/-1">
+    <label>Психологічна освіта</label><textarea id="education" readonly></textarea>
+  </div>
+  <div class="field" style="grid-column:1/-1">
+    <label>Тематики/теми</label><textarea id="topics" readonly></textarea>
+  </div>
 
-          <div class="field">
-            <label>Категорія за віком</label><input id="age" readonly />
-          </div>
-         
-
-          <div class="field" style="grid-column: 1/-1">
-            <label>Запит до ментора</label
-            ><textarea id="requestText" readonly></textarea>
-          </div>
-
-          <div class="field" style="grid-column: 1/-1">
-            <label>Про себе / ситуація</label
-            ><textarea id="aboutText" readonly></textarea>
-          </div>
-
-          <div class="field" style="grid-column: 1/-1">
-            <label>Психологічна освіта</label
-            ><textarea id="education" readonly></textarea>
-          </div>
-
-          <div class="field" style="grid-column: 1/-1">
-            <label>Тематики/теми</label
-            ><textarea id="topics" readonly></textarea>
-          </div>
-
-          <div class="field select-wrap" style="grid-column: 1/-1">
-            <label>Призначити ментора</label>
-            <div
-              id="mentorSelectBtn"
-              class="mentor-select"
-              tabindex="0"
-              aria-haspopup="listbox"
-              aria-expanded="false"
-            >
-              <span id="mentorSelectLabel">Оберіть ментора</span>
-              <img
-                class="mentor-caret"
-                src="/admin/images/arrow-down.png"
-                alt=""
-              />
-            </div>
-            <div
-              id="mentorMenu"
-              class="mentor-menu"
-              role="listbox"
-              tabindex="-1"
-            ></div>
-            <input type="hidden" id="mentorSelectValue" />
-          </div>
-        </div>
-      </div>
+  <div class="field select-wrap" style="grid-column:1/-1">
+    <label>Призначити ментора</label>
+    <div id="mentorSelectBtn" class="mentor-select" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+      <span id="mentorSelectLabel">Оберіть ментора</span>
+      <img class="mentor-caret" src="/admin/images/arrow-down.png" alt="">
+    </div>
+    <div id="mentorMenu" class="mentor-menu" role="listbox" tabindex="-1"></div>
+    <input type="hidden" id="mentorSelectValue">
+  </div>
+</div>
 
       <div class="actions">
   <button id="saveBtn" class="btn" type="button">Зберегти</button>
-</div>
+
 
     <script>
       // --- small helpers ---

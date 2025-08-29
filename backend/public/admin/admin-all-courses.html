@@ -79,23 +79,56 @@
   const API_BASE = "http://157.230.121.24:5050";
 
   function creatorDisplayName(course) {
-    // prefer saved strings
-    if (course.creatorName && course.creatorName.trim()) return course.creatorName;
-    // fallback to populated creatorId { firstName, lastName, fullName, email }
+    // 1) prefer saved flat string
+    if (course.creatorName && String(course.creatorName).trim()) {
+      return course.creatorName;
+    }
+    // 2) fallback to populated creatorId object
     const c = course.creatorId || {};
+    // try explicit fullName
+    if (c.fullName && String(c.fullName).trim()) return c.fullName;
+    // try first/last
     const full = [c.firstName, c.lastName].filter(Boolean).join(' ').trim();
-    return full || c.fullName || c.email || '-';
+    if (full) return full;
+    // last fallback: email
+    if (c.email && String(c.email).trim()) return c.email;
+    return '-';
   }
 
   function creatorDisplayRole(course) {
-    if (course.creatorRole && String(course.creatorRole).trim()) return course.creatorRole;
-    const c = course.creatorId || {};
-    // role may be a string or an object { name: '...' }
-    if (!c.role) return '-';
-    if (typeof c.role === 'string') return c.role;
-    if (typeof c.role === 'object') {
-      return c.role.name || c.role.title || '-';
+    // 1) prefer saved flat string
+    if (course.creatorRole && String(course.creatorRole).trim()) {
+      return course.creatorRole;
     }
+    const c = course.creatorId || {};
+    // Roles may be in different shapes:
+    // - c.role: string or object { name/title }
+    // - c.roles: array of strings or objects
+    const takeName = (r) => {
+      if (!r) return null;
+      if (typeof r === 'string') return r;
+      if (typeof r === 'object') return r.name || r.title || r.role || null;
+      return null;
+    };
+
+    // single role
+    const single = takeName(c.role);
+    if (single) return single;
+
+    // multiple roles
+    if (Array.isArray(c.roles) && c.roles.length) {
+      const arr = c.roles
+        .map(takeName)
+        .filter(Boolean);
+      if (arr.length) return arr.join(', ');
+    }
+
+    // sometimes API uses "role" as array at root course level (defensive)
+    if (Array.isArray(course.creatorRole) && course.creatorRole.length) {
+      const arr = course.creatorRole.map(takeName).filter(Boolean);
+      if (arr.length) return arr.join(', ');
+    }
+
     return '-';
   }
 
@@ -126,6 +159,14 @@
         const tr = document.createElement("tr");
         const name = creatorDisplayName(course);
         const role = creatorDisplayRole(course);
+
+        if (name === '-' || role === '-') {
+          console.warn('Missing creator name/role for course', course._id, {
+            creatorName: course.creatorName,
+            creatorRole: course.creatorRole,
+            creatorId: course.creatorId
+          });
+        }
 
         tr.innerHTML = `
           <td>${index + 1}</td>

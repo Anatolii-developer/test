@@ -83,7 +83,7 @@ exports.approveCourse = async (req, res) => {
 exports.getCourses = async (req, res) => {
   try {
     const courses = await Course.find()
-      .populate('creatorId', 'firstName lastName email role')
+     .populate('creatorId', 'firstName lastName fullName email role roles') 
       .sort({ createdAt: -1 });
 
     const now = new Date();

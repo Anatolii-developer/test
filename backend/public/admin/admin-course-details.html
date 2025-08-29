@@ -258,6 +258,24 @@ function getFullName(user) {
   return [user.firstName, user.lastName].filter(Boolean).join(" ");
 }
 
+function computeDurationText(startIso, endIso){
+  if(!startIso || !endIso) return '';
+  const s = new Date(startIso);
+  const e = new Date(endIso);
+  if(isNaN(s) || isNaN(e)) return '';
+  // normalize to noon to avoid DST issues
+  s.setHours(12,0,0,0);
+  e.setHours(12,0,0,0);
+  const msPerDay = 24*60*60*1000;
+  const days = Math.max(0, Math.round((e - s) / msPerDay) + 1); // inclusive range
+  const weeks = Math.floor(days / 7);
+  const remDays = days % 7;
+  const weekPart = weeks ? `${weeks} тижн.` : '';
+  const dayPart = remDays ? `${remDays} дн.` : (weeks ? '' : `${days} дн.`);
+  const joiner = weekPart && dayPart ? ' ' : '';
+  return `${days} днів (${weekPart}${joiner}${dayPart})`;
+}
+
 async function loadCourseDetails() {
   const params = new URLSearchParams(window.location.search);
   courseId = params.get('id');
@@ -277,7 +295,17 @@ async function loadCourseDetails() {
     document.getElementById("price").value = course.coursePrice;
     document.getElementById("zoom").value = course.zoomLink;
     document.getElementById("creatorName").value = course.creatorName || "";
-document.getElementById("creatorRole").value = course.creatorRole || "";
+    document.getElementById("creatorRole").value = course.creatorRole || "";
+
+    // Fallbacks for creatorName/creatorRole using creatorId if present
+    if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
+      const fallbackName = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ') || course.creatorId.email || '';
+      document.getElementById('creatorName').value = fallbackName;
+    }
+    if ((!course.creatorRole || course.creatorRole === '') && course.creatorId) {
+      const fallbackRole = course.creatorId.role || (Array.isArray(course.creatorId.roles) ? course.creatorId.roles.join(', ') : '');
+      document.getElementById('creatorRole').value = fallbackRole;
+    }
 
     selectedParticipantIds = (course.participants || []).map(p => typeof p === 'string' ? p : (p && p._id ? p._id : p));
 
@@ -287,6 +315,16 @@ document.getElementById("creatorRole").value = course.creatorRole || "";
 
     const start = course.courseDates && course.courseDates.start;
     const end   = course.courseDates && course.courseDates.end;
+
+    // Автовычисленная тривалість за датами
+    const autoDuration = computeDurationText(start, end);
+    if (autoDuration) {
+      const durEl = document.getElementById('duration');
+      if (durEl && (!durEl.value || durEl.value.trim() === '' || durEl.disabled)) {
+        durEl.value = autoDuration;
+      }
+    }
+
     const range = start || end ? `${fmtDate(start)} – ${fmtDate(end)}` : '';
     const group = course.accessType || '';
     document.getElementById('dateRange').value = range;

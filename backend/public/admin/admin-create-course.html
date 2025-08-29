@@ -131,10 +131,19 @@
 </div>
 
 
-        <div class="form-group">
-          <label>Тривалість курсу</label>
-          <input type="text" name="courseDuration" placeholder="Наприклад: 4 тижні, 8 занять" />
-        </div>
+       <div class="form-group">
+  <label>Тривалість курсу</label>
+
+  <!-- Календар: від і до -->
+  <div class="date-range">
+    <input type="date" name="durStart" id="durStart" />
+    <input type="date" name="durEnd" id="durEnd" />
+  </div>
+
+  <input type="text" id="durationHuman" placeholder="Наприклад: 10 днів (2 тижні)" disabled />
+
+  <input type="hidden" name="courseDuration" id="courseDuration" />
+</div>
 
         <div class="form-group">
           <label>Вартість курсу</label>
@@ -208,6 +217,52 @@ function logoutUser() {
   window.location.href = "login.html";
 }
 
+function daysBetweenISO(a,b){
+  if(!a || !b) return null;
+  const A = new Date(a), B = new Date(b);
+  if (isNaN(A) || isNaN(B)) return null;
+  // нормализуем к полночі UTC, щоб не з'їхало на часових поясах
+  const AU = Date.UTC(A.getFullYear(),A.getMonth(),A.getDate());
+  const BU = Date.UTC(B.getFullYear(),B.getMonth(),B.getDate());
+  return Math.round((BU - AU) / (1000*60*60*24)) + 1; // включно з обома датами
+}
+
+function humanDurationFromRange(startISO, endISO){
+  const d = daysBetweenISO(startISO, endISO);
+  if (d == null || d <= 0) return '';
+  const weeks = Math.floor(d / 7);
+  const rest  = d % 7;
+  const weeksPart = weeks ? `${weeks} тижн.` : '';
+  const restPart  = rest ? `${rest} дн.` : (weeks ? '' : `${d} дн.`);
+  const parts = [weeksPart, restPart].filter(Boolean).join(' ');
+  return `${d} днів${weeks ? ` (${parts})` : ''}`;
+}
+
+function bindDurationCalendar(){
+  const s = document.getElementById('durStart');
+  const e = document.getElementById('durEnd');
+  const h = document.getElementById('durationHuman');
+  const hidden = document.getElementById('courseDuration');
+
+  function recalc(){
+    const val = humanDurationFromRange(s && s.value, e && e.value);
+    if (h) h.value = val || '';
+    if (hidden) hidden.value = val || '';
+  }
+
+  if (s) s.addEventListener('change', () => {
+    if (e && e.value && s.value > e.value) e.value = s.value;
+    recalc();
+  });
+  if (e) e.addEventListener('change', () => {
+    if (s && s.value && e.value < s.value) s.value = e.value;
+    recalc();
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  bindDurationCalendar();
+});
 
 async function loadParticipants() {
   try {
@@ -235,14 +290,24 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
   const form = e.target;
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
+  // Возьмём даты из основного блока или из блока "Тривалість"
+  const startDate = form.startDate.value || form.durStart.value;
+  const endDate   = form.endDate.value   || form.durEnd.value;
+
+  // Если скрытая длительность ещё пуста — посчитаем по календарю тривалості
+  const durationHidden = document.getElementById('courseDuration');
+  if (durationHidden && !durationHidden.value && form.durStart.value && form.durEnd.value){
+    durationHidden.value = humanDurationFromRange(form.durStart.value, form.durEnd.value);
+  }
+
   const formData = {
     eventType: form.eventType.value,
     courseTitle: form.courseTitle.value,
     courseSubtitle: form.courseSubtitle.value,
     courseDescription: form.courseDescription.value,
     courseDates: {
-      start: form.startDate.value,
-      end: form.endDate.value
+      start: startDate,
+      end: endDate
     },
     courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
     courseTime: {
@@ -250,7 +315,7 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
       end: form.endTime.value
     },
     accessType: form.accessType.value,
-    courseDuration: form.courseDuration.value,
+    courseDuration: (durationHidden ? durationHidden.value : form.courseDuration.value),
     coursePrice: form.coursePrice.value,
     zoomLink: form.zoomLink.value,
     participants: Array.from(selectedUserIds),

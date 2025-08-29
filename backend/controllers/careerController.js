@@ -139,17 +139,28 @@ async function list(req, res) {
     const me = await User.findById(req.user._id).select("roles").lean();
     const isMentor =
       Array.isArray(me?.roles) &&
-      me.roles.some(
-        (r) =>
-          String(r).toLowerCase().includes("mentor") ||
-          String(r).toLowerCase().includes("ментор")
+      me.roles.some((r) =>
+        String(r).toLowerCase().includes("mentor") ||
+        String(r).toLowerCase().includes("ментор")
       );
 
-    // у заявки поле должно быть либо ObjectId в assignedMentor, либо assignedMentorId
     const myId = req.user._id;
-    const filter = isMentor
-      ? { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] }
-      : { user: myId };
+
+    // 🔹 Новое: явный выбор скоупа через query
+    const wantMine      = String(req.query.mine || "") === "1";       // только мои поданные мною
+    const wantAssigned  = String(req.query.assigned || "") === "1";   // заявки, назначенные на меня как на ментора
+
+    let filter;
+    if (wantMine) {
+      filter = { user: myId };
+    } else if (wantAssigned) {
+      filter = { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] };
+    } else {
+      // поведение по умолчанию (как было)
+      filter = isMentor
+        ? { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] }
+        : { user: myId };
+    }
 
     const apps = await CareerApplication.find(filter)
       .populate("user", "firstName lastName email username")

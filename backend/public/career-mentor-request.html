@@ -81,7 +81,7 @@
         font-weight: 700; /* Bold */
         font-size: 20px;
         color: #275D2B;
-        background-color: #DDF3DC;
+        background-color: #DDF3DC; /* names green */
       }
 
       /* Date */
@@ -155,7 +155,13 @@
       }
       input[readonly],
       textarea[readonly] {
-        background: #f6fbf6;
+        background: #ffffff; /* all read-only except names stay white */
+      }
+      /* keep names green even when readonly */
+      #lastName[readonly],
+      #firstName[readonly],
+      #middleName[readonly] {
+        background-color: #DDF3DC;
       }
       input,
       textarea {
@@ -377,11 +383,6 @@
 
         const topics = Array.isArray(a.topics) ? a.topics.filter(Boolean) : (a.topics || "");
         qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
-
-        // meta
-        const when = a.createdAt ? fmtDate(a.createdAt) : "";
-const metaEl = qs("#submittedMeta");
-if (when && metaEl) metaEl.textContent = "Дата подання: " + when;
 
         // show page
         qs("#page").style.display = "flex";

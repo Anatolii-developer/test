@@ -75,7 +75,29 @@
 
 
   <script>
+
   const API_BASE = "http://157.230.121.24:5050";
+
+  function creatorDisplayName(course) {
+    // prefer saved strings
+    if (course.creatorName && course.creatorName.trim()) return course.creatorName;
+    // fallback to populated creatorId { firstName, lastName, fullName, email }
+    const c = course.creatorId || {};
+    const full = [c.firstName, c.lastName].filter(Boolean).join(' ').trim();
+    return full || c.fullName || c.email || '-';
+  }
+
+  function creatorDisplayRole(course) {
+    if (course.creatorRole && String(course.creatorRole).trim()) return course.creatorRole;
+    const c = course.creatorId || {};
+    // role may be a string or an object { name: '...' }
+    if (!c.role) return '-';
+    if (typeof c.role === 'string') return c.role;
+    if (typeof c.role === 'object') {
+      return c.role.name || c.role.title || '-';
+    }
+    return '-';
+  }
 
 
   function logoutUser() {
@@ -102,11 +124,14 @@
 
       filteredCourses.forEach((course, index) => {
         const tr = document.createElement("tr");
+        const name = creatorDisplayName(course);
+        const role = creatorDisplayRole(course);
+
         tr.innerHTML = `
           <td>${index + 1}</td>
           <td>${course.courseTitle || "-"}</td>
-          <td>${course.creatorName || "-"}</td>
-          <td>${course.creatorRole || "-"}</td>
+          <td>${name}</td>
+          <td>${role}</td>
           <td>${formatDate(course.courseDates?.start)}</td>
           <td>
             <a href="admin-course-details.html?id=${course._id}" class="more-button">More</a>

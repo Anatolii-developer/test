@@ -128,7 +128,16 @@
   </aside>
   <div class="course-detail">
     <h1>Деталі курсу</h1>
-
+<div style="display:flex; gap:24px; flex-wrap:wrap;">
+  <div class="editable-block" style="min-width:260px; flex:1;">
+    <label>Створив</label>
+    <input id="creatorName" type="text" disabled />
+  </div>
+  <div class="editable-block" style="min-width:220px; flex:1;">
+    <label>Роль</label>
+    <input id="creatorRole" type="text" disabled />
+  </div>
+</div>
     <div class="editable-block">
       <label>Назва курсу</label>
       <textarea id="title" disabled></textarea>
@@ -267,6 +276,8 @@ async function loadCourseDetails() {
     document.getElementById("duration").value = course.courseDuration;
     document.getElementById("price").value = course.coursePrice;
     document.getElementById("zoom").value = course.zoomLink;
+    document.getElementById("creatorName").value = course.creatorName || "";
+document.getElementById("creatorRole").value = course.creatorRole || "";
 
     selectedParticipantIds = (course.participants || []).map(p => typeof p === 'string' ? p : (p && p._id ? p._id : p));
 

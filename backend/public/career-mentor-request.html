@@ -4,9 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ментор — Заявка</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet"/>
-    <link rel="icon" type="image/svg+xml" href="/assets/sidebar/IPS Logo (1).svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/assets/sidebar/IPS Logo (1).svg"
+    />
     <style>
       :root {
         --green: #275d2b;
@@ -14,10 +24,13 @@
         --orange: #e8812e;
         --light: #ecf5eb;
       }
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
       body {
         margin: 0;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
         background: var(--bg);
         color: #414141;
       }
@@ -48,7 +61,8 @@
         cursor: pointer;
         text-decoration: none;
         text-align: center;
-        font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
         font-weight: 600; /* Semi Bold */
         font-size: 24px;
         line-height: 1.2;
@@ -77,11 +91,11 @@
         height: 36px;
         border-radius: 8px;
         box-shadow: 1px 1px 4px 0px #00000040;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
         font-weight: 700; /* Bold */
         font-size: 20px;
-        color: #275D2B;
-        background-color: #DDF3DC; /* names green */
+        color: #275d2b;
+        background-color: #ddf3dc; /* names green */
       }
 
       /* Date */
@@ -161,7 +175,7 @@
       #lastName[readonly],
       #firstName[readonly],
       #middleName[readonly] {
-        background-color: #DDF3DC;
+        background-color: #ddf3dc;
       }
       input,
       textarea {
@@ -200,7 +214,8 @@
         color: #6b6b6b;
       }
 
-      .empty, .guard {
+      .empty,
+      .guard {
         text-align: center;
         color: #2a2a2a;
         padding: 24px;
@@ -225,29 +240,50 @@
           padding: 28px;
           margin: 16px auto;
         }
-        .card { grid-template-columns: 1fr; }
-        .photo-wrap { width: 200px; height: 200px; }
-        .grid.grid-names { grid-template-columns: 1fr; }
-        .info-grid { grid-template-columns: 1fr; }
-        .back-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .card {
+          grid-template-columns: 1fr;
+        }
+        .photo-wrap {
+          width: 200px;
+          height: 200px;
+        }
+        .grid.grid-names {
+          grid-template-columns: 1fr;
+        }
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+        .back-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="guard" class="guard" style="display:none">
+    <div id="guard" class="guard" style="display: none">
       Доступ лише для менторів.
       <div><a href="career-mentor-requests.html">Повернутися</a></div>
     </div>
 
-    <div id="page" class="page" style="display:none">
+    <div id="page" class="page" style="display: none">
       <div class="tabs">
         <a class="tab light" href="career-mentor-requests.html">Повернутися</a>
-        <div class="tab dark">Налаштування <br> ментора</div>
+        <div class="tab dark">
+          Налаштування <br />
+          ментора
+        </div>
       </div>
 
       <div class="card">
         <div class="photo-wrap">
-          <img id="photo" class="photo" src="/assets/profile-photo.png" alt="Фото" />
+          <img
+            id="photo"
+            class="photo"
+            src="/assets/profile-photo.png"
+            alt="Фото"
+          />
         </div>
 
         <div class="grid grid-names">
@@ -282,22 +318,22 @@
           <input id="age" readonly />
         </div>
 
-        <div class="field" style="grid-column:1/-1">
+        <div class="field" style="grid-column: 1/-1">
           <label>Запит до ментора</label>
           <textarea id="requestText" readonly></textarea>
         </div>
 
-        <div class="field" style="grid-column:1/-1">
+        <div class="field" style="grid-column: 1/-1">
           <label>Про себе / ситуація</label>
           <textarea id="aboutText" readonly></textarea>
         </div>
 
-        <div class="field" style="grid-column:1/-1">
+        <div class="field" style="grid-column: 1/-1">
           <label>Психологічна освіта</label>
           <textarea id="education" readonly></textarea>
         </div>
 
-        <div class="field" style="grid-column:1/-1">
+        <div class="field" style="grid-column: 1/-1">
           <label>Тематики/теми</label>
           <textarea id="topics" readonly></textarea>
         </div>
@@ -311,7 +347,9 @@
       const fmtDate = (iso) => {
         const d = new Date(iso);
         if (isNaN(d)) return "";
-        return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+        return `${pad(d.getDate())}.${pad(
+          d.getMonth() + 1
+        )}.${d.getFullYear()}`;
       };
       const params = new URLSearchParams(location.search);
       const ID = params.get("id");
@@ -319,7 +357,9 @@
       function getToken() {
         try {
           const u = JSON.parse(localStorage.getItem("user") || "{}");
-          return u.token || u.accessToken || localStorage.getItem("token") || null;
+          return (
+            u.token || u.accessToken || localStorage.getItem("token") || null
+          );
         } catch (_) {
           return localStorage.getItem("token") || null;
         }
@@ -341,10 +381,12 @@
           const body = await r.json().catch(() => ({}));
           if (!r.ok || !body?.user) return null;
           const roles = body.user.roles || [];
-          const ok = Array.isArray(roles) && roles.some((s) => {
-            const v = String(s).toLowerCase();
-            return v.includes("ментор") || v.includes("mentor");
-          });
+          const ok =
+            Array.isArray(roles) &&
+            roles.some((s) => {
+              const v = String(s).toLowerCase();
+              return v.includes("ментор") || v.includes("mentor");
+            });
           return ok ? body.user : null;
         } catch {
           return null;
@@ -364,25 +406,30 @@
         const body = await r.json().catch(() => ({}));
         if (!r.ok || !body?.ok) {
           qs("#guard").style.display = "block";
-          qs("#guard").textContent = body?.message || "Помилка завантаження заявки.";
+          qs("#guard").textContent =
+            body?.message || "Помилка завантаження заявки.";
           return;
         }
         const a = body.application || {};
         const u = a.user || {};
 
         qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
-        qs("#lastName").value   = u.lastName || "";
-        qs("#firstName").value  = u.firstName || "";
+        qs("#lastName").value = u.lastName || "";
+        qs("#firstName").value = u.firstName || "";
         qs("#middleName").value = u.middleName || "";
         qs("#submittedAt").value = fmtDate(a.createdAt);
-        qs("#experience").value  = a.experience || a.exp || "";
-        qs("#age").value         = a.ageGroup || a.age || "";
+        qs("#experience").value = a.experience || a.exp || "";
+        qs("#age").value = a.ageGroup || a.age || "";
         qs("#requestText").value = a.requestText || a.request || "";
-        qs("#aboutText").value   = a.aboutText || a.about || "";
-        qs("#education").value   = a.education || "";
+        qs("#aboutText").value = a.aboutText || a.about || "";
+        qs("#education").value = a.education || "";
 
-        const topics = Array.isArray(a.topics) ? a.topics.filter(Boolean) : (a.topics || "");
-        qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
+        const topics = Array.isArray(a.topics)
+          ? a.topics.filter(Boolean)
+          : a.topics || "";
+        qs("#topics").value = Array.isArray(topics)
+          ? topics.join(", ")
+          : topics;
 
         // show page
         qs("#page").style.display = "flex";

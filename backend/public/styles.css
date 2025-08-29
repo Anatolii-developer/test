@@ -518,10 +518,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 80px);
-  /* subtract header height */
-  background-color: #D8E8D0;
-  /* match your screenshot */
+ height: calc(100vh - 80px);
+  background-color: #96C194;
 }
 
 .success-image {

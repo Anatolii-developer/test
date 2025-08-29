@@ -88,6 +88,8 @@
             <input type="date" name="startDate" />
             <input type="date" name="endDate" />
           </div>
+          <input type="text" id="durationHuman" placeholder="Тривалість (обчислюється)" disabled />
+          <input type="hidden" name="courseDuration" id="courseDuration" />
         </div>
 
         <div class="form-group">
@@ -131,19 +133,6 @@
 </div>
 
 
-       <div class="form-group">
-  <label>Тривалість курсу</label>
-
-  <!-- Календар: від і до -->
-  <div class="date-range">
-    <input type="date" name="durStart" id="durStart" />
-    <input type="date" name="durEnd" id="durEnd" />
-  </div>
-
-  <input type="text" id="durationHuman" placeholder="Наприклад: 10 днів (2 тижні)" disabled />
-
-  <input type="hidden" name="courseDuration" id="courseDuration" />
-</div>
 
         <div class="form-group">
           <label>Вартість курсу</label>
@@ -238,9 +227,10 @@ function humanDurationFromRange(startISO, endISO){
   return `${d} днів${weeks ? ` (${parts})` : ''}`;
 }
 
-function bindDurationCalendar(){
-  const s = document.getElementById('durStart');
-  const e = document.getElementById('durEnd');
+
+function bindMainDateDuration(){
+  const s = document.querySelector('input[name="startDate"]');
+  const e = document.querySelector('input[name="endDate"]');
   const h = document.getElementById('durationHuman');
   const hidden = document.getElementById('courseDuration');
 
@@ -261,7 +251,7 @@ function bindDurationCalendar(){
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  bindDurationCalendar();
+  bindMainDateDuration();
 });
 
 async function loadParticipants() {
@@ -290,14 +280,12 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
   const form = e.target;
   const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  // Возьмём даты из основного блока или из блока "Тривалість"
-  const startDate = form.startDate.value || form.durStart.value;
-  const endDate   = form.endDate.value   || form.durEnd.value;
+  const startDate = form.startDate.value;
+  const endDate   = form.endDate.value;
 
-  // Если скрытая длительность ещё пуста — посчитаем по календарю тривалості
   const durationHidden = document.getElementById('courseDuration');
-  if (durationHidden && !durationHidden.value && form.durStart.value && form.durEnd.value){
-    durationHidden.value = humanDurationFromRange(form.durStart.value, form.durEnd.value);
+  if (durationHidden && !durationHidden.value && form.startDate.value && form.endDate.value){
+    durationHidden.value = humanDurationFromRange(form.startDate.value, form.endDate.value);
   }
 
   const formData = {

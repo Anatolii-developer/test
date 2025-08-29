@@ -21,6 +21,9 @@ exports.createCourse = async (req, res) => {
     const timeEnd   = req.body.courseTime?.end   || req.body.endTime   || '';
 
     const course = new Course({
+       creatorId:   req.body.creatorId || null,
+      creatorName: req.body.creatorName || '',
+      creatorRole: req.body.creatorRole || '',
       eventType: req.body.eventType,
       courseTitle: req.body.courseTitle,
       courseSubtitle: req.body.courseSubtitle,
@@ -79,7 +82,9 @@ exports.approveCourse = async (req, res) => {
 // GET /api/courses
 exports.getCourses = async (req, res) => {
   try {
-    const courses = await Course.find().sort({ createdAt: -1 });
+    const courses = await Course.find()
+      .populate('creatorId', 'firstName lastName email role')
+      .sort({ createdAt: -1 });
 
     const now = new Date();
 
@@ -104,6 +109,14 @@ exports.getCourses = async (req, res) => {
   await course.save();
 }
 
+        // Fallback for creatorName/creatorRole from creatorId, if not explicitly saved
+        if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
+          const fn = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ');
+          course.creatorName = fn || course.creatorId.email || course.creatorName || '';
+        }
+        if ((!course.creatorRole || course.creatorRole === '') && course.creatorId) {
+          course.creatorRole = course.creatorId.role || course.creatorRole || '';
+        }
 
         return course;
       })
@@ -120,6 +133,7 @@ exports.getCourses = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id)
+      .populate('creatorId', 'firstName lastName email role')
       .populate('participants', 'fullName email');
 
     if (!course) return res.status(404).json({ message: "Курс не знайдено" });
@@ -140,6 +154,15 @@ exports.getCourseById = async (req, res) => {
     if (course.status !== newStatus) {
       course.status = newStatus;
       await course.save();
+    }
+
+    // Ensure creatorName/creatorRole present in response
+    if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
+      const fn = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ');
+      course.creatorName = fn || course.creatorId.email || course.creatorName || '';
+    }
+    if ((!course.creatorRole || course.creatorRole === '') && course.creatorId) {
+      course.creatorRole = course.creatorId.role || course.creatorRole || '';
     }
 
     res.json(course);

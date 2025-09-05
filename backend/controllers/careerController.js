@@ -174,8 +174,48 @@ async function list(req, res) {
   }
 }
 
+// POST /api/career-applications
 async function create(req, res) {
-  /* без изменений */
+  try {
+    const b = req.body || {};
+
+    // нормализуем адресата
+    const rawTarget = String(b.target || '').toLowerCase().trim();
+    const target = rawTarget.startsWith('sup') ? 'supervisor'
+                 : rawTarget.startsWith('men') ? 'mentor'
+                 : null;
+
+    if (!target) {
+      return res.status(400).json({ ok:false, message: 'Вкажіть адресата: mentor або supervisor' });
+    }
+
+    // кто подал (если есть аутентификация)
+    const userId = req.user?._id || req.user?.id || null;
+
+    const app = await CareerApplication.create({
+      user: userId,
+      username: req.user?.username,
+      fullName: b.fullName,
+      email: b.email,
+
+      target,                         
+
+      experience: b.experience,
+      ageGroup: b.ageGroup,
+      requestText: b.requestText,
+      aboutText: b.aboutText,
+    });
+
+    // вернём с популяцией для удобства фронта
+    const populated = await CareerApplication.findById(app._id)
+      .populate('user', 'firstName lastName email username')
+      .lean();
+
+    return res.status(201).json({ ok:true, application: populated });
+  } catch (e) {
+    console.error('[career create] failed:', e);
+    return res.status(500).json({ ok:false, message:'Server error' });
+  }
 }
 async function assignMentor(req, res) {
   try {

@@ -71,19 +71,19 @@
         margin-top: 10px;
       }
 
-.req-row {
-  width: 910px;
-  height: 52px;
-  background: #ffeed9;
-  border-radius: 16px;
-  padding: 10px 16px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 14px auto;
-  justify-content: space-between; 
-}
+      .req-row {
+        width: 910px;
+        height: 52px;
+        background: #ffeed9;
+        border-radius: 16px;
+        padding: 10px 16px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 14px auto;
+        justify-content: space-between;
+      }
 
       /* Левая часть растягивается, внутри можно сжиматься */
       .req-left {
@@ -125,18 +125,18 @@
       }
 
       .btn-more {
-  height: 32px;
-  padding: 0 16px;
-  border-radius: 24px;
-  border: none;
-  cursor: pointer;
-  background: #275d2b;
-  color: #fff;
-  font-weight: 600;
-  font-size: 14px;
-  white-space: nowrap;
-  flex: 0 0 auto; /* кнопка не растягивается */
-}
+        height: 32px;
+        padding: 0 16px;
+        border-radius: 24px;
+        border: none;
+        cursor: pointer;
+        background: #275d2b;
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        flex: 0 0 auto; /* кнопка не растягивается */
+      }
 
       .empty {
         text-align: center;
@@ -159,45 +159,114 @@
       }
 
       /* ==== MODAL (деталі заявки) ==== */
-      .req-modal-backdrop{
-        position:fixed; inset:0; background:rgba(0,0,0,.45); display:none;
-        align-items:center; justify-content:center; z-index:2000;
+      .req-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
       }
-      .req-modal{
-        width:720px; max-width:90vw; background:#fff; border-radius:16px;
-        padding:24px 24px 20px; box-shadow:0 12px 40px rgba(0,0,0,.25);
-        position:relative;
-        max-height:90vh;              /* ограничиваем высоту модалки */
-        overflow:auto;                /* скролл внутри модалки */
-        -webkit-overflow-scrolling:touch; /* плавный скролл на iOS */
-        overscroll-behavior:contain;  /* чтобы не скроллился фон при дотягивании */
+      .req-modal {
+        width: 720px;
+        max-width: 90vw;
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px 24px 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        position: relative;
+        max-height: 90vh; /* ограничиваем высоту модалки */
+        overflow: auto; /* скролл внутри модалки */
+        -webkit-overflow-scrolling: touch; /* плавный скролл на iOS */
+        overscroll-behavior: contain; /* чтобы не скроллился фон при дотягивании */
       }
-      .req-modal h3{
-        margin:0 0 12px 0; font-size:24px; font-weight:600; color:#414141;
+      .req-modal h3 {
+        margin: 0 0 12px 0;
+        font-size: 24px;
+        font-weight: 600;
+        color: #414141;
       }
-      .req-meta{ color:#6b6b6b; font-size:14px; margin-bottom:12px }
-      .req-qa{ display:flex; flex-direction:column; gap:12px; margin-top:8px }
-      .req-qa .row{
-        background:#FFF7EE; border-radius:12px; padding:12px 14px;
+      .req-meta {
+        color: #6b6b6b;
+        font-size: 14px;
+        margin-bottom: 12px;
       }
-      .req-qa .q{ font-weight:600; color:#275D2B; margin-bottom:4px }
-      .req-qa .a{ white-space:pre-wrap; color:#414141 }
-      .req-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:16px }
-      .req-btn{ border:none; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:600 }
-      .req-btn.close{ background:#f3f4f6 }
-      .req-btn.primary{ background:#275D2B; color:#fff }
-      .req-close-x{
-        position:absolute; right:14px; top:12px; font-size:22px; line-height:1; cursor:pointer; opacity:.6;
+      .req-qa {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
       }
-      .req-close-x:hover{ opacity:1 }
+      .req-qa .row {
+        background: #fff7ee;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .req-qa .q {
+        font-weight: 600;
+        color: #275d2b;
+        margin-bottom: 4px;
+      }
+      .req-qa .a {
+        white-space: pre-wrap;
+        color: #414141;
+      }
+      .req-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 16px;
+      }
+      .req-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .req-btn.close {
+        background: #f3f4f6;
+      }
+      .req-btn.primary {
+        background: #275d2b;
+        color: #fff;
+      }
+      .req-close-x {
+        position: absolute;
+        right: 14px;
+        top: 12px;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.6;
+      }
+      .req-close-x:hover {
+        opacity: 1;
+      }
 
-      @media (max-width: 600px){
-        .req-modal{
-          max-height:92vh;
-          padding:18px 16px;
-          border-radius:12px;
+      .req-tag {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: #414141;
+        flex: 0 0 36px;
+      }
+      @media (max-width: 600px) {
+        .req-modal {
+          max-height: 92vh;
+          padding: 18px 16px;
+          border-radius: 12px;
         }
-        .req-modal h3{ font-size:20px }
+        .req-modal h3 {
+          font-size: 20px;
+        }
       }
     </style>
   </head>
@@ -380,51 +449,55 @@
       }
 
       function rowTemplate(i, item) {
-        const fullName =
-          (item.user &&
-            `${item.user.firstName || ""} ${
-              item.user.lastName || ""
-            }`.trim()) ||
-          (item.fullName && item.fullName.trim()) ||
-          (item.email || "").trim() ||
-          "Без імені";
+  const fullName =
+    (item.user && `${item.user.firstName || ""} ${item.user.lastName || ""}`.trim()) ||
+    (item.fullName && item.fullName.trim()) ||
+    (item.email || "").trim() || "Без імені";
 
-        const created = item.createdAt
-          ? formatDate(item.createdAt)
-          : item.created_at
-          ? formatDate(item.created_at)
-          : "";
+  const created = item.createdAt
+    ? formatDate(item.createdAt)
+    : item.created_at
+    ? formatDate(item.created_at)
+    : "";
 
-        const row = document.createElement("div");
-        row.className = "req-row";
+  // НОВОЕ: определяем адресата (бэкенд присылает target или targetType)
+  const t = (item.target || item.targetType || "").toString().toLowerCase();
+  // Буква: С — супервізор, М — ментор (кириллица)
+  const tagLetter = t.startsWith("sup") ? "С" : "М";
 
-        const left = document.createElement("div");
-        left.className = "req-left";
+  const row = document.createElement("div");
+  row.className = "req-row";
 
-        const num = document.createElement("div");
-        num.className = "req-num";
-        num.textContent = i;
+  const left = document.createElement("div");
+  left.className = "req-left";
 
-        const name = document.createElement("div");
-        name.className = "req-name";
-        name.textContent = fullName;
+  const num = document.createElement("div");
+  num.className = "req-num";
+  num.textContent = i;
 
-        const date = document.createElement("div");
-        date.className = "req-date";
-        date.textContent = created;
+  const name = document.createElement("div");
+  name.className = "req-name";
+  name.textContent = fullName;
 
-        left.append(num, name, date);
+  const date = document.createElement("div");
+  date.className = "req-date";
+  date.textContent = created;
 
-        const more = document.createElement("button");
-        more.className = "btn-more";
-        more.textContent = "Дізнатись більше";
-        more.addEventListener("click", () => {
-          openReqModal(item);
-        });
+  // 👇 НОВОЕ: бейдж «С/М»
+  const tag = document.createElement("div");
+  tag.className = "req-tag";
+  tag.textContent = tagLetter;
 
-        row.append(left, more);
-        return row;
-      }
+  left.append(num, name, date, tag);
+
+  const more = document.createElement("button");
+  more.className = "btn-more";
+  more.textContent = "Дізнатись більше";
+  more.addEventListener("click", () => openReqModal(item));
+
+  row.append(left, more);
+  return row;
+}
 
       async function load() {
         const { listEl, emptyEl } = ensureContainers();
@@ -504,115 +577,152 @@
       // Run after DOM is ready
       document.addEventListener("DOMContentLoaded", load);
 
+      function esc(s = "") {
+        return String(s).replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;",
+            }[m])
+        );
+      }
+      function fullNameFrom(item) {
+        // имя/фамилия
+        const u = item.user || {};
+        const first = u.firstName || item.firstName || "";
+        const last = u.lastName || item.lastName || "";
+        return first || last
+          ? `${first} ${last}`.trim()
+          : item.fullName || item.email || "Без імені";
+      }
 
-      function esc(s=''){
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
-function fullNameFrom(item){
-  // имя/фамилия
-  const u = item.user || {};
-  const first = u.firstName || item.firstName || '';
-  const last  = u.lastName  || item.lastName  || '';
-  return (first || last) ? `${first} ${last}`.trim() :
-         (item.fullName || item.email || 'Без імені');
-}
+      function getReqEls() {
+        return {
+          modal: document.getElementById("reqModal"),
+          title: document.getElementById("reqModalTitle"),
+          meta: document.getElementById("reqMeta"),
+          qa: document.getElementById("reqQA"),
+          closeX: document.getElementById("reqCloseX"),
+          closeBtn: document.getElementById("reqCloseBtn"),
+        };
+      }
 
+      function bindReqModalEvents() {
+        const { modal, closeX, closeBtn } = getReqEls();
+        if (!modal || window.__reqModalBound) return;
+        if (closeX) closeX.addEventListener("click", closeReqModal);
+        if (closeBtn) closeBtn.addEventListener("click", closeReqModal);
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeReqModal();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeReqModal();
+        });
+        window.__reqModalBound = true;
+      }
 
-function getReqEls(){
-  return {
-    modal:    document.getElementById('reqModal'),
-    title:    document.getElementById('reqModalTitle'),
-    meta:     document.getElementById('reqMeta'),
-    qa:       document.getElementById('reqQA'),
-    closeX:   document.getElementById('reqCloseX'),
-    closeBtn: document.getElementById('reqCloseBtn'),
-  };
-}
+      function openReqModal(item) {
+        bindReqModalEvents();
+        const { modal, title, meta, qa } = getReqEls();
+        if (!modal || !title || !meta || !qa) return;
 
-function bindReqModalEvents(){
-  const { modal, closeX, closeBtn } = getReqEls();
-  if (!modal || window.__reqModalBound) return;
-  if (closeX)   closeX.addEventListener('click', closeReqModal);
-  if (closeBtn) closeBtn.addEventListener('click', closeReqModal);
-  modal.addEventListener('click', (e)=>{ if (e.target === modal) closeReqModal(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeReqModal(); });
-  window.__reqModalBound = true;
-}
+        // Заголовок + мета
+        const fio = fullNameFrom(item);
+        const when = item.createdAt || item.created_at || item.created || null;
+        const whenStr = when ? formatDate(when) : "";
+        title.textContent = `Заявка — ${fio}`;
+        meta.textContent = whenStr ? `Дата подання: ${whenStr}` : "";
 
-function openReqModal(item){
-  bindReqModalEvents();
-  const { modal, title, meta, qa } = getReqEls();
-  if (!modal || !title || !meta || !qa) return;
+        // Q&A блок
+        qa.innerHTML = "";
 
-  // Заголовок + мета
-  const fio = fullNameFrom(item);
-  const when = item.createdAt || item.created_at || item.created || null;
-  const whenStr = when ? formatDate(when) : '';
-  title.textContent = `Заявка — ${fio}`;
-  meta.textContent = whenStr ? `Дата подання: ${whenStr}` : '';
+        const rows = [
+          {
+            q: "Імʼя",
+            a: (item.user?.firstName || item.firstName || "").trim(),
+          },
+          {
+            q: "Прізвище",
+            a: (item.user?.lastName || item.lastName || "").trim(),
+          },
+          { q: "Дата подання заявки", a: whenStr },
+          {
+            q: "Скільки років у вас практики",
+            a: item.experience || item.exp || "",
+          },
+          {
+            q: "До якої вікової категорії Ви відноситесь",
+            a: item.ageGroup || item.age || "",
+          },
+          {
+            q: "Ваш запит до ментора",
+            a: item.requestText || item.request || "",
+          },
+          {
+            q: "Про себе / деталі ситуації",
+            a: item.aboutText || item.about || "",
+          },
+        ];
 
-  // Q&A блок
-  qa.innerHTML = '';
+        if (Array.isArray(item.answers)) {
+          item.answers.forEach((x) => {
+            rows.push({ q: x.question || "Питання", a: x.answer || "" });
+          });
+        }
 
-  const rows = [
-    { q: 'Імʼя',                  a: (item.user?.firstName || item.firstName || '').trim() },
-    { q: 'Прізвище',              a: (item.user?.lastName  || item.lastName  || '').trim() },
-    { q: 'Дата подання заявки',   a: whenStr },
-    { q: 'Скільки років у вас практики', a: item.experience || item.exp || '' },
-    { q: 'До якої вікової категорії Ви відноситесь', a: item.ageGroup || item.age || '' },
-    { q: 'Ваш запит до ментора',  a: item.requestText || item.request || '' },
-    { q: 'Про себе / деталі ситуації', a: item.aboutText || item.about || '' },
-  ];
-
-  if (Array.isArray(item.answers)) {
-    item.answers.forEach(x=>{
-      rows.push({ q: x.question || 'Питання', a: x.answer || '' });
-    });
-  }
-
-  rows
-    .filter(r => (r.a && String(r.a).trim().length))
-    .forEach(r => {
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.innerHTML = `
+        rows
+          .filter((r) => r.a && String(r.a).trim().length)
+          .forEach((r) => {
+            const row = document.createElement("div");
+            row.className = "row";
+            row.innerHTML = `
         <div class="q">${esc(r.q)}</div>
         <div class="a">${esc(String(r.a))}</div>
       `;
-      qa.appendChild(row);
-    });
+            qa.appendChild(row);
+          });
 
-  // показати
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
+        // показати
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
 
-function closeReqModal(){
-  const { modal } = getReqEls();
-  if (modal){
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-}
+      function closeReqModal() {
+        const { modal } = getReqEls();
+        if (modal) {
+          modal.style.display = "none";
+          document.body.style.overflow = "";
+        }
+      }
 
-// убедимся, что события свяжутся после загрузки DOM (на случай, если клик произойдет очень рано)
-document.addEventListener('DOMContentLoaded', bindReqModalEvents);
+      // убедимся, что события свяжутся после загрузки DOM (на случай, если клик произойдет очень рано)
+      document.addEventListener("DOMContentLoaded", bindReqModalEvents);
     </script>
 
     <script src="script.js"></script>
 
     <!-- MODAL: детали заявки -->
-<div id="reqModal" class="req-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle">
-  <div class="req-modal">
-    <div class="req-close-x" id="reqCloseX">×</div>
-    <h3 id="reqModalTitle">Заявка</h3>
-    <div class="req-meta" id="reqMeta"></div>
-    <div class="req-qa" id="reqQA"></div>
-    <div class="req-actions">
-      <button class="req-btn close" id="reqCloseBtn">Закрити</button>
-      <!-- при необходимости добавь сюда primary-кнопку -->
+    <div
+      id="reqModal"
+      class="req-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reqModalTitle"
+    >
+      <div class="req-modal">
+        <div class="req-close-x" id="reqCloseX">×</div>
+        <h3 id="reqModalTitle">Заявка</h3>
+        <div class="req-meta" id="reqMeta"></div>
+        <div class="req-qa" id="reqQA"></div>
+        <div class="req-actions">
+          <button class="req-btn close" id="reqCloseBtn">Закрити</button>
+          <!-- при необходимости добавь сюда primary-кнопку -->
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   </body>
 </html>

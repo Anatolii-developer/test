@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Супервізорство — Заявки всіх учасників</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body { margin:0; font-family:"Poppins",sans-serif; background:#97c194; color:#414141; }
+      .apply-header { width:1110px; height:212px; background:#fff; border-radius:24px; margin:40px auto 20px; padding:40px 100px; display:flex; align-items:center; justify-content:space-between; }
+      .apply-title { font-size:40px; font-weight:600; color:#414141; }
+      .apply-image { width:284px; height:164px; }
+      .apply-arrow { width:64px; height:64px; }
+      .toolbar { width:1110px; margin:0 auto 20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+      .back-button { width:196px; height:48px; background:#275d2b; border-radius:24px; color:#fff; padding:10px 53px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; gap:12px; cursor:pointer; text-decoration:none; }
+      .apply-form { width:1110px; background:#fff; border-radius:24px; padding:24px 100px 40px; margin:0 auto 40px; box-sizing:border-box; }
+      h3.page-subtitle { margin:0 0 8px; font-weight:600; }
+
+      /* List */
+      #list { margin-top:10px; }
+      .req-row { width:100%; background:#ffeed9; border-radius:16px; padding:10px 16px; display:flex; align-items:center; gap:16px; margin:14px 0; justify-content:space-between; box-sizing:border-box; }
+      .req-left { display:flex; align-items:center; gap:16px; min-width:0; flex:1 1 auto; }
+      .req-num { width:36px; height:36px; border-radius:8px; background:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; flex:0 0 36px; }
+      .req-name { font-weight:500; font-size:20px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .req-date { font-weight:500; font-size:18px; color:#555; white-space:nowrap; flex:0 0 auto; }
+      .btn-more { display:inline-flex; align-items:center; justify-content:center; height:32px; padding:0 16px; border-radius:24px; border:none; cursor:pointer; background:#275d2b; color:#fff; font-weight:600; font-size:14px; white-space:nowrap; flex:0 0 auto; text-decoration:none; }
+      .empty { text-align:center; color:#6b6b6b; margin-top:8px; }
+      @media (max-width:1200px){ .apply-header,.apply-form,.toolbar { width:90%; padding-left:30px; padding-right:30px; } .req-row{ width:100%; } .req-name{ max-width:50vw; } }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar collapsed" id="sidebar">
+      <div class="toggle-button" onclick="toggleSidebar()">
+        <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+      </div>
+      <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+      <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+      <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+      <nav>
+        <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
+        <a href="mycertificates.html"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
+        <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
+        <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
+        <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
+      </nav>
+      <div class="logout"><img src="assets/sidebar/log-out.svg" alt="Logout" width="20" height="20"/><span>Вийти з акаунту</span></div>
+    </aside>
+
+    <div class="apply-header">
+      <div class="apply-title">Супервізорство — Заявки всіх учасників</div>
+      <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
+      <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
+    </div>
+
+    <div class="toolbar">
+      <a href="career-faq.html" class="back-button" style="margin:0">
+        <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
+      </a>
+    </div>
+
+    <div class="apply-form">
+      <h3 class="page-subtitle">Заявки всіх учасників</h3>
+      <div id="list"></div>
+      <div id="empty" class="empty" style="display:none">Поки що немає заявок учасників.</div>
+    </div>
+
+    <script>
+      const pad = (n)=>String(n).padStart(2,"0");
+      function formatDate(iso){ const d=new Date(iso); if(isNaN(d)) return ""; return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+      function fullNameFrom(item){
+        const u=item.user||{};
+        const first=u.firstName||item.firstName||"";
+        const last=u.lastName||item.lastName||"";
+        return first||last ? `${first} ${last}`.trim() : item.fullName||item.email||"Без імені";
+      }
+      function ensureContainers(){
+        const form=document.querySelector(".apply-form")||document.body;
+        let list=document.getElementById("list"); if(!list){ list=document.createElement("div"); list.id="list"; form.appendChild(list); }
+        let empty=document.getElementById("empty"); if(!empty){ empty=document.createElement("div"); empty.id="empty"; empty.className="empty"; empty.style.display="none"; empty.textContent="Поки що немає заявок учасників."; form.appendChild(empty); }
+        return { listEl:list, emptyEl:empty };
+      }
+      function showLoginNotice(msg){
+        const {emptyEl,listEl}=ensureContainers();
+        emptyEl.textContent=msg||"Щоб переглянути заявки — увійдіть у систему.";
+        emptyEl.style.display="block"; if(listEl) listEl.innerHTML="";
+        const btn=document.createElement("a"); btn.href="index.html"; btn.textContent="Увійти";
+        btn.style.cssText="display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;";
+        emptyEl.appendChild(btn);
+      }
+      function rowTemplate(i,item){
+        const fullName=fullNameFrom(item);
+        const created=item.createdAt?formatDate(item.createdAt):(item.created_at?formatDate(item.created_at):"");
+        const id=item._id||item.id||(item.application&&(item.application._id||item.application.id))||"";
+        const row=document.createElement("div"); row.className="req-row";
+        const left=document.createElement("div"); left.className="req-left";
+        const num=document.createElement("div"); num.className="req-num"; num.textContent=i;
+        const name=document.createElement("div"); name.className="req-name"; name.textContent=fullName;
+        const date=document.createElement("div"); date.className="req-date"; date.textContent=created;
+        left.append(num,name,date);
+        const more=document.createElement("a"); more.className="btn-more"; more.textContent="Дізнатись більше";
+        more.href=`career-supervisor-request.html?id=${encodeURIComponent(id)}`;
+        more.setAttribute("aria-label","Відкрити заявку детально");
+        row.append(left,more);
+        return row;
+      }
+      function getAuthToken(){
+        const keys=["token","authToken","jwt","accessToken","bearer"];
+        for(const k of keys){ const v=localStorage.getItem(k); if(v) return v; }
+        try{ const u=JSON.parse(localStorage.getItem("user")||"{}"); return u.token||u.accessToken||null; }catch(_){ return null; }
+      }
+      async function ensureSupervisor(){
+        try{
+          const res=await fetch("/api/users/profile",{method:"GET",credentials:"include"});
+          const body=await res.clone().json().catch(()=>null);
+          if(!res.ok||!body||!body.user) return null;
+          const roles=body.user.roles||[];
+          const has=Array.isArray(roles)&&roles.some(s=>{const v=String(s).toLowerCase(); return v.includes("супервізор")||v.includes("супервизор")||v.includes("supervisor");});
+          return has?body.user:null;
+        }catch(e){ return null; }
+      }
+      // Только заявки, назначенные текущему супервізору
+      async function fetchAllApplications(){
+        const token=getAuthToken();
+        const headers=Object.assign({Accept:"application/json"}, token?{Authorization:`Bearer ${token}`}:{});
+        try{
+          const res=await fetch("/api/career-applications?assigned=1&target=supervisor",{method:"GET",credentials:"include",headers});
+          const body=await res.clone().json().catch(()=>null);
+          if(res.ok){
+            if(Array.isArray(body)) return body;
+            if(Array.isArray(body?.items)) return body.items;
+            if(Array.isArray(body?.rows)) return body.rows;
+            if(Array.isArray(body?.data)) return body.data;
+            if(body?.ok && Array.isArray(body?.result)) return body.result;
+          }
+        }catch(_){}
+        return [];
+      }
+      async function load(){
+        const {listEl,emptyEl}=ensureContainers();
+        const user=await ensureSupervisor();
+        if(!user){ showLoginNotice("Доступ лише для супервізорів."); return; }
+        try{
+          const items=await fetchAllApplications();
+          listEl.innerHTML="";
+          if(!items.length){ emptyEl.style.display="block"; emptyEl.textContent="Поки що немає заявок учасників."; return; }
+          emptyEl.style.display="none";
+          items.sort((a,b)=>new Date(b.createdAt||b.created_at||0)-new Date(a.createdAt||a.created_at||0))
+               .forEach((it,idx)=>listEl.appendChild(rowTemplate(idx+1,it)));
+        }catch(err){
+          console.error(err);
+          emptyEl.textContent="Не вдалося завантажити заявки.";
+          emptyEl.style.display="block";
+        }
+      }
+      document.addEventListener("DOMContentLoaded", load);
+    </script>
+  </body>
+</html>

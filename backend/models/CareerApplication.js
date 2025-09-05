@@ -18,8 +18,11 @@ const CareerApplicationSchema = new Schema({
   ageGroup: String,
   requestText: String,
   aboutText: String,
+  
 
-  assignedMentor: { type: Schema.Types.ObjectId, ref: 'User' }
+  assignedMentor: { type: Schema.Types.ObjectId, ref: 'User' },
+  assignedSupervisor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+
 }, { timestamps: true });
 
 module.exports = model('CareerApplication', CareerApplicationSchema);

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');   // ← ЭТОГО НЕ ХВАТАЛО
+const mongoose = require('mongoose');
 const CareerApplication = require("../models/CareerApplication");
 const User = require("../models/User");
 
@@ -48,43 +48,40 @@ function hasMentorRole(roles) {
 /**
  * Разрешение на просмотр заявки:
  * - admin: да
- * - mentor: если назначен на заявку
- * - applicant: если сам подал (опционально — можно отключить этот пункт)
+ * - назначенный исполнитель (ментор или супервізор): да
+ * - заявитель: да
  */
 async function canViewApplication(req, app) {
   if (await isAdminUser(req)) return true;
 
   const myId = String(req.user?._id || req.user?.id || '');
 
-  // Если заявка назначена на меня — разрешаем независимо от ролей в токене
-  const assignedId = String(
-    app.assignedMentor?._id ||
-    app.assignedMentor ||
-    app.assignedMentorId ||
-    ''
-  );
-  if (assignedId && assignedId === myId) return true;
+  // Если заявка назначена на меня — разрешаем
+  const assignedMentorId = String(app.assignedMentor?._id || app.assignedMentor || app.assignedMentorId || '');
+  const assignedSupervisorId = String(app.assignedSupervisor?._id || app.assignedSupervisor || app.assignedSupervisorId || '');
+  if ((assignedMentorId && assignedMentorId === myId) || (assignedSupervisorId && assignedSupervisorId === myId)) {
+    return true;
+  }
 
   // Заявитель видит свою заявку
   if (String(app.user?._id || app.user) === myId) return true;
 
-  // Иначе — запрет
   return false;
 }
 
 // ==== handlers
 
-// был только админский — оставим как есть (для чисто админских роутов)
+// Админский «один»
 async function getOneAdmin(req, res) {
   try {
     if (!(await isAdminUser(req))) {
-      return res
-        .status(403)
-        .json({ ok: false, message: "Forbidden: admin only" });
+      return res.status(403).json({ ok: false, message: "Forbidden: admin only" });
     }
     const app = await CareerApplication.findById(req.params.id)
       .populate("user", "firstName lastName middleName email username photoUrl")
-      .populate("assignedMentor", "firstName lastName email username");
+      .populate('assignedMentor', 'firstName lastName email username')
+      .populate('assignedSupervisor', 'firstName lastName email username');
+
     if (!app) return res.status(404).json({ ok: false, message: "Not found" });
     res.json({ ok: true, application: app });
   } catch (e) {
@@ -93,12 +90,13 @@ async function getOneAdmin(req, res) {
   }
 }
 
-// НОВЫЙ: для админа, ментора (своё), та/або заявника (своё)
+// Общий «один» (доступен админу, назначенному, заявителю)
 async function getOne(req, res) {
   try {
     const app = await CareerApplication.findById(req.params.id)
       .populate("user", "firstName lastName middleName email username photoUrl")
-      .populate("assignedMentor", "firstName lastName email username");
+      .populate("assignedMentor", "firstName lastName email username")
+      .populate("assignedSupervisor", "firstName lastName email username");
 
     if (!app) return res.status(404).json({ ok: false, message: "Not found" });
 
@@ -113,6 +111,7 @@ async function getOne(req, res) {
   }
 }
 
+// Админский список
 async function listAdmin(req, res) {
   try {
     if (!(await isAdminUser(req))) {
@@ -122,6 +121,7 @@ async function listAdmin(req, res) {
     const apps = await CareerApplication.find({})
       .populate('user', 'firstName lastName email username')
       .populate('assignedMentor', 'firstName lastName email username')
+      .populate('assignedSupervisor', 'firstName lastName email username')
       .sort({ createdAt: -1 });
 
     res.json({ ok:true, rows: apps });
@@ -131,14 +131,14 @@ async function listAdmin(req, res) {
   }
 }
 
+// Общий список
 async function list(req, res) {
   try {
     if (!req.user)
       return res.status(401).json({ ok: false, message: "Unauthorized" });
 
     const me = await User.findById(req.user._id).select("roles").lean();
-    const isMentor =
-      Array.isArray(me?.roles) &&
+    const isMentor = Array.isArray(me?.roles) &&
       me.roles.some((r) =>
         String(r).toLowerCase().includes("mentor") ||
         String(r).toLowerCase().includes("ментор")
@@ -146,25 +146,39 @@ async function list(req, res) {
 
     const myId = req.user._id;
 
-    // 🔹 Новое: явный выбор скоупа через query
-    const wantMine      = String(req.query.mine || "") === "1";       // только мои поданные мною
-    const wantAssigned  = String(req.query.assigned || "") === "1";   // заявки, назначенные на меня как на ментора
+    // Скоупы
+    const wantMine      = String(req.query.mine || "") === "1";       // только мои (как заявителя)
+    const wantAssigned  = String(req.query.assigned || "") === "1";   // заявки, назначенные на меня
+    const targetFilter  = (req.query.target || '').toString().toLowerCase(); // mentor|supervisor
 
     let filter;
     if (wantMine) {
       filter = { user: myId };
     } else if (wantAssigned) {
-      filter = { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] };
+      if (targetFilter === 'supervisor') {
+        filter = { $or: [{ assignedSupervisor: myId }, { assignedSupervisorId: myId }] };
+      } else if (targetFilter === 'mentor') {
+        filter = { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] };
+      } else {
+        filter = { $or: [
+          { assignedMentor: myId }, { assignedMentorId: myId },
+          { assignedSupervisor: myId }, { assignedSupervisorId: myId }
+        ] };
+      }
     } else {
-      // поведение по умолчанию (как было)
+      // как раньше: если есть роль ментора — показываем назначения на меня (и ментор, и супервізор), иначе — мои заявки
       filter = isMentor
-        ? { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] }
+        ? { $or: [
+            { assignedMentor: myId }, { assignedMentorId: myId },
+            { assignedSupervisor: myId }, { assignedSupervisorId: myId }
+          ] }
         : { user: myId };
     }
 
     const apps = await CareerApplication.find(filter)
       .populate("user", "firstName lastName email username")
       .populate("assignedMentor", "firstName lastName email username")
+      .populate("assignedSupervisor", "firstName lastName email username")
       .sort({ createdAt: -1 });
 
     res.json({ ok: true, rows: apps });
@@ -189,7 +203,6 @@ async function create(req, res) {
       return res.status(400).json({ ok:false, message: 'Вкажіть адресата: mentor або supervisor' });
     }
 
-    // кто подал (если есть аутентификация)
     const userId = req.user?._id || req.user?.id || null;
 
     const app = await CareerApplication.create({
@@ -197,16 +210,13 @@ async function create(req, res) {
       username: req.user?.username,
       fullName: b.fullName,
       email: b.email,
-
-      target,                         
-
+      target,
       experience: b.experience,
       ageGroup: b.ageGroup,
       requestText: b.requestText,
       aboutText: b.aboutText,
     });
 
-    // вернём с популяцией для удобства фронта
     const populated = await CareerApplication.findById(app._id)
       .populate('user', 'firstName lastName email username')
       .lean();
@@ -217,40 +227,52 @@ async function create(req, res) {
     return res.status(500).json({ ok:false, message:'Server error' });
   }
 }
-async function assignMentor(req, res) {
+
+// PUT /api/career-applications/:id/assign
+// Унифицированный assign: { mentorId } или { supervisorId }
+async function assign(req, res) {
   try {
     const appId = req.params.id;
-    const { mentorId } = req.body || {};
+    const { mentorId, supervisorId } = req.body || {};
 
     if (!mongoose.isValidObjectId(appId)) {
       return res.status(400).json({ ok:false, message:'Invalid application id' });
     }
-    if (!mongoose.isValidObjectId(mentorId)) {
-      return res.status(400).json({ ok:false, message:'Invalid mentor id' });
+    if (!mentorId && !supervisorId) {
+      return res.status(400).json({ ok:false, message:'Expected mentorId or supervisorId' });
     }
 
-    const mentor = await User.findById(mentorId).select('roles firstName lastName email');
-    if (!mentor) return res.status(404).json({ ok:false, message:'Mentor not found' });
-
-    const isMentor = Array.isArray(mentor.roles) &&
-      mentor.roles.map(r => String(r).toLowerCase())
-                  .some(r => r.includes('mentor') || r.includes('ментор'));
-    if (!isMentor) return res.status(400).json({ ok:false, message:'User is not a mentor' });
-
-    const app = await CareerApplication.findByIdAndUpdate(
-      appId,
-      { $set: { assignedMentor: mentor._id } },
-      { new: true }
-    )
-      .populate('user', 'firstName lastName email username photoUrl')
-      .populate('assignedMentor', 'firstName lastName email username');
-
+    const app = await CareerApplication.findById(appId);
     if (!app) return res.status(404).json({ ok:false, message:'Application not found' });
 
-    return res.json({ ok:true, application: app });
+    if (mentorId) {
+      if (!mongoose.isValidObjectId(mentorId)) return res.status(400).json({ ok:false, message:'Invalid mentor id' });
+      const mentor = await User.findById(mentorId).select('roles');
+      const ok = Array.isArray(mentor?.roles) &&
+        mentor.roles.map(r=>String(r).toLowerCase()).some(r=>r.includes('mentor')||r.includes('ментор'));
+      if (!ok) return res.status(400).json({ ok:false, message:'User is not a mentor' });
+      app.assignedMentor = mentorId;
+    }
+
+    if (supervisorId) {
+      if (!mongoose.isValidObjectId(supervisorId)) return res.status(400).json({ ok:false, message:'Invalid supervisor id' });
+      const sup = await User.findById(supervisorId).select('roles');
+      const ok = Array.isArray(sup?.roles) &&
+        sup.roles.map(r=>String(r).toLowerCase()).some(r=>r.includes('supervisor')||r.includes('супервізор')||r.includes('супервизор'));
+      if (!ok) return res.status(400).json({ ok:false, message:'User is not a supervisor' });
+      app.assignedSupervisor = supervisorId;
+    }
+
+    await app.save();
+
+    const populated = await CareerApplication.findById(appId)
+      .populate('user','firstName lastName email username photoUrl')
+      .populate('assignedMentor','firstName lastName email username')
+      .populate('assignedSupervisor','firstName lastName email username');
+
+    return res.json({ ok:true, application: populated });
   } catch (e) {
-    console.error('[assignMentor] failed:', e);
-    // временно отдаем текст ошибки, чтобы увидеть причину в браузере
+    console.error('[assign] failed:', e);
     return res.status(500).json({ ok:false, message: e?.message || 'Server error' });
   }
 }
@@ -259,7 +281,7 @@ module.exports = {
   list,
   listAdmin,
   create,
-  assignMentor,
+  assign,
   getOneAdmin,
-  getOne, // <-- экспортируем новый
+  getOne,
 };

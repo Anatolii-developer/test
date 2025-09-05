@@ -33,6 +33,8 @@ router.get("/", auth, (req, res) => {
   return careerCtrl.list(req, res);
 });
 
+router.put("/:id/assign", auth, adminOnly, careerCtrl.assign);
+
 router.post("/", auth, careerCtrl.create);
 
 // назначить ментора — пусть остаётся только для админа

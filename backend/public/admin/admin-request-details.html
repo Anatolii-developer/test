@@ -325,7 +325,7 @@
   </div>
 
   <div class="field select-wrap" style="grid-column:1/-1">
-    <label>Призначити ментора</label>
+    <label id="assignLabel">Призначити ментора</label>
     <div id="mentorSelectBtn" class="mentor-select" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
       <span id="mentorSelectLabel">Оберіть ментора</span>
       <img class="mentor-caret" src="/admin/images/arrow-down.png" alt="">
@@ -371,53 +371,78 @@
         );
       };
 
-      // mentors dropdown (тот же, что у тебя в модалке)
-      let __MENTORS = [];
-      async function fetchMentors() {
+      // role-based assignee dropdown
+      let __ASSIGNEES = [];
+      let CURRENT_ROLE = 'mentor'; // will be detected from application
+
+      async function fetchUsersByRole(role) {
         const h = authHeaders();
-        let r = await fetch("/api/users?role=mentor", {
-          credentials: "include",
+        // 1) try server-side filtering
+        let r = await fetch(`/api/users?role=${encodeURIComponent(role)}`, {
+          credentials: 'include',
           headers: h,
         });
         if (r.ok) {
           const u = await r.json();
           return Array.isArray(u) ? u : [];
         }
-        r = await fetch("/api/users", { credentials: "include", headers: h });
+        // 2) fallback to client-side filtering
+        r = await fetch('/api/users', { credentials: 'include', headers: h });
         if (!r.ok) return [];
         const all = await r.json();
+        const roleLc = String(role).toLowerCase();
         return (Array.isArray(all) ? all : []).filter((u) => {
           const rs = (u.roles || []).map((s) => String(s).toLowerCase());
-          return rs.some((x) => x.includes("mentor") || x.includes("ментор"));
+          return rs.some((x) =>
+            x.includes(roleLc) ||
+            (roleLc === 'mentor' && x.includes('ментор')) ||
+            (roleLc === 'supervisor' && (x.includes('супервізор') || x.includes('супервизор')))
+          );
         });
       }
+
       function renderMentorMenu(list, selectedId) {
-        const menu = qs("#mentorMenu");
-        menu.innerHTML = "";
+        const menu = qs('#mentorMenu');
+        menu.innerHTML = '';
         if (!list.length) {
-          const d = document.createElement("div");
-          d.className = "mentor-option";
-          d.textContent = "Немає доступних менторів";
+          const d = document.createElement('div');
+          d.className = 'mentor-option';
+          d.textContent = 'Немає доступних користувачів';
           menu.appendChild(d);
           return;
         }
         list.forEach((m) => {
-          const d = document.createElement("div");
-          d.className =
-            "mentor-option" + (selectedId === m._id ? " active" : "");
-          d.textContent =
-            `${m.firstName || ""} ${m.lastName || ""}`.trim() ||
-            m.username ||
-            m.email ||
-            "Без імені";
-          d.addEventListener("click", () => {
-            qs("#mentorSelectLabel").textContent = d.textContent;
-            qs("#mentorSelectValue").value = m._id;
-            menu.style.display = "none";
-            qs("#mentorSelectBtn").setAttribute("aria-expanded", "false");
+          const d = document.createElement('div');
+          d.className = 'mentor-option' + (selectedId === m._id ? ' active' : '');
+          d.textContent = `${m.firstName || ''} ${m.lastName || ''}`.trim() || m.username || m.email || 'Без імені';
+          d.addEventListener('click', () => {
+            qs('#mentorSelectLabel').textContent = d.textContent;
+            qs('#mentorSelectValue').value = m._id;
+            menu.style.display = 'none';
+            qs('#mentorSelectBtn').setAttribute('aria-expanded', 'false');
           });
           menu.appendChild(d);
         });
+      }
+      function detectRequestedRole(a) {
+        // default mentor
+        const S = [
+          a?.to,
+          a?.target,
+          a?.type,
+          a?.category,
+          a?.direction,
+          a?.for,
+          a?.applyFor,
+          a?.requestType,
+          a?.applicationType,
+        ]
+          .map((v) => String(v || '').toLowerCase())
+          .join(' | ');
+
+        const isSupervisor =
+          S.includes('supervisor') || S.includes('супервізор') || S.includes('супервизор');
+        return isSupervisor ? 'supervisor' : 'mentor';
       }
       (() => {
         const btn = qs("#mentorSelectBtn"),
@@ -477,49 +502,59 @@
           ? a.topics.join(", ")
           : a.topics || "";
 
-        // mentors
-        __MENTORS = await fetchMentors();
-        const assignedId = a.assignedMentor?._id || a.assignedMentorId || "";
-        if (assignedId) {
-          const f = __MENTORS.find((m) => m._id === assignedId);
-          if (f)
-            qs("#mentorSelectLabel").textContent =
-              `${f.firstName || ""} ${f.lastName || ""}`.trim() ||
-              f.username ||
-              f.email ||
-              "Без імені";
-          qs("#mentorSelectValue").value = assignedId;
+        CURRENT_ROLE = detectRequestedRole(a);
+        const assignLabel = qs('#assignLabel');
+        if (assignLabel) assignLabel.textContent = CURRENT_ROLE === 'supervisor' ? 'Призначити супервізора' : 'Призначити ментора';
+        // Update placeholder on closed select
+        const selLabel = qs('#mentorSelectLabel');
+        if (selLabel && !qs('#mentorSelectValue').value) {
+          selLabel.textContent = CURRENT_ROLE === 'supervisor' ? 'Оберіть супервізора' : 'Оберіть ментора';
         }
-        renderMentorMenu(__MENTORS, assignedId);
+
+        // assignees by role
+        __ASSIGNEES = await fetchUsersByRole(CURRENT_ROLE);
+        const assignedId = CURRENT_ROLE === 'supervisor'
+          ? (a.assignedSupervisor?._id || a.assignedSupervisorId || '')
+          : (a.assignedMentor?._id || a.assignedMentorId || '');
+
+        if (assignedId) {
+          const f = __ASSIGNEES.find((m) => m._id === assignedId);
+          if (f) {
+            qs('#mentorSelectLabel').textContent = `${f.firstName || ''} ${f.lastName || ''}`.trim() || f.username || f.email || 'Без імені';
+            qs('#mentorSelectValue').value = assignedId;
+          }
+        }
+        renderMentorMenu(__ASSIGNEES, assignedId);
       }
 
    async function save() {
-  console.log('[save] start');
-  const mentorId = (qs("#mentorSelectValue").value || "").trim();
-  if (!mentorId) return alert("Оберіть ментора");
+    console.log('[save] start');
+    const selectedId = (qs('#mentorSelectValue').value || '').trim();
+    if (!selectedId) return alert(CURRENT_ROLE === 'supervisor' ? 'Оберіть супервізора' : 'Оберіть ментора');
 
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort('timeout'), 30000); // 30s
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort('timeout'), 30000); // 30s
 
-  try {
-    const r = await fetch(`/api/career-applications/${ID}/assign`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type':'application/json', ...authHeaders() },
-      body: JSON.stringify({ mentorId }),
-      signal: controller.signal,
-    });
-    clearTimeout(t);
-    console.log('[save] status:', r.status);
-    if (!r.ok) return alert('Помилка: ' + (await r.text()).slice(0,500));
-    alert('Ментор призначений');
-    history.back();
-  } catch (e) {
-    clearTimeout(t);
-    console.error('[save] failed:', e, e?.name, e?.message);
-    alert('Failed to fetch: ' + (e?.message || e));
+    try {
+      const key = CURRENT_ROLE === 'supervisor' ? 'supervisorId' : 'mentorId';
+      const r = await fetch(`/api/career-applications/${ID}/assign`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type':'application/json', ...authHeaders() },
+        body: JSON.stringify({ [key]: selectedId }),
+        signal: controller.signal,
+      });
+      clearTimeout(t);
+      console.log('[save] status:', r.status);
+      if (!r.ok) return alert('Помилка: ' + (await r.text()).slice(0,500));
+      alert(CURRENT_ROLE === 'supervisor' ? 'Супервізора призначено' : 'Ментора призначено');
+      history.back();
+    } catch (e) {
+      clearTimeout(t);
+      console.error('[save] failed:', e, e?.name, e?.message);
+      alert('Failed to fetch: ' + (e?.message || e));
+    }
   }
-}
 
       document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('saveBtn');

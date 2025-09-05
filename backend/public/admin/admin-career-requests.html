@@ -663,31 +663,6 @@
           ""
         );
       }
-      function isMentorApplication(item){
-        // Prefer explicit schema field if present
-        if (item && typeof item.target === 'string') {
-          return String(item.target).toLowerCase() === 'mentor';
-        }
-
-        // Fallback heuristics (for older records)
-        const toField = String(
-          item?.to || item?.target || item?.type || item?.category || item?.direction || item?.for || item?.applyFor || ""
-        ).toLowerCase();
-
-        const roleField = Array.isArray(item?.roles)
-          ? item.roles.join(",").toLowerCase()
-          : String(item?.role || "").toLowerCase();
-
-        const flags = [
-          toField.includes("mentor") || toField.includes("ментор"),
-          roleField.includes("mentor") || roleField.includes("ментор"),
-          String(item?.requestType||"").toLowerCase().includes("mentor"),
-          String(item?.applicationType||"").toLowerCase().includes("mentor"),
-          Boolean(item?.assignedMentorId || (item?.assignedMentor && item.assignedMentor._id))
-        ];
-
-        return flags.some(Boolean);
-      }
 
       const $tbody = document.getElementById("tblBody");
       const $empty = document.getElementById("empty");
@@ -973,44 +948,24 @@ function closeOnOutsideOnce(e){
      async function load() {
   try {
     const items = await fetchAllAdminApplications();
-
-    // фильтруем только заявки к ментору
-    const mentorItems = (Array.isArray(items) ? items : []).filter((it) => {
-      const toField = String(
-        it.to || it.target || it.type || it.category || it.direction || it.for || it.applyFor || ""
-      ).toLowerCase();
-      const roleField = Array.isArray(it.roles)
-        ? it.roles.join(",").toLowerCase()
-        : String(it.role || "").toLowerCase();
-      const isAssigned = Boolean(it.assignedMentorId || (it.assignedMentor && it.assignedMentor._id));
-
-      return (
-        toField.includes("mentor") ||
-        toField.includes("ментор") ||
-        roleField.includes("mentor") ||
-        roleField.includes("ментор") ||
-        String(it.requestType || "").toLowerCase().includes("mentor") ||
-        String(it.applicationType || "").toLowerCase().includes("mentor") ||
-        isAssigned
-      );
-    });
+    const list = Array.isArray(items) ? items : [];
 
     $tbody.innerHTML = "";
-    if (!mentorItems.length) {
+    if (!list.length) {
       $empty.style.display = "block";
       $empty.textContent = "Поки що немає заявок до менторів.";
       return;
     }
 
     $empty.style.display = "none";
-    mentorItems
-      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    list
+      .sort((a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0))
       .forEach((it, idx) => $tbody.appendChild(rowTemplate(idx + 1, it)));
   } catch (e) {
     console.error(e);
     $tbody.innerHTML = "";
     $empty.style.display = "block";
-    $empty.textContent = String(e.message || e); // 👈 покажем 401/403 и т.д.
+    $empty.textContent = String(e.message || e);
   }
 }
       document.addEventListener("DOMContentLoaded", () => {

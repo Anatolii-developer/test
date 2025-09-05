@@ -472,7 +472,7 @@
           token ? { 'Authorization': `Bearer ${token}` } : {}
         );
         try {
-          const res = await fetch('/api/career-applications?assigned=1', {
+          const res = await fetch('/api/career-applications?assigned=1&target=mentor', {
             method: 'GET',
             credentials: 'include',
             headers

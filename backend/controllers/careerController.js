@@ -112,13 +112,20 @@ async function getOne(req, res) {
 }
 
 // Админский список
+// ... сверху без изменений
+
 async function listAdmin(req, res) {
   try {
     if (!(await isAdminUser(req))) {
       return res.status(403).json({ ok:false, message:'Forbidden: admin only' });
     }
 
-    const apps = await CareerApplication.find({})
+    const target = String(req.query.target || '').toLowerCase().trim();
+    const q = {};
+    if (target === 'mentor')      q.target = 'mentor';
+    else if (target === 'supervisor') q.target = 'supervisor';
+
+    const apps = await CareerApplication.find(q)
       .populate('user', 'firstName lastName email username')
       .populate('assignedMentor', 'firstName lastName email username')
       .populate('assignedSupervisor', 'firstName lastName email username')
@@ -131,48 +138,63 @@ async function listAdmin(req, res) {
   }
 }
 
-// Общий список
 async function list(req, res) {
   try {
     if (!req.user)
       return res.status(401).json({ ok: false, message: "Unauthorized" });
 
-    const me = await User.findById(req.user._id).select("roles").lean();
-    const isMentor = Array.isArray(me?.roles) &&
-      me.roles.some((r) =>
-        String(r).toLowerCase().includes("mentor") ||
-        String(r).toLowerCase().includes("ментор")
-      );
-
     const myId = req.user._id;
+    const target = String(req.query.target || '').toLowerCase().trim(); // ← НОВОЕ
+    const wantMine     = String(req.query.mine || "") === "1";
+    const wantAssigned = String(req.query.assigned || "") === "1";
 
-    // Скоупы
-    const wantMine      = String(req.query.mine || "") === "1";       // только мои (как заявителя)
-    const wantAssigned  = String(req.query.assigned || "") === "1";   // заявки, назначенные на меня
-    const targetFilter  = (req.query.target || '').toString().toLowerCase(); // mentor|supervisor
+    // Роли пользователя (на случай дефолтного поведения без query)
+    const me = await User.findById(myId).select("roles").lean();
+    const rolesLc = (me?.roles || []).map(r => String(r).toLowerCase());
+    const iAmMentor     = rolesLc.some(r => r.includes('mentor') || r.includes('ментор'));
+    const iAmSupervisor = rolesLc.some(r => r.includes('supervisor') || r.includes('супервізор') || r.includes('супервизор'));
 
+    // Построим фильтр
     let filter;
+
     if (wantMine) {
+      // мои поданные заявки
       filter = { user: myId };
     } else if (wantAssigned) {
-      if (targetFilter === 'supervisor') {
+      // заявки, назначенные на меня — учитываем целевой тип
+      if (target === 'supervisor') {
         filter = { $or: [{ assignedSupervisor: myId }, { assignedSupervisorId: myId }] };
-      } else if (targetFilter === 'mentor') {
+      } else if (target === 'mentor') {
         filter = { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] };
       } else {
-        filter = { $or: [
-          { assignedMentor: myId }, { assignedMentorId: myId },
-          { assignedSupervisor: myId }, { assignedSupervisorId: myId }
-        ] };
+        // если target не указан, покажем оба назначения, но только мои
+        filter = {
+          $or: [
+            { assignedMentor: myId },     { assignedMentorId: myId },
+            { assignedSupervisor: myId }, { assignedSupervisorId: myId }
+          ]
+        };
       }
     } else {
-      // как раньше: если есть роль ментора — показываем назначения на меня (и ментор, и супервізор), иначе — мои заявки
-      filter = isMentor
-        ? { $or: [
-            { assignedMentor: myId }, { assignedMentorId: myId },
-            { assignedSupervisor: myId }, { assignedSupervisorId: myId }
-          ] }
-        : { user: myId };
+      // поведение по умолчанию, когда ?mine / ?assigned не заданы:
+      if (target === 'supervisor') {
+        filter = { $or: [{ assignedSupervisor: myId }, { assignedSupervisorId: myId }] };
+      } else if (target === 'mentor') {
+        filter = { $or: [{ assignedMentor: myId }, { assignedMentorId: myId }] };
+      } else {
+        // если target не задан:
+        // - ментору показываем назначенные на него как ментора
+        // - супервізору — как супервізора
+        // - иначе — свои заявки
+        if (iAmMentor || iAmSupervisor) {
+          const or = [];
+          if (iAmMentor)     or.push({ assignedMentor: myId },     { assignedMentorId: myId });
+          if (iAmSupervisor) or.push({ assignedSupervisor: myId }, { assignedSupervisorId: myId });
+          filter = or.length ? { $or: or } : { user: myId };
+        } else {
+          filter = { user: myId };
+        }
+      }
     }
 
     const apps = await CareerApplication.find(filter)

@@ -539,12 +539,6 @@
       return alert(isSupervisorFlow ? 'Оберіть супервізора' : 'Оберіть ментора');
     }
 
-    // If backend schema currently supports only mentor assignment, block supervisor flow with a clear message
-    if (isSupervisorFlow && !('assignedSupervisor' in ({}))) {
-      // Front-end guard because server schema likely lacks assignedSupervisor
-      return alert('Призначення супервізора ще не підтримується на сервері. Попросіть бекенд додати поле assignedSupervisor та приймати { supervisorId } у /assign');
-    }
-
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort('timeout'), 30000); // 30s
 

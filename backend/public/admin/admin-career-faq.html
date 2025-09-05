@@ -46,9 +46,12 @@
         margin-bottom: 28px;
       }
       .tile {
-        width: 326px;
+        width: 220px;
         height: 152px;
         border-radius: 16px;
+        padding: 82px 41px; /* top/right/bottom/left */
+        background: var(--green); /* #275D2B */
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -57,16 +60,11 @@
         text-align: center;
         cursor: pointer;
         user-select: none;
+        text-decoration: none; /* for <a> */
       }
-      .tile--green {
-        background: var(--green);
-        color: #fff;
-        padding: 82px 41px; /* per spec */
-      }
-      .tile--light {
-        background: var(--green-100);
+      .tile--active {
+        background: var(--green-100); /* #ECF5EB */
         color: var(--text);
-        padding: 44px 60px; /* per spec */
       }
 
       /* FAQ LIST */
@@ -277,14 +275,9 @@
     <div class="wrap">
       <!-- Header tiles -->
       <div class="tiles">
-        <div class="tile tile--green">Редагувати FAQ</div>
-        <a
-          href="admin-career-requests.html"
-          class="tile tile--light"
-          style="display: inline-block; text-decoration: none; cursor: pointer"
-        >
-          Налаштування ментора
-        </a>
+        <a href="admin-career-faq.html" class="tile tile--active">Редагувати FAQ</a>
+        <a href="admin-career-requests.html" class="tile">Налаштування ментора</a>
+        <a href="admin-supervisor-requests.html" class="tile">Налаштування супервізора</a>
       </div>
 
       <!-- FAQ list -->

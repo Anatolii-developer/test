@@ -449,55 +449,61 @@
       }
 
       function rowTemplate(i, item) {
-  const fullName =
-    (item.user && `${item.user.firstName || ""} ${item.user.lastName || ""}`.trim()) ||
-    (item.fullName && item.fullName.trim()) ||
-    (item.email || "").trim() || "Без імені";
+        const fullName =
+          (item.user &&
+            `${item.user.firstName || ""} ${
+              item.user.lastName || ""
+            }`.trim()) ||
+          (item.fullName && item.fullName.trim()) ||
+          (item.email || "").trim() ||
+          "Без імені";
 
-  const created = item.createdAt
-    ? formatDate(item.createdAt)
-    : item.created_at
-    ? formatDate(item.created_at)
-    : "";
+        const created = item.createdAt
+          ? formatDate(item.createdAt)
+          : item.created_at
+          ? formatDate(item.created_at)
+          : "";
 
-  // НОВОЕ: определяем адресата (бэкенд присылает target или targetType)
-  const t = (item.target || item.targetType || "").toString().toLowerCase();
-  // Буква: С — супервізор, М — ментор (кириллица)
-  const tagLetter = t.startsWith("sup") ? "С" : "М";
+        // НОВОЕ: определяем адресата (бэкенд присылает target или targetType)
+        const t = (item.target || item.targetType || "")
+          .toString()
+          .toLowerCase();
+        // Буква: С — супервізор, М — ментор (кириллица)
+        const tagLetter = t.startsWith("sup") ? "С" : "М";
 
-  const row = document.createElement("div");
-  row.className = "req-row";
+        const row = document.createElement("div");
+        row.className = "req-row";
 
-  const left = document.createElement("div");
-  left.className = "req-left";
+        const left = document.createElement("div");
+        left.className = "req-left";
 
-  const num = document.createElement("div");
-  num.className = "req-num";
-  num.textContent = i;
+        const num = document.createElement("div");
+        num.className = "req-num";
+        num.textContent = i;
 
-  const name = document.createElement("div");
-  name.className = "req-name";
-  name.textContent = fullName;
+        const name = document.createElement("div");
+        name.className = "req-name";
+        name.textContent = fullName;
 
-  const date = document.createElement("div");
-  date.className = "req-date";
-  date.textContent = created;
+        const date = document.createElement("div");
+        date.className = "req-date";
+        date.textContent = created;
 
-  // 👇 НОВОЕ: бейдж «С/М»
-  const tag = document.createElement("div");
-  tag.className = "req-tag";
-  tag.textContent = tagLetter;
+        // 👇 НОВОЕ: бейдж «С/М»
+        const tag = document.createElement("div");
+        tag.className = "req-tag";
+        tag.textContent = tagLetter;
 
-  left.append(num, name, date, tag);
+        left.append(num, name, date, tag);
 
-  const more = document.createElement("button");
-  more.className = "btn-more";
-  more.textContent = "Дізнатись більше";
-  more.addEventListener("click", () => openReqModal(item));
+        const more = document.createElement("button");
+        more.className = "btn-more";
+        more.textContent = "Дізнатись більше";
+        more.addEventListener("click", () => openReqModal(item));
 
-  row.append(left, more);
-  return row;
-}
+        row.append(left, more);
+        return row;
+      }
 
       async function load() {
         const { listEl, emptyEl } = ensureContainers();

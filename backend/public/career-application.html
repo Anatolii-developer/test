@@ -147,19 +147,7 @@
       border-radius: 24px;
       cursor: pointer;
     }
-    .req-tag {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  color: #414141;
-  flex: 0 0 36px;
-}
+    
 
     .view-requests-button {
   width: 260px;
@@ -318,6 +306,7 @@
 const API = "http://157.230.121.24:5050/api/career-applications";
 
 document.getElementById("submitBtn").addEventListener("click", async () => {
+  const target = document.querySelector('input[name="target"]:checked')?.value;
   const exp = document.querySelector('input[name="experience"]:checked')?.value;
   const age = document.querySelector('input[name="age"]:checked')?.value;
   const requestText = document.getElementById("requestText").value.trim();

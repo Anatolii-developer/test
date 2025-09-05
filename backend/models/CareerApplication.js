@@ -1,17 +1,25 @@
+// models/CareerApplication.js
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
-// models/CareerApplication.js
-const CareerApplicationSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+const CareerApplicationSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
   username: { type: String, index: true },
   fullName: String,
   email: String,
+
+  target: {
+    type: String,
+    enum: ['mentor', 'supervisor'],
+    required: true
+  },
+
   experience: String,
   ageGroup: String,
   requestText: String,
   aboutText: String,
-  assignedMentor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // 👈 новое поле
-}, { timestamps:true });
+
+  assignedMentor: { type: Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
 
 module.exports = model('CareerApplication', CareerApplicationSchema);

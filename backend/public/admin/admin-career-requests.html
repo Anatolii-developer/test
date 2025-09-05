@@ -15,6 +15,41 @@
       href="/assets/sidebar/IPS Logo (1).svg"
     />
     <style>
+      /* === Top tiles (mentor navigation) === */
+      .tiles {
+        display: flex;
+        gap: 16px;
+        margin: 0 auto 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .tile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 220px;
+        height: 152px;
+        border-radius: 16px;
+        padding: 82px 41px;
+        background: #275D2B;
+        color: #FFFFFF;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 1.2;
+        box-sizing: border-box;
+        transition: transform .12s ease, opacity .12s ease, background-color .2s ease, color .2s ease;
+      }
+      .tile:hover { transform: translateY(-2px); opacity: .95; }
+      .tile--active {
+        background: #ECF5EB;
+        color: #275D2B;
+      }
+      @media (max-width: 960px){
+        .tiles { gap: 12px; }
+        .tile { width: 46%; min-width: 220px; }
+      }
       body {
         margin: 0;
         font-family: Poppins, sans-serif;
@@ -377,6 +412,12 @@
     </aside>
 
     <div class="wrap">
+      <!-- Mentor navigation tiles -->
+      <div class="tiles" role="navigation" aria-label="Mentor navigation">
+        <a class="tile" href="admin-career-faq.html">Редагувати FAQ</a>
+        <a class="tile tile--active" href="admin-career-requests.html">Налаштування ментора</a>
+        <a class="tile" href="admin-supervisor-settings.html">Налаштування супервізора</a>
+      </div>
       <h1>Заявки всіх учасників</h1>
       <div class="req-table-wrap">
         <table class="req-table">

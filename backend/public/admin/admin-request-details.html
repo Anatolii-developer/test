@@ -374,6 +374,7 @@
       // role-based assignee dropdown
       let __ASSIGNEES = [];
       let CURRENT_ROLE = 'mentor'; // will be detected from application
+      let APP_TARGET = 'mentor';
 
       async function fetchUsersByRole(role) {
         const h = authHeaders();
@@ -487,6 +488,8 @@
           return;
         }
         const a = body.application;
+        // Set APP_TARGET based on backend-provided application target (if any)
+        APP_TARGET = (a && a.target) ? String(a.target).toLowerCase() : CURRENT_ROLE;
         const u = a.user || {};
         qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
         qs("#lastName").value = u.lastName || "";
@@ -530,24 +533,44 @@
    async function save() {
     console.log('[save] start');
     const selectedId = (qs('#mentorSelectValue').value || '').trim();
-    if (!selectedId) return alert(CURRENT_ROLE === 'supervisor' ? 'Оберіть супервізора' : 'Оберіть ментора');
+    const isSupervisorFlow = (CURRENT_ROLE === 'supervisor') || (APP_TARGET === 'supervisor');
+
+    if (!selectedId) {
+      return alert(isSupervisorFlow ? 'Оберіть супервізора' : 'Оберіть ментора');
+    }
+
+    // If backend schema currently supports only mentor assignment, block supervisor flow with a clear message
+    if (isSupervisorFlow && !('assignedSupervisor' in ({}))) {
+      // Front-end guard because server schema likely lacks assignedSupervisor
+      return alert('Призначення супервізора ще не підтримується на сервері. Попросіть бекенд додати поле assignedSupervisor та приймати { supervisorId } у /assign');
+    }
 
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort('timeout'), 30000); // 30s
 
     try {
-      const key = CURRENT_ROLE === 'supervisor' ? 'supervisorId' : 'mentorId';
+      const payloadKey = isSupervisorFlow ? 'supervisorId' : 'mentorId';
+      const bodyJson = { [payloadKey]: selectedId };
+
       const r = await fetch(`/api/career-applications/${ID}/assign`, {
         method: 'PUT',
         credentials: 'include',
-        headers: { 'Content-Type':'application/json', ...authHeaders() },
-        body: JSON.stringify({ [key]: selectedId }),
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(bodyJson),
         signal: controller.signal,
       });
       clearTimeout(t);
       console.log('[save] status:', r.status);
-      if (!r.ok) return alert('Помилка: ' + (await r.text()).slice(0,500));
-      alert(CURRENT_ROLE === 'supervisor' ? 'Супервізора призначено' : 'Ментора призначено');
+
+      if (!r.ok) {
+        let txt = '';
+        try { txt = await r.text(); } catch(_) {}
+        // expose server reason to help debugging 400 Bad Request
+        alert(`Помилка збереження (${r.status}): ${txt.slice(0,500) || 'Bad Request'}`);
+        return;
+      }
+
+      alert(isSupervisorFlow ? 'Супервізора призначено' : 'Ментора призначено');
       history.back();
     } catch (e) {
       clearTimeout(t);

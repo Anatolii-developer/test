@@ -281,7 +281,7 @@ module.exports = {
   list,
   listAdmin,
   create,
-  assign,
+  assign,        
   getOneAdmin,
   getOne,
 };

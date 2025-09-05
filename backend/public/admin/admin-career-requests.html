@@ -418,7 +418,7 @@
         <a class="tile tile--active" href="admin-career-requests.html">Налаштування ментора</a>
         <a class="tile" href="admin-supervisor-requests.html">Налаштування супервізора</a>
       </div>
-      <h1>Заявки всіх учасників</h1>
+      <h1>Заявки до менторів</h1> 
       <div class="req-table-wrap">
         <table class="req-table">
           <thead>
@@ -545,7 +545,7 @@
 
     <script>
       // ===== API (админу — без mine=1) =====
-      const API = "/api/career-applications?all=1";
+      const API = "/api/career-applications?all=1&target=mentor";
 
       function getAuthToken() {
         const direct =
@@ -575,7 +575,7 @@
   let page = 1, pageSize = 200;
 
   for (let guard = 0; guard < 25; guard++) {
-    const url = `/api/career-applications?all=1&limit=${pageSize}&page=${page}`;
+    const url = `${API}&limit=${pageSize}&page=${page}`;
 
     let res;
     try {
@@ -652,9 +652,25 @@
           ? `${first} ${last}`.trim()
           : item.fullName || item.email || "Без імені";
       }
-      function emailFrom(item) {
-        return (item.user?.email || item.email || "").trim();
-      }
+      function isMentorApplication(item){
+  const toField = String(
+    item.to || item.target || item.type || item.category || item.direction || item.for || item.applyFor || ""
+  ).toLowerCase();
+
+  const roleField = Array.isArray(item.roles)
+    ? item.roles.join(",").toLowerCase()
+    : String(item.role || "").toLowerCase();
+
+  const flags = [
+    toField.includes("mentor") || toField.includes("ментор"),
+    roleField.includes("mentor") || roleField.includes("ментор"),
+    String(item.requestType||"").toLowerCase().includes("mentor"),
+    String(item.applicationType||"").toLowerCase().includes("mentor"),
+    Boolean(item.assignedMentorId || (item.assignedMentor && item.assignedMentor._id)) // если уже назначен ментор
+  ];
+
+  return flags.some(Boolean);
+}
 
       const $tbody = document.getElementById("tblBody");
       const $empty = document.getElementById("empty");
@@ -937,23 +953,47 @@ function closeOnOutsideOnce(e){
         }
       }
 
-      async function load() {
+     async function load() {
   try {
     const items = await fetchAllAdminApplications();
+
+    // фильтруем только заявки к ментору
+    const mentorItems = (Array.isArray(items) ? items : []).filter((it) => {
+      const toField = String(
+        it.to || it.target || it.type || it.category || it.direction || it.for || it.applyFor || ""
+      ).toLowerCase();
+      const roleField = Array.isArray(it.roles)
+        ? it.roles.join(",").toLowerCase()
+        : String(it.role || "").toLowerCase();
+      const isAssigned = Boolean(it.assignedMentorId || (it.assignedMentor && it.assignedMentor._id));
+
+      return (
+        toField.includes("mentor") ||
+        toField.includes("ментор") ||
+        roleField.includes("mentor") ||
+        roleField.includes("ментор") ||
+        String(it.requestType || "").toLowerCase().includes("mentor") ||
+        String(it.applicationType || "").toLowerCase().includes("mentor") ||
+        isAssigned
+      );
+    });
+
     $tbody.innerHTML = "";
-    if (!items.length) {
+    if (!mentorItems.length) {
       $empty.style.display = "block";
-      $empty.textContent = "Поки що немає заявок.";
+      $empty.textContent = "Поки що немає заявок до менторів.";
       return;
     }
+
     $empty.style.display = "none";
-    items.sort((a,b)=> new Date(b.createdAt||0) - new Date(a.createdAt||0))
-         .forEach((it, idx)=> $tbody.appendChild(rowTemplate(idx+1, it)));
+    mentorItems
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+      .forEach((it, idx) => $tbody.appendChild(rowTemplate(idx + 1, it)));
   } catch (e) {
     console.error(e);
     $tbody.innerHTML = "";
     $empty.style.display = "block";
-    $empty.textContent = String(e.message || e)  // 👈 покажем 401/403 и т.д.
+    $empty.textContent = String(e.message || e); // 👈 покажем 401/403 и т.д.
   }
 }
       document.addEventListener("DOMContentLoaded", () => {

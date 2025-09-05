@@ -652,25 +652,42 @@
           ? `${first} ${last}`.trim()
           : item.fullName || item.email || "Без імені";
       }
+      function emailFrom(item){
+        const u = item && item.user ? item.user : {};
+        return (
+          item?.email ||
+          u?.email ||
+          u?.contactEmail ||
+          u?.login ||
+          u?.username ||
+          ""
+        );
+      }
       function isMentorApplication(item){
-  const toField = String(
-    item.to || item.target || item.type || item.category || item.direction || item.for || item.applyFor || ""
-  ).toLowerCase();
+        // Prefer explicit schema field if present
+        if (item && typeof item.target === 'string') {
+          return String(item.target).toLowerCase() === 'mentor';
+        }
 
-  const roleField = Array.isArray(item.roles)
-    ? item.roles.join(",").toLowerCase()
-    : String(item.role || "").toLowerCase();
+        // Fallback heuristics (for older records)
+        const toField = String(
+          item?.to || item?.target || item?.type || item?.category || item?.direction || item?.for || item?.applyFor || ""
+        ).toLowerCase();
 
-  const flags = [
-    toField.includes("mentor") || toField.includes("ментор"),
-    roleField.includes("mentor") || roleField.includes("ментор"),
-    String(item.requestType||"").toLowerCase().includes("mentor"),
-    String(item.applicationType||"").toLowerCase().includes("mentor"),
-    Boolean(item.assignedMentorId || (item.assignedMentor && item.assignedMentor._id)) // если уже назначен ментор
-  ];
+        const roleField = Array.isArray(item?.roles)
+          ? item.roles.join(",").toLowerCase()
+          : String(item?.role || "").toLowerCase();
 
-  return flags.some(Boolean);
-}
+        const flags = [
+          toField.includes("mentor") || toField.includes("ментор"),
+          roleField.includes("mentor") || roleField.includes("ментор"),
+          String(item?.requestType||"").toLowerCase().includes("mentor"),
+          String(item?.applicationType||"").toLowerCase().includes("mentor"),
+          Boolean(item?.assignedMentorId || (item?.assignedMentor && item.assignedMentor._id))
+        ];
+
+        return flags.some(Boolean);
+      }
 
       const $tbody = document.getElementById("tblBody");
       const $empty = document.getElementById("empty");

@@ -338,8 +338,9 @@
       <div class="actions">
   <button id="saveBtn" class="btn" type="button">Зберегти</button>
 </div>
-
+<script src="admin-auth.js"></script>
     <script>
+       document.addEventListener('DOMContentLoaded', requireAdminPage);
       // --- small helpers ---
       const qs = (s) => document.querySelector(s);
       const pad = (n) => String(n).padStart(2, "0");

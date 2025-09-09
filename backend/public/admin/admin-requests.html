@@ -71,8 +71,9 @@
 </main>
 
 
-
+<script src="admin-auth.js"></script>
 <script>
+   document.addEventListener('DOMContentLoaded', requireAdminPage);
 const API_URL = "http://157.230.121.24:5050";
 let currentUserId = null;
 let currentStatus = "WAIT FOR REVIEW";

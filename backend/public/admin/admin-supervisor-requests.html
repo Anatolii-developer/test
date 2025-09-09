@@ -4,49 +4,188 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Адмін — Заявки учасників</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="admin-styles.css" />
-    <link rel="icon" type="image/svg+xml" href="/assets/sidebar/IPS Logo (1).svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/assets/sidebar/IPS Logo (1).svg"
+    />
     <style>
-      .tiles{display:flex;gap:16px;margin:0 auto 20px;justify-content:center;flex-wrap:wrap}
-      .tile{display:inline-flex;align-items:center;justify-content:center;text-align:center;width:220px;height:152px;border-radius:16px;padding:82px 41px;background:#275D2B;color:#fff;text-decoration:none;font-weight:600;font-size:20px;line-height:1.2;box-sizing:border-box;transition:transform .12s ease,opacity .12s ease,background-color .2s ease,color .2s ease}
-      .tile:hover{transform:translateY(-2px);opacity:.95}
-      .tile--active{background:#ECF5EB;color:#275D2B}
-      body{margin:0;font-family:Poppins,sans-serif;background:#97c194;color:#414141}
-      .wrap{width:890px;margin:32px auto;background:#fff;border-radius:24px;padding:40px 100px}
-      h1{margin:0 0 10px;font-size:32px}
-      .req-table-wrap{margin-top:16px}
-      .req-table{width:100%;border-collapse:separate;border-spacing:0;border:1.5px solid #e8812e;border-radius:16px;overflow:hidden;font-size:16px}
-      .req-table thead th{background:#e8812e;color:#fff;text-align:left;padding:16px 18px;font-weight:600;font-size:18px}
-      .req-table thead th:first-child{width:60px;text-align:center}
-      .req-table tbody td{background:#fff;border-top:1px solid #e8812e;border-left:1px solid #e8812e;padding:14px 18px;vertical-align:middle}
-      .req-table tbody td:first-child{text-align:center;border-left:none;width:60px;font-weight:600}
-      .req-name-cell{font-size:18px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-      .req-email-cell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
-      .btn-view{background:#e8812e;color:#fff;border:none;cursor:pointer;border-radius:24px;padding:8px 18px;font-weight:600}
-      .empty{text-align:center;color:#6b6b6b;margin-top:8px}
-      @media (max-width:1200px){.wrap{width:90%;padding:40px 30px}}
+      .tiles {
+        display: flex;
+        gap: 16px;
+        margin: 0 auto 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .tile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 220px;
+        height: 152px;
+        border-radius: 16px;
+        padding: 82px 41px;
+        background: #275d2b;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 1.2;
+        box-sizing: border-box;
+        transition: transform 0.12s ease, opacity 0.12s ease,
+          background-color 0.2s ease, color 0.2s ease;
+      }
+      .tile:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
+      }
+      .tile--active {
+        background: #ecf5eb;
+        color: #275d2b;
+      }
+      body {
+        margin: 0;
+        font-family: Poppins, sans-serif;
+        background: #97c194;
+        color: #414141;
+      }
+      .wrap {
+        width: 890px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px 100px;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 32px;
+      }
+      .req-table-wrap {
+        margin-top: 16px;
+      }
+      .req-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1.5px solid #e8812e;
+        border-radius: 16px;
+        overflow: hidden;
+        font-size: 16px;
+      }
+      .req-table thead th {
+        background: #e8812e;
+        color: #fff;
+        text-align: left;
+        padding: 16px 18px;
+        font-weight: 600;
+        font-size: 18px;
+      }
+      .req-table thead th:first-child {
+        width: 60px;
+        text-align: center;
+      }
+      .req-table tbody td {
+        background: #fff;
+        border-top: 1px solid #e8812e;
+        border-left: 1px solid #e8812e;
+        padding: 14px 18px;
+        vertical-align: middle;
+      }
+      .req-table tbody td:first-child {
+        text-align: center;
+        border-left: none;
+        width: 60px;
+        font-weight: 600;
+      }
+      .req-name-cell {
+        font-size: 18px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 420px;
+      }
+      .req-email-cell {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 360px;
+      }
+      .btn-view {
+        background: #e8812e;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 24px;
+        padding: 8px 18px;
+        font-weight: 600;
+      }
+      .empty {
+        text-align: center;
+        color: #6b6b6b;
+        margin-top: 8px;
+      }
+      @media (max-width: 1200px) {
+        .wrap {
+          width: 90%;
+          padding: 40px 30px;
+        }
+      }
     </style>
   </head>
   <body>
     <aside class="sidebar" id="sidebar">
-      <img class="logo" src="/assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+      <img
+        class="logo"
+        src="/assets/sidebar/IPS Logo (2).svg"
+        alt="Logo"
+        id="logoExpanded"
+      />
       <p style="margin-left: 12px; font-weight: 600">Admin</p>
       <nav>
-        <a href="admin-requests.html"><img src="/assets/sidebar/profile.svg" /><span>Профайли</span></a>
-        <a href="admin-certificate.html"><img src="/assets/sidebar/news.svg" /><span>Сертифікати</span></a>
-        <a href="admin-career-faq.html"><img src="/assets/sidebar/3.svg" /><span>Планування кар'єри</span></a>
-        <a href="admin-library.html"><img src="/assets/sidebar/4.svg" /><span>Бібліотека</span></a>
-        <a href="admin-all-courses.html"><img src="/assets/sidebar/5.svg" /><span>Курси</span></a>
-        <a href="#"><img src="/assets/sidebar/6.svg" /><span>Облік практики</span></a>
+        <a href="admin-requests.html"
+          ><img src="/assets/sidebar/profile.svg" /><span>Профайли</span></a
+        >
+        <a href="admin-certificate.html"
+          ><img src="/assets/sidebar/news.svg" /><span>Сертифікати</span></a
+        >
+        <a href="admin-career-faq.html"
+          ><img src="/assets/sidebar/3.svg" /><span>Планування кар'єри</span></a
+        >
+        <a href="admin-library.html"
+          ><img src="/assets/sidebar/4.svg" /><span>Бібліотека</span></a
+        >
+        <a href="admin-all-courses.html"
+          ><img src="/assets/sidebar/5.svg" /><span>Курси</span></a
+        >
+        <a href="#"
+          ><img src="/assets/sidebar/6.svg" /><span>Облік практики</span></a
+        >
         <a href="#"><img src="/assets/sidebar/7.svg" /><span>Здоров’я</span></a>
         <a href="#"><img src="/assets/sidebar/8.svg" /><span>Фінанси</span></a>
-        <a href="#"><img src="/assets/sidebar/9.svg" /><span>Нерухомість</span></a>
+        <a href="#"
+          ><img src="/assets/sidebar/9.svg" /><span>Нерухомість</span></a
+        >
       </nav>
-      <div style="margin-top:auto">
-        <a href="#"><img src="/assets/sidebar/settings.svg" /><span>Налаштування</span></a>
+      <div style="margin-top: auto">
+        <a href="#"
+          ><img src="/assets/sidebar/settings.svg" /><span
+            >Налаштування</span
+          ></a
+        >
         <div class="logout" onclick="logoutUser()">
-          <img src="/assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+          <img
+            src="/assets/sidebar/log-out.svg"
+            alt="Logout Icon"
+            width="20"
+            height="20"
+          />
           <span>Logout Account</span>
         </div>
       </div>
@@ -55,8 +194,12 @@
     <div class="wrap">
       <div class="tiles" role="navigation" aria-label="Supervisor navigation">
         <a class="tile" href="admin-career-faq.html">Редагувати FAQ</a>
-        <a class="tile" href="admin-career-requests.html">Налаштування ментора</a>
-        <a class="tile tile--active" href="admin-supervisor-requests.html">Налаштування супервізора</a>
+        <a class="tile" href="admin-career-requests.html"
+          >Налаштування ментора</a
+        >
+        <a class="tile tile--active" href="admin-supervisor-requests.html"
+          >Налаштування супервізора</a
+        >
       </div>
 
       <h1>Заявки всіх учасників</h1>
@@ -73,64 +216,143 @@
           </thead>
           <tbody id="tblBody"></tbody>
         </table>
-        <div id="empty" class="empty" style="display:none">Поки що немає заявок.</div>
+        <div id="empty" class="empty" style="display: none">
+          Поки що немає заявок.
+        </div>
       </div>
     </div>
-
+<script src="admin-auth.js"></script>
     <script>
+       document.addEventListener('DOMContentLoaded', requireAdminPage);
       // --- helpers (как на менторской странице) ---
-      function getAuthToken(){
-        const direct = localStorage.getItem("token") || localStorage.getItem("authToken") || localStorage.getItem("jwt") || localStorage.getItem("accessToken") || localStorage.getItem("bearer") || null;
+      function getAuthToken() {
+        const direct =
+          localStorage.getItem("token") ||
+          localStorage.getItem("authToken") ||
+          localStorage.getItem("jwt") ||
+          localStorage.getItem("accessToken") ||
+          localStorage.getItem("bearer") ||
+          null;
         if (direct) return direct;
-        try{ const u = JSON.parse(localStorage.getItem("user")||"{}"); return u.token || u.accessToken || null; }catch{ return null; }
+        try {
+          const u = JSON.parse(localStorage.getItem("user") || "{}");
+          return u.token || u.accessToken || null;
+        } catch {
+          return null;
+        }
       }
-      const pad = n => String(n).padStart(2,"0");
-      function formatDate(iso){ const d=new Date(iso); if (isNaN(d)) return ""; return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
-      function fullNameFrom(item){
-        const u=item.user||{}; const first=u.firstName||item.firstName||""; const last=u.lastName||item.lastName||"";
-        return (first||last) ? `${first} ${last}`.trim() : (item.fullName || item.email || "Без імені");
+      const pad = (n) => String(n).padStart(2, "0");
+      function formatDate(iso) {
+        const d = new Date(iso);
+        if (isNaN(d)) return "";
+        return `${pad(d.getDate())}-${pad(
+          d.getMonth() + 1
+        )}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
       }
-      function emailFrom(item){ return (item.user?.email || item.email || "").trim(); }
+      function fullNameFrom(item) {
+        const u = item.user || {};
+        const first = u.firstName || item.firstName || "";
+        const last = u.lastName || item.lastName || "";
+        return first || last
+          ? `${first} ${last}`.trim()
+          : item.fullName || item.email || "Без імені";
+      }
+      function emailFrom(item) {
+        return (item.user?.email || item.email || "").trim();
+      }
 
       // --- fetch ALL admin apps, filtered by target=supervisor ---
-      async function fetchAllAdminApplications(){
+      async function fetchAllAdminApplications() {
         const token = getAuthToken();
-        const headers = Object.assign({ Accept: "application/json" }, token ? { Authorization: `Bearer ${token}` } : {});
+        const headers = Object.assign(
+          { Accept: "application/json" },
+          token ? { Authorization: `Bearer ${token}` } : {}
+        );
         const all = [];
-        let page=1, pageSize=200;
+        let page = 1,
+          pageSize = 200;
 
-        for (let guard=0; guard<25; guard++){
+        for (let guard = 0; guard < 25; guard++) {
           const url = `/api/career-applications?all=1&limit=${pageSize}&page=${page}&target=supervisor`;
           let res;
-          try{ res = await fetch(url, { method:"GET", credentials:"include", headers }); }
-          catch(e){ console.error("FETCH FAILED:", e); throw new Error("Failed to fetch (CORS / network / mixed content?)"); }
+          try {
+            res = await fetch(url, {
+              method: "GET",
+              credentials: "include",
+              headers,
+            });
+          } catch (e) {
+            console.error("FETCH FAILED:", e);
+            throw new Error(
+              "Failed to fetch (CORS / network / mixed content?)"
+            );
+          }
 
           const raw = await res.clone().text();
           console.log("[ADMIN/SUPERVISOR APPS]", res.status, raw);
-          if (res.status===401) throw new Error("401 Unauthorized — не зашла кука/токен");
-          if (res.status===403) throw new Error("403 Forbidden — нужен admin login");
+          if (res.status === 401)
+            throw new Error("401 Unauthorized — не зашла кука/токен");
+          if (res.status === 403)
+            throw new Error("403 Forbidden — нужен admin login");
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-          let body={}; try{ body=JSON.parse(raw); }catch{}
-          const chunk = Array.isArray(body) ? body
-            : Array.isArray(body?.rows) ? body.rows
-            : Array.isArray(body?.items) ? body.items
-            : Array.isArray(body?.data) ? body.data
-            : (body?.ok && Array.isArray(body?.result)) ? body.result
+          let body = {};
+          try {
+            body = JSON.parse(raw);
+          } catch {}
+          const chunk = Array.isArray(body)
+            ? body
+            : Array.isArray(body?.rows)
+            ? body.rows
+            : Array.isArray(body?.items)
+            ? body.items
+            : Array.isArray(body?.data)
+            ? body.data
+            : body?.ok && Array.isArray(body?.result)
+            ? body.result
             : [];
 
-          const onlySuper = chunk.filter(x => (x.target||"").toLowerCase()==="supervisor");
+          const onlySuper = chunk.filter(
+            (x) => (x.target || "").toLowerCase() === "supervisor"
+          );
           all.push(...onlySuper);
 
-          const hasMore = !!(body?.hasMore || body?.has_next || body?.next || body?.nextPage || body?.next_page || body?.next_page_token);
-          const total   = body?.total || body?.count || null;
-          const nextPage= body?.nextPage || (body?.page && body?.pages && body.page < body.pages ? body.page + 1 : null);
-          const tokenCandidate = body?.next_page_token || body?.nextPageToken || body?.pageToken || null;
+          const hasMore = !!(
+            body?.hasMore ||
+            body?.has_next ||
+            body?.next ||
+            body?.nextPage ||
+            body?.next_page ||
+            body?.next_page_token
+          );
+          const total = body?.total || body?.count || null;
+          const nextPage =
+            body?.nextPage ||
+            (body?.page && body?.pages && body.page < body.pages
+              ? body.page + 1
+              : null);
+          const tokenCandidate =
+            body?.next_page_token ||
+            body?.nextPageToken ||
+            body?.pageToken ||
+            null;
 
-          if (tokenCandidate){ page+=1; continue; }
-          if (nextPage){ page = nextPage; continue; }
-          if (hasMore && chunk.length>0){ page += 1; continue; }
-          if (total && all.length < total){ page += 1; continue; }
+          if (tokenCandidate) {
+            page += 1;
+            continue;
+          }
+          if (nextPage) {
+            page = nextPage;
+            continue;
+          }
+          if (hasMore && chunk.length > 0) {
+            page += 1;
+            continue;
+          }
+          if (total && all.length < total) {
+            page += 1;
+            continue;
+          }
           break;
         }
         return all;
@@ -139,10 +361,11 @@
       const $tbody = document.getElementById("tblBody");
       const $empty = document.getElementById("empty");
 
-      function rowTemplate(i, item){
+      function rowTemplate(i, item) {
         const tr = document.createElement("tr");
 
-        const tdNum = document.createElement("td"); tdNum.textContent = i;
+        const tdNum = document.createElement("td");
+        tdNum.textContent = i;
 
         const tdName = document.createElement("td");
         tdName.className = "req-name-cell";
@@ -165,20 +388,22 @@
         return tr;
       }
 
-      async function load(){
-        try{
+      async function load() {
+        try {
           const items = await fetchAllAdminApplications();
           $tbody.innerHTML = "";
-          if (!items.length){
+          if (!items.length) {
             $empty.style.display = "block";
             $empty.textContent = "Поки що немає заявок.";
             return;
           }
           $empty.style.display = "none";
           items
-            .sort((a,b)=> new Date(b.createdAt||0) - new Date(a.createdAt||0))
-            .forEach((it, idx)=> $tbody.appendChild(rowTemplate(idx+1, it)));
-        }catch(e){
+            .sort(
+              (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+            )
+            .forEach((it, idx) => $tbody.appendChild(rowTemplate(idx + 1, it)));
+        } catch (e) {
           console.error(e);
           $tbody.innerHTML = "";
           $empty.style.display = "block";

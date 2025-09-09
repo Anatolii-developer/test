@@ -310,8 +310,9 @@
         </div>
       </div>
     </div>
-
+<script src="admin-auth.js"></script>
     <script>
+       document.addEventListener('DOMContentLoaded', requireAdminPage);
       // ==== LOAD (с моками на случай отсутствия API) ====
       async function load() {
         try {

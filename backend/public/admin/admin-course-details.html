@@ -245,8 +245,9 @@
 
     <button class="submit-btn" onclick="saveChanges()">Зберегти</button>
   </div>
-
+  <script src="admin-auth.js"></script>
   <script>
+     document.addEventListener('DOMContentLoaded', requireAdminPage);
     let courseId;
 let allUsers = [];
 let selectedParticipantIds = [];

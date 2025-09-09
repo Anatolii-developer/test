@@ -1593,13 +1593,45 @@ body.sidebar-collapsed .sidebar .sb-toggle svg {
 }
 
 
-#mainContentWrapper,
-.roles-wrapper {
-  margin-left: 0 !important;
+/* ========== SIDEBAR FIX (всегда открыт, один отступ) ========== */
+
+/* 0) Тело страницы обычное, не flex */
+body { display: block !important; }
+
+/* 1) Отступ под фиксированный сайдбар: используем padding-left у body,
+      а НЕ margin-left у контентных блоков */
+:root {
+  --sb-w: 220px;          /* ширина сайдбара */
+  --sb-w-collapsed: 72px; /* не используем, но пусть будет */
 }
 
-/* 2) Скрыть кнопку-стрелку (коллапс не нужен) */
+/* Один источник отступа */
+body.with-sidebar { padding-left: var(--sb-w) !important; }
+/* На случай если где-то включится 'sidebar-collapsed' (мы его не используем) */
+body.with-sidebar.sidebar-collapsed { padding-left: var(--sb-w-collapsed) !important; }
+
+/* 2) Гасим ВСЕ margin-left, которые ты навешивал раньше на разные контейнеры */
+#mainContentWrapper,
+.admin-main,
+.wrap,
+.admin-card,
+.course-detail,
+.profile-wrapper,
+.table-card,
+.course-table-container,
+.create-course-content,
+.roles-wrapper,
+.main-content {
+  margin-left: 0 !important;  /* критично: убираем второй отступ */
+}
+
+/* 3) Кнопка сворачивания не нужна — сайдбар всегда открыт */
 .sb-toggle { display: none !important; }
 
-/* 3) Тело страницы не должно быть flex, раз сайдбар фиксированный */
-body { display: block !important; }
+/* 4) Сайдбар фиксированный, как и было */
+.sidebar {
+  position: fixed !important;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sb-w);
+  z-index: 1000;
+}

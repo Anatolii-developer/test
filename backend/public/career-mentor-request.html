@@ -84,22 +84,23 @@
 
 
    .contact-btn-wrap {
+  width: 100%;
   display: flex;
   justify-content: center;   /* центрируем кнопку */
-  margin-top: 12px;          /* небольшой отступ от фото */
+  margin-top: 12px;          /* отступ от фото */
   margin-bottom: 50px;       /* отодвигаем следующий контент вниз */
 }
 
 .contact-btn {
-  width: 160px;
   height: 36px;
+  padding: 0 53px;           /* горизонтальные отступы, без вертикальных */
+  line-height: 36px;         /* выравниваем текст по вертикали */
   border-radius: 24px;
-  padding: 10px 53px;
   background: #275D2B;
   color: #fff;
   border: none;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 500;
   font-family: "Poppins", sans-serif;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -160,7 +161,9 @@
       .photo-wrap {
         position: relative;
         width: 248px;
-        height: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
       .photo {
         width: 100%;
@@ -311,10 +314,10 @@
             src="/assets/profile-photo.png"
             alt="Фото"
           />
-         <div class="contact-btn-wrap">
+        </div>
+        <div class="contact-btn-wrap">
     <button class="contact-btn">Звʼязатися</button>
   </div>
-        </div>
 
         <div class="grid grid-names">
           <div class="field">

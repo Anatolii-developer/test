@@ -488,6 +488,34 @@ function filterParticipants(e) {
   const filtered = allUsers.filter(u => getFullName(u).toLowerCase().includes(query));
   renderUserList(filtered);
 }
+ function logoutUser(){
+    try{
+      // чистимо локальне
+      localStorage.removeItem('user');
+      ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
+    }catch(_){}
+
+    // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
+    const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
+    fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+
+    // редірект на логін з поверненням
+    const back = encodeURIComponent(location.pathname + location.search);
+    location.href = `admin-login.html?returnUrl=${back}`;
+  }
+
+  // прив’язуємо до кнопки
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btnLogout');
+    if (btn) btn.addEventListener('click', logoutUser);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const here = location.pathname.split('/').pop();
+  document.querySelectorAll('.sidebar nav a').forEach(a=>{
+    if (a.getAttribute('href') === here) a.classList.add('active');
+  });
+});
 
   </script>
 

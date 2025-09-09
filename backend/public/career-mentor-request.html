@@ -83,39 +83,30 @@
       }
 
 
-      /* Кнопка "Зв’язатися" під фото */
+   .contact-btn-wrap {
+  display: flex;
+  justify-content: center;   /* центрируем кнопку */
+  margin-top: 12px;          /* небольшой отступ от фото */
+  margin-bottom: 32px;       /* отодвигаем следующий контент вниз */
+}
+
 .contact-btn {
   width: 160px;
   height: 36px;
   border-radius: 24px;
-
-  /* твои отступы */
-  padding-top: 10px;
-  padding-right: 53px;
-  padding-bottom: 10px;
-  padding-left: 53px;
-
+  padding: 10px 53px;
   background: #275D2B;
-  color: #FFFFF9;
-  font-family: "Poppins", sans-serif;
+  color: #fff;
+  border: none;
+  font-size: 16px;
   font-weight: 600;
-  font-size: 14px;
-  line-height: 16px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  font-family: "Poppins", sans-serif;
   cursor: pointer;
-  border: 0;
-  margin-top: 12px;      /* отступ от фото вниз */
+  transition: background 0.2s ease;
 }
 
-.contact-btn:hover { opacity: .95; transform: translateY(-1px); }
-.contact-btn:disabled,
-.contact-btn[aria-disabled="true"] {
-  opacity: .6;
-  cursor: not-allowed;
+.contact-btn:hover {
+  background: #1e4722;
 }
       /* --- Field sizing per design --- */
       /* Name fields: last, first, middle */
@@ -319,7 +310,9 @@
             src="/assets/profile-photo.png"
             alt="Фото"
           />
-          <a id="contactBtn" class="contact-btn" href="#">Зв’язатися</a>
+         <div class="contact-btn-wrap">
+    <button class="contact-btn">Звʼязатися</button>
+  </div>
         </div>
 
         <div class="grid grid-names">

@@ -5,68 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Career Planning – FAQ (Admin)</title>
     <link rel="stylesheet" href="admin-styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
-      :root{
-        --green:#275d2b; --green-100:#ecf5eb; --peach:#ffeed9; --peach-cc:#ffeed9cc;
-        --text:#414141; --muted:#8f8f8f; --radius-24:24px; --radius-16:16px;
+      :root {
+        --green: #275d2b;
+        --green-100: #ecf5eb;
+        --peach: #ffeed9;
+        --peach-cc: #ffeed9cc;
+        --text: #414141;
+        --muted: #8f8f8f;
+        --radius-24: 24px;
+        --radius-16: 16px;
       }
-      *{ box-sizing:border-box; }
-      body{ margin:0; font-family:"Poppins",sans-serif; background:#97c194; color:var(--text); }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #97c194;
+        color: var(--text);
+      }
 
       /* единый отступ под фиксированный сайдбар */
-      .with-sidebar .wrap{ margin-left:250px; }
+      .with-sidebar .wrap {
+        margin-left: 250px;
+      }
 
       /* HEADER TILES */
-      .tiles{ display:flex; gap:20px; margin-bottom:28px; }
-      .tile{
-        width:220px; height:152px; border-radius:16px; padding:82px 41px;
-        background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center;
-        font-weight:600; font-size:24px; text-align:center; cursor:pointer; user-select:none; text-decoration:none;
+      .tiles {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 28px;
       }
-      .tile--active{ background:var(--green-100); color:var(--text); }
+      .tile {
+        width: 220px;
+        height: 152px;
+        border-radius: 16px;
+        padding: 82px 41px;
+        background: var(--green);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 24px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        text-decoration: none;
+      }
+      .tile--active {
+        background: var(--green-100);
+        color: var(--text);
+      }
 
       /* MAIN WRAPPER */
-      .wrap{
-        width:890px; margin:32px auto; background:#fff; border-radius:var(--radius-24); padding:60px 100px;
+      .wrap {
+        width: 890px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: var(--radius-24);
+        padding: 60px 100px;
       }
 
       /* FAQ LIST */
-      .faq-list{ display:flex; flex-direction:column; gap:18px; margin-top:14px; }
-      .faq-item{ width:690px; background:var(--peach-cc); border-radius:16px; padding:18px 22px; position:relative; }
-      .faq-q{ font-weight:700; font-size:20px; margin:0 48px 8px 0; }
-      .faq-a{ margin:0; color:var(--text); line-height:1.5; }
+      .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin-top: 14px;
+      }
+      .faq-item {
+        width: 690px;
+        background: var(--peach-cc);
+        border-radius: 16px;
+        padding: 18px 22px;
+        position: relative;
+      }
+      .faq-q {
+        font-weight: 700;
+        font-size: 20px;
+        margin: 0 48px 8px 0;
+      }
+      .faq-a {
+        margin: 0;
+        color: var(--text);
+        line-height: 1.5;
+      }
 
-      .faq-actions{ position:absolute; top:14px; right:14px; display:flex; gap:10px; }
-      .icon-btn{ width:32px; height:32px; border-radius:8px; border:none; background:#fff; cursor:pointer; display:grid; place-items:center; }
-      .icon-btn svg{ width:16px; height:16px; }
+      .faq-actions {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: flex;
+        gap: 10px;
+      }
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        background: #fff;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+      }
+      .icon-btn svg {
+        width: 16px;
+        height: 16px;
+      }
 
-      .add-wrap{ display:flex; justify-content:center; margin-top:24px; }
-      .btn-add{ background:#e8812e; color:#fff; border:none; border-radius:24px; padding:10px 24px; cursor:pointer; font-weight:600; }
+      .add-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+      }
+      .btn-add {
+        background: #e8812e;
+        color: #fff;
+        border: none;
+        border-radius: 24px;
+        padding: 10px 24px;
+        cursor: pointer;
+        font-weight: 600;
+      }
 
       /* MODAL */
-      .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.25); display:none; align-items:center; justify-content:center; z-index:20; }
-      .modal{ width:560px; background:#fff; border-radius:16px; padding:20px; }
-      .modal h3{ margin:0 0 12px; }
-      .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
-      .field label{ font-weight:500; color:var(--muted); }
-      .field input,.field textarea{ border:1px solid #bfbfbf; border-radius:8px; padding:10px 12px; font:inherit; width:100%; }
-      .field textarea{ min-height:120px; resize:vertical; }
-      .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
-      .btn{ border:none; border-radius:10px; padding:10px 14px; cursor:pointer; }
-      .btn-primary{ background:var(--green); color:#fff; }
-      .btn-ghost{ background:#f3f4f6; }
-      .empty{ text-align:center; color:#6b6b6b; margin-top:8px; }
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+      }
+      .modal {
+        width: 560px;
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px;
+      }
+      .modal h3 {
+        margin: 0 0 12px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .field label {
+        font-weight: 500;
+        color: var(--muted);
+      }
+      .field input,
+      .field textarea {
+        border: 1px solid #bfbfbf;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font: inherit;
+        width: 100%;
+      }
+      .field textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 10px;
+      }
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: var(--green);
+        color: #fff;
+      }
+      .btn-ghost {
+        background: #f3f4f6;
+      }
+      .empty {
+        text-align: center;
+        color: #6b6b6b;
+        margin-top: 8px;
+      }
 
       /* запасной стиль для подписи в сайдбаре на 2 строки */
-      .sidebar nav a span{ white-space:normal; line-height:1.15; }
-      
-      @media (max-width:1180px){
-        .with-sidebar .wrap{ margin-left:0; }
-        .wrap{ width:90%; padding:40px 30px; }
-        .faq-item{ width:100%; }
-        .tiles{ flex-wrap:wrap; }
+      .sidebar nav a span {
+        white-space: normal;
+        line-height: 1.15;
+      }
+
+      @media (max-width: 1180px) {
+        .with-sidebar .wrap {
+          margin-left: 0;
+        }
+        .wrap {
+          width: 90%;
+          padding: 40px 30px;
+        }
+        .faq-item {
+          width: 100%;
+        }
+        .tiles {
+          flex-wrap: wrap;
+        }
       }
     </style>
   </head>
@@ -77,13 +231,21 @@
 
     <main class="wrap">
       <div class="tiles">
-        <a href="admin-career-faq.html" class="tile tile--active">Редагувати FAQ</a>
-        <a href="admin-career-requests.html" class="tile">Налаштування ментора</a>
-        <a href="admin-supervisor-requests.html" class="tile">Налаштування супервізора</a>
+        <a href="admin-career-faq.html" class="tile tile--active"
+          >Редагувати FAQ</a
+        >
+        <a href="admin-career-requests.html" class="tile"
+          >Налаштування ментора</a
+        >
+        <a href="admin-supervisor-requests.html" class="tile"
+          >Налаштування супервізора</a
+        >
       </div>
 
       <div id="faqList" class="faq-list"></div>
-      <div id="emptyState" class="empty" style="display:none">Поки що немає питань.</div>
+      <div id="emptyState" class="empty" style="display: none">
+        Поки що немає питань.
+      </div>
 
       <div class="add-wrap">
         <button id="btnAdd" class="btn-add">Додати питання</button>
@@ -112,13 +274,13 @@
     <script src="admin-auth.js"></script>
     <script>
       // инициализация общей части + защита страницы
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         // подсветим активный пункт и вставим подпись «Планування кар'єри» в 2 строки
         // эта разметка уже заложена в renderAdminSidebar
-        if (typeof renderAdminSidebar === 'function') {
-          renderAdminSidebar('admin-career-faq.html');
+        if (typeof renderAdminSidebar === "function") {
+          renderAdminSidebar("admin-career-faq.html");
         }
-        if (typeof requireAdminPage === 'function') {
+        if (typeof requireAdminPage === "function") {
           requireAdminPage();
         }
         load();
@@ -156,41 +318,64 @@
         render();
       }
 
-      function iconPencil(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l10-10-4-4L4 16v4z" stroke="#275D2B" stroke-width="2" stroke-linejoin="round"/><path d="M14 6l4 4" stroke="#275D2B" stroke-width="2"/></svg>`;}
-      function iconTrash(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-1 0v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6h8z" stroke="#A31D1D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+      function iconPencil() {
+        return `<svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4l10-10-4-4L4 16v4z" stroke="#275D2B" stroke-width="2" stroke-linejoin="round"/><path d="M14 6l4 4" stroke="#275D2B" stroke-width="2"/></svg>`;
+      }
+      function iconTrash() {
+        return `<svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-1 0v14a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V6h8z" stroke="#A31D1D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      }
 
-      function render(){
+      function render() {
         $list.innerHTML = "";
-        if (!items.length){ $empty.style.display="block"; return; }
-        $empty.style.display="none";
+        if (!items.length) {
+          $empty.style.display = "block";
+          return;
+        }
+        $empty.style.display = "none";
 
-        items.forEach(it=>{
+        items.forEach((it) => {
           const el = document.createElement("div");
           el.className = "faq-item";
           el.dataset.id = it._id;
-          el.setAttribute("draggable","true");
+          el.setAttribute("draggable", "true");
           el.innerHTML = `
             <div class="faq-actions">
-              <button class="icon-btn js-edit" title="Редагувати" data-id="${it._id}">${iconPencil()}</button>
-              <button class="icon-btn js-del" title="Видалити" data-id="${it._id}">${iconTrash()}</button>
+              <button class="icon-btn js-edit" title="Редагувати" data-id="${
+                it._id
+              }">${iconPencil()}</button>
+              <button class="icon-btn js-del" title="Видалити" data-id="${
+                it._id
+              }">${iconTrash()}</button>
             </div>
             <h4 class="faq-q">${escapeHtml(it.question)}</h4>
             <p class="faq-a">${nl2br(escapeHtml(it.answer))}</p>
           `;
-          el.addEventListener("dragstart", e => { e.dataTransfer.effectAllowed="move"; el.classList.add("dragging"); });
-          el.addEventListener("dragend", async () => { el.classList.remove("dragging"); await persistOrder(); });
+          el.addEventListener("dragstart", (e) => {
+            e.dataTransfer.effectAllowed = "move";
+            el.classList.add("dragging");
+          });
+          el.addEventListener("dragend", async () => {
+            el.classList.remove("dragging");
+            await persistOrder();
+          });
           $list.appendChild(el);
         });
 
-        $list.querySelectorAll(".js-edit").forEach(btn=>{
-          btn.addEventListener("click", e => { e.stopPropagation(); openEdit(btn.dataset.id); });
+        $list.querySelectorAll(".js-edit").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openEdit(btn.dataset.id);
+          });
         });
-        $list.querySelectorAll(".js-del").forEach(btn=>{
-          btn.addEventListener("click", e => { e.stopPropagation(); removeItem(btn.dataset.id); });
+        $list.querySelectorAll(".js-del").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            removeItem(btn.dataset.id);
+          });
         });
       }
 
-      $list.addEventListener("dragover", e => {
+      $list.addEventListener("dragover", (e) => {
         e.preventDefault();
         const dragging = $list.querySelector(".dragging");
         if (!dragging) return;
@@ -199,65 +384,125 @@
         else $list.insertBefore(dragging, afterEl);
       });
 
-      function getDragAfterElement(container, y){
+      function getDragAfterElement(container, y) {
         const els = [...container.querySelectorAll(".faq-item:not(.dragging)")];
         let closest = { offset: Number.NEGATIVE_INFINITY, element: null };
-        for (const child of els){
+        for (const child of els) {
           const box = child.getBoundingClientRect();
-          const offset = y - (box.top + box.height/2);
-          if (offset < 0 && offset > closest.offset) closest = { offset, element: child };
+          const offset = y - (box.top + box.height / 2);
+          if (offset < 0 && offset > closest.offset)
+            closest = { offset, element: child };
         }
         return closest.element;
       }
 
-      async function persistOrder(){
+      async function persistOrder() {
         const nodes = [...$list.querySelectorAll(".faq-item")];
-        const items = nodes.map((n,idx)=>({ id:n.dataset.id, order:idx }));
+        const items = nodes.map((n, idx) => ({ id: n.dataset.id, order: idx }));
         const r = await fetch("/api/career-faq/reorder", {
-          method:"PUT", credentials:"include",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ items })
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items }),
         });
-        if (!r.ok){ const t = await r.text().catch(()=> ""); throw new Error("Bulk reorder failed: " + t); }
+        if (!r.ok) {
+          const t = await r.text().catch(() => "");
+          throw new Error("Bulk reorder failed: " + t);
+        }
         await load();
       }
 
-      function escapeHtml(s=""){ return s.replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-      function nl2br(s=""){ return s.replace(/\n/g,"<br/>"); }
-
-      // MODAL
-      function openCreate(){ editingId=null; $q.value=""; $a.value=""; $modalTitle.textContent="Нове питання"; $modal.style.display="flex"; $q.focus(); }
-      function openEdit(id){ const it = items.find(x=>x._id===id); if(!it) return; editingId=id; $q.value=it.question||""; $a.value=it.answer||""; $modalTitle.textContent="Редагувати питання"; $modal.style.display="flex"; $q.focus(); }
-      function closeModal(){ $modal.style.display="none"; }
-
-      async function save(){
-        const payload = { question:$q.value.trim(), answer:$a.value.trim() };
-        if (!payload.question || !payload.answer) return alert("Заповніть питання та відповідь");
-        try{
-          if (editingId){
-            const r = await fetch(API.update(editingId), { method:"PUT", headers:{ "Content-Type":"application/json" }, credentials:"include", body:JSON.stringify(payload) });
-            if (!r.ok) throw new Error("Update failed");
-          }else{
-            const r = await fetch(API.create, { method:"POST", headers:{ "Content-Type":"application/json" }, credentials:"include", body:JSON.stringify(payload) });
-            if (!r.ok) throw new Error("Create failed");
-          }
-          closeModal(); await load();
-        }catch(e){ console.error(e); alert("Не вдалося зберегти. Перевірте підключення та права доступу."); }
+      function escapeHtml(s = "") {
+        return s.replace(
+          /[&<>\"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;",
+            }[m])
+        );
+      }
+      function nl2br(s = "") {
+        return s.replace(/\n/g, "<br/>");
       }
 
-      async function removeItem(id){
+      // MODAL
+      function openCreate() {
+        editingId = null;
+        $q.value = "";
+        $a.value = "";
+        $modalTitle.textContent = "Нове питання";
+        $modal.style.display = "flex";
+        $q.focus();
+      }
+      function openEdit(id) {
+        const it = items.find((x) => x._id === id);
+        if (!it) return;
+        editingId = id;
+        $q.value = it.question || "";
+        $a.value = it.answer || "";
+        $modalTitle.textContent = "Редагувати питання";
+        $modal.style.display = "flex";
+        $q.focus();
+      }
+      function closeModal() {
+        $modal.style.display = "none";
+      }
+
+      async function save() {
+        const payload = { question: $q.value.trim(), answer: $a.value.trim() };
+        if (!payload.question || !payload.answer)
+          return alert("Заповніть питання та відповідь");
+        try {
+          if (editingId) {
+            const r = await fetch(API.update(editingId), {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify(payload),
+            });
+            if (!r.ok) throw new Error("Update failed");
+          } else {
+            const r = await fetch(API.create, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify(payload),
+            });
+            if (!r.ok) throw new Error("Create failed");
+          }
+          closeModal();
+          await load();
+        } catch (e) {
+          console.error(e);
+          alert("Не вдалося зберегти. Перевірте підключення та права доступу.");
+        }
+      }
+
+      async function removeItem(id) {
         if (!confirm("Видалити питання?")) return;
-        try{
-          const r = await fetch(API.remove(id), { method:"DELETE", credentials:"include" });
+        try {
+          const r = await fetch(API.remove(id), {
+            method: "DELETE",
+            credentials: "include",
+          });
           if (!r.ok) throw new Error("Delete failed");
           await load();
-        }catch(e){ console.error(e); alert("Не вдалося видалити."); }
+        } catch (e) {
+          console.error(e);
+          alert("Не вдалося видалити.");
+        }
       }
 
       $btnAdd.addEventListener("click", openCreate);
       $btnCancel.addEventListener("click", closeModal);
       $btnSave.addEventListener("click", save);
-      $modal.addEventListener("click", e => { if (e.target === $modal) closeModal(); });
+      $modal.addEventListener("click", (e) => {
+        if (e.target === $modal) closeModal();
+      });
     </script>
   </body>
 </html>

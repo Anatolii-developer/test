@@ -96,39 +96,9 @@
     .submit-btn.danger { background:#A31D1D; }
   </style>
 </head>
-<body>
-  <aside class="sidebar" id="sidebar">
-    <!-- Логотип -->
-    <img class="logo" src="../assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-  
-    
-    <p style="margin-left: 12px; font-weight: 600;">Admin</p>
-  
-    <!-- Навигация -->
-    <nav>
-      <a href="admin-requests.html"><img src="../assets/sidebar/profile.svg" /><span>Профайли</span></a>
-      <a href="admin-certificate.html"><img src="../assets/sidebar/news.svg" /><span>Сертифікати</span></a>
-      <a href="#"><img src="../assets/sidebar/3.svg" /><span>Планування кар'єри</span></a>
-      <a href="#"><img src="../assets/sidebar/4.svg" /><span>Бібліотека</span></a>
-      <a href="admin-all-courses.html"><img src="../assets/sidebar/5.svg" /><span>Курси</span></a>
-      <a href="#"><img src="../assets/sidebar/6.svg" /><span>Облік практики</span></a>
-      <a href="#"><img src="../assets/sidebar/7.svg" /><span>Здоров’я</span></a>
-      <a href="#"><img src="../assets/sidebar/8.svg" /><span>Фінанси</span></a>
-      <a href="#"><img src="../assets/sidebar/9.svg" /><span>Нерухомість</span></a>
-    </nav>
-  
-    <!-- Настройки + выход -->
-   <div class="sidebar-actions">
-  <a class="action-btn settings" href="admin-roles.html">
-    <img src="./images/settings.svg" alt="" width="18" height="18" />
-    <span>Налаштування</span>
-  </a>
-  <button class="action-btn logout" id="btnLogout">
-    <img src="../assets/sidebar/log-out.svg" alt="" width="18" height="18" />
-    <span>Вийти</span>
-  </button>
-</div>
-  </aside>
+<body class="with-sidebar">
+  <aside class="sidebar" id="sidebar"></aside>
+
   <div class="course-detail">
     <h1>Деталі курсу</h1>
 <div style="display:flex; gap:24px; flex-wrap:wrap;">
@@ -250,7 +220,16 @@
   </div>
   <script src="admin-auth.js"></script>
   <script>
-     document.addEventListener('DOMContentLoaded', requireAdminPage);
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof renderAdminSidebar === "function") {
+        renderAdminSidebar("admin-career-requests.html");
+      }
+      if (typeof requireAdminPage === "function") {
+        requireAdminPage();
+      }
+      load();
+    });
+
     let courseId;
 let allUsers = [];
 let selectedParticipantIds = [];

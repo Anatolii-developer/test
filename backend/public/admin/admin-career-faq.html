@@ -10,7 +10,16 @@
       rel="stylesheet"
     />
 
+    
     <style>
+
+      body.with-sidebar .wrap {
+  margin-left: 260px; /* было 250px — добавили немного «воздуха» */
+}
+
+@media (max-width: 1180px) {
+  body.with-sidebar .wrap { margin-left: 0; }
+}
       :root {
         --green: #275d2b;
         --green-100: #ecf5eb;

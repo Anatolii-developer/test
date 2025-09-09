@@ -72,3 +72,48 @@
     redirectToLogin();
   };
 })();
+
+// ==== SIDEBAR (shared across admin pages) ====
+// Вызывай на каждой админ-странице: renderAdminSidebar('имя_файла.html')
+window.renderAdminSidebar = function renderAdminSidebar(current) {
+  const host = document.getElementById('sidebar');
+  if (!host) return;
+
+  host.innerHTML = `
+    <img class="logo" src="../assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <p style="margin-left: 12px; font-weight: 600;">Admin</p>
+
+    <nav>
+      <a href="admin-requests.html"><img src="../assets/sidebar/profile.svg" /><span>Профайли</span></a>
+      <a href="admin-certificate.html"><img src="../assets/sidebar/news.svg" /><span>Сертифікати</span></a>
+      <a href="admin-career-faq.html"><img src="../assets/sidebar/3.svg" /><span>Планування<br>кар'єри</span></a>
+      <a href="admin-library.html"><img src="../assets/sidebar/4.svg" /><span>Бібліотека</span></a>
+      <a href="admin-all-courses.html"><img src="../assets/sidebar/5.svg" /><span>Курси</span></a>
+      <a href="#"><img src="../assets/sidebar/6.svg" /><span>Облік практики</span></a>
+      <a href="#"><img src="../assets/sidebar/7.svg" /><span>Здоров’я</span></a>
+      <a href="#"><img src="../assets/sidebar/8.svg" /><span>Фінанси</span></a>
+      <a href="#"><img src="../assets/sidebar/9.svg" /><span>Нерухомість</span></a>
+    </nav>
+
+    <div class="sidebar-actions">
+      <a class="action-btn settings" href="admin-roles.html">
+        <img src="./images/settings.svg" alt="" width="18" height="18" />
+        <span>Налаштування</span>
+      </a>
+      <button class="action-btn logout" id="btnLogout">
+        <img src="../assets/sidebar/log-out.svg" alt="" width="18" height="18" />
+        <span>Вийти</span>
+      </button>
+    </div>
+  `;
+
+  // активный пункт
+  const here = current || location.pathname.split('/').pop();
+  host.querySelectorAll('nav a').forEach(a => {
+    if (a.getAttribute('href') === here) a.classList.add('active');
+  });
+
+  // logout
+  const btn = host.querySelector('#btnLogout');
+  if (btn) btn.addEventListener('click', logoutUser);
+};

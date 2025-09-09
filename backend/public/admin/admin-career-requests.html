@@ -542,8 +542,9 @@
         </div>
       </div>
     </div>
-
+<script src="admin-auth.js"></script>
     <script>
+       document.addEventListener('DOMContentLoaded', requireAdminPage);
       // ===== API (админу — без mine=1) =====
       const API = "/api/career-applications?all=1&target=mentor";
 

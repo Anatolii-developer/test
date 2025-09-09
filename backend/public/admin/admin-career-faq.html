@@ -273,10 +273,27 @@
 
     <script src="admin-auth.js"></script>
     <script>
-      // инициализация общей части + защита страницы
+       window.logoutUser = function () {
+    if (typeof window.adminLogout === 'function') {
+      return window.adminLogout(); // штатный выход из admin-auth.js
+    }
+    // запасной вариант, если adminLogout вдруг недоступен
+    try { localStorage.removeItem('user'); } catch(e){}
+    ['token','authToken','jwt','accessToken','bearer'].forEach(k => { try{ localStorage.removeItem(k) }catch(e){} });
+    const back = encodeURIComponent(location.pathname + location.search);
+    location.href = `admin-login.html?returnUrl=${back}`;
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof renderAdminSidebar === "function") {
+      renderAdminSidebar("admin-career-faq.html");
+    }
+    if (typeof requireAdminPage === "function") {
+      requireAdminPage();
+    }
+    load();
+  });
       document.addEventListener("DOMContentLoaded", () => {
-        // подсветим активный пункт и вставим подпись «Планування кар'єри» в 2 строки
-        // эта разметка уже заложена в renderAdminSidebar
         if (typeof renderAdminSidebar === "function") {
           renderAdminSidebar("admin-career-faq.html");
         }

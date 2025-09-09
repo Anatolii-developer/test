@@ -1022,90 +1022,87 @@ function previewPhoto(event) {
 
 
 function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('mainContent');
-  const arrow = document.getElementById('toggleArrow');
-  const logoExpanded = document.getElementById('logoExpanded');
-  const logoCollapsed = document.getElementById('logoCollapsed');
+  // toggle pin state via button click
+  sidebarPinned = !sidebarPinned;
+  try { localStorage.setItem('sidebarPinned', JSON.stringify(sidebarPinned)); } catch (_) {}
+  applySidebarState();
+}
 
-  sidebar.classList.toggle('expanded');
-  sidebar.classList.toggle('collapsed');
-  if (sidebar.classList.contains('expanded')) {
-    arrow.style.transform = 'rotate(180deg)';
+// === Sidebar hover-to-open + pin state (restored interactive behavior) ===
+let sidebarPinned = (function(){
+  try { return JSON.parse(localStorage.getItem('sidebarPinned') || 'true'); } catch(_) { return true; }
+})();
+
+function getSidebar(){ return document.getElementById('sidebar'); }
+function getArrow(){ return document.getElementById('toggleArrow') || document.querySelector('#sbToggle svg'); }
+
+function applySidebarState(){
+  const sidebar = getSidebar();
+  if (!sidebar) return;
+
+  if (sidebarPinned) {
+    sidebar.classList.add('expanded');
+    sidebar.classList.remove('collapsed');
   } else {
-    arrow.style.transform = 'rotate(0deg)';
+    sidebar.classList.remove('expanded');
+    sidebar.classList.add('collapsed');
+  }
+
+  const arrow = getArrow();
+  if (arrow) {
+    arrow.style.transform = sidebarPinned ? 'rotate(180deg)' : 'rotate(0deg)';
   }
 }
 
-// === Sidebar hover-to-open + pin state ===
-let sidebarPinned = true; // always pinned/open
-
-// Try to restore pin state
-try {
-  sidebarPinned = JSON.parse(localStorage.getItem('sidebarPinned') || 'false');
-} catch (_) {
-  sidebarPinned = false;
-}
-sidebarPinned = true;
-try { localStorage.setItem('sidebarPinned', 'true'); } catch (_) {}
-
-function isTouchDevice(){
-  return (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
-}
-
-function applySidebarState() {
-  const sidebar = document.getElementById('sidebar');
-  const arrow = document.getElementById('toggleArrow');
+function enableSidebarHover(){
+  const sidebar = getSidebar();
   if (!sidebar) return;
-  // Force expanded styles
-  sidebar.classList.add('expanded');
-  sidebar.classList.remove('collapsed');
-  if (arrow) arrow.style.transform = 'rotate(180deg)';
+
+  // Open on hover/focus when NOT pinned
+  const openTemp = () => {
+    if (!sidebarPinned) {
+      sidebar.classList.add('expanded');
+      sidebar.classList.remove('collapsed');
+    }
+  };
+  const closeTemp = () => {
+    if (!sidebarPinned) {
+      sidebar.classList.remove('expanded');
+      sidebar.classList.add('collapsed');
+    }
+  };
+
+  sidebar.addEventListener('mouseenter', openTemp);
+  sidebar.addEventListener('mouseleave', closeTemp);
+  sidebar.addEventListener('focusin', openTemp);
+  sidebar.addEventListener('focusout', closeTemp);
 }
 
-function enableSidebarHover() {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-  // Force the pinned/open state and apply styles once
-  sidebarPinned = true;
-  try { localStorage.setItem('sidebarPinned', 'true'); } catch (_){}
-  applySidebarState();
-}
-
-// Rewire the existing toggle to act as a "pin/unpin"
-const _origToggleSidebar = toggleSidebar;
-toggleSidebar = function(){
-  // Keep pinned (no-op to prevent collapsing)
-  sidebarPinned = true;
-  try { localStorage.setItem('sidebarPinned', 'true'); } catch (_){}
-  applySidebarState();
-};
-
-// Inject small CSS to prevent "Вийти" label jump and keep buttons stable
+// Bind toggle button if present (supports #sbToggle from admin sidebar and #toggleArrow legacy)
 document.addEventListener('DOMContentLoaded', () => {
-  const style = document.createElement('style');
-  style.textContent = `
-    /* Keep action button label on one line and hide smoothly if needed */
-    .sidebar .action-btn { min-height: 40px; }
-    .sidebar .action-btn span { 
-      white-space: nowrap; 
-      overflow: hidden; 
-      display: inline-block; 
-      max-width: 200px; 
-      transition: max-width .2s ease, opacity .2s ease, margin .2s ease;
-    }
-    /* If some pages still use .sidebar-collapsed, hide text without layout jumps */
-    body.sidebar-collapsed .sidebar .action-btn span {
-      max-width: 0;
-      opacity: 0;
-      margin: 0;
-    }
-  `;
-  document.head.appendChild(style);
+  applySidebarState();
+  enableSidebarHover();
+
+  const btn = document.getElementById('sbToggle') || document.getElementById('toggleArrow');
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleSidebar();
+    });
+  }
 });
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', enableSidebarHover);
+// Inject small CSS to prevent "Вийти" label jump and keep buttons stable
+(function(){
+  const style = document.createElement('style');
+  style.textContent = `
+    .sidebar .action-btn { min-height: 40px; }
+    .sidebar .action-btn span{ white-space:nowrap; overflow:hidden; display:inline-block; max-width:200px; transition:max-width .2s ease, opacity .2s ease, margin .2s ease; }
+    body.sidebar-collapsed .sidebar .action-btn span{ max-width:0; opacity:0; margin:0; }
+  `;
+  document.head.appendChild(style);
+})();
+
 
 
 document.addEventListener("DOMContentLoaded", async () => {

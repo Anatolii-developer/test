@@ -73,27 +73,56 @@
   };
 })();
 
-// ==== SIDEBAR (shared across admin pages) ====
 // Вызывай на каждой админ-странице: renderAdminSidebar('имя_файла.html')
 window.renderAdminSidebar = function renderAdminSidebar(current) {
   const host = document.getElementById('sidebar');
   if (!host) return;
 
-  host.innerHTML = `
-    <img class="logo" src="../assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-    <p style="margin-left: 12px; font-weight: 600;">Admin</p>
+  const here = current || location.pathname.split('/').pop();
 
-    <nav>
-      <a href="admin-requests.html"><img src="../assets/sidebar/profile.svg" /><span>Профайли</span></a>
-      <a href="admin-certificate.html"><img src="../assets/sidebar/news.svg" /><span>Сертифікати</span></a>
-      <a href="admin-career-faq.html"><img src="../assets/sidebar/3.svg" /><span>Планування<br>кар'єри</span></a>
-      <a href="admin-library.html"><img src="../assets/sidebar/4.svg" /><span>Бібліотека</span></a>
-      <a href="admin-all-courses.html"><img src="../assets/sidebar/5.svg" /><span>Курси</span></a>
-      <a href="#"><img src="../assets/sidebar/6.svg" /><span>Облік практики</span></a>
-      <a href="#"><img src="../assets/sidebar/7.svg" /><span>Здоров’я</span></a>
-      <a href="#"><img src="../assets/sidebar/8.svg" /><span>Фінанси</span></a>
-      <a href="#"><img src="../assets/sidebar/9.svg" /><span>Нерухомість</span></a>
-    </nav>
+  host.innerHTML = `
+    <div class="sidebar__top">
+      <img class="logo" src="../assets/sidebar/IPS Logo (2).svg" alt="IPS Logo" />
+      <button class="sb-toggle" id="sbToggle" aria-label="Згорнути/розгорнути меню" title="Згорнути/розгорнути">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M15 6l-6 6 6 6" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <p style="margin: 6px 8px 10px; font-weight: 600;">Admin</p>
+
+    <div class="sidebar__scroll">
+      <nav role="navigation" aria-label="Admin navigation">
+        <a href="admin-requests.html" ${here==='admin-requests.html'?'class="active"':''}>
+          <img src="../assets/sidebar/profile.svg" alt="" /><span>Профайли</span>
+        </a>
+        <a href="admin-certificate.html" ${here==='admin-certificate.html'?'class="active"':''}>
+          <img src="../assets/sidebar/news.svg" alt="" /><span>Сертифікати</span>
+        </a>
+        <a href="admin-career-faq.html" ${here==='admin-career-faq.html'?'class="active"':''}>
+          <img src="../assets/sidebar/3.svg" alt="" /><span>Планування<br>кар'єри</span>
+        </a>
+        <a href="admin-library.html" ${here==='admin-library.html'?'class="active"':''}>
+          <img src="../assets/sidebar/4.svg" alt="" /><span>Бібліотека</span>
+        </a>
+        <a href="admin-all-courses.html" ${here==='admin-all-courses.html'?'class="active"':''}>
+          <img src="../assets/sidebar/5.svg" alt="" /><span>Курси</span>
+        </a>
+        <a href="#" >
+          <img src="../assets/sidebar/6.svg" alt="" /><span>Облік практики</span>
+        </a>
+        <a href="#">
+          <img src="../assets/sidebar/7.svg" alt="" /><span>Здоров’я</span>
+        </a>
+        <a href="#">
+          <img src="../assets/sidebar/8.svg" alt="" /><span>Фінанси</span>
+        </a>
+        <a href="#">
+          <img src="../assets/sidebar/9.svg" alt="" /><span>Нерухомість</span>
+        </a>
+      </nav>
+    </div>
 
     <div class="sidebar-actions">
       <a class="action-btn settings" href="admin-roles.html">
@@ -107,13 +136,20 @@ window.renderAdminSidebar = function renderAdminSidebar(current) {
     </div>
   `;
 
-  // активный пункт
-  const here = current || location.pathname.split('/').pop();
-  host.querySelectorAll('nav a').forEach(a => {
-    if (a.getAttribute('href') === here) a.classList.add('active');
-  });
-
-  // logout
+  // bind: logout
   const btn = host.querySelector('#btnLogout');
   if (btn) btn.addEventListener('click', logoutUser);
+
+  // bind: collapse toggle (и восстановление состояния)
+  const root = document.body;
+  root.classList.add('with-sidebar');
+  const collapsedSaved = localStorage.getItem('adm.sidebarCollapsed') === '1';
+  root.classList.toggle('sidebar-collapsed', collapsedSaved);
+
+  const tgl = host.querySelector('#sbToggle');
+  if (tgl) tgl.addEventListener('click', () => {
+    const now = !root.classList.contains('sidebar-collapsed');
+    root.classList.toggle('sidebar-collapsed', now);
+    localStorage.setItem('adm.sidebarCollapsed', now ? '1' : '0');
+  });
 };

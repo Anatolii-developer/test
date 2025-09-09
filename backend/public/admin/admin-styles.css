@@ -5,7 +5,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 #mainContentWrapper {
-  margin-left: 250px; /* место под фиксированный сайдбар (ширина 220 + зазор) */
+  margin-left: 250px;
+  /* место под фиксированный сайдбар (ширина 220 + зазор) */
 }
 
 #admin-main,
@@ -13,22 +14,23 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;  /* центрирует внутренние блоки типа .create-course-content */
+  align-items: center;
+  /* центрирует внутренние блоки типа .create-course-content */
   padding: 40px 0;
   box-sizing: border-box;
 }
 
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    background-color: #97C194;
-  }
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  background-color: #97C194;
+}
 
 
-  .requests-table td {
+.requests-table td {
   vertical-align: top;
   word-wrap: break-word;
   max-width: 180px;
@@ -36,344 +38,323 @@ body {
 
 .layout {
   display: flex;
-  height: auto; /* или min-height: 100vh; */
+  height: auto;
+  /* или min-height: 100vh; */
   width: 100%;
 }
-  
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 220px;
-  height: 100vh;
-  background-color: #F8F8F8;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 1px solid #ccc;
-  z-index: 1000; /* поверх остального контента */
-   flex-shrink: 0;
+
+
+
+.admin-logo {
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-  
-  .admin-logo {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  
-  .admin-user {
-    font-weight: 500;
-    margin-bottom: 40px;
-  }
-  
-  .sidebar nav a {
-    display: block;
-    color: #333;
-    text-decoration: none;
-    padding: 10px 0;
-    font-size: 16px;
-  }
-  
-  .sidebar nav a.active {
-    color: #E37009;
-    font-weight: 600;
-  }
-  
-  .logout {
-    color: #E04343;
-    cursor: pointer;
-    margin-top: 20px;
-    font-size: 16px;
-  }
-  
-  .admin-main {
-    flex: 1;
-    padding: 40px;
-    border-radius: 24px;
-    margin: 40px;
-  }
-
-  .admin-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .table-card {
-    width: 890px;
-    padding: 60px 100px;
-    border-radius: 24px;
-    background-color: #FFFFF9;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-top: 36px;
-  }
-  
-  .top-nav {
-    display: flex;
-    gap: 50px;
-    margin-top: 30px;
-    justify-content: center;
-  }
-  
-  .requests-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    margin-top: 24px;
-  }
-  
-  
-  
-  .top-btn {
-    width: 180px;
-    height: 44px;
-    background-color: #E37009;
-    color: white;
-    padding: 10px 32px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .top-btn.active {
-    background-color: #A95305;
-  }
-  
-  .search-block {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  
-  .search-block input {
-    width: 300px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  
-  .search-btn {
-    width: 113px;
-    height: 40px;
-    background-color: #E37009;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  
-  .requests-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    border: 2px solid #E37009; /* рамка таблицы */
-  }
-  
-  .requests-table thead {
-    background-color: #E37009;
-    color: white;
-  }
-
-  
-  
-  .requests-table th,
-  .requests-table td {
-    padding: 12px 16px;
-    border: 1px solid #E37009; /* цвет линий */
-    text-align: left;
-  }
-  .more-btn {
-    width: 97px;
-    border-radius: 24px;
-    padding: 10px;
-    gap: 10px;
-    background-color: #E37009;
-    color: white;
-    border: none;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: background-color 0.2s ease;
-    display: inline-block;
-    margin-left: 0; /* гарантирует, что не центрируется */
-  }
-  
-  .more-btn:hover {
-    background-color: #cf6108;
-  }
+.admin-user {
+  font-weight: 500;
+  margin-bottom: 40px;
+}
 
 
-  
+.logout {
+  color: #E04343;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 16px;
+}
 
-  .materials-top-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-bottom: 40px;
-  }
-  
-  .dropdown-wrapper select {
-    width: 456px;
-    height: 48px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    background-color: #f6f0e3;
-    border: none;
-    font-size: 16px;
-    margin-bottom: 32px;
-  }
-  
-  .materials-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    margin-bottom: 32px;
-  }
-  
-  .materials-table th,
-  .materials-table td {
-    padding: 10px 16px;
-    border: 1px solid #E37009;
-    text-align: left;
-  }
-  
-  .materials-table thead {
-    background-color: #E37009;
-    color: white;
-  }
-  
-  .datetime-row {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 32px;
-  }
-  
-  .input-with-icon {
-    position: relative;
-  }
-  
-  .input-with-icon input {
-    width: 236px;
-    padding: 16px 40px 16px 20px;
-    border: 2px solid #E37009;
-    border-radius: 12px;
-    font-size: 16px;
-    color: #333;
-    background-color: #FFFFF9;
-  }
-  
-  .input-with-icon input::placeholder {
-    color: #b3b3b3;
-  }
-  
-  .calendar-icon {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-    opacity: 1;
-    color: #E37009;
-  }
-  
-  
-  .button-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 32px;
-  }
-  
-  .green-btn {
-    background-color: #275D2B;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 24px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  .submit-btn {
-    display: block;
-    margin: 0 auto;
-    background-color: #E37009;
-    color: white;
-    padding: 12px 48px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  
+.admin-main {
+  flex: 1;
+  padding: 40px;
+  border-radius: 24px;
+  margin: 40px;
+}
 
-  .admin-wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #97C194;
-    padding: 40px 0;
-  }
-  
-  .materials-top-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-bottom: 32px;
-  }
-  
-  .top-btns {
-    width: 326px;
-    height: 152px;
-    background-color: #275D2B;
-    color: white;
-    border-radius: 16px;
-    font-size: 20px;
-    font-weight: 600;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .top-btns.inactive {
-    background-color: #F3F3F3;
-    color: #333;
-  }
-  
-  .admin-card {
-    width: 1110px;
-    background-color: #FFFFF9;
-    padding: 60px 100px;
-    border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
+.admin-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  
+.table-card {
+  width: 890px;
+  padding: 60px 100px;
+  border-radius: 24px;
+  background-color: #FFFFF9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 36px;
+}
 
-  .search-bar-wrapper {
-    margin-bottom: 24px;
-    display: flex;
-    justify-content: flex-end; /* ← сместить вправо */
-  }
-  
-  .search-bar {
-    width: 320px;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: 2px solid #E37009;
-    border-radius: 16px;
-    background-color: #FFFFF9;
-    color: #333;
-  }
-  
+.top-nav {
+  display: flex;
+  gap: 50px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 24px;
+}
+
+
+
+.top-btn {
+  width: 180px;
+  height: 44px;
+  background-color: #E37009;
+  color: white;
+  padding: 10px 32px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.top-btn.active {
+  background-color: #A95305;
+}
+
+.search-block {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.search-block input {
+  width: 300px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.search-btn {
+  width: 113px;
+  height: 40px;
+  background-color: #E37009;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border: 2px solid #E37009;
+  /* рамка таблицы */
+}
+
+.requests-table thead {
+  background-color: #E37009;
+  color: white;
+}
+
+
+
+.requests-table th,
+.requests-table td {
+  padding: 12px 16px;
+  border: 1px solid #E37009;
+  /* цвет линий */
+  text-align: left;
+}
+
+.more-btn {
+  width: 97px;
+  border-radius: 24px;
+  padding: 10px;
+  gap: 10px;
+  background-color: #E37009;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  display: inline-block;
+  margin-left: 0;
+  /* гарантирует, что не центрируется */
+}
+
+.more-btn:hover {
+  background-color: #cf6108;
+}
+
+
+
+
+.materials-top-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.dropdown-wrapper select {
+  width: 456px;
+  height: 48px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background-color: #f6f0e3;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 32px;
+}
+
+.materials-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+.materials-table th,
+.materials-table td {
+  padding: 10px 16px;
+  border: 1px solid #E37009;
+  text-align: left;
+}
+
+.materials-table thead {
+  background-color: #E37009;
+  color: white;
+}
+
+.datetime-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input {
+  width: 236px;
+  padding: 16px 40px 16px 20px;
+  border: 2px solid #E37009;
+  border-radius: 12px;
+  font-size: 16px;
+  color: #333;
+  background-color: #FFFFF9;
+}
+
+.input-with-icon input::placeholder {
+  color: #b3b3b3;
+}
+
+.calendar-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  opacity: 1;
+  color: #E37009;
+}
+
+
+.button-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.green-btn {
+  background-color: #275D2B;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  display: block;
+  margin: 0 auto;
+  background-color: #E37009;
+  color: white;
+  padding: 12px 48px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+
+.admin-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #97C194;
+  padding: 40px 0;
+}
+
+.materials-top-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.top-btns {
+  width: 326px;
+  height: 152px;
+  background-color: #275D2B;
+  color: white;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.top-btns.inactive {
+  background-color: #F3F3F3;
+  color: #333;
+}
+
+.admin-card {
+  width: 1110px;
+  background-color: #FFFFF9;
+  padding: 60px 100px;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+.search-bar-wrapper {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: flex-end;
+  /* ← сместить вправо */
+}
+
+.search-bar {
+  width: 320px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 2px solid #E37009;
+  border-radius: 16px;
+  background-color: #FFFFF9;
+  color: #333;
+}
+
 
 .modal {
   position: fixed;
@@ -446,111 +427,34 @@ body {
 #submitDecision:hover {
   background-color: #cf6108;
 }
-  #modalActions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 25px;
-  }
 
-  #modalActions button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  #approveBtn {
-    background-color: #4CAF50;
-    color: white;
-  }
-
-  #rejectBtn {
-    background-color: #f44336;
-    color: white;
-  }
-
-
-
-.sidebar nav a.active {
-  background-color: #FFFFFF;
-}
-
-
-
-.sidebar nav a span {
-  transition: opacity 0.3s ease, max-width 0.3s ease, margin 0.3s ease;
-  overflow: hidden;
-  white-space: nowrap;
-  display: inline-block;
-  opacity: 1;
-  max-width: 200px;
-  margin-left: 10px;
-}
-
-
-
-
-
-.sidebar .toggle-button img {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.5s ease;
-}
-
-
-.sidebar .logo,
-.sidebar .profile,
-.sidebar nav,
-.sidebar .logout {
-  margin-bottom: 20px;
-}
-
-.sidebar .logo {
-  width: 160px;            /* Fix width so it doesn’t overflow */
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin-left: 12px;       /* Add some spacing inside the sidebar */
-}
-
-
-
-
-
-
-    .sidebar .line {
-      border-radius: 2px;
-      height: 2px;
-      margin: 12px 0;
-    }
-
-
-
-    .sidebar nav a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 5px;
-      border-radius: 8px;
-      color: #333;
-      text-decoration: none;
-      margin-bottom: 12px;
-      position: relative;
-    }
-    
-
-.sidebar .logout {
+#modalActions {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  color: #E04343;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 16px;
+  justify-content: space-between;
+  margin-top: 25px;
 }
+
+#modalActions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+#approveBtn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#rejectBtn {
+  background-color: #f44336;
+  color: white;
+}
+
+
+
 
 
 
@@ -589,18 +493,20 @@ body {
 }
 
 .action-controls {
-  justify-content: center; /* или flex-end */
+  justify-content: center;
+  /* или flex-end */
 }
 
 
 .table-card {
   width: 890px;
-  gap: 36px; /* можно оставить, если используешь flex внутри */
+  gap: 36px;
+  /* можно оставить, если используешь flex внутри */
   border-radius: 24px;
   background-color: #FFFFF9;
   padding: 60px 100px;
   margin-top: 36px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .top-title-box {
@@ -677,8 +583,10 @@ body {
 }
 
 .add-cert-btn[data-lang="ua"] {
-  background-color: #0057B7;         /* синий (UA) */
-  color: #FFD700;                    /* жёлтый (UA) */
+  background-color: #0057B7;
+  /* синий (UA) */
+  color: #FFD700;
+  /* жёлтый (UA) */
   border-color: #FFD700;
 }
 
@@ -688,8 +596,10 @@ body {
 }
 
 .add-cert-btn[data-lang="eng"] {
-  background-color: #012169;         /* тёмно-синий (UK) */
-  color: #FF0000;                    /* красный (UK) */
+  background-color: #012169;
+  /* тёмно-синий (UK) */
+  color: #FF0000;
+  /* красный (UK) */
   border-color: #FF0000;
 }
 
@@ -749,7 +659,7 @@ body {
   padding: 60px 100px;
   background: white;
   border-radius: 24px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   margin: auto;
 }
 
@@ -774,7 +684,8 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-.course-table th, .course-table td {
+.course-table th,
+.course-table td {
   padding: 12px;
   text-align: left;
   border: 1px solid #ddd;
@@ -795,7 +706,8 @@ body {
   display: inline-block;
   text-align: center;
   transition: background-color 0.3s ease;
-  text-decoration: none; /* ❌ Убирает линию под ссылкой */
+  text-decoration: none;
+  /* ❌ Убирает линию под ссылкой */
 }
 
 .more-button:hover {
@@ -811,7 +723,8 @@ body {
 .create-course-content {
   width: 890px;
   background-color: #fffef9;
-  margin: 28px auto; /* Центрирует по горизонтали */
+  margin: 28px auto;
+  /* Центрирует по горизонтали */
   padding: 60px 100px;
   border-radius: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -942,28 +855,29 @@ body {
 
 
 
- .tag {
-    background-color: #e0e0e0;
-    border-radius: 20px;
-    padding: 5px 10px;
-    font-size: 0.9em;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
+.tag {
+  background-color: #e0e0e0;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  .tag .remove-btn {
-    background: none;
-    border: none;
-    color: #333;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 0;
-  }
+.tag .remove-btn {
+  background: none;
+  border: none;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+}
 
-  .tag .remove-btn:hover {
-    color: red;
-  }
+.tag .remove-btn:hover {
+  color: red;
+}
+
 .roles-wrapper {
   margin-left: 250px;
   width: 890px;
@@ -1192,10 +1106,12 @@ body {
 
 .action-buttons {
   display: flex;
-  flex-direction: column; /* добавь это */
+  flex-direction: column;
+  /* добавь это */
   gap: 20px;
   margin-top: 30px;
-  align-items: flex-start; /* чтобы не тянулось на всю ширину */
+  align-items: flex-start;
+  /* чтобы не тянулось на всю ширину */
 }
 
 
@@ -1211,25 +1127,25 @@ body {
 }
 
 label[for="courseSelect"] {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 500;
-      font-size: 18px;
-      color: #8F8F8F;
-      display: block;
-      margin-bottom: 8px;
-    }
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #8F8F8F;
+  display: block;
+  margin-bottom: 8px;
+}
 
-     #courseSelect {
-      width: 456px;
-      height: 48px;
-      margin-bottom: 24px;
-      border-radius: 5px;
-      border: none;
-      background-color: #FFEED9;
-      padding: 0 12px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 16px;
-    }
+#courseSelect {
+  width: 456px;
+  height: 48px;
+  margin-bottom: 24px;
+  border-radius: 5px;
+  border: none;
+  background-color: #FFEED9;
+  padding: 0 12px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+}
 
 
 .materials-header {
@@ -1268,69 +1184,75 @@ label[for="courseSelect"] {
 
 
 .date-time label {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 500;
-      font-size: 18px;
-      color: #8F8F8F;
-    }
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #8F8F8F;
+}
 
-    .submit-button {
-      margin: 30px auto 0;
-      display: block;
-      width: 180px;
-      height: 44px;
-      background-color: #E37009;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: 600;
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-    }
+.submit-button {
+  margin: 30px auto 0;
+  display: block;
+  width: 180px;
+  height: 44px;
+  background-color: #E37009;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+}
 
-     .btn-green-add,
-    .btn-dark-green {
-      width: 164px;
-      height: 44px;
-      border-radius: 24px;
-      background-color: #275D2B;
-      color: white;
-      border: none;
-      font-weight: 600;
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-    }
+.btn-green-add,
+.btn-dark-green {
+  width: 164px;
+  height: 44px;
+  border-radius: 24px;
+  background-color: #275D2B;
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+}
 
 
-     .profile-wrapper {
-      max-width: 890px;
-      margin: 40px auto;
-      background-color: #fff;
-      border-radius: 24px;
-      padding: 60px 100px;
-      font-family: 'Poppins', sans-serif;
-    }
-    .profile-wrapper h2 {
-      margin-bottom: 24px;
-    }
-    .profile-wrapper p {
-      margin: 10px 0;
-      line-height: 1.6;
-    }
+.profile-wrapper {
+  max-width: 890px;
+  margin: 40px auto;
+  background-color: #fff;
+  border-radius: 24px;
+  padding: 60px 100px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.profile-wrapper h2 {
+  margin-bottom: 24px;
+}
+
+.profile-wrapper p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
 /* ==== FAQ admin modal overrides (prevent class name collision) ==== */
 /* When the HTML uses <div id="modal" class="modal-backdrop"><div class="modal"> ... */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  display: none;            /* will be set to flex from JS when opened */
+  display: none;
+  /* will be set to flex from JS when opened */
   align-items: center;
   justify-content: center;
-  z-index: 2000;            /* above sidebar */
+  z-index: 2000;
+  /* above sidebar */
 }
 
 /* Ensure inner .modal is treated as content, not fullscreen overlay */
 .modal-backdrop .modal {
-  position: static;         /* cancel fixed from generic .modal rule */
+  position: static;
+  /* cancel fixed from generic .modal rule */
   background-color: #FFFFF9;
   border-radius: 16px;
   padding: 20px;
@@ -1338,83 +1260,334 @@ label[for="courseSelect"] {
   max-width: 90vw;
   max-height: 85vh;
   overflow: auto;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* ==== FAQ admin modal: vertical stack ==== */
 .modal-backdrop .modal {
-  display: flex;             /* override generic .modal (row) */
-  flex-direction: column;    /* stack children vertically */
-  align-items: stretch;      /* make fields full width */
-  gap: 12px;                 /* spacing between blocks */
+  display: flex;
+  /* override generic .modal (row) */
+  flex-direction: column;
+  /* stack children vertically */
+  align-items: stretch;
+  /* make fields full width */
+  gap: 12px;
+  /* spacing between blocks */
 }
 
-.modal-backdrop .modal .field { /* ensure fields are block-level */
+.modal-backdrop .modal .field {
+  /* ensure fields are block-level */
   width: 100%;
 }
 
-.modal-backdrop .modal .modal-actions { /* buttons row, right aligned */
+.modal-backdrop .modal .modal-actions {
+  /* buttons row, right aligned */
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
 
-.faq-item { 
-  cursor: grab; 
-}
-.faq-item.dragging { 
-  opacity: .6; cursor: grabbing; 
+.faq-item {
+  cursor: grab;
 }
 
-
-/* Контейнер дій */
-.sidebar-actions{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin:12px 0 18px 0;
+.faq-item.dragging {
+  opacity: .6;
+  cursor: grabbing;
 }
 
 /* Базова кнопка-дія (і як <a>, і як <button>) */
-.action-btn{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:10px;
-  border:1.5px solid transparent;
-  background:#FFFFFF;
-  color:#2d2d2d;
-  font-size:16px;
-  font-weight:600;
-  text-decoration:none;
-  cursor:pointer;
-  transition:background-color .2s ease, border-color .2s ease, color .2s ease, transform .05s ease;
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: #FFFFFF;
+  color: #2d2d2d;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .05s ease;
 }
-.action-btn img{ flex:0 0 18px; }
+
+.action-btn img {
+  flex: 0 0 18px;
+}
 
 /* Налаштування — “текстова” зелена */
-.action-btn.settings{
-  background:#ECF5EB;           /* світло-зелений фон */
-  color:#275D2B;
-  border-color:#275D2B;
+.action-btn.settings {
+  background: #ECF5EB;
+  /* світло-зелений фон */
+  color: #275D2B;
+  border-color: #275D2B;
 }
-.action-btn.settings:hover{
-  background:#d9ebd7;
+
+.action-btn.settings:hover {
+  background: #d9ebd7;
 }
 
 /* Вийти — червона варіація */
-.action-btn.logout{
-  background:#FFF1F1;
-  color:#A31D1D;
-  border-color:#A31D1D;
+.action-btn.logout {
+  background: #FFF1F1;
+  color: #A31D1D;
+  border-color: #A31D1D;
 }
-.action-btn.logout:hover{
-  background:#FFE3E3;
+
+.action-btn.logout:hover {
+  background: #FFE3E3;
 }
 
 /* Невеличкий тап/клік-ефект */
-.action-btn:active{ transform:scale(0.98); }
+.action-btn:active {
+  transform: scale(0.98);
+}
 
-/* Щоб посилання в сайдбарі не злипались зі стилями action-btn */
-.sidebar nav a{ padding:8px 6px; }
+/* =========================
+   Sidebar v2 (compact, collapsible, accessible)
+   ========================= */
+:root {
+  --sb-w: 220px;
+  /* ширина в разложенном виде */
+  --sb-w-collapsed: 72px;
+  /* ширина в свернутом виде */
+  --sb-bg: #F8F8F8;
+  --sb-border: #D9D9D9;
+  --sb-text: #333;
+  --sb-active: #FFFFFF;
+  --brand: #E37009;
+  --brand-hover: #cf6108;
+}
+
+/* базовая раскладка */
+body.with-sidebar {
+  display: block;
+}
+
+/* чтобы не ломать страницы, где body был flex */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sb-w);
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+/* Контентный отступ (универсально для всех твоих контейнеров) */
+body.with-sidebar:not(.sidebar-collapsed) .wrap,
+body.with-sidebar:not(.sidebar-collapsed) .admin-main,
+body.with-sidebar:not(.sidebar-collapsed) #mainContentWrapper,
+body.with-sidebar:not(.sidebar-collapsed) .admin-card,
+body.with-sidebar:not(.sidebar-collapsed) .course-detail,
+body.with-sidebar:not(.sidebar-collapsed) .profile-wrapper,
+body.with-sidebar:not(.sidebar-collapsed) .table-card,
+body.with-sidebar:not(.sidebar-collapsed) .course-table-container,
+body.with-sidebar:not(.sidebar-collapsed) .create-course-content,
+body.with-sidebar:not(.sidebar-collapsed) .roles-wrapper,
+body.with-sidebar:not(.sidebar-collapsed) .main-content {
+  margin-left: var(--sb-w);
+}
+
+body.with-sidebar.sidebar-collapsed .wrap,
+body.with-sidebar.sidebar-collapsed .admin-main,
+body.with-sidebar.sidebar-collapsed #mainContentWrapper,
+body.with-sidebar.sidebar-collapsed .admin-card,
+body.with-sidebar.sidebar-collapsed .course-detail,
+body.with-sidebar.sidebar-collapsed .profile-wrapper,
+body.with-sidebar.sidebar-collapsed .table-card,
+body.with-sidebar.sidebar-collapsed .course-table-container,
+body.with-sidebar.sidebar-collapsed .create-course-content,
+body.with-sidebar.sidebar-collapsed .roles-wrapper,
+body.with-sidebar.sidebar-collapsed .main-content {
+  margin-left: var(--sb-w-collapsed);
+}
+
+/* Скролл только для зоны меню */
+.sidebar__scroll {
+  overflow: auto;
+  padding-right: 4px;
+  margin: 8px 0;
+}
+
+/* Шапка: логотип + кнопка сворачивания */
+.sidebar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 8px;
+}
+
+.sidebar .logo {
+  width: 160px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.sb-toggle {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.sb-toggle:focus-visible {
+  outline: 2px solid #0000;
+  box-shadow: 0 0 0 3px #0000001a;
+}
+
+/* Навигация */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  color: var(--sb-text);
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 1.2;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.sidebar nav a:hover {
+  background: #fff;
+}
+
+.sidebar nav a.active {
+  background: var(--sb-active);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* Иконки в меню */
+.sidebar nav a img {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+/* Текст пункта меню: разрешаем перенос на 2 строки */
+.sidebar nav a span {
+  display: inline-block;
+  white-space: normal;
+  /* << ключ для "Планування кар'єри" в 2 строки */
+  max-width: 200px;
+}
+
+/* Блок быстрых действий снизу */
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: #FFFFFF;
+  color: #2d2d2d;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s, transform .05s;
+}
+
+.action-btn img {
+  flex: 0 0 18px;
+}
+
+.action-btn.settings {
+  background: #ECF5EB;
+  color: #275D2B;
+  border-color: #275D2B;
+}
+
+.action-btn.settings:hover {
+  background: #d9ebd7;
+}
+
+.action-btn.logout {
+  background: #FFF1F1;
+  color: #A31D1D;
+  border-color: #A31D1D;
+}
+
+.action-btn.logout:hover {
+  background: #FFE3E3;
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+/* Свернутый режим */
+body.sidebar-collapsed .sidebar {
+  width: var(--sb-w-collapsed);
+}
+
+body.sidebar-collapsed .sidebar nav a span {
+  opacity: 0;
+  max-width: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+body.sidebar-collapsed .sidebar .logo {
+  width: 36px;
+}
+
+body.sidebar-collapsed .sidebar .sb-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Мобильная адаптация: при узком экране отступ убираем, сайдбар занимает всю ширину (или остаётся фиксированным с ручкой) */
+@media (max-width: 1180px) {
+
+  body.with-sidebar:not(.sidebar-collapsed) .wrap,
+  body.with-sidebar:not(.sidebar-collapsed) .admin-main,
+  body.with-sidebar:not(.sidebar-collapsed) #mainContentWrapper,
+  body.with-sidebar:not(.sidebar-collapsed) .admin-card,
+  body.with-sidebar:not(.sidebar-collapsed) .course-detail,
+  body.with-sidebar:not(.sidebar-collapsed) .profile-wrapper,
+  body.with-sidebar:not(.sidebar-collapsed) .table-card,
+  body.with-sidebar:not(.sidebar-collapsed) .course-table-container,
+  body.with-sidebar:not(.sidebar-collapsed) .create-course-content,
+  body.with-sidebar:not(.sidebar-collapsed) .roles-wrapper,
+  body.with-sidebar:not(.sidebar-collapsed) .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Дружелюбие к пользователям c reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .sidebar nav a,
+  .action-btn,
+  .sb-toggle {
+    transition: none !important;
+  }
+}

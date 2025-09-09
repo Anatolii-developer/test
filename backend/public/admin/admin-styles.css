@@ -1591,3 +1591,15 @@ body.sidebar-collapsed .sidebar .sb-toggle svg {
     transition: none !important;
   }
 }
+
+
+#mainContentWrapper,
+.roles-wrapper {
+  margin-left: 0 !important;
+}
+
+/* 2) Скрыть кнопку-стрелку (коллапс не нужен) */
+.sb-toggle { display: none !important; }
+
+/* 3) Тело страницы не должно быть flex, раз сайдбар фиксированный */
+body { display: block !important; }

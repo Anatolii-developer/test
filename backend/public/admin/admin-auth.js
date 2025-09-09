@@ -138,13 +138,13 @@ window.renderAdminSidebar = function renderAdminSidebar(current) {
 
   // bind: logout
   const btn = host.querySelector('#btnLogout');
-  if (btn) btn.addEventListener('click', logoutUser);
+if (btn) btn.addEventListener('click', logoutUser);
 
-  // bind: collapse toggle (и восстановление состояния)
-  const root = document.body;
-  root.classList.add('with-sidebar');
-  const collapsedSaved = localStorage.getItem('adm.sidebarCollapsed') === '1';
-  root.classList.toggle('sidebar-collapsed', collapsedSaved);
+// всегда открытый сайдбар, без localStorage и переключателя
+const root = document.body;
+root.classList.add('with-sidebar');
+root.classList.remove('sidebar-collapsed'); // на всякий случай, если где-то остался
+
 
   const tgl = host.querySelector('#sbToggle');
   if (tgl) tgl.addEventListener('click', () => {

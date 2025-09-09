@@ -1038,7 +1038,7 @@ function toggleSidebar() {
 }
 
 // === Sidebar hover-to-open + pin state ===
-let sidebarPinned = false;
+let sidebarPinned = true; // always pinned/open
 
 // Try to restore pin state
 try {
@@ -1046,6 +1046,8 @@ try {
 } catch (_) {
   sidebarPinned = false;
 }
+sidebarPinned = true;
+try { localStorage.setItem('sidebarPinned', 'true'); } catch (_) {}
 
 function isTouchDevice(){
   return (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
@@ -1055,71 +1057,52 @@ function applySidebarState() {
   const sidebar = document.getElementById('sidebar');
   const arrow = document.getElementById('toggleArrow');
   if (!sidebar) return;
-
-  if (sidebarPinned) {
-    sidebar.classList.add('expanded');
-    sidebar.classList.remove('collapsed');
-    if (arrow) arrow.style.transform = 'rotate(180deg)';
-  } else {
-    sidebar.classList.remove('expanded');
-    sidebar.classList.add('collapsed');
-    if (arrow) arrow.style.transform = 'rotate(0deg)';
-  }
+  // Force expanded styles
+  sidebar.classList.add('expanded');
+  sidebar.classList.remove('collapsed');
+  if (arrow) arrow.style.transform = 'rotate(180deg)';
 }
 
 function enableSidebarHover() {
   const sidebar = document.getElementById('sidebar');
-  const arrow = document.getElementById('toggleArrow');
   if (!sidebar) return;
-
-  // Apply initial state (respect saved pin)
+  // Force the pinned/open state and apply styles once
+  sidebarPinned = true;
+  try { localStorage.setItem('sidebarPinned', 'true'); } catch (_){}
   applySidebarState();
-
-  // On non-touch devices we expand on hover when NOT pinned
-  if (!isTouchDevice()) {
-    sidebar.addEventListener('mouseenter', () => {
-      if (!sidebarPinned) {
-        sidebar.classList.add('expanded');
-        sidebar.classList.remove('collapsed');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-      }
-    });
-
-    sidebar.addEventListener('mouseleave', () => {
-      if (!sidebarPinned) {
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-      }
-    });
-
-    // Accessibility: keep open while focusing inside with keyboard
-    sidebar.addEventListener('focusin', () => {
-      if (!sidebarPinned) {
-        sidebar.classList.add('expanded');
-        sidebar.classList.remove('collapsed');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-      }
-    });
-    sidebar.addEventListener('focusout', (e) => {
-      // Collapse only if focus moved fully outside
-      if (!sidebarPinned && !sidebar.contains(document.activeElement)) {
-        sidebar.classList.remove('expanded');
-        sidebar.classList.add('collapsed');
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-      }
-    });
-  }
 }
 
 // Rewire the existing toggle to act as a "pin/unpin"
 const _origToggleSidebar = toggleSidebar;
 toggleSidebar = function(){
-  // Invert pin state and persist
-  sidebarPinned = !sidebarPinned;
-  localStorage.setItem('sidebarPinned', JSON.stringify(sidebarPinned));
+  // Keep pinned (no-op to prevent collapsing)
+  sidebarPinned = true;
+  try { localStorage.setItem('sidebarPinned', 'true'); } catch (_){}
   applySidebarState();
 };
+
+// Inject small CSS to prevent "Вийти" label jump and keep buttons stable
+document.addEventListener('DOMContentLoaded', () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Keep action button label on one line and hide smoothly if needed */
+    .sidebar .action-btn { min-height: 40px; }
+    .sidebar .action-btn span { 
+      white-space: nowrap; 
+      overflow: hidden; 
+      display: inline-block; 
+      max-width: 200px; 
+      transition: max-width .2s ease, opacity .2s ease, margin .2s ease;
+    }
+    /* If some pages still use .sidebar-collapsed, hide text without layout jumps */
+    body.sidebar-collapsed .sidebar .action-btn span {
+      max-width: 0;
+      opacity: 0;
+      margin: 0;
+    }
+  `;
+  document.head.appendChild(style);
+});
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', enableSidebarHover);

@@ -1365,3 +1365,56 @@ label[for="courseSelect"] {
 .faq-item.dragging { 
   opacity: .6; cursor: grabbing; 
 }
+
+
+/* Контейнер дій */
+.sidebar-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin:12px 0 18px 0;
+}
+
+/* Базова кнопка-дія (і як <a>, і як <button>) */
+.action-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1.5px solid transparent;
+  background:#FFFFFF;
+  color:#2d2d2d;
+  font-size:16px;
+  font-weight:600;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background-color .2s ease, border-color .2s ease, color .2s ease, transform .05s ease;
+}
+.action-btn img{ flex:0 0 18px; }
+
+/* Налаштування — “текстова” зелена */
+.action-btn.settings{
+  background:#ECF5EB;           /* світло-зелений фон */
+  color:#275D2B;
+  border-color:#275D2B;
+}
+.action-btn.settings:hover{
+  background:#d9ebd7;
+}
+
+/* Вийти — червона варіація */
+.action-btn.logout{
+  background:#FFF1F1;
+  color:#A31D1D;
+  border-color:#A31D1D;
+}
+.action-btn.logout:hover{
+  background:#FFE3E3;
+}
+
+/* Невеличкий тап/клік-ефект */
+.action-btn:active{ transform:scale(0.98); }
+
+/* Щоб посилання в сайдбарі не злипались зі стилями action-btn */
+.sidebar nav a{ padding:8px 6px; }

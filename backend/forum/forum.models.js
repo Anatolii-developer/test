@@ -1,5 +1,7 @@
 // server/forum/forum.models.js
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
+const ObjectId = Schema.Types.ObjectId;
 
 const ForumCategorySchema = new mongoose.Schema({
   title: { type: String, required: true },

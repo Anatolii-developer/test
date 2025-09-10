@@ -166,8 +166,10 @@ function can(action){
 
   (posts || []).forEach(p => {
     const canDel = Forum.can('moderate:posts') || (Forum.currentUser && Forum.currentUser._id === p.author?._id);
-    const liked = !!p.liked;
-    const likes = typeof p.likes === 'number' ? p.likes : 0;
+
+    // начальное состояние
+    const liked = !!(p.liked ?? (Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === String(Forum.currentUser?._id))));
+    const likes = Number.isFinite(p.likes) ? p.likes : 0;
 
     const el = document.createElement('div');
     el.className = 'post';
@@ -175,7 +177,7 @@ function can(action){
       <div class="post-head">
         <div class="meta"><strong>${escapeHtml(p.author?.username || p.author?.email || '-')}</strong> • ${fmtDate(p.createdAt)}</div>
         <div class="actions">
-          <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1':'0'}">
+          <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1' : '0'}">
             👍 <span class="js-like-count">${likes}</span>
           </button>
           ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
@@ -186,43 +188,48 @@ function can(action){
     $root.appendChild(el);
   });
 
-  // поведение лайка: toggle без перезагрузки всей темы
+  // toggle like/unlike без перезагрузки темы
   $root.querySelectorAll('.js-like').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id;
       const countEl = btn.querySelector('.js-like-count');
       const likedNow = btn.dataset.liked === '1';
 
+      // блокируем кнопку только на время запроса, а не навсегда
+      btn.disabled = true;
       try {
         let r;
         if (likedNow) {
-          r = await Forum.api.unlikePost(id); // DELETE
+          // снять лайк
+          r = await Forum.api.unlikePost(id); // DELETE /posts/:id/like
         } else {
-          r = await Forum.api.likePost(id);   // POST
+          // поставить лайк
+          r = await Forum.api.likePost(id);   // POST /posts/:id/like
         }
-        // обновляем UI по ответу сервера
+
+        // Синхронизируем UI строго по ответу сервера
         if (r && typeof r.likes === 'number') {
-          countEl.textContent = r.likes;
+          countEl.textContent = String(r.likes);
         } else {
-          // fallback на клиентский подсчет
+          // fallback — осторожный клиентский пересчёт
           const cur = parseInt(countEl.textContent || '0', 10);
           countEl.textContent = String(likedNow ? Math.max(0, cur - 1) : cur + 1);
         }
         btn.dataset.liked = r?.liked ? '1' : '0';
       } catch (e) {
-        // если сервер вернул 409 Already liked / Not liked, просто синхронизируемся
-        // можно дернуть легкий GET /api/forum/posts/:id (если есть), но обычно не нужно
         console.warn('like toggle error', e);
+        // опционально можно показать alert с e.message
+      } finally {
+        btn.disabled = false;
       }
     });
   });
 
-  // удаление — как было
+  // удаление поста
   $root.querySelectorAll('.js-del').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('Видалити повідомлення?')) return;
       await Forum.api.deletePost(btn.dataset.id);
-      // локально удалим DOM-элемент без полного перерендеринга
       btn.closest('.post')?.remove();
     });
   });

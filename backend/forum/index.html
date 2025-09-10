@@ -1,80 +1,168 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Форум</title>
-  <link rel="stylesheet" href="../admin-styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    body.with-sidebar .wrap { margin-left: 250px; }
-    .wrap { width: 890px; margin: 32px auto; background:#fff; border-radius:24px; padding: 40px 60px; }
-    .forum-header { display:flex; justify-content: space-between; align-items:center; gap:12px; }
-    .forum-title { font-size:24px; font-weight:600; }
-    .btn { border:none; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:600; }
-    .btn-primary { background:#275D2B; color:#fff; }
-    .btn-ghost { background:#F3F4F6; }
-    .thread-list { margin-top:18px; display:flex; flex-direction:column; gap:12px; }
-    .thread-item { border:1px solid #E37009; border-radius:12px; padding:14px 16px; background:#FFFDF7; display:flex; justify-content:space-between; gap:12px; }
-    .thread-meta { color:#777; font-size:12px; }
-    .tag { display:inline-block; background:#ECF5EB; color:#275D2B; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px; }
-    .toolbar { display:flex; gap:8px; align-items:center; }
-    .search { display:flex; gap:8px; align-items:center; }
-    .search input { padding:10px 12px; border:1px solid #ddd; border-radius:10px; width:260px; }
-    @media (max-width:1180px){ body.with-sidebar .wrap{margin-left:0;} .wrap{width:90%; padding:30px;} }
-  </style>
-</head>
-<body class="with-sidebar">
-  <aside class="sidebar" id="sidebar"></aside>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Форум</title>
+   <link rel="stylesheet" href="./forum.css">
 
-  <main class="wrap">
-    <div class="forum-header">
-      <div>
-        <div class="forum-title">Форум</div>
-        <div id="roleHint" class="thread-meta"></div>
-      </div>
-      <div class="toolbar">
-        <div class="search">
-          <input id="q" type="text" placeholder="Пошук тем..." />
-          <button class="btn btn-ghost" id="btnSearch">Шукати</button>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body.with-sidebar .wrap {
+        margin-left: 250px;
+      }
+      .wrap {
+        width: 890px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px 60px;
+      }
+      .forum-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .forum-title {
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background: #275d2b;
+        color: #fff;
+      }
+      .btn-ghost {
+        background: #f3f4f6;
+      }
+      .thread-list {
+        margin-top: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .thread-item {
+        border: 1px solid #e37009;
+        border-radius: 12px;
+        padding: 14px 16px;
+        background: #fffdf7;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .thread-meta {
+        color: #777;
+        font-size: 12px;
+      }
+      .tag {
+        display: inline-block;
+        background: #ecf5eb;
+        color: #275d2b;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        margin-left: 6px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .search {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .search input {
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        width: 260px;
+      }
+      @media (max-width: 1180px) {
+        body.with-sidebar .wrap {
+          margin-left: 0;
+        }
+        .wrap {
+          width: 90%;
+          padding: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body class="with-sidebar">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="wrap">
+      <div class="forum-header">
+        <div>
+          <div class="forum-title">Форум</div>
+          <div id="roleHint" class="thread-meta"></div>
         </div>
-        <button class="btn btn-primary" id="btnNewThread">Нова тема</button>
+        <div class="toolbar">
+          <div class="search">
+            <input id="q" type="text" placeholder="Пошук тем..." />
+            <button class="btn btn-ghost" id="btnSearch">Шукати</button>
+          </div>
+          <button class="btn btn-primary" id="btnNewThread">Нова тема</button>
+        </div>
       </div>
-    </div>
 
-    <div id="empty" class="thread-meta" style="display:none;margin-top:12px;">Поки що немає тем.</div>
-    <div id="list" class="thread-list"></div>
-  </main>
+      <div
+        id="empty"
+        class="thread-meta"
+        style="display: none; margin-top: 12px"
+      >
+        Поки що немає тем.
+      </div>
+      <div id="list" class="thread-list"></div>
+    </main>
 
-  <script src="../admin-auth.js"></script>
-  <script src="./forum.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (typeof renderAdminSidebar === 'function') renderAdminSidebar('forum/index.html');
-      await Forum.init();            // загрузка профиля, ролей, сайдбара
-      Forum.renderRoleHint('#roleHint');
+    <script src="../admin-auth.js"></script>
+    <script src="./forum.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        if (typeof renderAdminSidebar === "function")
+          renderAdminSidebar("forum/index.html");
+        await Forum.init(); // загрузка профиля, ролей, сайдбара
+        Forum.renderRoleHint("#roleHint");
 
-      // список тем
-      const load = async () => {
-        const q = document.getElementById('q').value.trim();
-        const data = await Forum.api.listThreads({ q });
-        Forum.renderThreadList('#list', data, '#empty');
-      };
-      document.getElementById('btnSearch').addEventListener('click', load);
-      document.getElementById('q').addEventListener('keydown', e=>{ if(e.key==='Enter') load(); });
+        // список тем
+        const load = async () => {
+          const q = document.getElementById("q").value.trim();
+          const data = await Forum.api.listThreads({ q });
+          Forum.renderThreadList("#list", data, "#empty");
+        };
+        document.getElementById("btnSearch").addEventListener("click", load);
+        document.getElementById("q").addEventListener("keydown", (e) => {
+          if (e.key === "Enter") load();
+        });
 
-      // создать тему
-      document.getElementById('btnNewThread').addEventListener('click', async () => {
-        const title = prompt('Заголовок теми:');
-        if (!title) return;
-        const content = prompt('Перший пост:');
-        if (!content) return;
-        const t = await Forum.api.createThread({ title, content });
-        if (t && t._id) location.href = `./thread.html?id=${t._id}`;
+        // создать тему
+        document
+          .getElementById("btnNewThread")
+          .addEventListener("click", async () => {
+            const title = prompt("Заголовок теми:");
+            if (!title) return;
+            const content = prompt("Перший пост:");
+            if (!content) return;
+            const t = await Forum.api.createThread({ title, content });
+            if (t && t._id) location.href = `./thread.html?id=${t._id}`;
+          });
+
+        await load();
       });
-
-      await load();
-    });
-  </script>
-</body>
+    </script>
+    
+  </body>
 </html>

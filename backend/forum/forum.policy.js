@@ -1,10 +1,11 @@
 // backend/forum/forum.policy.js
 const Role = require('../models/Role');
 
+
 const PERMISSIONS_BY_ROLE = {
   admin:      ['forum:*'],
   mentor:     ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own','forum:moderate'],
-  supervisor: ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own'],
+  supervisor: ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own','forum:moderate'], 
   user:       ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own'],
 };
 

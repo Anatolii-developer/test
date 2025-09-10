@@ -85,17 +85,27 @@ window.Forum = (function () {
   }
 
   // простые проверки прав (можно расширять)
-  function can(action) {
-    if (roleSet.has('admin')) return true;
+function can(action){
+  // Адмін — усе дозволено
+  if (roleSet.has('admin')) return true;
 
-    if (action === 'moderate:threads' || action === 'moderate:posts') {
-      return roleSet.has('moderator') || roleSet.has('модератор');
-    }
-    if (action === 'post:create') {
-      return !!currentUser;
-    }
+  // Ролі, що модеру́ють
+  const modRoles = new Set([
+    'moderator','модератор',
+    'mentor','ментор',
+    'supervisor','супервізор'
+  ]);
+
+  if (action === 'moderate:threads' || action === 'moderate:posts') {
+    // якщо є хоч одна з мод-ролей — можна
+    for (const r of modRoles) if (roleSet.has(r)) return true;
     return false;
   }
+
+  if (action === 'post:create') return !!currentUser; // будь-який залогінений
+
+  return false;
+}
 
   // ---- API ----
   const api = {

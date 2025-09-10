@@ -26,6 +26,28 @@ r.post('/categories', ensureAuth, async (req, res) => {
   res.json(cat);
 });
 
+// backend/forum/forum.routes.js
+const path = require('path');
+const { upload } = require('./upload.middleware');
+
+// отдать статику уже настроено сервером (см. ниже)
+r.post('/uploads', ensureAuth, upload.array('files', 10), async (req, res) => {
+  const atts = req.files.map(f => {
+    const ext = path.extname(f.filename).toLowerCase();
+    const kind = f.mimetype.startsWith('image/')
+      ? 'image'
+      : (f.mimetype.startsWith('video/') ? 'video' : 'file');
+    return {
+      kind,
+      url: `/uploads/${f.filename}`,
+      name: f.originalname,
+      mime: f.mimetype,
+      size: f.size
+    };
+  });
+  res.json({ ok: true, attachments: atts });
+});
+
 // темы категории
 r.get('/categories/:id/topics', ensureAuth, async (req, res) => {
   const cat = await ForumCategory.findById(req.params.id).lean();

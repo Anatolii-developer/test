@@ -73,6 +73,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
+  maxAge: '7d',
+  setHeaders: (res) => res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+}));
+
 app.listen(5050, '0.0.0.0', () => {
   console.log('🚀 Server listening on http://0.0.0.0:5050');
 });

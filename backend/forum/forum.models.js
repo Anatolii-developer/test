@@ -30,9 +30,8 @@ const ForumPostSchema = new mongoose.Schema({
   content:  { type: String, required: true, maxlength: 10000 },
   attachments: [{ url: String, name: String, type: String, size: Number }],
 
-  // счётчик можно оставить, но надёжнее считать по likedBy.length
-  likes: { type: Number, default: 0 },
-  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // 👈
+ likes:    { type: Number,  default: 0 },           
+  likedBy:  [{ type: ObjectId, ref: 'User', index: true }],
 
   editedAt: Date,
   editedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

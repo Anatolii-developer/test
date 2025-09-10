@@ -27,6 +27,8 @@ window.Forum = (function () {
     }
   }
 
+  
+
   async function fetchJSON(input, { headers, ...opts } = {}) {
     const token = getAuthToken();
     const baseHeaders = {
@@ -60,6 +62,7 @@ window.Forum = (function () {
     } catch (_) { return null; }
   }
 
+  
   function normalizeRoles(user) {
     const bag = new Set();
     if (!user) return bag;
@@ -146,6 +149,9 @@ function can(action){
     async deleteThread(threadId) {
       return fetchJSON(`/api/forum/threads/${threadId}`, { method: 'DELETE' });
     },
+    async unlikePost(postId) {
+  return fetchJSON(`/api/forum/posts/${postId}/like`, { method: 'DELETE' });
+},
   };
 
   // ---- Рендеры ----
@@ -153,6 +159,74 @@ function can(action){
   function short(s, n) { s = String(s || ''); return s.length <= n ? s : s.slice(0, n - 1) + '…'; }
   function fmtDate(d) { try { return new Date(d).toLocaleString('uk-UA'); } catch (_) { return ''; } }
 
+  function renderPosts(sel, posts) {
+  const $root = document.querySelector(sel);
+  if (!$root) return;
+  $root.innerHTML = '';
+
+  (posts || []).forEach(p => {
+    const canDel = Forum.can('moderate:posts') || (Forum.currentUser && Forum.currentUser._id === p.author?._id);
+    const liked = !!p.liked;
+    const likes = typeof p.likes === 'number' ? p.likes : 0;
+
+    const el = document.createElement('div');
+    el.className = 'post';
+    el.innerHTML = `
+      <div class="post-head">
+        <div class="meta"><strong>${escapeHtml(p.author?.username || p.author?.email || '-')}</strong> • ${fmtDate(p.createdAt)}</div>
+        <div class="actions">
+          <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1':'0'}">
+            👍 <span class="js-like-count">${likes}</span>
+          </button>
+          ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
+        </div>
+      </div>
+      <div style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(p.content || '')}</div>
+    `;
+    $root.appendChild(el);
+  });
+
+  // поведение лайка: toggle без перезагрузки всей темы
+  $root.querySelectorAll('.js-like').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const countEl = btn.querySelector('.js-like-count');
+      const likedNow = btn.dataset.liked === '1';
+
+      try {
+        let r;
+        if (likedNow) {
+          r = await Forum.api.unlikePost(id); // DELETE
+        } else {
+          r = await Forum.api.likePost(id);   // POST
+        }
+        // обновляем UI по ответу сервера
+        if (r && typeof r.likes === 'number') {
+          countEl.textContent = r.likes;
+        } else {
+          // fallback на клиентский подсчет
+          const cur = parseInt(countEl.textContent || '0', 10);
+          countEl.textContent = String(likedNow ? Math.max(0, cur - 1) : cur + 1);
+        }
+        btn.dataset.liked = r?.liked ? '1' : '0';
+      } catch (e) {
+        // если сервер вернул 409 Already liked / Not liked, просто синхронизируемся
+        // можно дернуть легкий GET /api/forum/posts/:id (если есть), но обычно не нужно
+        console.warn('like toggle error', e);
+      }
+    });
+  });
+
+  // удаление — как было
+  $root.querySelectorAll('.js-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Видалити повідомлення?')) return;
+      await Forum.api.deletePost(btn.dataset.id);
+      // локально удалим DOM-элемент без полного перерендеринга
+      btn.closest('.post')?.remove();
+    });
+  });
+}
   function renderRoleHint(sel) {
     const el = document.querySelector(sel);
     if (!el) return;

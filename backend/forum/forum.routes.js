@@ -159,10 +159,9 @@ r.get('/threads', ensureAuth, async (req, res) => {
   })));
 });
 
-// GET /api/forum/threads/:id
 r.get('/threads/:id', ensureAuth, async (req, res) => {
   const t = await ForumTopic.findById(req.params.id)
-    .populate('authorId', 'username email firstName lastName')   // ⇦
+    .populate('authorId', 'username email firstName lastName')
     .lean();
   if (!t) return res.status(404).json({ message: 'Thread not found' });
 
@@ -171,19 +170,22 @@ r.get('/threads/:id', ensureAuth, async (req, res) => {
 
   const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
     .sort({ createdAt: 1 })
-    .populate('authorId', 'username email firstName lastName')   // ⇦
+    .populate('authorId', 'username email firstName lastName')
+    .select('content authorId createdAt likes likedBy')       // 👈 важно
     .lean();
 
-  const thread = {
+  const uid = String(req.user._id);
+
+  const thread = t.authorId ? {
     ...t,
-    author: t.authorId ? {
+    author: {
       _id: t.authorId._id,
       username: t.authorId.username,
       email: t.authorId.email,
       firstName: t.authorId.firstName,
       lastName: t.authorId.lastName,
-    } : null
-  };
+    }
+  } : t;
 
   const mappedPosts = posts.map(p => ({
     ...p,
@@ -193,7 +195,8 @@ r.get('/threads/:id', ensureAuth, async (req, res) => {
       email: p.authorId.email,
       firstName: p.authorId.firstName,
       lastName: p.authorId.lastName,
-    } : null
+    } : null,
+    liked: Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === uid), // 👈 флаг для фронта
   }));
 
   res.json({ thread, posts: mappedPosts });
@@ -263,10 +266,10 @@ r.post('/posts/:id/like', ensureAuth, async (req, res) => {
   if (upd.matchedCount === 0) {
     return res.status(404).json({ message: 'Post not found' });
   }
-  if (upd.modifiedCount === 0) {
-    // пользователь уже лайкнул раньше
-    return res.status(409).json({ ok: false, message: 'Already liked' });
-  }
+if (upd.modifiedCount === 0) {
+  const cur = await ForumPost.findById(req.params.id).select('likes likedBy').lean();
+  return res.json({ ok: true, likes: cur?.likes ?? (cur?.likedBy?.length || 0), liked: true });
+}
 
   // если реально добавили — можно либо инкрементить поле likes,
   // либо посчитать по длине массива

@@ -129,14 +129,17 @@
       <div id="posts" style="margin-top: 16px"></div>
 
       <div id="composer" class="composer">
-        <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
-        <div style="display: flex; gap: 8px; align-items: center">
-          <button class="btn btn-primary" id="btnReply">Відповісти</button>
-          <span class="meta" id="lockHint" style="display: none"
-            >Тема закрита для нових відповідей</span
-          >
-        </div>
-      </div>
+  <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
+
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+    <input id="replyFiles" type="file" multiple />
+    <button class="btn btn-primary" id="btnReply">Надіслати</button>
+    <span class="meta" id="lockHint" style="display:none">Тема закрита для нових відповідей</span>
+  </div>
+
+  <!-- превью выбранных файлов -->
+  <div id="preview" class="attachments-preview"></div>
+</div>
     </main>
 
     <script src="./forum.js"></script>
@@ -147,6 +150,64 @@
         await Forum.init();
 
         const id = new URLSearchParams(location.search).get("id");
+        const $files = document.getElementById("replyFiles");
+        const $preview = document.getElementById("preview");
+        const $text = document.getElementById("replyText");
+        $files.addEventListener("change", () => {
+  $preview.innerHTML = "";
+  [...$files.files].forEach(f => {
+    if (f.type.startsWith("image/")) {
+      const url = URL.createObjectURL(f);
+      const img = document.createElement("img");
+      img.src = url;
+      img.onload = () => URL.revokeObjectURL(url);
+      $preview.appendChild(img);
+    } else {
+      const div = document.createElement("div");
+      div.className = "meta";
+      div.textContent = `Файл: ${f.name} (${Math.round(f.size/1024)} KB)`;
+      $preview.appendChild(div);
+    }
+  });
+});
+
+// отправка поста с файлами
+document.getElementById("btnReply").addEventListener("click", async () => {
+  const content = $text.value.trim();
+  const hasFiles = $files.files && $files.files.length > 0;
+
+  if (!content && !hasFiles) return;
+
+  try {
+    if (hasFiles) {
+      const form = new FormData();
+      form.append("content", content);
+      [...$files.files].forEach(f => form.append("files", f));
+
+      const res = await fetch(`/api/forum/threads/${id}/posts-with-files`, {
+        method: "POST",
+        body: form,
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Помилка");
+    } else {
+      // старый путь без файлов
+      await Forum.api.addPost(id, { content });
+    }
+
+    // очистка и перерисовка
+    $text.value = "";
+    $files.value = "";
+    $preview.innerHTML = "";
+
+    const data = await Forum.api.getThread(id);
+    Forum.renderPosts("#posts", data.posts, { thread: data.thread });
+  } catch (e) {
+    alert(e.message || e);
+  }
+});
+
         if (!id) return (location.href = "./index.html");
 
         const { thread, posts } = await Forum.api.getThread(id);
@@ -187,6 +248,8 @@
             location.href = "./index.html";
           };
         }
+
+        
       });
     </script>
   </body>

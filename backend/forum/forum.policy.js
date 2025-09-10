@@ -1,116 +1,84 @@
-// server/forum/forum.policy.js
-const Role = require('../models/Role'); // твой Role.js
-// Если у User роли как ссылки:
-///   user.roles: [ObjectId<Role>]  ИЛИ как строки:
-///   user.roles: ['admin', 'mentor']  (на всякий)
+// backend/forum/forum.policy.js
+const Role = require('../models/Role');
 
 const PERMISSIONS_BY_ROLE = {
-  // имена ролей -> список прав
-  admin: [
-    'forum:*', // суперправа
-  ],
-  mentor: [
-    'forum:read', 'forum:create', 'forum:reply',
-    'forum:edit_own', 'forum:delete_own',
-    'forum:moderate', // закрыть/открыть, закрепить, удалить чужие
-  ],
-  supervisor: [
-    'forum:read', 'forum:create', 'forum:reply',
-    'forum:edit_own', 'forum:delete_own',
-    // без глобальной модерации (при желании добавь)
-  ],
-  user: [
-    'forum:read', 'forum:create', 'forum:reply',
-    'forum:edit_own', 'forum:delete_own',
-  ],
+  admin:      ['forum:*'],
+  mentor:     ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own','forum:moderate'],
+  supervisor: ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own'],
+  user:       ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own'],
 };
 
-function norm(s=''){ return String(s).trim().toLowerCase(); }
+const norm = (s='') => String(s).trim().toLowerCase();
+
+// маппинг локализованных/сложных названий к базовым
+function toBaseRole(name='') {
+  const n = norm(name);
+  if (n.includes('admin') || n.includes('адмін') || n.includes('администратор')) return 'admin';
+  if (n.includes('ментор')) return 'mentor';
+  if (n.includes('супервізор') || n.includes('супервизор')) return 'supervisor';
+  // любые “психолог/спеціаліст/psy-*” отправим в базовую "user"
+  if (n.includes('psy') || n.includes('псих') || n.includes('спеціаліст') || n.includes('специалист')) return 'user';
+  // если явно одна из базовых — вернём как есть
+  if (['admin','mentor','supervisor','user'].includes(n)) return n;
+  return 'user'; // дефолт
+}
 
 async function getUserRoleNames(user) {
-  if (!user) return [];
-  // разные формы хранения ролей
-  let roleNames = [];
-  if (Array.isArray(user.roles) && user.roles.length) {
-    // могут быть ObjectId (Role) или строки
-    const objectIds = user.roles.filter(r => (r && typeof r==='object' && r._id) || String(r).match(/^[a-f0-9]{24}$/i));
-    const stringNames = user.roles.filter(r => typeof r === 'string');
+  if (!user) return ['user'];
 
-    if (objectIds.length) {
-      const roles = await Role.find({ _id: { $in: objectIds }, active: true }).lean();
-      roleNames.push(...roles.map(r => norm(r.name)));
+  let names = [];
+
+  if (Array.isArray(user.roles) && user.roles.length) {
+    // если в user.roles лежат ObjectId/объекты — подтянем роли из БД
+    const ids = user.roles
+      .map(r => (typeof r === 'object' && r?._id) ? r._id : r)
+      .filter(v => String(v).match(/^[a-f0-9]{24}$/i));
+    if (ids.length) {
+      const docs = await Role.find({ _id: { $in: ids }, active: true }).lean();
+      names.push(...docs.map(r => toBaseRole(r.name)));
     }
-    if (stringNames.length) {
-      roleNames.push(...stringNames.map(norm));
-    }
+    // плюс возможные строковые названия
+    names.push(...user.roles
+      .filter(r => typeof r === 'string')
+      .map(s => toBaseRole(s)));
   } else if (user.role) {
-    // одиночная роль (строка или объект)
-    if (typeof user.role === 'string') roleNames.push(norm(user.role));
-    else if (user.role && user.role.name) roleNames.push(norm(user.role.name));
+    names.push(toBaseRole(typeof user.role === 'string' ? user.role : user.role.name));
   }
-  // дефолт — обычный пользователь
-  if (!roleNames.length) roleNames = ['user'];
-  return [...new Set(roleNames)];
+
+  if (!names.length) names = ['user'];
+  return [...new Set(names)];
 }
 
 async function getPermissions(user) {
-  const names = await getUserRoleNames(user);
+  const roleNames = await getUserRoleNames(user);
   const set = new Set();
-  for (const roleName of names) {
-    const list = PERMISSIONS_BY_ROLE[roleName] || [];
-    list.forEach(p => set.add(p));
+  for (const base of roleNames) {
+    (PERMISSIONS_BY_ROLE[base] || []).forEach(p => set.add(p));
   }
-  // если есть forum:* — даём все
-  if (set.has('forum:*')) return new Proxy({}, { get:()=>true });
-
-  // удобный предикат
-  const has = (perm) => set.has(perm);
-  return { has };
+  if (set.has('forum:*')) return new Proxy({}, { get: () => true });
+  return { has: p => set.has(p) };
 }
 
-// sugar:
 async function can(user, perm) {
   const perms = await getPermissions(user);
-  if (perms.has === true) return true;        // wildcard
-  return typeof perms.has === 'function' ? perms.has(perm) : !!perms[perm];
+  if (perms.has === true) return true;
+  return perms.has(perm);
 }
-async function canModerate(user) {
-  return (await can(user, 'forum:moderate')) || (await can(user, 'forum:*'));
-}
-async function canRead(user) {
-  return (await can(user, 'forum:read')) || (await can(user, 'forum:*'));
-}
-async function canCreateTopic(user) {
-  return (await can(user, 'forum:create')) || (await can(user, 'forum:*'));
-}
-async function canReply(user) {
-  return (await can(user, 'forum:reply')) || (await can(user, 'forum:*'));
-}
-function isOwn(user, doc) {
-  return user && doc && String(doc.authorId) === String(user._id);
-}
+async function canModerate(user)   { return (await can(user,'forum:moderate')) || (await can(user,'forum:*')); }
+async function canRead(user)       { return (await can(user,'forum:read'))      || (await can(user,'forum:*')); }
+async function canCreateTopic(user){ return (await can(user,'forum:create'))    || (await can(user,'forum:*')); }
+async function canReply(user)      { return (await can(user,'forum:reply'))     || (await can(user,'forum:*')); }
 
-async function canEditPost(user, post) {
-  if (!user) return false;
-  if (await canModerate(user)) return true;
-  if (isOwn(user, post) && await can(user, 'forum:edit_own')) return true;
-  return false;
-}
-async function canDeletePost(user, post) {
-  if (!user) return false;
-  if (await canModerate(user)) return true;
-  if (isOwn(user, post) && await can(user, 'forum:delete_own')) return true;
-  return false;
-}
+function isOwn(user, doc) { return user && doc && String(doc.authorId) === String(user._id); }
+async function canEditPost(user, post)   { return (await canModerate(user)) || (isOwn(user,post) && await can(user,'forum:edit_own')); }
+async function canDeletePost(user, post) { return (await canModerate(user)) || (isOwn(user,post) && await can(user,'forum:delete_own')); }
 
-// Ограничение видимости категорий по ролям:
 async function canSeeCategory(user, category) {
-  if (!category?.allowedRoles?.length) return !!user; // если список пуст — любой авторизованный
-  const userRoleNames = await getUserRoleNames(user);
-  // найдём активные Role по category.allowedRoles и сравним с именами
+  if (!category?.allowedRoles?.length) return !!user;
+  const userRoles = await getUserRoleNames(user);
   const roles = await Role.find({ _id: { $in: category.allowedRoles }, active: true }).lean();
-  const allowedNames = roles.map(r => norm(r.name));
-  return userRoleNames.some(n => allowedNames.includes(n));
+  const allowed = roles.map(r => toBaseRole(r.name));
+  return userRoles.some(n => allowed.includes(n));
 }
 
 module.exports = {

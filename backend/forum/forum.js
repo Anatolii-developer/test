@@ -1,159 +1,211 @@
-const express = require('express');
-const r = express.Router();
-const { ForumCategory, ForumTopic, ForumPost } = require('./forum.models');
-const { ensureAuth } = require('../auth/middleware');
-const { canSeeCategory, canCreateTopic, canReply, canModerate } = require('./forum.permissions');
+// Универсальный фронтовый модуль форума
+// Предполагает, что бэк смонтирован как app.use('/api/forum', forumRoutes)
 
-async function getOrCreateDefaultCategory() {
-  let cat = await ForumCategory.findOne({ slug: 'general' });
-  if (!cat) {
-    cat = await ForumCategory.create({
-      title: 'General',
-      slug: 'general',
-      order: 0,
-      description: 'Default discussion category'
+window.Forum = (function(){
+  const API_BASE = ''; // тот же домен
+  let currentUser = null;
+  let roleSet = new Set();
+
+  function readUser(){
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || 'null');
+      return u || null;
+    } catch(_) { return null; }
+  }
+
+  function normalizeRoles(user){
+    const bag = new Set();
+    if (!user) return bag;
+    if (Array.isArray(user.roles)) {
+      for (const r of user.roles) {
+        if (!r) continue;
+        if (typeof r === 'string') bag.add(r.toLowerCase());
+        else if (typeof r === 'object' && r.name) bag.add(String(r.name).toLowerCase());
+      }
+    }
+    if (user.role) {
+      if (typeof user.role === 'string') bag.add(user.role.toLowerCase());
+      else if (user.role.name) bag.add(String(user.role.name).toLowerCase());
+    }
+    return bag;
+  }
+
+  async function init(){
+    // рендерим общий сайдбар (если есть глобал)
+    currentUser = readUser();
+    roleSet = normalizeRoles(currentUser);
+    // на всякий случай потянем /api/users/profile для валидации куки
+    try { await fetch(`${API_BASE}/api/users/profile`, {credentials:'include'}); } catch(_){}
+  }
+
+  // простые проверки прав (можно расширять)
+  function can(action){
+    // базовые:
+    if (roleSet.has('admin')) return true;
+
+    if (action === 'moderate:threads' || action === 'moderate:posts') {
+      return roleSet.has('moderator') || roleSet.has('модератор');
+    }
+    if (action === 'post:create') {
+      return !!currentUser; // любой залогиненый
+    }
+    return false;
+  }
+
+  // API
+  const api = {
+    async listThreads({ q } = {}){
+      const url = new URL('/api/forum/threads', location.origin);
+      if (q) url.searchParams.set('q', q);
+      const r = await fetch(url, { credentials:'include' });
+      if (!r.ok) return [];
+      return r.json();
+    },
+    async createThread({ title, content }){
+      const r = await fetch('/api/forum/threads', {
+        method:'POST', credentials:'include',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ title, content })
+      });
+      return r.json();
+    },
+    async getThread(id){
+      const r = await fetch(`/api/forum/threads/${id}`, { credentials:'include' });
+      if (!r.ok) throw new Error('Not found');
+      return r.json(); // { thread, posts }
+    },
+    async addPost(threadId, { content }){
+      const r = await fetch(`/api/forum/threads/${threadId}/posts`, {
+        method:'POST', credentials:'include',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ content })
+      });
+      return r.json();
+    },
+    async likePost(postId){
+      const r = await fetch(`/api/forum/posts/${postId}/like`, {
+        method:'POST', credentials:'include'
+      });
+      return r.json();
+    },
+    async deletePost(postId){
+      const r = await fetch(`/api/forum/posts/${postId}`, {
+        method:'DELETE', credentials:'include'
+      });
+      return r.json();
+    },
+    async togglePin(threadId){
+      const r = await fetch(`/api/forum/threads/${threadId}/pin`, {
+        method:'POST', credentials:'include'
+      });
+      return r.json();
+    },
+    async toggleLock(threadId){
+      const r = await fetch(`/api/forum/threads/${threadId}/lock`, {
+        method:'POST', credentials:'include'
+      });
+      return r.json();
+    },
+    async deleteThread(threadId){
+      const r = await fetch(`/api/forum/threads/${threadId}`, {
+        method:'DELETE', credentials:'include'
+      });
+      return r.json();
+    },
+  };
+
+  // Рендеры
+  function escapeHtml(s=''){ return s.replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+  function short(s, n){ s = String(s||''); return s.length<=n ? s : s.slice(0,n-1)+'…'; }
+  function fmtDate(d){ try{ return new Date(d).toLocaleString('uk-UA'); } catch(_){ return ''; } }
+
+  function renderRoleHint(sel){
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const roles = Array.from(roleSet);
+    el.textContent = currentUser ? `Ви увійшли як ${currentUser.username || currentUser.email || 'user'} (${roles.join(', ') || 'без ролі'})` : 'Ви не авторизовані';
+  }
+
+  function renderThreadList(sel, items, emptySel){
+    const $list = document.querySelector(sel);
+    const $empty = document.querySelector(emptySel);
+    if (!$list) return;
+    $list.innerHTML = '';
+    if (!items || !items.length){
+      if ($empty) $empty.style.display = 'block';
+      return;
+    }
+    if ($empty) $empty.style.display = 'none';
+
+    items.forEach(t=>{
+      const a = document.createElement('a');
+      a.href = `./thread.html?id=${t._id}`;
+      a.className = 'thread-item';
+      a.innerHTML = `
+        <div>
+          <div style="font-weight:600">${escapeHtml(t.title)}
+            ${t.pinned ? '<span class="tag">📌 Закріплено</span>' : ''}
+            ${t.locked ? '<span class="tag">🔒 Закрито</span>' : ''}
+          </div>
+          <div class="thread-meta">Створив: ${escapeHtml(t.author?.username || t.author?.email || '-')}, ${fmtDate(t.createdAt)} • Відповідей: ${t.postsCount||0}</div>
+        </div>
+        <div class="thread-meta">${short(escapeHtml(t.preview || t.lastPostPreview || ''), 64)}</div>
+      `;
+      $list.appendChild(a);
     });
   }
-  return cat;
-}
 
-// ===== Compatibility routes for "threads"-based frontend =====
-// List all threads the user can see (across categories)
-r.get('/api/forum/threads', ensureAuth, async (req, res) => {
-  const q = (req.query.q || '').trim().toLowerCase();
-  const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
-  const allowedCatIds = [];
-  for (const c of cats) {
-    if (await canSeeCategory(req.user, c)) allowedCatIds.push(c._id);
+  function renderThreadHead(thread, selTitle, selMeta, selActions){
+    const $t = document.querySelector(selTitle);
+    const $m = document.querySelector(selMeta);
+    if ($t) $t.textContent = thread.title;
+    if ($m) $m.textContent = `Створив: ${thread.author?.username || thread.author?.email || '-'} • ${fmtDate(thread.createdAt)} ${thread.pinned?'• 📌 Закріплено':''} ${thread.locked?'• 🔒 Закрито':''}`;
+    if (selActions && can('moderate:threads')){
+      const $a = document.querySelector(selActions);
+      if ($a) $a.style.display = 'flex';
+    }
   }
-  if (!allowedCatIds.length) return res.json([]);
 
-  const filter = { categoryId: { $in: allowedCatIds } };
-  if (q) filter.title = { $regex: q, $options: 'i' };
-
-  const threads = await ForumTopic.find(filter)
-    .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
-    .limit(200)
-    .lean();
-
-  res.json(threads.map(t => ({
-    _id: t._id,
-    title: t.title,
-    createdAt: t.createdAt,
-    updatedAt: t.updatedAt,
-    lastPostAt: t.lastPostAt,
-    postsCount: t.postsCount || 0,
-    pinned: !!t.pinned,
-    locked: !!t.locked,
-    author: t.authorId ? { _id: t.authorId } : null,
-    preview: t.preview || ''
-  })));
-});
-
-// Create a thread in default category
-r.post('/api/forum/threads', ensureAuth, async (req, res) => {
-  if (!await canCreateTopic(req.user)) return res.status(403).json({ message: 'Forbidden' });
-  const cat = await getOrCreateDefaultCategory();
-  if (!await canSeeCategory(req.user, cat)) return res.status(403).json({ message: 'Forbidden' });
-
-  const title = String(req.body.title || '').trim();
-  const content = String(req.body.content || '').trim();
-  if (!title) return res.status(400).json({ message: 'Title is required' });
-
-  const topic = await ForumTopic.create({
-    categoryId: cat._id,
-    title,
-    authorId: req.user._id,
-    postsCount: 0,
-    lastPostAt: new Date()
-  });
-
-  if (content) {
-    await ForumPost.create({
-      topicId: topic._id,
-      authorId: req.user._id,
-      content
+  function renderPosts(sel, posts, { thread } = {}){
+    const $root = document.querySelector(sel);
+    if (!$root) return;
+    $root.innerHTML = '';
+    (posts||[]).forEach(p=>{
+      const canDel = can('moderate:posts') || (currentUser && currentUser._id === p.author?._id);
+      const el = document.createElement('div');
+      el.className = 'post';
+      el.innerHTML = `
+        <div class="post-head">
+          <div class="meta"><strong>${escapeHtml(p.author?.username || p.author?.email || '-')}</strong> • ${fmtDate(p.createdAt)}</div>
+          <div class="actions">
+            <button class="btn btn-ghost js-like" data-id="${p._id}">👍 ${p.likes||0}</button>
+            ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
+          </div>
+        </div>
+        <div style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(p.content||'')}</div>
+      `;
+      $root.appendChild(el);
     });
-    await ForumTopic.findByIdAndUpdate(topic._id, { $inc: { postsCount: 1 }, lastPostAt: new Date() });
+
+    $root.querySelectorAll('.js-like').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        await api.likePost(btn.dataset.id);
+        // обновим счётчик без полной перезагрузки
+        const id = new URLSearchParams(location.search).get('id');
+        const data = await api.getThread(id);
+        renderPosts(sel, data.posts, { thread: data.thread });
+      });
+    });
+    $root.querySelectorAll('.js-del').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if (!confirm('Видалити повідомлення?')) return;
+        await api.deletePost(btn.dataset.id);
+        const id = new URLSearchParams(location.search).get('id');
+        const data = await api.getThread(id);
+        renderPosts(sel, data.posts, { thread: data.thread });
+      });
+    });
   }
 
-  res.json(topic);
-});
-
-// Get single thread with posts
-r.get('/api/forum/threads/:id', ensureAuth, async (req, res) => {
-  const thread = await ForumTopic.findById(req.params.id).lean();
-  if (!thread) return res.status(404).json({ message: 'Thread not found' });
-
-  const cat = await ForumCategory.findById(thread.categoryId).lean();
-  if (!cat || !await canSeeCategory(req.user, cat)) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
-
-  const posts = await ForumPost.find({ topicId: thread._id, deleted: { $ne: true } })
-    .sort({ createdAt: 1 })
-    .lean();
-
-  res.json({ thread, posts });
-});
-
-// Add post to thread (alias)
-r.post('/api/forum/threads/:id/posts', ensureAuth, async (req, res) => {
-  if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
-  const topic = await ForumTopic.findById(req.params.id);
-  if (!topic) return res.status(404).json({ message: 'Thread not found' });
-  if (topic.locked && !await canModerate(req.user)) {
-    return res.status(403).json({ message: 'Thread is locked' });
-  }
-
-  const content = String(req.body.content || '').trim();
-  if (!content) return res.status(400).json({ message: 'Content is required' });
-
-  const post = await ForumPost.create({
-    topicId: topic._id,
-    authorId: req.user._id,
-    content
-  });
-  await ForumTopic.findByIdAndUpdate(topic._id, { $inc: { postsCount: 1 }, lastPostAt: new Date() });
-  res.json(post);
-});
-
-// Like post
-r.post('/api/forum/posts/:id/like', ensureAuth, async (req, res) => {
-  const post = await ForumPost.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: 'Post not found' });
-  post.likes = (post.likes || 0) + 1;
-  await post.save();
-  res.json({ ok: true, likes: post.likes });
-});
-
-// Pin & Lock thread aliases
-r.post('/api/forum/threads/:id/pin', ensureAuth, async (req, res) => {
-  if (!await canModerate(req.user)) return res.status(403).json({ message: 'Forbidden' });
-  const t = await ForumTopic.findById(req.params.id);
-  if (!t) return res.status(404).json({ message: 'Thread not found' });
-  t.pinned = !t.pinned;
-  await t.save();
-  res.json({ ok: true, pinned: t.pinned });
-});
-
-r.post('/api/forum/threads/:id/lock', ensureAuth, async (req, res) => {
-  if (!await canModerate(req.user)) return res.status(403).json({ message: 'Forbidden' });
-  const t = await ForumTopic.findById(req.params.id);
-  if (!t) return res.status(404).json({ message: 'Thread not found' });
-  t.locked = !t.locked;
-  await t.save();
-  res.json({ ok: true, locked: t.locked });
-});
-
-// Delete thread
-r.delete('/api/forum/threads/:id', ensureAuth, async (req, res) => {
-  if (!await canModerate(req.user)) return res.status(403).json({ message: 'Forbidden' });
-  const t = await ForumTopic.findById(req.params.id);
-  if (!t) return res.status(404).json({ message: 'Thread not found' });
-  await ForumPost.updateMany({ topicId: t._id }, { $set: { deleted: true } });
-  await t.deleteOne();
-  res.json({ ok: true });
-});
-
-module.exports = r;
+  return { init, api, can, renderRoleHint, renderThreadList, renderThreadHead, renderPosts };
+})();

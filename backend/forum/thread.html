@@ -1,99 +1,193 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Тема форуму</title>
-  <link rel="stylesheet" href="../admin-styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    body.with-sidebar .wrap { margin-left: 250px; }
-    .wrap { width: 890px; margin: 32px auto; background:#fff; border-radius:24px; padding: 40px 60px; }
-    .thread-head { display:flex; justify-content:space-between; gap:12px; align-items:center; }
-    .title { font-size:22px; font-weight:700; }
-    .meta { color:#777; font-size:12px; }
-    .btn { border:none; border-radius:10px; padding:8px 12px; cursor:pointer; font-weight:600; }
-    .btn-primary { background:#275D2B; color:#fff; }
-    .btn-danger { background:#A31D1D; color:#fff; }
-    .btn-ghost { background:#F3F4F6; }
-    .badge { display:inline-block; background:#ECF5EB; color:#275D2B; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px; }
-    .post { border:1px solid #E37009; border-radius:12px; padding:12px 14px; background:#FFFDF7; }
-    .post + .post { margin-top:10px; }
-    .post .post-head { display:flex; justify-content:space-between; align-items:center; }
-    .post .actions { display:flex; gap:8px; align-items:center; }
-    .composer { margin-top:16px; display:flex; flex-direction:column; gap:8px; }
-    .composer textarea { width:100%; min-height:110px; padding:12px; border:1px solid #ddd; border-radius:12px; }
-    @media (max-width:1180px){ body.with-sidebar .wrap{margin-left:0;} .wrap{width:90%; padding:30px;} }
-  </style>
-</head>
-<body class="with-sidebar">
-  <aside class="sidebar" id="sidebar"></aside>
-
-  <main class="wrap">
-    <div class="thread-head">
-      <div>
-        <div class="title" id="tTitle">...</div>
-        <div class="meta" id="tMeta"></div>
-      </div>
-      <div id="tModActions" class="actions" style="display:none;">
-        <button class="btn btn-ghost" id="btnPin">📌 Закріпити/відкріпити</button>
-        <button class="btn btn-ghost" id="btnLock">🔒 Закрити/відкрити</button>
-        <button class="btn btn-danger" id="btnDelThread">Видалити тему</button>
-      </div>
-    </div>
-
-    <div id="posts" style="margin-top:16px;"></div>
-
-    <div id="composer" class="composer">
-      <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button class="btn btn-primary" id="btnReply">Відповісти</button>
-        <span class="meta" id="lockHint" style="display:none;">Тема закрита для нових відповідей</span>
-      </div>
-    </div>
-  </main>
-
-  <script src="../admin-auth.js"></script>
-  <script src="./forum.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (typeof renderAdminSidebar === 'function') renderAdminSidebar('forum/index.html');
-      await Forum.init();
-
-      const id = new URLSearchParams(location.search).get('id');
-      if (!id) return (location.href = './index.html');
-
-      const { thread, posts } = await Forum.api.getThread(id);
-      Forum.renderThreadHead(thread, '#tTitle', '#tMeta', '#tModActions');
-      Forum.renderPosts('#posts', posts, { thread });
-
-      // composer
-      if (thread.locked) {
-        document.getElementById('composer').style.opacity = .6;
-        document.getElementById('replyText').disabled = true;
-        document.getElementById('lockHint').style.display = 'inline';
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Тема форуму</title>
+<link rel="stylesheet" href="./forum.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body.with-sidebar .wrap {
+        margin-left: 250px;
       }
-      document.getElementById('btnReply').addEventListener('click', async () => {
-        const text = document.getElementById('replyText').value.trim();
-        if (!text) return;
-        await Forum.api.addPost(id, { content: text });
-        document.getElementById('replyText').value = '';
-        const data = await Forum.api.getThread(id);
-        Forum.renderPosts('#posts', data.posts, { thread: data.thread });
+      .wrap {
+        width: 890px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px 60px;
+      }
+      .thread-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+      .title {
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .meta {
+        color: #777;
+        font-size: 12px;
+      }
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background: #275d2b;
+        color: #fff;
+      }
+      .btn-danger {
+        background: #a31d1d;
+        color: #fff;
+      }
+      .btn-ghost {
+        background: #f3f4f6;
+      }
+      .badge {
+        display: inline-block;
+        background: #ecf5eb;
+        color: #275d2b;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        margin-left: 6px;
+      }
+      .post {
+        border: 1px solid #e37009;
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: #fffdf7;
+      }
+      .post + .post {
+        margin-top: 10px;
+      }
+      .post .post-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .post .actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .composer {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .composer textarea {
+        width: 100%;
+        min-height: 110px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+      }
+      @media (max-width: 1180px) {
+        body.with-sidebar .wrap {
+          margin-left: 0;
+        }
+        .wrap {
+          width: 90%;
+          padding: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body class="with-sidebar">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="wrap">
+      <div class="thread-head">
+        <div>
+          <div class="title" id="tTitle">...</div>
+          <div class="meta" id="tMeta"></div>
+        </div>
+        <div id="tModActions" class="actions" style="display: none">
+          <button class="btn btn-ghost" id="btnPin">
+            📌 Закріпити/відкріпити
+          </button>
+          <button class="btn btn-ghost" id="btnLock">
+            🔒 Закрити/відкрити
+          </button>
+          <button class="btn btn-danger" id="btnDelThread">
+            Видалити тему
+          </button>
+        </div>
+      </div>
+
+      <div id="posts" style="margin-top: 16px"></div>
+
+      <div id="composer" class="composer">
+        <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
+        <div style="display: flex; gap: 8px; align-items: center">
+          <button class="btn btn-primary" id="btnReply">Відповісти</button>
+          <span class="meta" id="lockHint" style="display: none"
+            >Тема закрита для нових відповідей</span
+          >
+        </div>
+      </div>
+    </main>
+
+    <script src="./forum.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        if (typeof renderAdminSidebar === "function")
+          renderAdminSidebar("forum/index.html");
+        await Forum.init();
+
+        const id = new URLSearchParams(location.search).get("id");
+        if (!id) return (location.href = "./index.html");
+
+        const { thread, posts } = await Forum.api.getThread(id);
+        Forum.renderThreadHead(thread, "#tTitle", "#tMeta", "#tModActions");
+        Forum.renderPosts("#posts", posts, { thread });
+
+        // composer
+        if (thread.locked) {
+          document.getElementById("composer").style.opacity = 0.6;
+          document.getElementById("replyText").disabled = true;
+          document.getElementById("lockHint").style.display = "inline";
+        }
+        document
+          .getElementById("btnReply")
+          .addEventListener("click", async () => {
+            const text = document.getElementById("replyText").value.trim();
+            if (!text) return;
+            await Forum.api.addPost(id, { content: text });
+            document.getElementById("replyText").value = "";
+            const data = await Forum.api.getThread(id);
+            Forum.renderPosts("#posts", data.posts, { thread: data.thread });
+          });
+
+        // mod buttons (only for allowed roles)
+        if (Forum.can("moderate:threads")) {
+          document.getElementById("tModActions").style.display = "flex";
+          document.getElementById("btnPin").onclick = async () => {
+            await Forum.api.togglePin(id);
+            location.reload();
+          };
+          document.getElementById("btnLock").onclick = async () => {
+            await Forum.api.toggleLock(id);
+            location.reload();
+          };
+          document.getElementById("btnDelThread").onclick = async () => {
+            if (!confirm("Видалити тему?")) return;
+            await Forum.api.deleteThread(id);
+            location.href = "./index.html";
+          };
+        }
       });
-
-      // mod buttons (only for allowed roles)
-      if (Forum.can('moderate:threads')) {
-        document.getElementById('tModActions').style.display = 'flex';
-        document.getElementById('btnPin').onclick = async ()=>{ await Forum.api.togglePin(id); location.reload(); };
-        document.getElementById('btnLock').onclick = async ()=>{ await Forum.api.toggleLock(id); location.reload(); };
-        document.getElementById('btnDelThread').onclick = async ()=>{
-          if (!confirm('Видалити тему?')) return;
-          await Forum.api.deleteThread(id);
-          location.href = './index.html';
-        };
-      }
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

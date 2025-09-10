@@ -3,14 +3,14 @@ const express = require('express');
 const r = express.Router();
 
 const { ForumCategory, ForumTopic, ForumPost } = require('./forum.models');
-const { ensureAuth } = require('./authz.middleware');
+const { ensureAuth } = require('./authz.middleware.js');
 const {
   canRead, canCreateTopic, canReply, canModerate,
   canEditPost, canDeletePost, canSeeCategory
 } = require('./forum.policy');
 
 // список категорий (видимых для юзера)
-r.get('/api/forum/categories', ensureAuth, async (req, res) => {
+r.get('/categories', ensureAuth, async (req, res) => {
   const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
   const visible = [];
   for (const c of cats) {
@@ -20,14 +20,14 @@ r.get('/api/forum/categories', ensureAuth, async (req, res) => {
 });
 
 // создать категорию (только модераторы/админы)
-r.post('/api/forum/categories', ensureAuth, async (req, res) => {
+r.post('/categories', ensureAuth, async (req, res) => {
   if (!await canModerate(req.user)) return res.status(403).json({ message: 'Forbidden' });
   const cat = await ForumCategory.create(req.body);
   res.json(cat);
 });
 
 // темы категории
-r.get('/api/forum/categories/:id/topics', ensureAuth, async (req, res) => {
+r.get('/categories/:id/topics', ensureAuth, async (req, res) => {
   const cat = await ForumCategory.findById(req.params.id).lean();
   if (!cat || !await canSeeCategory(req.user, cat)) return res.json([]);
   const topics = await ForumTopic.find({ categoryId: cat._id })
@@ -36,7 +36,7 @@ r.get('/api/forum/categories/:id/topics', ensureAuth, async (req, res) => {
 });
 
 // создать тему
-r.post('/api/forum/categories/:id/topics', ensureAuth, async (req, res) => {
+r.post('/categories/:id/topics', ensureAuth, async (req, res) => {
   if (!await canCreateTopic(req.user)) return res.status(403).json({ message: 'Forbidden' });
   const cat = await ForumCategory.findById(req.params.id);
   if (!cat || !await canSeeCategory(req.user, cat)) return res.status(404).json({ message: 'Category not found' });
@@ -50,21 +50,21 @@ r.post('/api/forum/categories/:id/topics', ensureAuth, async (req, res) => {
 });
 
 // модерация темы (закрепить/разблокировать и т.п.)
-r.patch('/api/forum/topics/:id', ensureAuth, async (req, res) => {
+r.patch('/topics/:id', ensureAuth, async (req, res) => {
   if (!await canModerate(req.user)) return res.status(403).json({ message: 'Forbidden' });
   const t = await ForumTopic.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(t);
 });
 
 // посты в теме
-r.get('/api/forum/topics/:id/posts', ensureAuth, async (req, res) => {
+r.get('/topics/:id/posts', ensureAuth, async (req, res) => {
   const posts = await ForumPost.find({ topicId: req.params.id, deleted: { $ne: true } })
     .sort({ createdAt: 1 }).lean();
   res.json(posts);
 });
 
 // ответ в теме
-r.post('/api/forum/topics/:id/posts', ensureAuth, async (req, res) => {
+r.post('/topics/:id/posts', ensureAuth, async (req, res) => {
   if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
   const topic = await ForumTopic.findById(req.params.id);
   if (!topic) return res.status(404).json({ message: 'Topic not found' });
@@ -82,7 +82,7 @@ r.post('/api/forum/topics/:id/posts', ensureAuth, async (req, res) => {
 });
 
 // редактировать / удалить пост
-r.patch('/api/forum/posts/:id', ensureAuth, async (req, res) => {
+r.patch('/posts/:id', ensureAuth, async (req, res) => {
   const post = await ForumPost.findById(req.params.id);
   if (!post) return res.status(404).json({ message: 'Post not found' });
   if (!await canEditPost(req.user, post)) return res.status(403).json({ message: 'Forbidden' });
@@ -94,7 +94,7 @@ r.patch('/api/forum/posts/:id', ensureAuth, async (req, res) => {
   res.json(post);
 });
 
-r.delete('/api/forum/posts/:id', ensureAuth, async (req, res) => {
+r.delete('/posts/:id', ensureAuth, async (req, res) => {
   const post = await ForumPost.findById(req.params.id);
   if (!post) return res.status(404).json({ message: 'Post not found' });
   if (!await canDeletePost(req.user, post)) return res.status(403).json({ message: 'Forbidden' });

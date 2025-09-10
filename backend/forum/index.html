@@ -218,6 +218,12 @@
 
     await load();
   });
+
+  let t;
+document.getElementById("q").addEventListener("input", () => {
+  clearTimeout(t);
+  t = setTimeout(load, 350);
+});
     </script>
     
   </body>

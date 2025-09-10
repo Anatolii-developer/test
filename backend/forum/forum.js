@@ -223,14 +223,15 @@ function can(action){
       $root.appendChild(el);
     });
 
-    $root.querySelectorAll('.js-like').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        await api.likePost(btn.dataset.id);
-        const id = new URLSearchParams(location.search).get('id');
-        const data = await api.getThread(id);
-        renderPosts(sel, data.posts, { thread: data.thread });
-      });
-    });
+   $root.querySelectorAll('.js-like').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    try {
+      const r = await api.likePost(btn.dataset.id); // { ok, likes }
+      btn.innerHTML = `👍 ${r.likes ?? ((+btn.textContent.replace(/[^\d]/g,'')||0)+1)}`;
+      btn.disabled = true; // если запрет на повторный лайк
+    } catch(e){ alert('Не вдалося поставити лайк'); }
+  });
+});
     $root.querySelectorAll('.js-del').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (!confirm('Видалити повідомлення?')) return;

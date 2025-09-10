@@ -8,7 +8,23 @@ const PERMISSIONS_BY_ROLE = {
   user:       ['forum:read','forum:create','forum:reply','forum:edit_own','forum:delete_own'],
 };
 
-const norm = (s='') => String(s).trim().toLowerCase();
+
+
+function toCanonicalRole(name = '') {
+  const n = String(name).trim().toLowerCase();
+
+  if (n.includes('admin') || n.includes('адмін') || n.includes('адмініст')) return 'admin';
+  if (n.includes('ментор')) return 'mentor';
+  if (n.includes('супервізор')) return 'supervisor';
+  if (n.includes('psy')) return 'user'; // або окрему гілку, якщо треба
+
+  // за замовчуванням — звичайний користувач
+  return 'user';
+}
+
+function norm(s=''){ return String(s).trim().toLowerCase(); }
+
+
 
 // маппинг локализованных/сложных названий к базовым
 function toBaseRole(name='') {
@@ -24,39 +40,35 @@ function toBaseRole(name='') {
 }
 
 async function getUserRoleNames(user) {
-  if (!user) return ['user'];
-
-  let names = [];
-
+  if (!user) return [];
+  let roleNames = [];
   if (Array.isArray(user.roles) && user.roles.length) {
-    // если в user.roles лежат ObjectId/объекты — подтянем роли из БД
-    const ids = user.roles
-      .map(r => (typeof r === 'object' && r?._id) ? r._id : r)
-      .filter(v => String(v).match(/^[a-f0-9]{24}$/i));
-    if (ids.length) {
-      const docs = await Role.find({ _id: { $in: ids }, active: true }).lean();
-      names.push(...docs.map(r => toBaseRole(r.name)));
-    }
-    // плюс возможные строковые названия
-    names.push(...user.roles
-      .filter(r => typeof r === 'string')
-      .map(s => toBaseRole(s)));
-  } else if (user.role) {
-    names.push(toBaseRole(typeof user.role === 'string' ? user.role : user.role.name));
-  }
+    const objectIds = user.roles.filter(r => (r && typeof r==='object' && r._id) || String(r).match(/^[a-f0-9]{24}$/i));
+    const stringNames = user.roles.filter(r => typeof r === 'string');
 
-  if (!names.length) names = ['user'];
-  return [...new Set(names)];
+    if (objectIds.length) {
+      const roles = await Role.find({ _id: { $in: objectIds }, active: true }).lean();
+      roleNames.push(...roles.map(r => r?.name).filter(Boolean));
+    }
+    if (stringNames.length) roleNames.push(...stringNames);
+  } else if (user.role) {
+    roleNames.push(typeof user.role === 'string' ? user.role : user.role.name);
+  }
+  if (!roleNames.length) roleNames = ['user'];
+  // ⇩ повертаємо вже канонічні ключі
+  return [...new Set(roleNames.map(toCanonicalRole))];
 }
 
 async function getPermissions(user) {
-  const roleNames = await getUserRoleNames(user);
+  const names = await getUserRoleNames(user);
   const set = new Set();
-  for (const base of roleNames) {
-    (PERMISSIONS_BY_ROLE[base] || []).forEach(p => set.add(p));
+  for (const canonical of names) {
+    const list = PERMISSIONS_BY_ROLE[canonical] || [];
+    list.forEach(p => set.add(p));
   }
-  if (set.has('forum:*')) return new Proxy({}, { get: () => true });
-  return { has: p => set.has(p) };
+  if (set.has('forum:*')) return new Proxy({}, { get:()=>true });
+  const has = (perm) => set.has(perm);
+  return { has };
 }
 
 async function can(user, perm) {

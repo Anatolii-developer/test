@@ -121,16 +121,13 @@ async function getOrCreateDefaultCategory() {
   return cat;
 }
 
-// GET /api/forum/threads  — list threads across visible categories
+// GET /api/forum/threads
 r.get('/threads', ensureAuth, async (req, res) => {
   const q = (req.query.q || '').trim().toLowerCase();
 
-  // собрать все категории, которые пользователь видит
   const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
   const allowed = [];
-  for (const c of cats) {
-    if (await canSeeCategory(req.user, c)) allowed.push(c._id);
-  }
+  for (const c of cats) if (await canSeeCategory(req.user, c)) allowed.push(c._id);
   if (!allowed.length) return res.json([]);
 
   const filter = { categoryId: { $in: allowed } };
@@ -139,6 +136,7 @@ r.get('/threads', ensureAuth, async (req, res) => {
   const threads = await ForumTopic.find(filter)
     .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
     .limit(200)
+    .populate('authorId', 'username email firstName lastName')   // ⇦ додали
     .lean();
 
   res.json(threads.map(t => ({
@@ -150,9 +148,55 @@ r.get('/threads', ensureAuth, async (req, res) => {
     postsCount: t.postsCount || 0,
     pinned: !!t.pinned,
     locked: !!t.locked,
-    author: t.authorId ? { _id: t.authorId } : null,
+    author: t.authorId ? {
+      _id: t.authorId._id,
+      username: t.authorId.username,
+      email: t.authorId.email,
+      firstName: t.authorId.firstName,
+      lastName: t.authorId.lastName,
+    } : null,
     preview: t.preview || '',
   })));
+});
+
+// GET /api/forum/threads/:id
+r.get('/threads/:id', ensureAuth, async (req, res) => {
+  const t = await ForumTopic.findById(req.params.id)
+    .populate('authorId', 'username email firstName lastName')   // ⇦
+    .lean();
+  if (!t) return res.status(404).json({ message: 'Thread not found' });
+
+  const cat = await ForumCategory.findById(t.categoryId).lean();
+  if (!cat || !await canSeeCategory(req.user, cat)) return res.status(403).json({ message: 'Forbidden' });
+
+  const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
+    .sort({ createdAt: 1 })
+    .populate('authorId', 'username email firstName lastName')   // ⇦
+    .lean();
+
+  const thread = {
+    ...t,
+    author: t.authorId ? {
+      _id: t.authorId._id,
+      username: t.authorId.username,
+      email: t.authorId.email,
+      firstName: t.authorId.firstName,
+      lastName: t.authorId.lastName,
+    } : null
+  };
+
+  const mappedPosts = posts.map(p => ({
+    ...p,
+    author: p.authorId ? {
+      _id: p.authorId._id,
+      username: p.authorId.username,
+      email: p.authorId.email,
+      firstName: p.authorId.firstName,
+      lastName: p.authorId.lastName,
+    } : null
+  }));
+
+  res.json({ thread, posts: mappedPosts });
 });
 
 // POST /api/forum/threads  — create in default category (and first post)
@@ -184,20 +228,6 @@ r.post('/threads', ensureAuth, async (req, res) => {
   }
 
   res.json(topic);
-});
-
-// GET /api/forum/threads/:id — thread + posts
-r.get('/threads/:id', ensureAuth, async (req, res) => {
-  const thread = await ForumTopic.findById(req.params.id).lean();
-  if (!thread) return res.status(404).json({ message: 'Thread not found' });
-
-  const cat = await ForumCategory.findById(thread.categoryId).lean();
-  if (!cat || !await canSeeCategory(req.user, cat)) return res.status(403).json({ message: 'Forbidden' });
-
-  const posts = await ForumPost.find({ topicId: thread._id, deleted: { $ne: true } })
-    .sort({ createdAt: 1 }).lean();
-
-  res.json({ thread, posts });
 });
 
 // POST /api/forum/threads/:id/posts — add reply

@@ -544,7 +544,8 @@ main {
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow-y: auto;           
+  overflow-x: hidden;
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
   /* optional shadow */
 }
@@ -580,6 +581,7 @@ main {
 
 .sidebar nav a.active {
   background-color: #FFFFFF;
+    flex: 1 1 auto;
 }
 
 
@@ -711,10 +713,17 @@ main {
   font-weight: 500;
   cursor: pointer;
   font-size: 16px;
+  position: sticky;
+  bottom: 12px;                /* прилипает к низу при скролле */
+  background: #ECF5EB;         /* фон как у сайдбара, чтобы не мигал */
+  padding: 8px 10px;
+  border-radius: 10px;
+  z-index: 1; 
 }
 
 .sidebar.collapsed .logout span {
   display: none;
+   justify-content: center;   
 }
 
 

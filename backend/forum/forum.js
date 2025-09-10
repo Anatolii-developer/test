@@ -29,31 +29,38 @@ window.Forum = (function () {
 
   
 
-  async function fetchJSON(input, { headers, ...opts } = {}) {
-    const token = getAuthToken();
-    const baseHeaders = {
-      Accept: 'application/json',
-      ...(headers || {}),
-    };
-    if (token) baseHeaders.Authorization = `Bearer ${token}`;
+async function fetchJSON(input, { headers, ...opts } = {}) {
+  const token = getAuthToken();
+  const baseHeaders = { Accept: 'application/json', ...(headers || {}) };
+  if (token) baseHeaders.Authorization = `Bearer ${token}`;
 
-    const res = await fetch(input, {
-      credentials: 'include',
-      headers: baseHeaders,
-      ...opts,
-    });
+  const res = await fetch(input, {
+    credentials: 'include',
+    headers: baseHeaders,
+    ...opts,
+  });
 
-    // попытка прочитать json (даже при ошибках)
-    let data = null;
-    try { data = await res.clone().json(); } catch (_) {}
+  const ct = (res.headers.get('content-type') || '').toLowerCase();
+  let data = null, text = null;
 
-    if (!res.ok) {
-      // удобный лог в консоль
-      console.warn('Forum API error:', res.status, res.url, data || (await res.text().catch(()=>'') ));
-      throw new Error(data?.message || `HTTP ${res.status}`);
-    }
-    return data;
+  if (ct.includes('application/json')) {
+    try { data = await res.clone().json(); } catch (e) {}
+  } else {
+    try { text = await res.clone().text(); } catch (e) {}
   }
+
+  if (!res.ok) {
+    const snippet = text ? text.slice(0, 200) : '';
+    console.warn('Forum API error:', res.status, res.url, data || snippet);
+    throw new Error(data?.message || `HTTP ${res.status}`);
+  }
+
+  if (data != null) return data;
+
+  // Ожидали JSON, но получили HTML/текст => подскажем где именно
+  console.warn('Expected JSON but got non-JSON from', res.url, 'content-type=', ct, 'sample=', (text||'').slice(0,200));
+  throw new Error('Server returned non-JSON');
+}
 
   function readUser() {
     try {
@@ -283,46 +290,7 @@ function can(action){
     }
   }
 
-  function renderPosts(sel, posts, { thread } = {}) {
-    const $root = document.querySelector(sel);
-    if (!$root) return;
-    $root.innerHTML = '';
-    (posts || []).forEach(p => {
-      const canDel = can('moderate:posts') || (currentUser && currentUser._id === p.author?._id);
-      const el = document.createElement('div');
-      el.className = 'post';
-      el.innerHTML = `
-        <div class="post-head">
-          <div class="meta"><strong>${escapeHtml(p.author?.username || p.author?.email || '-')}</strong> • ${fmtDate(p.createdAt)}</div>
-          <div class="actions">
-            <button class="btn btn-ghost js-like" data-id="${p._id}">👍 ${p.likes || 0}</button>
-            ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
-          </div>
-        </div>
-        <div style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(p.content || '')}</div>
-      `;
-      $root.appendChild(el);
-    });
 
-   $root.querySelectorAll('.js-like').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    try {
-      const r = await api.likePost(btn.dataset.id); // { ok, likes }
-      btn.innerHTML = `👍 ${r.likes ?? ((+btn.textContent.replace(/[^\d]/g,'')||0)+1)}`;
-      btn.disabled = true; // если запрет на повторный лайк
-    } catch(e){ alert('Не вдалося поставити лайк'); }
-  });
-});
-    $root.querySelectorAll('.js-del').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Видалити повідомлення?')) return;
-        await api.deletePost(btn.dataset.id);
-        const id = new URLSearchParams(location.search).get('id');
-        const data = await api.getThread(id);
-        renderPosts(sel, data.posts, { thread: data.thread });
-      });
-    });
-  }
 
   return { init, api, can, renderRoleHint, renderThreadList, renderThreadHead, renderPosts };
 })();

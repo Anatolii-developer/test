@@ -1,27 +1,11 @@
-// backend/forum/authz.middleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 function extractToken(req) {
-  // 1) Authorization: Bearer
   const h = req.headers.authorization || req.headers.Authorization || '';
-  if (typeof h === 'string' && h.startsWith('Bearer ')) {
-    return h.slice(7).trim();
-  }
-
-  // 2) Куки — попробуем известные имена
+  if (typeof h === 'string' && h.startsWith('Bearer ')) return h.slice(7).trim();
   const c = req.cookies || {};
-  const known =
-    c.token || c.jwt || c.accessToken || c.authToken || c.bearer;
-  if (known) return known;
-
-  // 3) Фолбэк: найдём любую куку, похожую на JWT (3 части через точку)
-  for (const v of Object.values(c)) {
-    if (typeof v === 'string' && v.split('.').length === 3) {
-      return v;
-    }
-  }
-  return null;
+  return c.token || c.jwt || c.accessToken || c.authToken || c.bearer || null;
 }
 
 function getUserIdFromPayload(decoded) {
@@ -33,7 +17,9 @@ async function ensureAuth(req, res, next) {
     const token = extractToken(req);
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // <-- ключевой фикс: одинаковый секрет и fallback
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+
     const uid = getUserIdFromPayload(decoded);
     if (!uid) return res.status(401).json({ message: 'Unauthorized' });
 
@@ -43,7 +29,6 @@ async function ensureAuth(req, res, next) {
     req.user = user;
     next();
   } catch (e) {
-    // console.warn('[forum] ensureAuth error:', e?.message);
     return res.status(401).json({ message: 'Unauthorized' });
   }
 }

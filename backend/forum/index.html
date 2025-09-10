@@ -161,6 +161,63 @@
 
         await load();
       });
+
+
+      document.addEventListener("DOMContentLoaded", async () => {
+    if (typeof renderAdminSidebar === "function")
+      renderAdminSidebar("forum/index.html");
+
+    await Forum.init();                 // загрузка профиля/ролей/сессии
+    Forum.renderRoleHint("#roleHint");
+
+    const btnNew = document.getElementById("btnNewThread");
+
+    // 1) Скрыть кнопку "Нова тема", если нет прав (не авторизован)
+    // На фронте считаем, что достаточно быть залогиненым, чтобы мочь створювати тему.
+    // Если на бэке логика строже — все равно поймаем 403 ниже.
+    if (!Forum.can("post:create")) {
+      btnNew.style.display = "none";
+    }
+
+    // 2) Загрузка списка
+    const load = async () => {
+      try {
+        const q = document.getElementById("q").value.trim();
+        const data = await Forum.api.listThreads({ q });
+        Forum.renderThreadList("#list", data, "#empty");
+      } catch (e) {
+        console.warn(e);
+        alert("Не вдалося завантажити список тем.");
+      }
+    };
+    document.getElementById("btnSearch").addEventListener("click", load);
+    document.getElementById("q").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") load();
+    });
+
+    // 3) Создать тему с внятной обработкой 401/403
+    btnNew.addEventListener("click", async () => {
+      const title = prompt("Заголовок теми:");
+      if (!title) return;
+      const content = prompt("Перший пост:") || "";
+
+      try {
+        const t = await Forum.api.createThread({ title, content });
+        if (t && t._id) location.href = `./thread.html?id=${t._id}`;
+      } catch (err) {
+        const msg = String(err.message || err);
+        if (/unauthorized/i.test(msg) || /401/.test(msg)) {
+          alert("Потрібно увійти в акаунт, щоб створити тему.");
+        } else if (/forbidden/i.test(msg) || /403/.test(msg)) {
+          alert("У вас немає прав створювати теми (403). Зверніться до адміністратора.");
+        } else {
+          alert("Не вдалося створити тему: " + msg);
+        }
+      }
+    });
+
+    await load();
+  });
     </script>
     
   </body>

@@ -8,37 +8,30 @@ function extractToken(req) {
   if (typeof h === 'string' && h.startsWith('Bearer ')) {
     return h.slice(7).trim();
   }
-  // 2) Возможные имена куки
+
+  // 2) Куки — попробуем известные имена
   const c = req.cookies || {};
-  return (
-    c.token ||
-    c.jwt ||
-    c.accessToken ||
-    c.authToken ||
-    c.bearer ||
-    null
-  );
+  const known =
+    c.token || c.jwt || c.accessToken || c.authToken || c.bearer;
+  if (known) return known;
+
+  // 3) Фолбэк: найдём любую куку, похожую на JWT (3 части через точку)
+  for (const v of Object.values(c)) {
+    if (typeof v === 'string' && v.split('.').length === 3) {
+      return v;
+    }
+  }
+  return null;
 }
 
 function getUserIdFromPayload(decoded) {
-  // поддержим разные варианты поля id
-  return (
-    decoded?.id ||
-    decoded?._id ||
-    decoded?.userId ||
-    decoded?.uid ||
-    null
-  );
+  return decoded?.id || decoded?._id || decoded?.userId || decoded?.uid || null;
 }
 
 async function ensureAuth(req, res, next) {
   try {
     const token = extractToken(req);
-    if (!token) {
-      // временная диагностика — поможет понять, что именно приходит
-      // console.warn('[forum] no token', { cookies: Object.keys(req.cookies||{}), hasAuth: !!(req.headers.authorization) });
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const uid = getUserIdFromPayload(decoded);
@@ -50,7 +43,7 @@ async function ensureAuth(req, res, next) {
     req.user = user;
     next();
   } catch (e) {
-    // console.warn('[forum] ensureAuth error', e?.message);
+    // console.warn('[forum] ensureAuth error:', e?.message);
     return res.status(401).json({ message: 'Unauthorized' });
   }
 }

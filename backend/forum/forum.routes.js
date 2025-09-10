@@ -250,12 +250,14 @@ r.post('/threads/:id/posts', ensureAuth, async (req, res) => {
   res.json(post);
 });
 
-// POST /api/forum/posts/:id/like — like post
+// POST /api/forum/posts/:id/like
 r.post('/posts/:id/like', ensureAuth, async (req, res) => {
-  const post = await ForumPost.findById(req.params.id);
+  const post = await ForumPost.findByIdAndUpdate(
+    req.params.id,
+    { $inc: { likes: 1 } },
+    { new: true }
+  );
   if (!post) return res.status(404).json({ message: 'Post not found' });
-  post.likes = (post.likes || 0) + 1;
-  await post.save();
   res.json({ ok: true, likes: post.likes });
 });
 

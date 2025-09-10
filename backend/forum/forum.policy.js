@@ -75,16 +75,16 @@ async function can(user, perm) {
   return typeof perms.has === 'function' ? perms.has(perm) : !!perms[perm];
 }
 async function canModerate(user) {
-  return can(user, 'forum:moderate') || can(user, 'forum:*');
+  return (await can(user, 'forum:moderate')) || (await can(user, 'forum:*'));
 }
 async function canRead(user) {
-  return can(user, 'forum:read') || can(user, 'forum:*');
+  return (await can(user, 'forum:read')) || (await can(user, 'forum:*'));
 }
 async function canCreateTopic(user) {
-  return can(user, 'forum:create') || can(user, 'forum:*');
+  return (await can(user, 'forum:create')) || (await can(user, 'forum:*'));
 }
 async function canReply(user) {
-  return can(user, 'forum:reply') || can(user, 'forum:*');
+  return (await can(user, 'forum:reply')) || (await can(user, 'forum:*'));
 }
 function isOwn(user, doc) {
   return user && doc && String(doc.authorId) === String(user._id);

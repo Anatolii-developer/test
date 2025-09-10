@@ -252,13 +252,53 @@ r.post('/threads/:id/posts', ensureAuth, async (req, res) => {
 
 // POST /api/forum/posts/:id/like
 r.post('/posts/:id/like', ensureAuth, async (req, res) => {
+  const userId = req.user._id;
+
+  // сначала пытаемся добавить userId в likedBy (без дублей)
+  const upd = await ForumPost.updateOne(
+    { _id: req.params.id, deleted: { $ne: true } },
+    { $addToSet: { likedBy: userId } }
+  );
+
+  if (upd.matchedCount === 0) {
+    return res.status(404).json({ message: 'Post not found' });
+  }
+  if (upd.modifiedCount === 0) {
+    // пользователь уже лайкнул раньше
+    return res.status(409).json({ ok: false, message: 'Already liked' });
+  }
+
+  // если реально добавили — можно либо инкрементить поле likes,
+  // либо посчитать по длине массива
   const post = await ForumPost.findByIdAndUpdate(
     req.params.id,
-    { $inc: { likes: 1 } },
-    { new: true }
+    { $inc: { likes: 1 } },          // поддерживаем числовой кэш
+    { new: true, select: 'likes likedBy' }
   );
-  if (!post) return res.status(404).json({ message: 'Post not found' });
-  res.json({ ok: true, likes: post.likes });
+
+  res.json({ ok: true, likes: post.likes, liked: true });
+});
+
+
+// DELETE /api/forum/posts/:id/like
+r.delete('/posts/:id/like', ensureAuth, async (req, res) => {
+  const userId = req.user._id;
+
+  const upd = await ForumPost.updateOne(
+    { _id: req.params.id, deleted: { $ne: true } },
+    { $pull: { likedBy: userId } }
+  );
+
+  if (upd.matchedCount === 0) return res.status(404).json({ message: 'Post not found' });
+  if (upd.modifiedCount === 0) return res.status(409).json({ ok: false, message: 'Not liked' });
+
+  const post = await ForumPost.findByIdAndUpdate(
+    req.params.id,
+    { $inc: { likes: -1 } },
+    { new: true, select: 'likes likedBy' }
+  );
+
+  res.json({ ok: true, likes: post.likes, liked: false });
 });
 
 // POST /api/forum/threads/:id/pin — toggle pin

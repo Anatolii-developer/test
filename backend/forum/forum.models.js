@@ -24,20 +24,20 @@ const ForumTopicSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // server/forum/forum.models.js
-
 const ForumPostSchema = new mongoose.Schema({
   topicId:  { type: mongoose.Schema.Types.ObjectId, ref: 'ForumTopic', required: true, index: true },
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   content:  { type: String, required: true, maxlength: 10000 },
   attachments: [{ url: String, name: String, type: String, size: Number }],
 
-  likes: { type: Number, default: 0 },        // 👈 добавить это
+  // счётчик можно оставить, но надёжнее считать по likedBy.length
+  likes: { type: Number, default: 0 },
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // 👈
 
   editedAt: Date,
   editedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   deleted:  { type: Boolean, default: false },
 }, { timestamps: true });
-
 
 module.exports = {
   ForumCategory: mongoose.model('ForumCategory', ForumCategorySchema),

@@ -29,7 +29,7 @@ const ForumTopicSchema = new mongoose.Schema({
 // server/forum/forum.models.js
 const AttachmentSchema = new Schema({
   kind: { type: String, enum: ['image','video','file'], required: true },
-  url: String,
+  url: { type: String, required: true },
   name: String,
   mime: String,
   size: Number,
@@ -42,7 +42,20 @@ const AttachmentSchema = new Schema({
 const ForumPostSchema = new mongoose.Schema({
   topicId:  { type: mongoose.Schema.Types.ObjectId, ref: 'ForumTopic', required: true, index: true },
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  content:  { type: String, required: true, maxlength: 10000 },
+  // content не обязателен, если есть attachments
+  content: {
+    type: String,
+    default: '',
+    maxlength: 10000,
+    validate: {
+      validator: function (v) {
+        const hasText = typeof v === 'string' && v.trim().length > 0;
+        const hasFiles = Array.isArray(this.attachments) && this.attachments.length > 0;
+        return hasText || hasFiles;
+      },
+      message: 'Content or attachments required',
+    }
+  },
 
   // ВАЖНО: вот так
   attachments: { type: [AttachmentSchema], default: [] },

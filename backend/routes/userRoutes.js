@@ -20,35 +20,26 @@ const certStorage = multer.diskStorage({
 });
 const certUpload = multer({ storage: certStorage });
 
-// ===== mini-auth =====
-async function auth(req, res, next) {
-  const raw =
-    (req.cookies && req.cookies.token) ||
-    (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+// mini-auth
+function auth(req, res, next) {
+  // 1) Сначала заголовок Authorization
+  const bearer = (req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+  // 2) Потом cookie
+  const fromCookie = req.cookies?.token;
+  const raw = bearer || fromCookie;
 
-  if (!raw) return res.status(401).json({ ok: false, message: "Unauthorized" });
+  if (!raw) return res.status(401).json({ ok: false, message: 'Unauthorized' });
 
   try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET not set");
-    const p = jwt.verify(raw, secret); // { id, ... }
+    const secret = process.env.JWT_SECRET || 'dev_secret';
+    const payload = jwt.verify(raw, secret); // { id, roles? }
 
-    const user = await User.findById(p.id).lean();
-    if (!user) return res.status(401).json({ ok: false, message: "Unauthorized" });
-
-    const roles = Array.isArray(user.roles) ? user.roles.map(r => String(r).toLowerCase()) : [];
-    req.user = {
-      id: String(user._id),
-      email: user.email,
-      username: user.username,
-      roles,
-    };
+    req.user = payload; // можно дальше подгрузить юзера из БД, если нужно
     next();
   } catch (e) {
-    return res.status(401).json({ ok: false, message: "Invalid token" });
+    return res.status(401).json({ ok: false, message: 'Invalid token' });
   }
 }
-
 function adminOnly(req, res, next) {
   const roles = Array.isArray(req.user?.roles)
     ? req.user.roles.map((r) => String(r).toLowerCase())

@@ -53,7 +53,6 @@ const path = require('path');
 // отдать статику уже настроено сервером (см. ниже)
 r.post('/uploads', ensureAuth, forumUpload.array('files', 10), async (req, res) => {
   const atts = req.files.map(f => {
-    const ext = path.extname(f.filename).toLowerCase();
     const kind = f.mimetype.startsWith('image/')
       ? 'image'
       : (f.mimetype.startsWith('video/') ? 'video' : 'file');
@@ -111,7 +110,8 @@ r.post('/threads/:id/posts-with-files', ensureAuth, (req, res) => {
 
       res.json(post);
     } catch (e) {
-      console.error('posts-with-files failed:', e);
+      console.error('posts-with-files failed:', e?.message || e);
+      if (e?.stack) console.error(e.stack);
       res.status(500).json({ message: 'Internal server error' });
     }
   });
@@ -150,7 +150,9 @@ r.patch('/topics/:id', ensureAuth, async (req, res) => {
 // посты в теме
 r.get('/topics/:id/posts', ensureAuth, async (req, res) => {
   const posts = await ForumPost.find({ topicId: req.params.id, deleted: { $ne: true } })
-    .sort({ createdAt: 1 }).lean();
+    .sort({ createdAt: 1 })
+    .select('content authorId createdAt likes likedBy attachments')
+    .lean();
   res.json(posts);
 });
 
@@ -303,7 +305,7 @@ r.get('/threads/:id', optionalAuth, async (req, res) => {
     const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
       .sort({ createdAt: 1 })
       .populate('authorId', 'username email firstName lastName')
-      .select('content authorId createdAt likes likedBy')
+      .select('content authorId createdAt likes likedBy attachments')
       .lean();
 
     const uid = req.user ? String(req.user._id) : '';

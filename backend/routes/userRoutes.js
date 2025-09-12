@@ -20,23 +20,27 @@ const certStorage = multer.diskStorage({
 });
 const certUpload = multer({ storage: certStorage });
 
-// mini-auth
 function auth(req, res, next) {
-  // 1) Сначала заголовок Authorization
-  const bearer = (req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
-  // 2) Потом cookie
-  const fromCookie = req.cookies?.token;
-  const raw = bearer || fromCookie;
+  const headerToken = (req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim() || null;
+  const cookieToken = req.cookies?.token || null;
 
-  if (!raw) return res.status(401).json({ ok: false, message: 'Unauthorized' });
+  // 1) Сначала пробуем куку (она httpOnly и надёжнее)
+  let token = cookieToken || headerToken;
+  if (!token) return res.status(401).json({ ok: false, message: 'Unauthorized' });
 
+  const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+
+  // Если в приоритете оказался headerToken, но он невалиден — попробуем куку
   try {
-    const secret = process.env.JWT_SECRET || 'dev_secret';
-    const payload = jwt.verify(raw, secret); // { id, roles? }
-
-    req.user = payload; // можно дальше подгрузить юзера из БД, если нужно
-    next();
-  } catch (e) {
+    req.user = jwt.verify(token, JWT_SECRET);
+    return next();
+  } catch (_) {
+    if (token === headerToken && cookieToken) {
+      try {
+        req.user = jwt.verify(cookieToken, JWT_SECRET);
+        return next();
+      } catch {}
+    }
     return res.status(401).json({ ok: false, message: 'Invalid token' });
   }
 }

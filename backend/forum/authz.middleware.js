@@ -2,7 +2,11 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const ALGS = (process.env.JWT_ALGS || 'HS256').split(',').map(s => s.trim());
+// ЕДИНЫЕ настройки JWT
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const ALGS = (process.env.JWT_ALGS || 'HS256')
+  .split(',')
+  .map(s => s.trim());
 
 function extractToken(req) {
   const h = req.headers.authorization || req.headers.Authorization || '';
@@ -12,7 +16,6 @@ function extractToken(req) {
 }
 
 function getUserIdFromPayload(decoded) {
-  // поддерживаем разные названия поля id
   return decoded?.id || decoded?._id || decoded?.userId || decoded?.uid || null;
 }
 
@@ -21,10 +24,8 @@ async function ensureAuth(req, res, next) {
     const token = extractToken(req);
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error('JWT secret missing');
-
-    const decoded = jwt.verify(token, secret, { algorithms: ALGS, clockTolerance: 5 });
+    // Верифицируем тем же секретом и алгоритму(ам), что и при логине
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ALGS, clockTolerance: 5 });
     const uid = getUserIdFromPayload(decoded);
     if (!uid) return res.status(401).json({ message: 'Unauthorized' });
 

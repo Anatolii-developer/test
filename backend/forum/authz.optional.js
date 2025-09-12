@@ -1,8 +1,12 @@
-// authz.optional.js
+// backend/forum/authz.optional.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const ALGS = (process.env.JWT_ALGS || 'HS256').split(',').map(s => s.trim());
+// ЕДИНЫЕ настройки JWT (как в login и ensureAuth)
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const ALGS = (process.env.JWT_ALGS || 'HS256')
+  .split(',')
+  .map(s => s.trim());
 
 function extractToken(req) {
   const h = req.headers.authorization || req.headers.Authorization || '';
@@ -11,16 +15,18 @@ function extractToken(req) {
   return c.token || c.jwt || c.accessToken || c.authToken || c.bearer || null;
 }
 
+function getUserIdFromPayload(decoded) {
+  return decoded?.id || decoded?._id || decoded?.userId || decoded?.uid || null;
+}
+
 async function optionalAuth(req, _res, next) {
   try {
     const token = extractToken(req);
     if (!token) { req.user = null; return next(); }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) { req.user = null; return next(); } // молча пропускаем, если нет секрета
-
-    const decoded = jwt.verify(token, secret, { algorithms: ALGS, clockTolerance: 5 });
-    const uid = decoded?.id || decoded?._id || decoded?.userId || decoded?.uid || null;
+    // Верифицируем тем же секретом/алгоритмами
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ALGS, clockTolerance: 5 });
+    const uid = getUserIdFromPayload(decoded);
     if (!uid) { req.user = null; return next(); }
 
     const user = await User.findById(uid).lean();

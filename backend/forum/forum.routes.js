@@ -4,6 +4,7 @@ const r = express.Router();
 
 const { ForumCategory, ForumTopic, ForumPost } = require('./forum.models');
 const { ensureAuth } = require('./authz.middleware.js');
+const { optionalAuth } = require('./authz.optional.js');
 const {
   canRead, canCreateTopic, canReply, canModerate,
   canEditPost, canDeletePost, canSeeCategory
@@ -174,12 +175,17 @@ async function getOrCreateDefaultCategory() {
 }
 
 // GET /api/forum/threads
-r.get('/threads', ensureAuth, async (req, res) => {
+r.get('/threads', optionalAuth, async (req, res) => {
   const q = (req.query.q || '').trim().toLowerCase();
 
   const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
   const allowed = [];
-  for (const c of cats) if (await canSeeCategory(req.user, c)) allowed.push(c._id);
+  for (const c of cats) {
+    let ok = await canSeeCategory(req.user, c);
+    // если пользователь не авторизован, но категория публичная (нет ограничений) — разрешаем
+    if (!ok && !req.user && (!c.allowedRoles || c.allowedRoles.length === 0)) ok = true;
+    if (ok) allowed.push(c._id);
+  }
   if (!allowed.length) return res.json([]);
 
   const filter = { categoryId: { $in: allowed } };
@@ -211,14 +217,19 @@ r.get('/threads', ensureAuth, async (req, res) => {
   })));
 });
 
-r.get('/threads/:id', ensureAuth, async (req, res) => {
+r.get('/threads/:id', optionalAuth, async (req, res) => {
   const t = await ForumTopic.findById(req.params.id)
     .populate('authorId', 'username email firstName lastName')
     .lean();
   if (!t) return res.status(404).json({ message: 'Thread not found' });
 
   const cat = await ForumCategory.findById(t.categoryId).lean();
-  if (!cat || !await canSeeCategory(req.user, cat)) return res.status(403).json({ message: 'Forbidden' });
+  if (!cat) return res.status(404).json({ message: 'Category not found' });
+  let canSee = await canSeeCategory(req.user, cat);
+  if (!canSee && !req.user && (!cat.allowedRoles || cat.allowedRoles.length === 0)) {
+    canSee = true; // публичная категория, можно читать без авторизации
+  }
+  if (!canSee) return res.status(403).json({ message: 'Forbidden' });
 
   const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
     .sort({ createdAt: 1 })
@@ -226,7 +237,7 @@ r.get('/threads/:id', ensureAuth, async (req, res) => {
     .select('content authorId createdAt likes likedBy')       // 👈 важно
     .lean();
 
-  const uid = String(req.user._id);
+  const uid = req.user ? String(req.user._id) : '';
 
   const thread = t.authorId ? {
     ...t,

@@ -5,6 +5,7 @@ const r = express.Router();
 const { ForumCategory, ForumTopic, ForumPost } = require('./forum.models');
 const { ensureAuth } = require('./authz.middleware.js');
 const { optionalAuth } = require('./authz.optional.js');
+const { upload: forumUpload } = require('./upload.middleware');
 const {
   canRead, canCreateTopic, canReply, canModerate,
   canEditPost, canDeletePost, canSeeCategory
@@ -47,10 +48,10 @@ r.post('/categories', ensureAuth, async (req, res) => {
 
 // backend/forum/forum.routes.js
 const path = require('path');
-const { upload } = require('./upload.middleware');
+
 
 // отдать статику уже настроено сервером (см. ниже)
-r.post('/uploads', ensureAuth, upload.array('files', 10), async (req, res) => {
+r.post('/uploads', ensureAuth, forumUpload.array('files', 10), async (req, res) => {
   const atts = req.files.map(f => {
     const ext = path.extname(f.filename).toLowerCase();
     const kind = f.mimetype.startsWith('image/')
@@ -67,10 +68,9 @@ r.post('/uploads', ensureAuth, upload.array('files', 10), async (req, res) => {
   res.json({ ok: true, attachments: atts });
 });
 
-const { upload } = require('./upload.middleware');
 
 r.post('/threads/:id/posts-with-files', ensureAuth, (req, res) => {
-  upload.array('files', 10)(req, res, async (err) => {
+  forumUpload.array('files', 10)(req, res, async (err) => {
     if (err) {
       // ошибки Multer (тип, размер, лимит) — отдадим 400 с сообщением
       return res.status(400).json({ message: err.message || 'Upload error' });

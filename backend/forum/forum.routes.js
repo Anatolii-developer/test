@@ -179,30 +179,48 @@ r.get('/threads', optionalAuth, async (req, res) => {
   try {
     const q = (req.query.q || '').trim().toLowerCase();
 
-    const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
+    let cats = [];
+    try {
+      cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
+    } catch (e) {
+      console.error('Categories query failed:', e);
+      return res.status(500).json({ message: 'Internal server error (cats)', detail: e.message });
+    }
+
     const allowed = [];
     for (const c of cats) {
       try {
-        let ok = await canSeeCategory(req.user, c);
-        // гость + публичная категория (нет ограничений) — пускаем
-        if (!ok && !req.user && (!c.allowedRoles || c.allowedRoles.length === 0)) ok = true;
+        // пускаем гостей в публичные категории
+        if (!c?.allowedRoles?.length && !req.user) {
+          allowed.push(c._id);
+          continue;
+        }
+        // авторизованные — через policy
+        const ok = await canSeeCategory(req.user, c);
         if (ok) allowed.push(c._id);
       } catch (e) {
-        // Логируем конкретную категорию, но не валим весь запрос
-        console.error('canSeeCategory failed for category', c?._id, e);
+        console.error('canSeeCategory failed for', c?._id, e);
+        // не валим весь запрос — просто пропускаем эту категорию
+        continue;
       }
     }
 
     if (!allowed.length) return res.json([]);
 
-    const filter = { categoryId: { $in: allowed } };
+    const filter = { categoryId: { $in: allowed.filter(Boolean) } };
     if (q) filter.title = { $regex: q, $options: 'i' };
 
-    const threads = await ForumTopic.find(filter)
-      .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
-      .limit(200)
-      .populate('authorId', 'username email firstName lastName')
-      .lean();
+    let threads = [];
+    try {
+      threads = await ForumTopic.find(filter)
+        .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
+        .limit(200)
+        .populate('authorId', 'username email firstName lastName')
+        .lean();
+    } catch (e) {
+      console.error('Threads query failed:', e, 'filter=', filter);
+      return res.status(500).json({ message: 'Internal server error (threads)', detail: e.message });
+    }
 
     return res.json(threads.map(t => ({
       _id: t._id,
@@ -223,8 +241,8 @@ r.get('/threads', optionalAuth, async (req, res) => {
       preview: t.preview || '',
     })));
   } catch (e) {
-    console.error('GET /api/forum/threads failed:', e);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error('GET /api/forum/threads failed (outer):', e);
+    return res.status(500).json({ message: 'Internal server error (outer)', detail: e.message });
   }
 });
 

@@ -10,6 +10,14 @@ const {
   canEditPost, canDeletePost, canSeeCategory
 } = require('./forum.policy');
 
+
+let loaded = {};
+try {
+  loaded = require('./forum.models');
+} catch (_) {
+  loaded = {};
+}
+
 // список категорий (видимых для юзера)
 r.get('/categories', ensureAuth, async (req, res) => {
   const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();

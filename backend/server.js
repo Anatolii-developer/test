@@ -47,7 +47,6 @@ app.use(express.json());
 
 // Статика
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/forum', express.static(path.join(__dirname, 'forum')));
 

@@ -67,34 +67,54 @@ r.post('/uploads', ensureAuth, upload.array('files', 10), async (req, res) => {
   res.json({ ok: true, attachments: atts });
 });
 
-// добавить над существующим POST /api/forum/threads/:id/posts
-r.post('/threads/:id/posts-with-files', ensureAuth, upload.array('files', 10), async (req, res) => {
-  if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
-  const topic = await ForumTopic.findById(req.params.id);
-  if (!topic) return res.status(404).json({ message: 'Thread not found' });
+const { upload } = require('./upload.middleware');
 
-  const content = String(req.body.content || '').trim();
-  if (!content && (!req.files || !req.files.length))
-    return res.status(400).json({ message: 'Content or files required' });
+r.post('/threads/:id/posts-with-files', ensureAuth, (req, res) => {
+  upload.array('files', 10)(req, res, async (err) => {
+    if (err) {
+      // ошибки Multer (тип, размер, лимит) — отдадим 400 с сообщением
+      return res.status(400).json({ message: err.message || 'Upload error' });
+    }
 
-  const atts = (req.files || []).map(f => ({
-    kind: f.mimetype.startsWith('image/') ? 'image'
-        : (f.mimetype.startsWith('video/') ? 'video' : 'file'),
-    url: `/uploads/${f.filename}`,
-    name: f.originalname,
-    mime: f.mimetype,
-    size: f.size
-  }));
+    try {
+      if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
 
-  const post = await ForumPost.create({
-    topicId: topic._id,
-    authorId: req.user._id,
-    content,
-    attachments: atts
+      const topic = await ForumTopic.findById(req.params.id);
+      if (!topic) return res.status(404).json({ message: 'Thread not found' });
+
+      const content = String(req.body.content || '').trim();
+      const hasFiles = (req.files && req.files.length > 0);
+      if (!content && !hasFiles) {
+        return res.status(400).json({ message: 'Content or files required' });
+      }
+
+      const atts = (req.files || []).map(f => ({
+        kind: f.mimetype.startsWith('image/') ? 'image'
+            : (f.mimetype.startsWith('video/') ? 'video' : 'file'),
+        url: `/uploads/${f.filename}`,
+        name: f.originalname,
+        mime: f.mimetype,
+        size: f.size
+      }));
+
+      const post = await ForumPost.create({
+        topicId: topic._id,
+        authorId: req.user._id,
+        content,
+        attachments: atts
+      });
+
+      await ForumTopic.findByIdAndUpdate(topic._id, {
+        $inc: { postsCount: 1 },
+        lastPostAt: new Date()
+      });
+
+      res.json(post);
+    } catch (e) {
+      console.error('posts-with-files failed:', e);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   });
-  await ForumTopic.findByIdAndUpdate(topic._id, { $inc: { postsCount: 1 }, lastPostAt: new Date() });
-
-  res.json(post);
 });
 
 // темы категории

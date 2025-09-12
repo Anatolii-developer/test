@@ -102,6 +102,34 @@
           padding: 30px;
         }
       }
+      .attachments-preview {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .attachments-preview img {
+        max-width: 140px;
+        max-height: 140px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
+      .reply-context {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        background: #f3f6ff;
+        color: #25467a;
+        font-size: 12px;
+      }
+      .reply-context .close {
+        cursor: pointer;
+        font-weight: 700;
+        border: none;
+        background: transparent;
+      }
     </style>
   </head>
   <body class="with-sidebar">
@@ -129,6 +157,10 @@
       <div id="posts" style="margin-top: 16px"></div>
 
       <div id="composer" class="composer">
+  <div id="replyCtx" class="reply-context">
+    Відповідь на:&nbsp;<span id="replyToWho"></span>
+    <button id="replyCancel" class="close" title="Скасувати">×</button>
+  </div>
   <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
 
   <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
@@ -153,6 +185,43 @@
         const $files = document.getElementById("replyFiles");
         const $preview = document.getElementById("preview");
         const $text = document.getElementById("replyText");
+
+        // ---- reply-to (threaded) state ----
+        let currentParentId = null;
+
+        // Chip elements
+        const $replyCtx = document.getElementById("replyCtx");
+        const $replyToWho = document.getElementById("replyToWho");
+        const $replyCancel = document.getElementById("replyCancel");
+
+        function showReplyCtx({ author = "", snippet = "" } = {}) {
+          $replyToWho.textContent = author ? `${author}: ${snippet}` : "";
+          $replyCtx.style.display = author ? "inline-flex" : "none";
+        }
+        function clearReplyCtx() {
+          currentParentId = null;
+          $replyCtx.style.display = "none";
+          $replyToWho.textContent = "";
+        }
+        // Allow Forum.renderPosts() to call this
+        window.setReplyParent = function (postId, opts = {}) {
+          currentParentId = postId;
+          showReplyCtx({
+            author: (opts.author || "").toString(),
+            snippet: (opts.snippet || "").toString().slice(0, 80)
+          });
+          // Focus composer
+          $text?.focus();
+        };
+        // Also support custom event if Forum.renderPosts dispatches it
+        document.addEventListener("forum:set-reply-parent", (e) => {
+          const { postId, author, snippet } = e.detail || {};
+          if (!postId) return;
+          window.setReplyParent(postId, { author, snippet });
+        });
+        // Cancel button
+        $replyCancel?.addEventListener("click", clearReplyCtx);
+
         $files.addEventListener("change", () => {
   $preview.innerHTML = "";
   [...$files.files].forEach(f => {
@@ -177,34 +246,36 @@ document.getElementById("btnReply").addEventListener("click", async () => {
 
   if (!content && !hasFiles) return;
 
-  try {
-    if (hasFiles) {
-      const form = new FormData();
-      form.append("content", content);
-      [...$files.files].forEach(f => form.append("files", f));
+    try {
+      if (hasFiles) {
+        const form = new FormData();
+        form.append("content", content);
+        if (currentParentId) form.append("parentId", currentParentId);
+        [...$files.files].forEach(f => form.append("files", f));
 
-      const res = await fetch(`/api/forum/threads/${id}/posts-with-files`, {
-        method: "POST",
-        body: form,
-        credentials: "include"
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Помилка");
-    } else {
-      // старый путь без файлов
-      await Forum.api.addPost(id, { content });
+        const res = await fetch(`/api/forum/threads/${id}/posts-with-files`, {
+          method: "POST",
+          body: form,
+          credentials: "include"
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Помилка");
+      } else {
+        // JSON path — передаем parentId
+        await Forum.api.addPost(id, { content, parentId: currentParentId || undefined });
+      }
+
+      // очистка и перерисовка
+      $text.value = "";
+      $files.value = "";
+      $preview.innerHTML = "";
+      clearReplyCtx();
+
+      const data = await Forum.api.getThread(id);
+      Forum.renderPosts("#posts", data.posts, { thread: data.thread });
+    } catch (e) {
+      alert(e.message || e);
     }
-
-    // очистка и перерисовка
-    $text.value = "";
-    $files.value = "";
-    $preview.innerHTML = "";
-
-    const data = await Forum.api.getThread(id);
-    Forum.renderPosts("#posts", data.posts, { thread: data.thread });
-  } catch (e) {
-    alert(e.message || e);
-  }
 });
 
         if (!id) return (location.href = "./index.html");

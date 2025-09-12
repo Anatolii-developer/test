@@ -67,56 +67,91 @@ r.post('/uploads', ensureAuth, forumUpload.array('files', 10), async (req, res) 
   res.json({ ok: true, attachments: atts });
 });
 
-
 r.post('/threads/:id/posts-with-files', ensureAuth, (req, res) => {
   forumUpload.array('files', 10)(req, res, async (err) => {
-    if (err) {
-      // ошибки Multer (тип, размер, лимит) — отдадим 400 с сообщением
-      return res.status(400).json({ message: err.message || 'Upload error' });
+    if (err) return res.status(400).json({ message: err.message || 'Upload error' });
+try {
+  if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
+
+  const topic = await ForumTopic.findById(req.params.id);
+  if (!topic) return res.status(404).json({ message: 'Thread not found' });
+
+  const content = String(req.body.content || '').trim();
+  const hasFiles = (req.files && req.files.length > 0);
+  const parentId = req.body.parentId ? String(req.body.parentId).trim() : null;
+
+  let parent = null;
+  if (parentId) {
+    parent = await ForumPost.findById(parentId).select('topicId');
+    if (!parent) return res.status(404).json({ message: 'Parent post not found' });
+    if (String(parent.topicId) !== String(topic._id)) {
+      return res.status(400).json({ message: 'Parent belongs to another thread' });
     }
+  }
 
-    try {
-      if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
+  if (!content && !hasFiles) {
+    return res.status(400).json({ message: 'Content or files required' });
+  }
 
-      const topic = await ForumTopic.findById(req.params.id);
-      if (!topic) return res.status(404).json({ message: 'Thread not found' });
+  const atts = (req.files || []).map(f => ({
+    kind: f.mimetype.startsWith('image/') ? 'image'
+         : (f.mimetype.startsWith('video/') ? 'video' : 'file'),
+    url: `/uploads/${f.filename}`,
+    name: f.originalname,
+    mime: f.mimetype,
+    size: f.size
+  }));
 
-      const content = String(req.body.content || '').trim();
-      const hasFiles = (req.files && req.files.length > 0);
-      if (!content && !hasFiles) {
-        return res.status(400).json({ message: 'Content or files required' });
-      }
+  const post = await ForumPost.create({
+    topicId: topic._id,
+    authorId: req.user._id,
+    parentId: parent ? parent._id : null,
+    content,
+    attachments: atts
+  });
 
-      const atts = (req.files || []).map(f => ({
-        kind: f.mimetype.startsWith('image/') ? 'image'
-            : (f.mimetype.startsWith('video/') ? 'video' : 'file'),
-        url: `/uploads/${f.filename}`,
-        name: f.originalname,
-        mime: f.mimetype,
-        size: f.size
-      }));
+  await ForumTopic.findByIdAndUpdate(topic._id, {
+    $inc: { postsCount: 1 },
+    lastPostAt: new Date()
+  });
 
-      const post = await ForumPost.create({
-        topicId: topic._id,
-        authorId: req.user._id,
-        content,
-        attachments: atts
-      });
-
-      await ForumTopic.findByIdAndUpdate(topic._id, {
-        $inc: { postsCount: 1 },
-        lastPostAt: new Date()
-      });
-
-      res.json(post);
-    } catch (e) {
-      console.error('posts-with-files failed:', e?.message || e);
-      if (e?.stack) console.error(e.stack);
-      res.status(500).json({ message: 'Internal server error' });
-    }
+  return res.json(post);
+} catch (e) {
+  console.error('posts-with-files failed:', e?.message || e);
+  if (e?.stack) console.error(e.stack);
+  return res.status(500).json({ message: 'Internal server error' });
+}
   });
 });
 
+
+// reply-to-post (JSON)
+r.post('/posts/:id/replies', ensureAuth, async (req, res) => {
+  const parent = await ForumPost.findById(req.params.id);
+  if (!parent) return res.status(404).json({ message: 'Parent post not found' });
+
+  const topic = await ForumTopic.findById(parent.topicId);
+  if (!topic) return res.status(404).json({ message: 'Thread not found' });
+  if (topic.locked && !await canModerate(req.user)) return res.status(403).json({ message: 'Thread is locked' });
+  if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
+
+  const content = String(req.body.content || '').trim();
+if (!content) return res.status(400).json({ message: 'Content is required' });
+
+const post = await ForumPost.create({
+  topicId: topic._id,
+  authorId: req.user._id,
+  content,
+  parentId: parent._id
+});
+
+await ForumTopic.findByIdAndUpdate(
+  topic._id,
+  { $inc: { postsCount: 1 }, lastPostAt: new Date() }
+);
+
+return res.json(post);
+});
 // темы категории
 r.get('/categories/:id/topics', ensureAuth, async (req, res) => {
   const cat = await ForumCategory.findById(req.params.id).lean();
@@ -151,7 +186,7 @@ r.patch('/topics/:id', ensureAuth, async (req, res) => {
 r.get('/topics/:id/posts', ensureAuth, async (req, res) => {
   const posts = await ForumPost.find({ topicId: req.params.id, deleted: { $ne: true } })
     .sort({ createdAt: 1 })
-    .select('content authorId createdAt likes likedBy attachments')
+    .select('content authorId createdAt likes likedBy attachments parentId')
     .lean();
   res.json(posts);
 });
@@ -302,27 +337,35 @@ r.get('/threads/:id', optionalAuth, async (req, res) => {
     }
     if (!canSee) return res.status(403).json({ message: 'Forbidden' });
 
-    const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
-      .sort({ createdAt: 1 })
-      .populate('authorId', 'username email firstName lastName')
-      .select('content authorId createdAt likes likedBy attachments')
-      .lean();
+    const rawPosts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
+  .sort({ createdAt: 1 })
+  .populate('authorId', 'username email firstName lastName')
+  .select('content authorId createdAt likes likedBy attachments parentId')
+  .lean();
 
-    const uid = req.user ? String(req.user._id) : '';
+const uid = req.user ? String(req.user._id) : '';
 
-    const thread = t.authorId ? {
-      ...t,
-      author: {
-        _id: t.authorId._id,
-        username: t.authorId.username,
-        email: t.authorId.email,
-        firstName: t.authorId.firstName,
-        lastName: t.authorId.lastName,
-      }
-    } : t;
+// нормализуем по id и навешиваем children
+const byId = new Map();
+rawPosts.forEach(p => byId.set(String(p._id), { ...p, _id: String(p._id), children: [] }));
 
-    const mappedPosts = posts.map(p => ({
+const roots = [];
+for (const p of byId.values()) {
+  const pid = p.parentId ? String(p.parentId) : null;
+  if (pid && byId.has(pid)) {
+    byId.get(pid).children.push(p);
+  } else {
+    roots.push(p);
+  }
+}
+
+// DFS -> плоский список с depth
+const flat = [];
+(function dfs(nodes, depth) {
+  for (const p of nodes) {
+    flat.push({
       ...p,
+      depth,
       author: p.authorId ? {
         _id: p.authorId._id,
         username: p.authorId.username,
@@ -331,9 +374,24 @@ r.get('/threads/:id', optionalAuth, async (req, res) => {
         lastName: p.authorId.lastName,
       } : null,
       liked: Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === uid),
-    }));
+    });
+    if (p.children && p.children.length) dfs(p.children, depth + 1);
+  }
+})(roots, 0);
 
-    return res.json({ thread, posts: mappedPosts });
+// thread-автор так же нормализован
+const thread = t.authorId ? {
+  ...t,
+  author: {
+    _id: t.authorId._id,
+    username: t.authorId.username,
+    email: t.authorId.email,
+    firstName: t.authorId.firstName,
+    lastName: t.authorId.lastName,
+  }
+} : t;
+
+return res.json({ thread, posts: flat });
   } catch (e) {
     console.error('GET /api/forum/threads/:id failed:', e);
     return res.status(500).json({ message: 'Internal server error' });
@@ -372,52 +430,43 @@ r.post('/threads', ensureAuth, async (req, res) => {
 });
 
 // POST /api/forum/threads/:id/posts — add reply
+// POST /api/forum/threads/:id/posts — add reply (JSON)
 r.post('/threads/:id/posts', ensureAuth, async (req, res) => {
   if (!await canReply(req.user)) return res.status(403).json({ message: 'Forbidden' });
+
   const topic = await ForumTopic.findById(req.params.id);
   if (!topic) return res.status(404).json({ message: 'Thread not found' });
-  if (topic.locked && !await canModerate(req.user)) return res.status(403).json({ message: 'Thread is locked' });
+  if (topic.locked && !await canModerate(req.user)) {
+    return res.status(403).json({ message: 'Thread is locked' });
+  }
 
   const content = String(req.body.content || '').trim();
+  const parentId = req.body.parentId ? String(req.body.parentId).trim() : null;
+
+  let parent = null;
+  if (parentId) {
+    parent = await ForumPost.findById(parentId).select('topicId');
+    if (!parent) return res.status(404).json({ message: 'Parent post not found' });
+    if (String(parent.topicId) !== String(topic._id)) {
+      return res.status(400).json({ message: 'Parent belongs to another thread' });
+    }
+  }
+
   if (!content) return res.status(400).json({ message: 'Content is required' });
 
   const post = await ForumPost.create({
     topicId: topic._id,
     authorId: req.user._id,
+    parentId: parent ? parent._id : null,   // 👈 ВАЖНО
     content,
   });
-  await ForumTopic.findByIdAndUpdate(topic._id, { $inc: { postsCount: 1 }, lastPostAt: new Date() });
+
+  await ForumTopic.findByIdAndUpdate(topic._id, {
+    $inc: { postsCount: 1 },
+    lastPostAt: new Date()
+  });
 
   res.json(post);
-});
-
-// POST /api/forum/posts/:id/like
-r.post('/posts/:id/like', ensureAuth, async (req, res) => {
-  const userId = req.user._id;
-
-  // сначала пытаемся добавить userId в likedBy (без дублей)
-  const upd = await ForumPost.updateOne(
-    { _id: req.params.id, deleted: { $ne: true } },
-    { $addToSet: { likedBy: userId } }
-  );
-
-  if (upd.matchedCount === 0) {
-    return res.status(404).json({ message: 'Post not found' });
-  }
-if (upd.modifiedCount === 0) {
-  const cur = await ForumPost.findById(req.params.id).select('likes likedBy').lean();
-  return res.json({ ok: true, likes: cur?.likes ?? (cur?.likedBy?.length || 0), liked: true });
-}
-
-  // если реально добавили — можно либо инкрементить поле likes,
-  // либо посчитать по длине массива
-  const post = await ForumPost.findByIdAndUpdate(
-    req.params.id,
-    { $inc: { likes: 1 } },          // поддерживаем числовой кэш
-    { new: true, select: 'likes likedBy' }
-  );
-
-  res.json({ ok: true, likes: post.likes, liked: true });
 });
 
 

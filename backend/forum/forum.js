@@ -134,11 +134,12 @@ function can(action){
     async getThread(id) {
       return fetchJSON(`/api/forum/threads/${id}`);
     },
-    async addPost(threadId, { content }) {
+    async addPost(threadId, { content, parentId } = {}) {
+      const payload = parentId ? { content, parentId } : { content };
       return fetchJSON(`/api/forum/threads/${threadId}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify(payload),
       });
     },
     async likePost(postId) {
@@ -178,6 +179,7 @@ function can(action){
 
     const el = document.createElement('div');
     el.className = 'post';
+    el.style.marginLeft = `${(p.depth || 0) * 24}px`;
 
     // Текст
     const contentHTML = p.content ? `<div class="post-content" style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(p.content)}</div>` : '';
@@ -204,6 +206,7 @@ function can(action){
           <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1' : '0'}">
             👍 <span class="js-like-count">${likes}</span>
           </button>
+          <button class="btn btn-ghost js-reply" data-id="${p._id}">↩︎ Відповісти</button>
           ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
         </div>
       </div>
@@ -236,6 +239,16 @@ function can(action){
       if (!confirm('Видалити повідомлення?')) return;
       await Forum.api.deletePost(btn.dataset.id);
       btn.closest('.post')?.remove();
+    });
+  });
+  // reply: delegate to global setter (thread.html defines setReplyParent), or fire a CustomEvent
+  $root.querySelectorAll('.js-reply').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (typeof window.setReplyParent === 'function') {
+        window.setReplyParent(btn.dataset.id);
+      } else {
+        document.dispatchEvent(new CustomEvent('forum:set-reply-parent', { detail: { postId: btn.dataset.id } }));
+      }
     });
   });
 }

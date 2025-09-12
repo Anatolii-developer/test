@@ -176,93 +176,110 @@ async function getOrCreateDefaultCategory() {
 
 // GET /api/forum/threads
 r.get('/threads', optionalAuth, async (req, res) => {
-  const q = (req.query.q || '').trim().toLowerCase();
+  try {
+    const q = (req.query.q || '').trim().toLowerCase();
 
-  const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
-  const allowed = [];
-  for (const c of cats) {
-    let ok = await canSeeCategory(req.user, c);
-    // если пользователь не авторизован, но категория публичная (нет ограничений) — разрешаем
-    if (!ok && !req.user && (!c.allowedRoles || c.allowedRoles.length === 0)) ok = true;
-    if (ok) allowed.push(c._id);
+    const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();
+    const allowed = [];
+    for (const c of cats) {
+      try {
+        let ok = await canSeeCategory(req.user, c);
+        // гость + публичная категория (нет ограничений) — пускаем
+        if (!ok && !req.user && (!c.allowedRoles || c.allowedRoles.length === 0)) ok = true;
+        if (ok) allowed.push(c._id);
+      } catch (e) {
+        // Логируем конкретную категорию, но не валим весь запрос
+        console.error('canSeeCategory failed for category', c?._id, e);
+      }
+    }
+
+    if (!allowed.length) return res.json([]);
+
+    const filter = { categoryId: { $in: allowed } };
+    if (q) filter.title = { $regex: q, $options: 'i' };
+
+    const threads = await ForumTopic.find(filter)
+      .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
+      .limit(200)
+      .populate('authorId', 'username email firstName lastName')
+      .lean();
+
+    return res.json(threads.map(t => ({
+      _id: t._id,
+      title: t.title,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+      lastPostAt: t.lastPostAt,
+      postsCount: t.postsCount || 0,
+      pinned: !!t.pinned,
+      locked: !!t.locked,
+      author: t.authorId ? {
+        _id: t.authorId._id,
+        username: t.authorId.username,
+        email: t.authorId.email,
+        firstName: t.authorId.firstName,
+        lastName: t.authorId.lastName,
+      } : null,
+      preview: t.preview || '',
+    })));
+  } catch (e) {
+    console.error('GET /api/forum/threads failed:', e);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-  if (!allowed.length) return res.json([]);
-
-  const filter = { categoryId: { $in: allowed } };
-  if (q) filter.title = { $regex: q, $options: 'i' };
-
-  const threads = await ForumTopic.find(filter)
-    .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
-    .limit(200)
-    .populate('authorId', 'username email firstName lastName')   // ⇦ додали
-    .lean();
-
-  res.json(threads.map(t => ({
-    _id: t._id,
-    title: t.title,
-    createdAt: t.createdAt,
-    updatedAt: t.updatedAt,
-    lastPostAt: t.lastPostAt,
-    postsCount: t.postsCount || 0,
-    pinned: !!t.pinned,
-    locked: !!t.locked,
-    author: t.authorId ? {
-      _id: t.authorId._id,
-      username: t.authorId.username,
-      email: t.authorId.email,
-      firstName: t.authorId.firstName,
-      lastName: t.authorId.lastName,
-    } : null,
-    preview: t.preview || '',
-  })));
 });
 
 r.get('/threads/:id', optionalAuth, async (req, res) => {
-  const t = await ForumTopic.findById(req.params.id)
-    .populate('authorId', 'username email firstName lastName')
-    .lean();
-  if (!t) return res.status(404).json({ message: 'Thread not found' });
+  try {
+    const t = await ForumTopic.findById(req.params.id)
+      .populate('authorId', 'username email firstName lastName')
+      .lean();
+    if (!t) return res.status(404).json({ message: 'Thread not found' });
 
-  const cat = await ForumCategory.findById(t.categoryId).lean();
-  if (!cat) return res.status(404).json({ message: 'Category not found' });
-  let canSee = await canSeeCategory(req.user, cat);
-  if (!canSee && !req.user && (!cat.allowedRoles || cat.allowedRoles.length === 0)) {
-    canSee = true; // публичная категория, можно читать без авторизации
-  }
-  if (!canSee) return res.status(403).json({ message: 'Forbidden' });
+    const cat = await ForumCategory.findById(t.categoryId).lean();
+    if (!cat) return res.status(404).json({ message: 'Category not found' });
 
-  const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
-    .sort({ createdAt: 1 })
-    .populate('authorId', 'username email firstName lastName')
-    .select('content authorId createdAt likes likedBy')       // 👈 важно
-    .lean();
-
-  const uid = req.user ? String(req.user._id) : '';
-
-  const thread = t.authorId ? {
-    ...t,
-    author: {
-      _id: t.authorId._id,
-      username: t.authorId.username,
-      email: t.authorId.email,
-      firstName: t.authorId.firstName,
-      lastName: t.authorId.lastName,
+    let canSee = await canSeeCategory(req.user, cat);
+    if (!canSee && !req.user && (!cat.allowedRoles || cat.allowedRoles.length === 0)) {
+      canSee = true;
     }
-  } : t;
+    if (!canSee) return res.status(403).json({ message: 'Forbidden' });
 
-  const mappedPosts = posts.map(p => ({
-    ...p,
-    author: p.authorId ? {
-      _id: p.authorId._id,
-      username: p.authorId.username,
-      email: p.authorId.email,
-      firstName: p.authorId.firstName,
-      lastName: p.authorId.lastName,
-    } : null,
-    liked: Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === uid), // 👈 флаг для фронта
-  }));
+    const posts = await ForumPost.find({ topicId: t._id, deleted: { $ne: true } })
+      .sort({ createdAt: 1 })
+      .populate('authorId', 'username email firstName lastName')
+      .select('content authorId createdAt likes likedBy')
+      .lean();
 
-  res.json({ thread, posts: mappedPosts });
+    const uid = req.user ? String(req.user._id) : '';
+
+    const thread = t.authorId ? {
+      ...t,
+      author: {
+        _id: t.authorId._id,
+        username: t.authorId.username,
+        email: t.authorId.email,
+        firstName: t.authorId.firstName,
+        lastName: t.authorId.lastName,
+      }
+    } : t;
+
+    const mappedPosts = posts.map(p => ({
+      ...p,
+      author: p.authorId ? {
+        _id: p.authorId._id,
+        username: p.authorId.username,
+        email: p.authorId.email,
+        firstName: p.authorId.firstName,
+        lastName: p.authorId.lastName,
+      } : null,
+      liked: Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === uid),
+    }));
+
+    return res.json({ thread, posts: mappedPosts });
+  } catch (e) {
+    console.error('GET /api/forum/threads/:id failed:', e);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 // POST /api/forum/threads  — create in default category (and first post)

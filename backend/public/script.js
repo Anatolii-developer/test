@@ -1,5 +1,31 @@
 
+
 API_BASE = "http://157.230.121.24:5050";
+
+// --- Global fetch wrapper: add Bearer token and credentials by default ---
+(function(){
+  const _fetch = window.fetch;
+  window.fetch = function(input, init){
+    init = init || {};
+    const headers = new Headers(init.headers || {});
+    try {
+      const token =
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken') ||
+        localStorage.getItem('jwt') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('bearer');
+      if (token && !headers.has('Authorization')) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+    } catch(_) {}
+    return _fetch(input, {
+      ...init,
+      headers,
+      credentials: init.credentials ?? 'include',
+    });
+  };
+})();
 
 async function login() {
   const username = document.getElementById("username").value.trim();
@@ -23,10 +49,12 @@ async function login() {
       alert("Помилка: " + (result.message || "Невідома"));
       return;
     }
-
-    // Сохраняем пользователя
+    // Сохраняем токен и пользователя
+    if (result.token) {
+      try { localStorage.setItem('token', result.token); } catch(_) {}
+    }
     localStorage.setItem("user", JSON.stringify(result.user));
-    console.log("[LOGIN] Пользователь сохранён в localStorage");
+    console.log("[LOGIN] Пользователь и токен сохранены в localStorage");
 
     // Проверим, реально ли куки установились
     console.log("[LOGIN] Делаю проверочный запрос /profile...");
@@ -1154,6 +1182,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutButton) {
     logoutButton.addEventListener("click", () => {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("bearer");
       window.location.href = "index.html";
     });
   }

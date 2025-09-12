@@ -1,4 +1,4 @@
-// authz.middleware.js
+// backend/forum/authz.middleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -11,13 +11,10 @@ function extractToken(req) {
   return c.token || c.jwt || c.accessToken || c.authToken || c.bearer || null;
 }
 
-const token = jwt.sign(
-  { id: String(user._id) },           // <= ВАЖНО: поле "id"
-  process.env.JWT_SECRET,
-  { algorithm: 'HS256', expiresIn: '7d' }
-);
-res.cookie('token', token, { httpOnly:true, sameSite:'lax', secure:false, path:'/', maxAge:7*24*60*60*1000 });
-res.json({ user, token });            // и верни token в ответе
+function getUserIdFromPayload(decoded) {
+  // поддерживаем разные названия поля id
+  return decoded?.id || decoded?._id || decoded?.userId || decoded?.uid || null;
+}
 
 async function ensureAuth(req, res, next) {
   try {
@@ -38,7 +35,9 @@ async function ensureAuth(req, res, next) {
     req.auth = decoded;
     next();
   } catch (e) {
-    if (e.name === 'TokenExpiredError') return res.status(401).json({ message: 'Token expired' });
+    if (e.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired' });
+    }
     return res.status(401).json({ message: 'Unauthorized' });
   }
 }

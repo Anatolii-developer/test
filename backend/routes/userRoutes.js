@@ -21,18 +21,30 @@ const certStorage = multer.diskStorage({
 const certUpload = multer({ storage: certStorage });
 
 // ===== mini-auth =====
-function auth(req, res, next) {
-  const token =
+async function auth(req, res, next) {
+  const raw =
     (req.cookies && req.cookies.token) ||
     (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
 
-  if (!token)
-    return res.status(401).json({ ok: false, message: "Unauthorized" });
+  if (!raw) return res.status(401).json({ ok: false, message: "Unauthorized" });
+
   try {
-    const p = jwt.verify(token, process.env.JWT_SECRET || "dev_secret");
-    req.user = p; // { id, roles, email, username }
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error("JWT_SECRET not set");
+    const p = jwt.verify(raw, secret); // { id, ... }
+
+    const user = await User.findById(p.id).lean();
+    if (!user) return res.status(401).json({ ok: false, message: "Unauthorized" });
+
+    const roles = Array.isArray(user.roles) ? user.roles.map(r => String(r).toLowerCase()) : [];
+    req.user = {
+      id: String(user._id),
+      email: user.email,
+      username: user.username,
+      roles,
+    };
     next();
-  } catch {
+  } catch (e) {
     return res.status(401).json({ ok: false, message: "Invalid token" });
   }
 }

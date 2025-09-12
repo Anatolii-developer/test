@@ -219,16 +219,7 @@ document.getElementById("btnReply").addEventListener("click", async () => {
           document.getElementById("replyText").disabled = true;
           document.getElementById("lockHint").style.display = "inline";
         }
-        document
-          .getElementById("btnReply")
-          .addEventListener("click", async () => {
-            const text = document.getElementById("replyText").value.trim();
-            if (!text) return;
-            await Forum.api.addPost(id, { content: text });
-            document.getElementById("replyText").value = "";
-            const data = await Forum.api.getThread(id);
-            Forum.renderPosts("#posts", data.posts, { thread: data.thread });
-          });
+    
 
         // mod buttons (only for allowed roles)
         if (Forum.can("moderate:threads")) {

@@ -172,13 +172,31 @@ function can(action){
   $root.innerHTML = '';
 
   (posts || []).forEach(p => {
-    const canDel = Forum.can('moderate:posts') || (currentUser && currentUser._id === p.author?._id);
-
+    const canDel = Forum.can('moderate:posts') || (currentUser && String(currentUser._id) === String(p.author?._id));
     const liked = !!(p.liked ?? (Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === String(currentUser?._id))));
-    const likes = Number.isFinite(p.likes) ? p.likes : 0;
+    const likes  = Number.isFinite(p.likes) ? p.likes : 0;
 
     const el = document.createElement('div');
     el.className = 'post';
+
+    // Текст
+    const contentHTML = p.content ? `<div class="post-content" style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(p.content)}</div>` : '';
+
+    // Вложения
+    let attsHTML = '';
+    if (Array.isArray(p.attachments) && p.attachments.length) {
+      const parts = p.attachments.map(a => {
+        if (a.kind === 'image') {
+          return `
+            <a class="post-attachment" href="${a.url}" target="_blank" rel="noopener">
+              <img class="post-img" src="${a.url}" alt="${escapeHtml(a.name||'image')}" />
+            </a>`;
+        }
+        return `<div class="post-attachment"><a href="${a.url}" target="_blank" rel="noopener">${escapeHtml(a.name || 'Файл')}</a></div>`;
+      });
+      attsHTML = `<div class="post-attachments">${parts.join('')}</div>`;
+    }
+
     el.innerHTML = `
       <div class="post-head">
         <div class="meta"><strong>${escapeHtml(p.author?.username || p.author?.email || '-')}</strong> • ${fmtDate(p.createdAt)}</div>
@@ -189,49 +207,30 @@ function can(action){
           ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
         </div>
       </div>
-      <div style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(p.content || '')}</div>
+      ${contentHTML}
+      ${attsHTML}
     `;
     $root.appendChild(el);
   });
 
-  // toggle like/unlike без перезагрузки темы
+  // like / unlike
   $root.querySelectorAll('.js-like').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id;
       const countEl = btn.querySelector('.js-like-count');
       const likedNow = btn.dataset.liked === '1';
-
-      // блокируем кнопку только на время запроса, а не навсегда
       btn.disabled = true;
       try {
-        let r;
-        if (likedNow) {
-          // снять лайк
-          r = await Forum.api.unlikePost(id); // DELETE /posts/:id/like
-        } else {
-          // поставить лайк
-          r = await Forum.api.likePost(id);   // POST /posts/:id/like
-        }
-
-        // Синхронизируем UI строго по ответу сервера
-        if (r && typeof r.likes === 'number') {
-          countEl.textContent = String(r.likes);
-        } else {
-          // fallback — осторожный клиентский пересчёт
-          const cur = parseInt(countEl.textContent || '0', 10);
-          countEl.textContent = String(likedNow ? Math.max(0, cur - 1) : cur + 1);
-        }
+        const r = likedNow ? await Forum.api.unlikePost(id) : await Forum.api.likePost(id);
+        if (r && typeof r.likes === 'number') countEl.textContent = String(r.likes);
         btn.dataset.liked = r?.liked ? '1' : '0';
       } catch (e) {
         console.warn('like toggle error', e);
-        // опционально можно показать alert с e.message
-      } finally {
-        btn.disabled = false;
-      }
+      } finally { btn.disabled = false; }
     });
   });
 
-  // удаление поста
+  // delete
   $root.querySelectorAll('.js-del').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('Видалити повідомлення?')) return;

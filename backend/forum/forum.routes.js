@@ -18,6 +18,16 @@ try {
   loaded = {};
 }
 
+
+
+
+if (!ForumCategory || !ForumTopic || !ForumPost) {
+  throw new Error(
+    'Forum models are not available. Check require("./forum.models") and mongoose connection/registration.'
+  );
+}
+
+
 // список категорий (видимых для юзера)
 r.get('/categories', ensureAuth, async (req, res) => {
   const cats = await ForumCategory.find({}).sort({ order: 1, title: 1 }).lean();

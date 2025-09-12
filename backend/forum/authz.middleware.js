@@ -11,9 +11,13 @@ function extractToken(req) {
   return c.token || c.jwt || c.accessToken || c.authToken || c.bearer || null;
 }
 
-function getUserIdFromPayload(decoded) {
-  return decoded?.id || decoded?._id || decoded?.userId || decoded?.uid || null;
-}
+const token = jwt.sign(
+  { id: String(user._id) },           // <= ВАЖНО: поле "id"
+  process.env.JWT_SECRET,
+  { algorithm: 'HS256', expiresIn: '7d' }
+);
+res.cookie('token', token, { httpOnly:true, sameSite:'lax', secure:false, path:'/', maxAge:7*24*60*60*1000 });
+res.json({ user, token });            // и верни token в ответе
 
 async function ensureAuth(req, res, next) {
   try {

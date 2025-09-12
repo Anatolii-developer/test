@@ -1,5 +1,8 @@
+// authz.middleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+
+const ALGS = (process.env.JWT_ALGS || 'HS256').split(',').map(s => s.trim());
 
 function extractToken(req) {
   const h = req.headers.authorization || req.headers.Authorization || '';
@@ -17,9 +20,10 @@ async function ensureAuth(req, res, next) {
     const token = extractToken(req);
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
-    // <-- ключевой фикс: одинаковый секрет и fallback
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT secret missing');
 
+    const decoded = jwt.verify(token, secret, { algorithms: ALGS, clockTolerance: 5 });
     const uid = getUserIdFromPayload(decoded);
     if (!uid) return res.status(401).json({ message: 'Unauthorized' });
 
@@ -27,10 +31,12 @@ async function ensureAuth(req, res, next) {
     if (!user) return res.status(401).json({ message: 'Unauthorized' });
 
     req.user = user;
+    req.auth = decoded;
     next();
   } catch (e) {
+    if (e.name === 'TokenExpiredError') return res.status(401).json({ message: 'Token expired' });
     return res.status(401).json({ message: 'Unauthorized' });
   }
 }
 
-module.exports = { ensureAuth };
+module.exports = { ensureAuth, extractToken, getUserIdFromPayload };

@@ -25,23 +25,38 @@ const ForumTopicSchema = new mongoose.Schema({
   lastPostAt: { type: Date, default: Date.now, index: true },
 }, { timestamps: true });
 
+
 // server/forum/forum.models.js
+const AttachmentSchema = new Schema({
+  kind: { type: String, enum: ['image','video','file'], required: true },
+  url: String,
+  name: String,
+  mime: String,
+  size: Number,
+  width: Number,
+  height: Number,
+  duration: Number,
+  createdAt: { type: Date, default: Date.now },
+});
+
 const ForumPostSchema = new mongoose.Schema({
   topicId:  { type: mongoose.Schema.Types.ObjectId, ref: 'ForumTopic', required: true, index: true },
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   content:  { type: String, required: true, maxlength: 10000 },
-  attachments: [{ url: String, name: String, type: String, size: Number }],
 
- likes:    { type: Number,  default: 0 },           
-  likedBy:  [{ type: ObjectId, ref: 'User', index: true }],
+  // ВАЖНО: вот так
+  attachments: { type: [AttachmentSchema], default: [] },
+
+  likes:   { type: Number, default: 0 },
+  likedBy: [{ type: ObjectId, ref: 'User', index: true }],
 
   editedAt: Date,
   editedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   deleted:  { type: Boolean, default: false },
 }, { timestamps: true });
 
-module.exports = {
-  ForumCategory: mongoose.model('ForumCategory', ForumCategorySchema),
-  ForumTopic:    mongoose.model('ForumTopic',    ForumTopicSchema),
-  ForumPost:     mongoose.model('ForumPost',     ForumPostSchema),
-};
+// Индексы
+ForumTopicSchema.index({ categoryId: 1, pinned: -1, lastPostAt: -1, createdAt: -1 });
+ForumPostSchema.index({ topicId: 1, createdAt: 1 });
+ForumCategorySchema.index({ order: 1, title: 1 });
+

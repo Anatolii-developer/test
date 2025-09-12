@@ -172,10 +172,9 @@ function can(action){
   $root.innerHTML = '';
 
   (posts || []).forEach(p => {
-    const canDel = Forum.can('moderate:posts') || (Forum.currentUser && Forum.currentUser._id === p.author?._id);
+    const canDel = Forum.can('moderate:posts') || (currentUser && currentUser._id === p.author?._id);
 
-    // начальное состояние
-    const liked = !!(p.liked ?? (Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === String(Forum.currentUser?._id))));
+    const liked = !!(p.liked ?? (Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === String(currentUser?._id))));
     const likes = Number.isFinite(p.likes) ? p.likes : 0;
 
     const el = document.createElement('div');

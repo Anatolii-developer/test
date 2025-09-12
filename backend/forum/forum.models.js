@@ -60,3 +60,9 @@ ForumTopicSchema.index({ categoryId: 1, pinned: -1, lastPostAt: -1, createdAt: -
 ForumPostSchema.index({ topicId: 1, createdAt: 1 });
 ForumCategorySchema.index({ order: 1, title: 1 });
 
+
+module.exports = {
+  ForumCategory: mongoose.model('ForumCategory', ForumCategorySchema),
+  ForumTopic:    mongoose.model('ForumTopic',    ForumTopicSchema),
+  ForumPost:     mongoose.model('ForumPost',     ForumPostSchema),
+};

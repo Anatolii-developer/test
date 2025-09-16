@@ -142,6 +142,26 @@ function can(action){
         body: JSON.stringify(payload),
       });
     },
+    async togglePrivate(threadId, nextIsPrivate) {
+    return fetchJSON(`/api/forum/topics/${threadId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isPrivate: !!nextIsPrivate })
+    });
+  },
+ async removeParticipant(threadId, userId) {
+    return fetchJSON(`/api/forum/topics/${threadId}/participants/${encodeURIComponent(userId)}`, {
+      method: 'DELETE'
+    });
+  },
+
+    async addParticipant(threadId, userId) {
+    return fetchJSON(`/api/forum/topics/${threadId}/participants`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+  },
     async likePost(postId) {
       return fetchJSON(`/api/forum/posts/${postId}/like`, { method: 'POST' });
     },

@@ -20,6 +20,7 @@ const ForumTopicSchema = new Schema({
   pinned: { type: Boolean, default: false },
   locked: { type: Boolean, default: false },
 
+  isPrivate:   { type: Boolean, default: false, index: true },
   postsCount: { type: Number, default: 0 },
   lastPostAt: { type: Date, default: Date.now, index: true },
 }, { timestamps: true });
@@ -76,7 +77,7 @@ const ForumPostSchema = new Schema({
 }, { timestamps: true });
 
 // Индексы
-ForumTopicSchema.index({ categoryId: 1, pinned: -1, lastPostAt: -1, createdAt: -1 });
+ForumTopicSchema.index({ categoryId: 1, pinned: -1, lastPostAt: -1, createdAt: -1, isPrivate: 1 });
 ForumPostSchema.index({ topicId: 1, parentId: 1, createdAt: 1 }); // для дерева и сортировки
 ForumPostSchema.index({ topicId: 1, ancestors: 1 });              // выборка поддеревьев
 ForumCategorySchema.index({ order: 1, title: 1 });

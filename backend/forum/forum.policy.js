@@ -98,6 +98,47 @@ async function canSeeCategory(user, category) {
   return userRoles.some(n => allowed.includes(n));
 }
 
+
+function normRoles(user){
+  return (user?.roles || [])
+    .map(r => typeof r === 'string' ? r : r?.name)
+    .filter(Boolean)
+    .map(s => String(s).toLowerCase());
+}
+async function isAdmin(user){ return normRoles(user).includes('admin'); }
+async function isModerator(user){ 
+  const r = normRoles(user);
+  return ['moderator','ментор','supervisor','супервізор'].some(x => r.includes(x));
+}
+
+// Чи бачить тред
+async function canSeeTopic(user, topic){
+  if (!topic) return false;
+  if (await isAdmin(user) || await isModerator(user)) return true;
+  // автор завжди бачить
+  if (user && String(user._id) === String(topic.authorId)) return true;
+  if (!topic.isPrivate) return true;
+  if (!user) return false;
+  // приватний — тільки учасники
+  return (topic.participants || []).some(id => String(id) === String(user._id));
+}
+
+// Чи може відповісти в треді
+async function canReplyInTopic(user, topic){
+  if (!topic) return false;
+  if (await isAdmin(user) || await isModerator(user)) return true;
+  if (topic.locked) return false;
+  // автор треда — так
+  if (user && String(user._id) === String(topic.authorId)) return true;
+  // приватний — тільки учасники
+  if (topic.isPrivate) {
+    return user && (topic.participants || []).some(id => String(id) === String(user._id));
+  }
+  // публічний — будь-який авторизований
+  return !!user;
+}
+
 module.exports = {
-  isAdmin, can, canRead, canCreateTopic, canReply, canModerate, canEditPost, canDeletePost, canSeeCategory,
+  isAdmin, can, canRead, canCreateTopic, canReply, canModerate, canEditPost, canDeletePost, canSeeCategory, canSeeTopic,
+  canReplyInTopic, isModerator
 };

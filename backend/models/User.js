@@ -44,6 +44,8 @@ const userSchema = new mongoose.Schema({
   roles: [{ type: String }],
   status: { type: String, default: "WAIT FOR REVIEW" },
   createdAt: { type: Date, default: Date.now },
+forumBlocked: { type: Boolean, default: false },   // полный бан форума
+forumMutedUntil: { type: Date, default: null },    // мут (до даты); null = нет мута
 });
 
 // хеширование пароля перед сохранением

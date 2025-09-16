@@ -46,6 +46,10 @@ const ForumPostSchema = new Schema({
   depth:        { type: Number, default: 0 },
   repliesCount: { type: Number, default: 0 },
 
+  hidden: { type: Boolean, default: false },                // скрыт модератором
+  hiddenReason: { type: String, default: '' },              // причина скрытия
+  hiddenBy: { type: Schema.Types.ObjectId, ref: 'User' }, 
+
   // контент не обязателен, если есть вложения
   content: {
     type: String,

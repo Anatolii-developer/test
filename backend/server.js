@@ -50,6 +50,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/forum', express.static(path.join(__dirname, 'forum')));
 
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
 // API маршруты
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/courses', require('./routes/courseRoutes'));

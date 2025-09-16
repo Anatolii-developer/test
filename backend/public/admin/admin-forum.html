@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Forum Admin</title>
+    <link rel="stylesheet" href="./admin-styles.css" />
+    <style>
+      :root {
+        --green: #275d2b;
+        --red: #a31d1d;
+        --bg: #f6f7f9;
+      }
+      body {
+        font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto,
+          sans-serif;
+        margin: 0;
+        background: var(--bg);
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 24px auto;
+        padding: 0 16px;
+      }
+      h1 {
+        margin: 12px 0 16px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      @media (min-width: 1100px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        padding: 16px;
+      }
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 8px 0;
+      }
+      .muted {
+        color: #666;
+        font-size: 12px;
+      }
+      input,
+      select {
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+      }
+      button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .btn {
+        background: #f3f4f6;
+      }
+      .btn.primary {
+        background: var(--green);
+        color: #fff;
+      }
+      .btn.red {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn.warn {
+        background: #ffb020;
+        color: #111;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+      }
+      th {
+        text-align: left;
+        font-weight: 600;
+        background: #fafafa;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      .scroll {
+        max-height: 420px;
+        overflow: auto;
+        border: 1px solid #eee;
+        border-radius: 12px;
+      }
+      .tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #ecf5eb;
+        color: var(--green);
+        font-size: 12px;
+        margin-right: 6px;
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        font-size: 12px;
+        margin-right: 6px;
+      }
+      .danger {
+        color: var(--red);
+        font-weight: 600;
+      }
+      .ok {
+        color: var(--green);
+        font-weight: 600;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .inline {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .small {
+        font-size: 12px;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      .nowrap {
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="toolbar">
+        <h1>Модерація форуму</h1>
+        <div class="inline small">
+          <span id="me" class="muted">…</span>
+          <a class="btn" href="/forum/index.html">⬅ До форуму</a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="inline small">
+          <label class="small muted">Ліміт:</label>
+          <select id="limit">
+            <option>25</option>
+            <option selected>50</option>
+            <option>100</option>
+            <option>200</option>
+          </select>
+          <button class="btn" id="btnReload">Оновити</button>
+        </div>
+        <div class="muted">Адмін бачить усі пости, включно з прихованими</div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Теми</h2>
+          <div class="scroll">
+            <table id="tblTopics">
+              <thead>
+                <tr>
+                  <th>Назва</th>
+                  <th>Стан</th>
+                  <th>Пости</th>
+                  <th>Оновлено</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Останні пости</h2>
+          <div class="scroll">
+            <table id="tblPosts">
+              <thead>
+                <tr>
+                  <th>Пост</th>
+                  <th>Автор</th>
+                  <th>Статус</th>
+                  <th>Коли</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Користувачі</h2>
+          <div class="row small">
+            <div class="inline">
+              <label>Мут (хв):</label
+              ><input
+                id="muteMinutes"
+                type="number"
+                min="1"
+                step="5"
+                value="60"
+              />
+            </div>
+            <div class="inline">
+              <label>Або до дати:</label
+              ><input id="muteUntil" type="datetime-local" />
+            </div>
+          </div>
+          <div class="scroll">
+            <table id="tblUsers">
+              <thead>
+                <tr>
+                  <th>Користувач</th>
+                  <th>Ролі</th>
+                  <th>Статус</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Знаряддя</h2>
+          <div class="row">
+            <a class="btn" href="/forum/index.html" target="_blank"
+              >Відкрити форум</a
+            >
+            <a
+              class="btn"
+              href="/admin/admin-login.html?returnUrl=/admin/admin-forum.html"
+              >Змінити адміна</a
+            >
+          </div>
+          <div class="muted small">
+            API: <span class="mono">/api/forum/admin/overview</span>,
+            <span class="mono"
+              >PATCH /api/forum/admin/posts/:id/(hide|unhide)</span
+            >,
+            <span class="mono"
+              >POST /api/forum/admin/users/:id/(block|mute)</span
+            >, <span class="mono">POST /api/forum/threads/:id/(pin|lock)</span>,
+            <span class="mono">DELETE /api/forum/threads/:id</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API = ""; // той самий домен
+      const $ = (sel) => document.querySelector(sel);
+      const fmt = (d) => new Date(d).toLocaleString("uk-UA");
+
+      function getUser() {
+        try {
+          return JSON.parse(localStorage.getItem("user") || "null");
+        } catch {
+          return null;
+        }
+      }
+      function isAdmin(u) {
+        const roles = (u?.roles || []).map((r) => String(r).toLowerCase());
+        return roles.includes("admin");
+      }
+      async function fetchJSON(url, opts = {}) {
+        const res = await fetch(url, { credentials: "include", ...opts });
+        let data = null;
+        try {
+          data = await res.clone().json();
+        } catch {}
+        if (!res.ok) throw new Error(data?.message || "HTTP " + res.status);
+        return data;
+      }
+      async function ensureAdminOrRedirect() {
+        let me = getUser();
+        try {
+          const p = await fetchJSON(`${API}/api/users/profile`);
+          if (p?.user) me = p.user;
+        } catch {}
+        if (!isAdmin(me)) {
+          alert("Потрібна роль admin");
+          location.href =
+            "/admin/admin-login.html?returnUrl=/admin/admin-forum.html";
+          return null;
+        }
+        document.getElementById("me").textContent =
+          me.username || me.email || "admin";
+        return me;
+      }
+      async function loadOverview() {
+        const limit = Number(document.getElementById("limit").value || 50);
+        return fetchJSON(`${API}/api/forum/admin/overview?limit=${limit}`);
+      }
+
+      function renderTopics(topics) {
+        const tb = document.querySelector("#tblTopics tbody");
+        tb.innerHTML = "";
+        topics.forEach((t) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>
+            <div><a class="mono" href="/forum/thread.html?id=${
+              t._id
+            }" target="_blank">${t.title}</a></div>
+            <div class="small muted">id: <span class="mono">${
+              t._id
+            }</span></div>
+          </td>
+          <td class="nowrap">
+            ${t.pinned ? '<span class="tag">📌 Закріплено</span>' : ""}
+            ${
+              t.locked
+                ? '<span class="pill">🔒 Закрито</span>'
+                : '<span class="pill">Відкрита</span>'
+            }
+          </td>
+          <td class="nowrap">${t.postsCount || 0}</td>
+          <td class="small">${fmt(
+            t.lastPostAt || t.updatedAt || t.createdAt
+          )}</td>
+          <td class="nowrap">
+            <button class="btn" data-act="pin" data-id="${t._id}">${
+            t.pinned ? "Відкріпити" : "Закріпити"
+          }</button>
+            <button class="btn warn" data-act="lock" data-id="${t._id}">${
+            t.locked ? "Відкрити" : "Закрити"
+          }</button>
+            <button class="btn red" data-act="del-thread" data-id="${
+              t._id
+            }">Видалити</button>
+          </td>`;
+          tb.appendChild(tr);
+        });
+        tb.querySelectorAll("button[data-act]").forEach((btn) => {
+          btn.onclick = async () => {
+            const id = btn.dataset.id,
+              act = btn.dataset.act;
+            try {
+              if (act === "pin")
+                await fetchJSON(`/api/forum/threads/${id}/pin`, {
+                  method: "POST",
+                });
+              else if (act === "lock")
+                await fetchJSON(`/api/forum/threads/${id}/lock`, {
+                  method: "POST",
+                });
+              else if (act === "del-thread") {
+                if (!confirm("Видалити тему цілком?")) return;
+                await fetchJSON(`/api/forum/threads/${id}`, {
+                  method: "DELETE",
+                });
+              }
+              await refresh();
+            } catch (e) {
+              alert(e.message || e);
+            }
+          };
+        });
+      }
+
+      function renderPosts(posts) {
+        const tb = document.querySelector("#tblPosts tbody");
+        tb.innerHTML = "";
+        posts.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>
+            <div>${(p.content || "").slice(0, 160)}</div>
+            <div class="small muted">id:<span class="mono"> ${
+              p._id
+            }</span></div>
+            ${
+              p.attachments?.length
+                ? `<div class="small muted">файлів: ${p.attachments.length}</div>`
+                : ""
+            }
+          </td>
+          <td class="small"><div>${p.authorId || "-"}</div></td>
+          <td class="nowrap">${
+            p.hidden
+              ? '<span class="danger">Приховано</span>'
+              : '<span class="ok">Видимий</span>'
+          }</td>
+          <td class="small">${fmt(p.createdAt)}</td>
+          <td class="nowrap">
+            ${
+              p.hidden
+                ? `<button class="btn primary" data-act="unhide" data-id="${p._id}">Показати</button>`
+                : `<button class="btn warn" data-act="hide" data-id="${p._id}">Сховати</button>`
+            }
+          </td>`;
+          tb.appendChild(tr);
+        });
+        tb.querySelectorAll("button[data-act]").forEach((btn) => {
+          btn.onclick = async () => {
+            const id = btn.dataset.id,
+              act = btn.dataset.act;
+            try {
+              if (act === "hide") {
+                const reason = prompt(
+                  "Причина приховування (необов’язково):",
+                  ""
+                );
+                await fetchJSON(`/api/forum/admin/posts/${id}/hide`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ reason }),
+                });
+              } else if (act === "unhide") {
+                await fetchJSON(`/api/forum/admin/posts/${id}/unhide`, {
+                  method: "PATCH",
+                });
+              }
+              await refresh();
+            } catch (e) {
+              alert(e.message || e);
+            }
+          };
+        });
+      }
+
+      function renderUsers(users) {
+        const tb = document.querySelector("#tblUsers tbody");
+        tb.innerHTML = "";
+        users.forEach((u) => {
+          const blocked = !!u.forumBlocked;
+          const muted = u.forumMutedUntil ? new Date(u.forumMutedUntil) : null;
+          const muteActive = muted && muted.valueOf() > Date.now();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td><div>${
+            u.username || u.email || u._id
+          }</div><div class="small muted mono">${u.email || ""}</div></td>
+          <td class="small">${(u.roles || [])
+            .map((r) => `<span class="pill">${r}</span>`)
+            .join("")}</td>
+          <td class="small nowrap">
+            ${
+              blocked
+                ? '<span class="danger">Заблоковано</span>'
+                : '<span class="ok">OK</span>'
+            }
+            ${
+              muteActive
+                ? `<div class="small">Muted до ${fmt(muted)}</div>`
+                : ""
+            }
+          </td>
+          <td class="nowrap">
+            <button class="btn ${
+              blocked ? "primary" : "red"
+            }" data-act="block" data-id="${u._id}" data-val="${
+            blocked ? 0 : 1
+          }">
+              ${blocked ? "Розблокувати" : "Заблокувати"}
+            </button>
+            <button class="btn" data-act="mute" data-id="${u._id}">${
+            muteActive ? "Перезаписати мут" : "Мут"
+          }</button>
+            ${
+              muteActive
+                ? `<button class="btn" data-act="unmute" data-id="${u._id}">Зняти мут</button>`
+                : ""
+            }
+          </td>`;
+          tb.appendChild(tr);
+        });
+        tb.querySelectorAll("button[data-act]").forEach((btn) => {
+          btn.onclick = async () => {
+            const id = btn.dataset.id,
+              act = btn.dataset.act;
+            try {
+              if (act === "block") {
+                const blocked = btn.dataset.val === "1";
+                await fetchJSON(`/api/forum/admin/users/${id}/block`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ blocked }),
+                });
+              } else if (act === "mute") {
+                const min = Number(
+                  document.getElementById("muteMinutes").value || 0
+                );
+                const untilStr = document.getElementById("muteUntil").value;
+                const payload = {};
+                if (untilStr) payload.until = new Date(untilStr).toISOString();
+                else if (min > 0) payload.minutes = min;
+                else {
+                  alert("Вкажіть хвилини або дату/час");
+                  return;
+                }
+                await fetchJSON(`/api/forum/admin/users/${id}/mute`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+              } else if (act === "unmute") {
+                await fetchJSON(`/api/forum/admin/users/${id}/mute`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ minutes: 0 }),
+                });
+              }
+              await refresh();
+            } catch (e) {
+              alert(e.message || e);
+            }
+          };
+        });
+      }
+
+      async function refresh() {
+        const data = await loadOverview();
+        renderTopics(data.topics || []);
+        renderPosts(data.posts || []);
+        renderUsers(data.users || []);
+      }
+
+      (async function () {
+        const me = await ensureAdminOrRedirect();
+        if (!me) return;
+        document.getElementById("btnReload").onclick = refresh;
+        await refresh();
+      })();
+    </script>
+  </body>
+</html>

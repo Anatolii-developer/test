@@ -10,6 +10,10 @@ const PERMISSIONS_BY_ROLE = {
 };
 
 
+function isAdmin(user){
+  const roles = (user?.roles || []).map(r => String(r).toLowerCase());
+  return roles.includes('admin');
+} 
 
 function toCanonicalRole(name = '') {
   const n = String(name).trim().toLowerCase();
@@ -95,5 +99,5 @@ async function canSeeCategory(user, category) {
 }
 
 module.exports = {
-  can, canRead, canCreateTopic, canReply, canModerate, canEditPost, canDeletePost, canSeeCategory,
+  isAdmin, can, canRead, canCreateTopic, canReply, canModerate, canEditPost, canDeletePost, canSeeCategory,
 };

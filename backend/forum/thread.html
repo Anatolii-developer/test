@@ -286,78 +286,56 @@ document.getElementById("btnReply").addEventListener("click", async () => {
         Forum.renderThreadHead(thread, "#tTitle", "#tMeta", "#tModActions");
         Forum.renderPosts("#posts", posts, { thread });
 
-        // composer
-        if (thread.locked) {
-          document.getElementById("composer").style.opacity = 0.6;
-          document.getElementById("replyText").disabled = true;
-          document.getElementById("lockHint").style.display = "inline";
+        // показать статус приватності поруч із метаданими
+        if (thread.isPrivate) {
+          const tMeta = document.getElementById("tMeta");
+          if (tMeta) tMeta.textContent += " • 🔐 Приватна";
         }
-    
 
-        // mod buttons (only for allowed roles)
-        if (Forum.can("moderate:threads")) {
-          document.getElementById("tModActions").style.display = "flex";
-          document.getElementById("btnPin").onclick = async () => {
-            await Forum.api.togglePin(id);
-            location.reload();
-          };
-          document.getElementById("btnLock").onclick = async () => {
-            await Forum.api.toggleLock(id);
-            location.reload();
-          };
-          document.getElementById("btnDelThread").onclick = async () => {
+        // хто може бачити мод-кнопки: модератор або автор теми
+        const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();
+        const canModThis = Forum.can("moderate:threads") || (me && thread.author && String(me._id) === String(thread.author._id));
+
+        // mod/owner buttons
+        if (canModThis) {
+          const $actions = document.getElementById("tModActions");
+          if ($actions) $actions.style.display = "flex";
+
+          const $btnPin = document.getElementById("btnPin");
+          const $btnLock = document.getElementById("btnLock");
+          const $btnDel = document.getElementById("btnDelThread");
+          const $btnPrivacy = document.getElementById("btnPrivacy");
+          const $btnInvite = document.getElementById("btnInvite");
+
+          $btnPin && ($btnPin.onclick = async () => { await Forum.api.togglePin(id); location.reload(); });
+          $btnLock && ($btnLock.onclick = async () => { await Forum.api.toggleLock(id); location.reload(); });
+          $btnDel && ($btnDel.onclick = async () => {
             if (!confirm("Видалити тему?")) return;
             await Forum.api.deleteThread(id);
             location.href = "./index.html";
-          };
+          });
+
+          // приватність
+          $btnPrivacy && ($btnPrivacy.onclick = async () => {
+            const next = !thread.isPrivate;
+            await Forum.api.togglePrivate(id, next);
+            location.reload();
+          });
+
+          // запрошення
+          $btnInvite && ($btnInvite.onclick = async () => {
+            const userId = prompt("Введіть ID користувача, якого запросити:");
+            if (!userId) return;
+            try {
+              await Forum.api.addParticipant(id, userId.trim());
+              alert("Користувача додано до приватної теми");
+            } catch (e) {
+              alert(e.message || e);
+            }
+          });
         }
-
-        
+    
       });
-
-      // после получения { thread, posts }
-const isModerator = Forum.can("moderate:threads");
-
-// показать текущий статус приватности в заголовке
-if (thread.isPrivate) {
-  const tMeta = document.getElementById("tMeta");
-  tMeta.textContent += " • 🔐 Приватна";
-}
-
-// мод-кнопки
-if (Forum.can("moderate:threads") || (Forum.currentUser && Forum.currentUser._id === thread.author?._id)) {
-  document.getElementById("tModActions").style.display = "flex";
-
-  // уже есть:
-  document.getElementById("btnPin").onclick = async () => { await Forum.api.togglePin(id); location.reload(); };
-  document.getElementById("btnLock").onclick = async () => { await Forum.api.toggleLock(id); location.reload(); };
-  document.getElementById("btnDelThread").onclick = async () => { if (!confirm("Видалити тему?")) return; await Forum.api.deleteThread(id); location.href = "./index.html"; };
-
-  // НОВОЕ: приватность
-  const $btnPrivacy = document.getElementById("btnPrivacy");
-  if ($btnPrivacy) {
-    $btnPrivacy.onclick = async () => {
-      const next = !thread.isPrivate;
-      await Forum.api.togglePrivate(id, next);
-      location.reload();
-    };
-  }
-
-  // НОВОЕ: приглашение участника
-  const $btnInvite = document.getElementById("btnInvite");
-  if ($btnInvite) {
-    $btnInvite.onclick = async () => {
-      const userId = prompt("Введіть ID користувача, якого запросити:");
-      if (!userId) return;
-      try {
-        await Forum.api.addParticipant(id, userId.trim());
-        alert("Користувача додано до приватної теми");
-      } catch (e) {
-        alert(e.message || e);
-      }
-    };
-  }
-}
     </script>
   </body>
 </html>

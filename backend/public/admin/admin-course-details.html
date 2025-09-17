@@ -178,7 +178,9 @@
         <div class="date-range">
           <!-- видимий інпут за дизайном -->
           <input id="dateRangeInput" type="text" readonly placeholder="ДД.ММ.РРРР – ДД.ММ.РРРР" />
-
+          <button class="edit-btn" id="dateEditBtn" type="button" onclick="openDateEditor()" aria-label="Редагувати дати">
+            <img src="../assets/edit-icon.svg" alt="Edit" />
+          </button>
           <!-- приховані реальні дати -->
           <input id="startDate" type="date" hidden />
           <input id="endDate" type="date" hidden />
@@ -581,6 +583,7 @@
         const pEnd = document.getElementById("pickerEnd");
         const btnApply = document.getElementById("applyDates");
         const btnCancel = document.getElementById("cancelDates");
+        const editBtn = document.getElementById('dateEditBtn');
         if (!input || !pop) return;
 
         const hiddenStart = () => document.getElementById("startDate");
@@ -601,10 +604,33 @@
           setDateRangeDisplay(pStart?.value || "", pEnd?.value || "");
           close();
         });
-        document.addEventListener("click", (e) => {
-          if (!pop.contains(e.target) && e.target !== input) close();
+        // Modified click handler to ignore clicks on editBtn as well
+        document.addEventListener('click', (e) => {
+          const t = e.target;
+          if (pop.contains(t) || t === input || t === editBtn) return; // не закривати при кліку на інпут/кнопку/всередині поповера
+          close();
         });
+        // щоб кліки всередині поповера не бульбашилися до документа
+        pop.addEventListener('click', (e)=> e.stopPropagation());
+        // Click handler for edit button
+        if (editBtn) editBtn.addEventListener('click', (e)=> { e.stopPropagation(); openDateEditor(e); });
       })();
+
+      // Function to open date popover and stop event propagation
+      function openDateEditor(event){
+        try { if (event) event.stopPropagation(); } catch(_){}
+        const pop = document.getElementById('datePopover');
+        const pStart = document.getElementById('pickerStart');
+        const pEnd = document.getElementById('pickerEnd');
+        const hStart = document.getElementById('startDate');
+        const hEnd = document.getElementById('endDate');
+        if (!pop) return;
+        if (pStart && hStart) pStart.value = hStart.value || '';
+        if (pEnd && hEnd) pEnd.value = hEnd.value || '';
+        pop.classList.add('open');
+        // фокус на перший пікер
+        setTimeout(()=>{ try { pStart && pStart.focus(); } catch(_){} }, 0);
+      }
 
       async function approveCourse() {
         if (!courseId) return;
@@ -613,7 +639,7 @@
             `http://157.230.121.24:5050/api/courses/${courseId}/approve`,
             { method: "PUT" }
           );
-          const data = await r.json().catch(() => ({}));
+          const   data = await r.json().catch(() => ({}));
           if (!r.ok)
             throw new Error(data.message || "Не вдалося підтвердити курс");
           alert("Курс підтверджено");

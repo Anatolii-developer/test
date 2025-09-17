@@ -1,87 +1,139 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Поточні курси</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-  <!-- Sidebar -->
-  <aside class="sidebar collapsed" id="sidebar">
-    <div class="toggle-button" onclick="toggleSidebar()">
-      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
-    </div>
-    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
-    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
-    <nav>
-      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
-      <a href="mycertificates.html"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
-      <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
-      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
-      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
-      <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
-      <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
-      <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
-      <a href="#"><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a>
-    </nav>
-    <div class="logout">
-      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
-      <span>Вийти з акаунту</span>
-    </div>
-  </aside>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Поточні курси</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar collapsed" id="sidebar">
+      <div class="toggle-button" onclick="toggleSidebar()">
+        <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+      </div>
+      <img
+        class="logo"
+        src="assets/sidebar/IPS Logo (2).svg"
+        alt="Logo"
+        id="logoExpanded"
+      />
+      <img
+        class="logo-collapsed"
+        src="assets/sidebar/IPS Logo (1).svg"
+        alt="Logo Small"
+        id="logoCollapsed"
+      />
+      <img
+        class="profile"
+        src="assets/profile-photo.png"
+        alt="User"
+        width="40"
+        height="40"
+      />
+      <nav>
+        <a href="profile.html"
+          ><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a
+        >
+        <a href="mycertificates.html"
+          ><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a
+        >
+        <a href="career-faq.html"
+          ><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a
+        >
+        <a href="library.html"
+          ><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a
+        >
+        <a href="my-courses.html"
+          ><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a
+        >
+        <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
+        <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
+        <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
+        <a href="#"
+          ><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a
+        >
+      </nav>
+      <div class="logout">
+        <img
+          src="assets/sidebar/log-out.svg"
+          alt="Logout Icon"
+          width="20"
+          height="20"
+        />
+        <span>Вийти з акаунту</span>
+      </div>
+    </aside>
 
-  <!-- Main Content -->
-  <main id="mainContent">
-    <div class="main-header">
-      <h2>Поточні курси</h2>
-      <img src="assets/library/going.png" alt="Current Courses" />
-    </div>
-
-    <div class="completed-nav-buttons">
-      <a href="my-courses.html" class="completed-nav-button"><img src="assets/library/arrow-main.svg">Головна</a>
-      <a href="completed-courses.html" class="completed-nav-button">Пройдені</a>
-      <a href="current-courses.html" class="completed-nav-button active">Поточні</a>
-      <a href="planned-courses.html" class="completed-nav-button">Заплановані</a>
-      <a href="create-course.html" class="completed-nav-button create">Створити</a>
-    </div>
-
-    <section class="completed-courses-content">
-      <div class="date-section">
-        <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
-        <div class="date-inputs">
-          <input type="date" class="date-input" />
-          <input type="date" class="date-input" />
-        </div>
-        <div class="filter-btn-wrapper">
-          <button class="filter-btn" disabled>Фільтрувати</button>
-        </div>
+    <!-- Main Content -->
+    <main id="mainContent">
+      <div class="main-header">
+        <h2>Поточні курси</h2>
+        <img src="assets/library/going.png" alt="Current Courses" />
       </div>
 
-      <div class="current-courses-container"></div>
-    </section>
-  </main>
+      <div class="completed-nav-buttons">
+        <a href="my-courses.html" class="completed-nav-button"
+          ><img src="assets/library/arrow-main.svg" />Головна</a
+        >
+        <a href="completed-courses.html" class="completed-nav-button"
+          >Пройдені</a
+        >
+        <a href="current-courses.html" class="completed-nav-button active"
+          >Поточні</a
+        >
+        <a href="planned-courses.html" class="completed-nav-button"
+          >Заплановані</a
+        >
+        <a href="create-course.html" class="completed-nav-button create"
+          >Створити</a
+        >
+      </div>
 
-  <!-- Modal -->
-  <div class="modal-current-course" id="courseModal">
-    <div class="modal-current-course-content">
-      <span class="modal-current-course-close" onclick="closeModal()">&times;</span>
-      <div id="modalCourseContent"></div>
+      <section class="completed-courses-content">
+        <div class="date-section">
+          <label class="date-label">Publishing Date (DD/MM/YYYY)</label>
+          <div class="date-inputs">
+            <input type="date" class="date-input" />
+            <input type="date" class="date-input" />
+          </div>
+          <div class="filter-btn-wrapper">
+            <button class="filter-btn" disabled>Фільтрувати</button>
+          </div>
+        </div>
+
+        <div class="current-courses-container"></div>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-current-course" id="courseModal">
+      <div class="modal-current-course-content">
+        <span class="modal-current-course-close" onclick="closeModal()"
+          >&times;</span
+        >
+        <div id="modalCourseContent"></div>
+      </div>
     </div>
-  </div>
 
-  <script>
-    const API_BASE = "http://157.230.121.24:5050";
+    <script>
+      const API_BASE = "http://157.230.121.24:5050";
 
-    function openCourseModal(course) {
-      const modal = document.getElementById('courseModal');
-      const content = document.getElementById('modalCourseContent');
-      const start = new Date(course.courseDates.start).toLocaleDateString("uk-UA");
-      const end = new Date(course.courseDates.end).toLocaleDateString("uk-UA");
+      function openCourseModal(course) {
+        const modal = document.getElementById("courseModal");
+        const content = document.getElementById("modalCourseContent");
+        const start = new Date(course.courseDates.start).toLocaleDateString(
+          "uk-UA"
+        );
+        const end = new Date(course.courseDates.end).toLocaleDateString(
+          "uk-UA"
+        );
 
-      content.innerHTML = `
+        content.innerHTML = `
       <div class="modal-course-dates-line">
   <hr />
   <span>${start} – ${end}</span>
@@ -92,56 +144,75 @@
         <h4 class="modal-course-subtitle">${course.courseSubtitle}</h4>
         <p class="modal-course-description">${course.courseDescription}</p>
         <div class="modal-course-info">
-          <div><span class="modal-course-label">Тип заходу:</span> <span class="modal-course-answer">${course.eventType}</span></div>
+          <div><span class="modal-course-label">Тип заходу:</span> <span class="modal-course-answer">${
+            course.eventType
+          }</span></div>
           <div><span class="modal-course-label">Дати проведення курсу:</span> <span class="modal-course-answer">${start} – ${end}</span></div>
-          <div><span class="modal-course-label">Дні проведення курсу:</span> <span class="modal-course-answer">${course.courseDays.join(', ')}</span></div>
-          <div><span class="modal-course-label">Години проведення:</span> <span class="modal-course-answer">${course.courseTime.start} – ${course.courseTime.end}</span></div>
-          <div><span class="modal-course-label">Тип курсу:</span> <span class="modal-course-answer">${course.accessType}</span></div>
-          <div><span class="modal-course-label">Тривалість курсу:</span> <span class="modal-course-answer">${course.courseDuration}</span></div>
-          <div><span class="modal-course-label">Вартість курсу:</span> <span class="modal-course-answer">${course.coursePrice}</span></div>
-          ${course.zoomLink ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Посилання на зустріч:</a></span></div>` : ""}
+          <div><span class="modal-course-label">Дні проведення курсу:</span> <span class="modal-course-answer">${course.courseDays.join(
+            ", "
+          )}</span></div>
+          <div><span class="modal-course-label">Години проведення:</span> <span class="modal-course-answer">${
+            course.courseTime.start
+          } – ${course.courseTime.end}</span></div>
+          <div><span class="modal-course-label">Тип курсу:</span> <span class="modal-course-answer">${
+            course.accessType
+          }</span></div>
+          <div><span class="modal-course-label">Тривалість курсу:</span> <span class="modal-course-answer">${
+            course.courseDuration
+          }</span></div>
+          <div><span class="modal-course-label">Вартість курсу:</span> <span class="modal-course-answer">${
+            course.coursePrice
+          }</span></div>
+          ${
+            course.zoomLink
+              ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Посилання на зустріч:</a></span></div>`
+              : ""
+          }
            <div class="modal-course-footer">
     <button class="view-site-button">Переглянути на сайті</button>
   </div>
         </div>`;
 
-      modal.style.display = "flex";
-      
-    }
+        modal.style.display = "flex";
+      }
 
-    function closeModal() {
-      document.getElementById('courseModal').style.display = "none";
-    }
+      function closeModal() {
+        document.getElementById("courseModal").style.display = "none";
+      }
 
-    async function loadCurrentCourses() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user) return;
+      async function loadCurrentCourses() {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) return;
 
-      try {
-        const res = await fetch(`${API_BASE}/api/courses`);
-        const allCourses = await res.json();
+        try {
+          const res = await fetch(`${API_BASE}/api/courses`);
+          const allCourses = await res.json();
 
-        const currentCourses = allCourses.filter(course =>
-          course.status === "Поточний" &&
-          (course.accessType === "Відкрита група" || course.participants.includes(user._id))
-        );
+          const currentCourses = allCourses.filter(
+            (course) =>
+              course.status === "Поточний" &&
+              (course.accessType === "Відкрита група" ||
+                course.participants.includes(user._id))
+          );
 
-        const container = document.querySelector(".current-courses-container");
-        container.innerHTML = "";
+          const container = document.querySelector(
+            ".current-courses-container"
+          );
+          container.innerHTML = "";
 
-        if (currentCourses.length === 0) {
-          container.innerHTML = "<p>Наразі немає поточних курсів</p>";
-          return;
-        }
+          if (currentCourses.length === 0) {
+            container.innerHTML = "<p>Наразі немає поточних курсів</p>";
+            return;
+          }
 
-        currentCourses.forEach(course => {
-          const courseDate = course.courseDates?.start
-            ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
-            : "";
+          currentCourses.forEach((course) => {
+            const courseDate = course.courseDates?.start
+              ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+              : "";
 
-          const div = document.createElement("div");
-          div.className = "current-course-item";
-          div.innerHTML = `
+            const div = document.createElement("div");
+            div.className = "current-course-item";
+            div.innerHTML = `
             <div class="course-date-line">
               <hr />
               <span>${courseDate}</span>
@@ -150,28 +221,36 @@
             <div class="current-course-inner">
               <div>
                 <h3 class="current-course-title">${course.courseTitle}</h3>
-                <p class="current-course-subtitle">${course.courseSubtitle || ""}</p>
-                <p class="current-course-description">${course.courseDescription || ""}</p>
+                <p class="current-course-subtitle">${
+                  course.courseSubtitle || ""
+                }</p>
+                <p class="current-course-description">${
+                  course.courseDescription || ""
+                }</p>
               </div>
               <div class="course-actions">
-                ${course.zoomLink ? `<a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">Приєднатися до зустрічі</a>` : ""}
+                ${
+                  course.zoomLink
+                    ? `<a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">Приєднатися до зустрічі</a>`
+                    : ""
+                }
                 <button class="current-show-more-btn">Дізнатись більше</button>
               </div>
             </div>`;
 
-          div.querySelector(".current-show-more-btn").addEventListener("click", () => openCourseModal(course));
+            div
+              .querySelector(".current-show-more-btn")
+              .addEventListener("click", () => openCourseModal(course));
 
-
-          container.appendChild(div);
-        });
-
-      } catch (err) {
-        console.error("Помилка при завантаженні курсів:", err);
+            container.appendChild(div);
+          });
+        } catch (err) {
+          console.error("Помилка при завантаженні курсів:", err);
+        }
       }
-    }
 
-    window.addEventListener("DOMContentLoaded", loadCurrentCourses);
-  </script>
-<script src="script.js"></script>
-</body>
+      window.addEventListener("DOMContentLoaded", loadCurrentCourses);
+    </script>
+    <script src="script.js"></script>
+  </body>
 </html>

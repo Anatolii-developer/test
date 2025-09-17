@@ -314,6 +314,27 @@
     </div>
     <script src="admin-auth.js"></script>
     <script>
+  // Ensure logoutUser is globally available for admin-auth.js
+  function logoutUser() {
+    try {
+      localStorage.removeItem("user");
+      ["token", "authToken", "jwt", "accessToken", "bearer"].forEach((k) =>
+        localStorage.removeItem(k)
+      );
+    } catch (_) {}
+
+    // Attempt backend logout (ignore network errors)
+    fetch(`/api/users/logout`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
+
+    // Redirect to admin login with return URL
+    const back = encodeURIComponent(location.pathname + location.search);
+    location.href = `admin-login.html?returnUrl=${back}`;
+  }
+  // expose to window in case admin-auth.js references it directly
+  window.logoutUser = logoutUser;
   // --- Page bootstrap ---
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderAdminSidebar === "function") {

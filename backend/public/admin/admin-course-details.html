@@ -325,6 +325,7 @@
       });
 
       let courseId;
+      let resolvedCourseId = null; // фактичний _id курсу після завантаження
       let allUsers = [];
       let selectedParticipantIds = [];
 
@@ -373,18 +374,60 @@
       }
 
       async function deleteCourse() {
-  if (!courseId) { alert("Не вказано ID курсу"); return; }
+  const formTitle = document.getElementById("title")?.value?.trim() || "";
+  const idRaw = courseId;
+  const idToDelete = resolvedCourseId || idRaw;
+
+  if (!idToDelete) { alert("Не вказано ID курсу"); return; }
   if (!confirm("Точно видалити цей курс? Дію неможливо скасувати.")) return;
 
   const btn = document.getElementById('deleteBtn');
   btn && (btn.disabled = true);
 
-  try {
-    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+  // helper to perform DELETE by id
+  const doDelete = async (id) => {
+    const r = await fetch(`http://157.230.121.24:5050/api/courses/${id}`, {
       method: "DELETE",
       credentials: "include",
       headers: getAuthHeaders(),
     });
+    return r;
+  };
+
+  try {
+    // 1) пряма спроба видалити поточний (уточнений) id
+    let r = await doDelete(idToDelete);
+
+    if (r.status === 404) {
+      // 2) fallback: спробуємо відшукати курс у списку і видалити знайдений
+      console.warn("[deleteCourse] 404 for id:", idToDelete, "— шукаю в списку за назвою:", formTitle);
+      const listRes = await fetch(`http://157.230.121.24:5050/api/courses`);
+      const all = await listRes.json();
+
+      // підбір кандидатів: точна назва або починається/закінчується так само як idRaw
+      let candidates = all.filter(c => String(c._id) === String(idRaw));
+      if (!candidates.length && formTitle) {
+        candidates = all.filter(c => (c.courseTitle || "").trim() === formTitle);
+      }
+      if (!candidates.length && idRaw) {
+        candidates = all.filter(c => String(c._id).startsWith(String(idRaw)) || String(c._id).endsWith(String(idRaw)));
+      }
+
+      if (!candidates.length) {
+        alert("Курс не знайдено (можливо, вже видалено або невірний ID).");
+        return;
+      }
+
+      if (candidates.length > 1) {
+        const list = candidates.slice(0, 5).map(c => `• ${c.courseTitle || '(без назви)'} — ${c._id}`).join('\n');
+        alert("Знайдено кілька можливих кандидатів за цим ідентифікатором/назвою:\n\n" + list + "\n\nУточніть, будь ласка, який саме потрібно видалити.");
+        return;
+      }
+
+      const found = candidates[0];
+      if (!confirm(`Знайдено курс:\n"${found.courseTitle || '(без назви)'}"\n(id: ${found._id})\n\nВидалити його?`)) return;
+      r = await doDelete(found._id);
+    }
 
     if (r.status === 404) {
       alert("Курс не знайдено (можливо, уже видалено або невірний ID).");
@@ -470,6 +513,7 @@
     }
 
     const course = await res.json();
+    resolvedCourseId = course && course._id ? course._id : courseId;
 
     // ====== заповнюємо поля ======
     const $ = (id) => document.getElementById(id);

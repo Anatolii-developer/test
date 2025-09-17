@@ -404,6 +404,7 @@
       }
 
       const course = await res.json();
+      console.log("[admin-course-details] loaded course:", course);
 
       // Basic fields
       $("title").value       = course.courseTitle || "";
@@ -416,6 +417,9 @@
       $("zoom").value        = course.zoomLink || "";
       $("creatorName").value = course.creatorName || (course.creatorId ? ([course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(" ") || course.creatorId.email || "") : "");
       $("creatorRole").value = course.creatorRole || (course.creatorId ? (course.creatorId.role || (Array.isArray(course.creatorId.roles) ? course.creatorId.roles.join(", ") : "")) : "");
+
+      // Group type (UI field) — fall back to accessType if backend has no explicit groupType
+      $("groupType").value = (course.groupType || course.accessType || "");
 
       // Dates
       const start = course.courseDates && course.courseDates.start;

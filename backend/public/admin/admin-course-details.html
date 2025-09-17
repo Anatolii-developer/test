@@ -95,17 +95,6 @@
       .submit-btn.danger {
         background: #a31d1d;
       }
-
-      #dateRangeInput {
-  padding: 12px;
-  font-size: 16px;
-  border: 2px solid #e37009;
-  border-radius: 8px;
-  background-color: #fffef9;
-  color: #333;
-  min-height: 48px;
-  width: 100%;
-}
     </style>
   </head>
   <body class="with-sidebar">
@@ -123,16 +112,13 @@
           <input id="creatorRole" type="text" disabled />
         </div>
       </div>
-     <div class="editable-block">
-  <label>Дати проведення курсу</label>
-
-  <!-- одиночний видимий інпут -->
-  <input id="dateRangeInput" type="text" placeholder="ДД.ММ.РРРР – ДД.ММ.РРРР" />
-
-  <!-- приховані реальні дати (їх читає saveChanges) -->
-  <input id="startDate" type="date" hidden />
-  <input id="endDate"   type="date" hidden />
-</div>
+      <div class="editable-block">
+        <label>Назва курсу</label>
+        <textarea id="title" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('title')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
 
       <div class="editable-block">
         <label>Тип (інфо)</label>
@@ -546,70 +532,6 @@
           alert(e.message || "Помилка підтвердження");
         }
       }
-
-      // Форматування
-const pad2 = n => String(n).padStart(2,'0');
-const toYMD = iso => {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d)) return "";
-  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-};
-const toDMY = iso => {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d)) return "";
-  return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
-};
-
-// Після завантаження курсу — оновіть відображення одним рядком
-function setDateRangeDisplay(startIso, endIso) {
-  const $range = document.getElementById("dateRangeInput");
-  const $start = document.getElementById("startDate");
-  const $end   = document.getElementById("endDate");
-  if ($start) $start.value = toYMD(startIso);
-  if ($end)   $end.value   = toYMD(endIso);
-  if ($range) $range.value =
-    (startIso || endIso) ? `${toDMY(startIso)} – ${toDMY(endIso)}` : "";
-}
-
-// В loadCourseDetails() ПІСЛЯ того як отримаєте start/end:
-/// const start = course.courseDates?.start;
-/// const end   = course.courseDates?.end;
-/// замість запису в старе #dateRange: 
-// document.getElementById("dateRange").value = range;  // ← видаліть
-// зробіть:
-setDateRangeDisplay(start, end);
-
-// Під час кліку по одному інпуту — показуємо нативні пікери по черзі
-(function bindRangePicker(){
-  const $range = document.getElementById("dateRangeInput");
-  const $start = document.getElementById("startDate");
-  const $end   = document.getElementById("endDate");
-  if (!$range || !$start || !$end) return;
-
-  $range.addEventListener("click", async () => {
-    // викликаємо нативний пікер початку
-    $start.showPicker?.(); // у Safari/Chrome
-    // чекаємо поки користувач вибере (мікро-хак: невелика затримка)
-    setTimeout(() => { $end.showPicker?.(); }, 50);
-  });
-
-  // якщо користувач змінив будь-яку дату — оновити рядок
-  const sync = () => setDateRangeDisplay($start.value, $end.value);
-  $start.addEventListener("change", sync);
-  $end.addEventListener("change", sync);
-
-  // також підтримуємо ручний ввід у форматі "ДД.ММ.РРРР – ДД.ММ.РРРР"
-  $range.addEventListener("change", () => {
-    const m = $range.value.match(/^\s*(\d{2})\.(\d{2})\.(\d{4})\s*[-–]\s*(\d{2})\.(\d{2})\.(\d{4})\s*$/);
-    if (!m) return setDateRangeDisplay($start.value, $end.value);
-    const [ , d1,m1,y1, d2,m2,y2 ] = m;
-    const start = new Date(`${y1}-${m1}-${d1}T12:00:00Z`).toISOString();
-    const end   = new Date(`${y2}-${m2}-${d2}T12:00:00Z`).toISOString();
-    setDateRangeDisplay(start, end);
-  });
-})();
 
       async function rejectCourse() {
         if (!courseId) return;

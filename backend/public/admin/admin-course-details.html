@@ -376,41 +376,64 @@
       async function deleteCourse() {
   const formTitle = document.getElementById("title")?.value?.trim() || "";
   const idRaw = courseId;
-  const idToDelete = resolvedCourseId || idRaw;
+  const baseId = (resolvedCourseId || idRaw || "").trim();
+  if (!baseId) { alert("Не вказано ID курсу"); return; }
 
-  if (!idToDelete) { alert("Не вказано ID курсу"); return; }
   if (!confirm("Точно видалити цей курс? Дію неможливо скасувати.")) return;
 
   const btn = document.getElementById('deleteBtn');
   btn && (btn.disabled = true);
 
-  // helper to perform DELETE by id
-  const doDelete = async (id) => {
-    const r = await fetch(`http://157.230.121.24:5050/api/courses/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: getAuthHeaders(),
-    });
-    return r;
-  };
+  const idEnc = encodeURIComponent(baseId);
+  const H = getAuthHeaders();
+
+  // try several backend variants
+  async function tryDelete(id) {
+    const idSafe = encodeURIComponent(id);
+    const variants = [
+      { url: `http://157.230.121.24:5050/api/courses/${idSafe}`,        method: "DELETE" },
+      { url: `http://157.230.121.24:5050/api/courses/${idSafe}/delete`,  method: "PUT"    },
+      { url: `http://157.230.121.24:5050/api/courses/${idSafe}/delete`,  method: "POST"   },
+    ];
+    for (const v of variants) {
+      try {
+        const r = await fetch(v.url, { method: v.method, credentials: "include", headers: H });
+        if (r.status === 404) {
+          // keep trying next variant
+          continue;
+        }
+        if (r.ok) return r;
+        // read message if possible
+        let msg = "";
+        try { const d = await r.clone().json(); msg = d?.message || ""; } catch {}
+        throw new Error(msg || `HTTP ${r.status}`);
+      } catch (e) {
+        // try next variant
+      }
+    }
+    // if nothing worked, synthesize 404 to trigger fallback search
+    return new Response(null, { status: 404 });
+  }
 
   try {
-    // 1) пряма спроба видалити поточний (уточнений) id
-    let r = await doDelete(idToDelete);
+    // 1) first pass: attempt by current id
+    let r = await tryDelete(baseId);
 
     if (r.status === 404) {
-      // 2) fallback: спробуємо відшукати курс у списку і видалити знайдений
-      console.warn("[deleteCourse] 404 for id:", idToDelete, "— шукаю в списку за назвою:", formTitle);
-      const listRes = await fetch(`http://157.230.121.24:5050/api/courses`);
+      // 2) fallback: look up by exact id or exact title in list and try again
+      console.warn("[deleteCourse] 404 for id:", baseId, "— searching list by title:", formTitle);
+      const listRes = await fetch(`http://157.230.121.24:5050/api/courses`, { credentials: "include", headers: H });
       const all = await listRes.json();
 
-      // підбір кандидатів: точна назва або починається/закінчується так само як idRaw
+      // gather candidates
       let candidates = all.filter(c => String(c._id) === String(idRaw));
       if (!candidates.length && formTitle) {
         candidates = all.filter(c => (c.courseTitle || "").trim() === formTitle);
       }
       if (!candidates.length && idRaw) {
-        candidates = all.filter(c => String(c._id).startsWith(String(idRaw)) || String(c._id).endsWith(String(idRaw)));
+        candidates = all.filter(c =>
+          String(c._id).startsWith(String(idRaw)) || String(c._id).endsWith(String(idRaw))
+        );
       }
 
       if (!candidates.length) {
@@ -418,15 +441,27 @@
         return;
       }
 
+      // if multiple, ask user to confirm the first exact-title match else the first one
+      let chosen = candidates[0];
+      const exactByTitle = candidates.find(c => (c.courseTitle || "").trim() === formTitle) || chosen;
+
       if (candidates.length > 1) {
-        const list = candidates.slice(0, 5).map(c => `• ${c.courseTitle || '(без назви)'} — ${c._id}`).join('\n');
-        alert("Знайдено кілька можливих кандидатів за цим ідентифікатором/назвою:\n\n" + list + "\n\nУточніть, будь ласка, який саме потрібно видалити.");
-        return;
+        const list = candidates.slice(0, 8).map(c => `• ${c.courseTitle || '(без назви)'} — ${c._id}`).join('\n');
+        if (!confirm("Знайдено кілька курсів:\n\n" + list + "\n\nВидалити перший збіг?\n" +
+                     `"${(exactByTitle.courseTitle || '(без назви)')}" (id: ${exactByTitle._id})`)) {
+          return;
+        }
+      } else {
+        if (!confirm(`Знайдено курс:\n"${exactByTitle.courseTitle || '(без назви)'}"\n(id: ${exactByTitle._id})\n\nВидалити його?`)) {
+          return;
+        }
       }
 
-      const found = candidates[0];
-      if (!confirm(`Знайдено курс:\n"${found.courseTitle || '(без назви)'}"\n(id: ${found._id})\n\nВидалити його?`)) return;
-      r = await doDelete(found._id);
+      // remember resolved id for this page session
+      resolvedCourseId = exactByTitle._id;
+
+      // try all server delete variants with the chosen id
+      r = await tryDelete(exactByTitle._id);
     }
 
     if (r.status === 404) {
@@ -434,8 +469,10 @@
       return;
     }
 
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.message || `HTTP ${r.status}`);
+    // success or handled error
+    let data = {};
+    try { data = await r.clone().json(); } catch {}
+    if (!r.ok) throw new Error(data?.message || `HTTP ${r.status}`);
 
     alert("Курс видалено");
     location.href = "admin-all-courses.html";

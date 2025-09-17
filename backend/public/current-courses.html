@@ -168,9 +168,13 @@
               ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Посилання на зустріч:</a></span></div>`
               : ""
           }
-           <div class="modal-course-footer">
-    <button class="view-site-button">Переглянути на сайті</button>
-  </div>
+        <div class="modal-course-footer">
+  ${
+    course.siteLink
+      ? `<a class="view-site-button" href="${course.siteLink}" target="_blank">Переглянути на сайті</a>`
+      : ""
+  }
+</div>
         </div>`;
 
         modal.style.display = "flex";

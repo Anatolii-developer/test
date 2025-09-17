@@ -95,6 +95,38 @@
       .submit-btn.danger {
         background: #a31d1d;
       }
+      /* Date range single-input UI */
+      .date-range { position: relative; }
+      #dateRangeInput {
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid #e37009;
+        border-radius: 8px;
+        background-color: #fffef9;
+        color: #333;
+        min-height: 48px;
+        width: 100%;
+        cursor: pointer;
+      }
+      .date-popover {
+        position: absolute;
+        z-index: 20;
+        top: 100%;
+        left: 0;
+        margin-top: 6px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.1);
+        padding: 12px;
+        display: none;
+        min-width: 340px;
+      }
+      .date-popover.open { display: block; }
+      .date-popover .row { display:flex; gap:12px; align-items:flex-end; }
+      .date-popover label { font-weight:600; font-size:12px; display:block; margin:0 0 4px; }
+      .date-popover input[type="date"] { padding:8px 10px; border:1px solid #ddd; border-radius:8px; }
+      .date-popover .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
     </style>
   </head>
   <body class="with-sidebar">
@@ -143,18 +175,32 @@
 
       <div class="editable-block">
         <label>Дати проведення курсу</label>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap">
-          <div>
-            <div class="meta">Початок</div>
-            <input id="startDate" type="date" />
-          </div>
-          <div>
-            <div class="meta">Кінець</div>
-            <input id="endDate" type="date" />
+        <div class="date-range">
+          <!-- видимий інпут за дизайном -->
+          <input id="dateRangeInput" type="text" readonly placeholder="ДД.ММ.РРРР – ДД.ММ.РРРР" />
+
+          <!-- приховані реальні дати -->
+          <input id="startDate" type="date" hidden />
+          <input id="endDate" type="date" hidden />
+
+          <!-- popover з нативними date-пікерами -->
+          <div class="date-popover" id="datePopover">
+            <div class="row">
+              <div style="flex:1">
+                <label for="pickerStart">Початок</label>
+                <input id="pickerStart" type="date" />
+              </div>
+              <div style="flex:1">
+                <label for="pickerEnd">Кінець</label>
+                <input id="pickerEnd" type="date" />
+              </div>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn" id="cancelDates">Скасувати</button>
+              <button type="button" class="btn primary" id="applyDates">Застосувати</button>
+            </div>
           </div>
         </div>
-        <!-- за бажанням залиште read-only поле для відображення -->
-        <input id="dateRange" type="text" disabled />
       </div>
 
       <div class="editable-block">
@@ -289,6 +335,34 @@
         return [user.firstName, user.lastName].filter(Boolean).join(" ");
       }
 
+      // --- date helpers for single-range control ---
+      const pad2 = (n) => String(n).padStart(2, "0");
+      function toYMD(iso){
+        if (!iso) return "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso; // already Y-M-D
+        const d = new Date(iso);
+        if (isNaN(d)) return "";
+        return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+      }
+      function toDMY(iso){
+        if (!iso) return "";
+        const d = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(iso+"T12:00:00") : new Date(iso);
+        if (isNaN(d)) return "";
+        return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
+      }
+      function normalizeISO(val){
+        if (!val) return "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return new Date(val+"T12:00:00").toISOString();
+        const d = new Date(val);
+        return isNaN(d) ? "" : d.toISOString();
+      }
+      function setDateRangeDisplay(startVal, endVal){
+        const sIso = normalizeISO(startVal);
+        const eIso = normalizeISO(endVal);
+        const input = document.getElementById("dateRangeInput");
+        if (input) input.value = (sIso || eIso) ? `${toDMY(sIso)} – ${toDMY(eIso)}` : "";
+      }
+
       async function deleteCourse() {
         if (!courseId) return;
         const ok = confirm("Точно видалити цей курс? Дію неможливо скасувати.");
@@ -395,27 +469,12 @@
           const start = course.courseDates && course.courseDates.start;
           const end = course.courseDates && course.courseDates.end;
 
-          // в date inputs очікується "YYYY-MM-DD"
-          const toYMD = (iso) => {
-            if (!iso) return "";
-            const d = new Date(iso);
-            if (isNaN(d)) return "";
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const day = String(d.getDate()).padStart(2, "0");
-            return `${y}-${m}-${day}`;
-          };
-
-          const $start = document.getElementById("startDate");
-          const $end = document.getElementById("endDate");
-          if ($start) $start.value = toYMD(start);
-          if ($end) $end.value = toYMD(end);
-
-          // красивий рядок для read-only поля
-          const range =
-            start || end ? `${fmtDate(start)} – ${fmtDate(end)}` : "";
-          document.getElementById("dateRange").value = range;
-          document.getElementById("groupType").value = group;
+          const $hiddenStart = document.getElementById("startDate");
+          const $hiddenEnd = document.getElementById("endDate");
+          if ($hiddenStart) $hiddenStart.value = toYMD(start);
+          if ($hiddenEnd) $hiddenEnd.value = toYMD(end);
+          setDateRangeDisplay(start, end);
+          document.getElementById("groupType").value = course.accessType || "";
 
           // Виставляємо "Вид курсу" селект
           const typeSel = document.getElementById("eventTypeSel");
@@ -478,8 +537,8 @@
           zoomLink: document.getElementById("zoom").value,
           participants: selectedParticipantIds,
           courseDates: {
-            start: startIso ? new Date(startIso).toISOString() : null,
-            end: endIso ? new Date(endIso).toISOString() : null,
+            start: startIso ? new Date(startIso + (/-/.test(startIso) && startIso.length===10 ? 'T12:00:00' : '')).toISOString() : null,
+            end:   endIso   ? new Date(endIso   + (/-/.test(endIso)   && endIso.length===10   ? 'T12:00:00' : '')).toISOString()   : null,
           },
         };
 
@@ -514,6 +573,38 @@
           alert(err.message || "Помилка при збереженні");
         }
       }
+      // Bind popover behaviour for single date-range control
+      (function bindDateRangeUI(){
+        const input = document.getElementById("dateRangeInput");
+        const pop = document.getElementById("datePopover");
+        const pStart = document.getElementById("pickerStart");
+        const pEnd = document.getElementById("pickerEnd");
+        const btnApply = document.getElementById("applyDates");
+        const btnCancel = document.getElementById("cancelDates");
+        if (!input || !pop) return;
+
+        const hiddenStart = () => document.getElementById("startDate");
+        const hiddenEnd = () => document.getElementById("endDate");
+
+        function open(){
+          if (pStart) pStart.value = hiddenStart()?.value || "";
+          if (pEnd)   pEnd.value   = hiddenEnd()?.value   || "";
+          pop.classList.add("open");
+        }
+        function close(){ pop.classList.remove("open"); }
+
+        input.addEventListener("click", open);
+        btnCancel && btnCancel.addEventListener("click", close);
+        btnApply && btnApply.addEventListener("click", () => {
+          if (pStart && hiddenStart()) hiddenStart().value = pStart.value || "";
+          if (pEnd && hiddenEnd())     hiddenEnd().value   = pEnd.value   || "";
+          setDateRangeDisplay(pStart?.value || "", pEnd?.value || "");
+          close();
+        });
+        document.addEventListener("click", (e) => {
+          if (!pop.contains(e.target) && e.target !== input) close();
+        });
+      })();
 
       async function approveCourse() {
         if (!courseId) return;

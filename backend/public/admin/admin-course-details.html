@@ -430,7 +430,6 @@
   }
   console.log('[admin-course-details] courseId =', courseId);
 
-  // вспомогалка: включить/выключить кнопки, чтобы не жали зря
   const setBusy = (on) => {
     ["deleteBtn"].forEach(id => {
       const b = document.getElementById(id);
@@ -440,51 +439,95 @@
 
   setBusy(true);
   try {
-    // 1) пробуем прямой GET по id
+    // 1) спроба прямого GET
     let res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
+
     if (res.status === 404) {
-      // 2) fallback: тянем список и ищем подходящий курс
+      // 2) фолбек: шукаємо реальний _id у списку
       const listRes = await fetch(`http://157.230.121.24:5050/api/courses`);
       const all = await listRes.json();
-      // попробуем найти по точному совпадению _id
       let found = all.find(c => String(c._id) === String(courseId));
-
-      // если не нашли — возможно, пришёл укороченный/битый id из списка: 
-      // поищем по началу/концу строки (иногда обрезают)
       if (!found) {
-        found = all.find(c =>
-          String(c._id).startsWith(String(courseId)) ||
-          String(c._id).endsWith(String(courseId))
-        );
+        found = all.find(c => String(c._id).startsWith(String(courseId)) || String(c._id).endsWith(String(courseId)));
       }
-
       if (!found) {
         alert("Курс не знайдено (ID некоректний або запис відсутній). Повертаю назад.");
-        // безопасно отправим на список
         location.href = "admin-all-courses.html";
         return;
       }
-
-      // нашёлся другой реальный id — починим URL и перезагрузим
       if (String(found._id) !== String(courseId)) {
         const u = new URL(location.href);
         u.searchParams.set("id", found._id);
         location.replace(u.toString());
         return;
       }
-
-      // если всё-таки текущий == found._id, просто падаем ниже и повторяем разбор
       res = await fetch(`http://157.230.121.24:5050/api/courses/${found._id}`);
     }
 
     if (!res.ok) {
-      const data = await res.json().catch(()=> ({}));
+      const data = await res.json().catch(() => ({}));
       throw new Error(data.message || `HTTP ${res.status}`);
     }
 
     const course = await res.json();
-    // === дальше оставляй твою текущую логику заполнения полей ===
-    // ... (твой код присвоений в инпуты)
+
+    // ====== заповнюємо поля ======
+    const $ = (id) => document.getElementById(id);
+    $("title").value = course.courseTitle || "";
+    $("eventType").value = course.eventType || "";
+    $("subtitle").value = course.courseSubtitle || "";
+    $("description").value = course.courseDescription || "";
+    $("access").value = course.accessType || "";
+    $("duration").value = course.courseDuration || "";
+    $("price").value = course.coursePrice || "";
+    $("zoom").value = course.zoomLink || "";
+
+    // Автор
+    $("creatorName").value = course.creatorName || "";
+    $("creatorRole").value = course.creatorRole || "";
+    if ((!course.creatorName || !course.creatorName.length) && course.creatorId) {
+      const nm = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(" ") || course.creatorId.email || "";
+      $("creatorName").value = nm;
+    }
+    if ((!course.creatorRole || !course.creatorRole.length) && course.creatorId) {
+      const rl = course.creatorId.role || (Array.isArray(course.creatorId.roles) ? course.creatorId.roles.join(", ") : "");
+      $("creatorRole").value = rl;
+    }
+
+    // Учасники
+    selectedParticipantIds = (course.participants || []).map(p => typeof p === 'string' ? p : (p && p._id ? p._id : p));
+    try {
+      const usersRes = await fetch("http://157.230.121.24:5050/api/users");
+      allUsers = await usersRes.json();
+      updateParticipantsUI();
+    } catch (_) {}
+
+    // Дати (приховані інпути + красивий дисплей)
+    const start = course.courseDates && course.courseDates.start;
+    const end   = course.courseDates && course.courseDates.end;
+    const $hS = $("startDate");
+    const $hE = $("endDate");
+    if ($hS) $hS.value = toYMD(start);
+    if ($hE) $hE.value = toYMD(end);
+    setDateRangeDisplay(start, end);
+
+    // Тип курсу селект
+    const typeSel = $("eventTypeSel");
+    if (typeSel && course.eventType) typeSel.value = course.eventType;
+
+    // Підказка статусу + доступність модерації
+    const hint = $("statusHint");
+    if (hint) hint.textContent = course.status ? `Поточний статус: ${course.status}` : "";
+
+    // Посилання на сторінку (siteLink/publicUrl/...)
+    let site = course.siteLink || course.publicUrl || course.pageUrl || course.website || course.websiteUrl || "";
+    try {
+      const map = JSON.parse(localStorage.getItem("course.siteLinks") || "{}");
+      if (!site && map && map[course._id || courseId]) site = map[course._id || courseId];
+    } catch(_) {}
+    const $site = $("siteLink");
+    if ($site) $site.value = site;
+
   } catch (err) {
     console.error("Помилка при завантаженні курсу:", err);
     alert(err.message || "Помилка завантаження курсу");
@@ -564,7 +607,7 @@
             {
               method: "PUT",
               credentials: "include",
-              headers: { "Content-Type": "application/json" },
+              headers: getAuthHeaders(),
               body: JSON.stringify(updated),
             }
           );
@@ -688,7 +731,7 @@
         }
       }
 
-      window.addEventListener("DOMContentLoaded", loadCourseDetails);
+      // window.addEventListener("DOMContentLoaded", loadCourseDetails);
 
       async function openParticipantsModal() {
         try {

@@ -1,512 +1,637 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Деталі курсу</title>
-  <link rel="stylesheet" href="admin-styles.css" />
-  <style>
-    .course-detail {
-      width: 890px;
-      margin: 40px auto;
-      padding: 60px 100px;
-      border-radius: 24px;
-      background: #fffef9;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Деталі курсу</title>
+    <link rel="stylesheet" href="admin-styles.css" />
+    <style>
+      .course-detail {
+        width: 890px;
+        margin: 40px auto;
+        padding: 60px 100px;
+        border-radius: 24px;
+        background: #fffef9;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
 
-    .editable-block {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
+      .editable-block {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
 
-    .editable-block label {
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
+      .editable-block label {
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
 
-    .editable-block textarea {
-      resize: vertical;
-      padding: 12px;
-      font-size: 16px;
-      border: 2px solid #E37009;
-      border-radius: 8px;
-      background-color: #fffef9;
-      color: #333;
-      min-height: 48px;
-    }
+      .editable-block textarea {
+        resize: vertical;
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid #e37009;
+        border-radius: 8px;
+        background-color: #fffef9;
+        color: #333;
+        min-height: 48px;
+      }
 
-    .editable-block textarea[disabled] {
-      background-color: #f0f0f0;
-      color: #888;
-      border: 1px solid #ccc;
-      cursor: not-allowed;
-    }
+      .editable-block textarea[disabled] {
+        background-color: #f0f0f0;
+        color: #888;
+        border: 1px solid #ccc;
+        cursor: not-allowed;
+      }
 
-    .editable-block input[type="text"],
-    .editable-block input[disabled] {
-      padding: 12px;
-      font-size: 16px;
-      border: 2px solid #E37009;
-      border-radius: 8px;
-      background-color: #fffef9;
-      color: #333;
-      min-height: 48px;
-    }
+      .editable-block input[type="text"],
+      .editable-block input[disabled] {
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid #e37009;
+        border-radius: 8px;
+        background-color: #fffef9;
+        color: #333;
+        min-height: 48px;
+      }
 
-    .editable-block input[disabled] {
-      background-color: #f0f0f0;
-      color: #888;
-      border: 1px solid #ccc;
-      cursor: not-allowed;
-    }
-    
-.edit-btn {
-  position: absolute;
-  right: 10px;
-  top: 38px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
+      .editable-block input[disabled] {
+        background-color: #f0f0f0;
+        color: #888;
+        border: 1px solid #ccc;
+        cursor: not-allowed;
+      }
 
-.edit-btn img {
-  width: 20px;
-  height: 20px;
-}
+      .edit-btn {
+        position: absolute;
+        right: 10px;
+        top: 38px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+      }
 
+      .edit-btn img {
+        width: 20px;
+        height: 20px;
+      }
 
-    .submit-btn {
-      align-self: flex-end;
-      margin-top: 20px;
-      background-color: #E37009;
-      color: white;
-      border: none;
-      padding: 14px 24px;
-      font-size: 16px;
-      font-weight: 500;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .submit-btn.danger { background:#A31D1D; }
-  </style>
-</head>
-<body class="with-sidebar">
-  <aside class="sidebar" id="sidebar"></aside>
+      .submit-btn {
+        align-self: flex-end;
+        margin-top: 20px;
+        background-color: #e37009;
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .submit-btn.danger {
+        background: #a31d1d;
+      }
+    </style>
+  </head>
+  <body class="with-sidebar">
+    <aside class="sidebar" id="sidebar"></aside>
 
-  <div class="course-detail">
-    <h1>Деталі курсу</h1>
-<div style="display:flex; gap:24px; flex-wrap:wrap;">
-  <div class="editable-block" style="min-width:260px; flex:1;">
-    <label>Створив</label>
-    <input id="creatorName" type="text" disabled />
-  </div>
-  <div class="editable-block" style="min-width:220px; flex:1;">
-    <label>Роль</label>
-    <input id="creatorRole" type="text" disabled />
-  </div>
-</div>
-    <div class="editable-block">
-      <label>Назва курсу</label>
-      <textarea id="title" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('title')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Тип (інфо)</label>
-      <textarea id="eventType" disabled></textarea>
-    </div>
-
-    <div class="editable-block">
-      <label>Підзаголовок</label>
-      <textarea id="subtitle" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('subtitle')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Опис</label>
-      <textarea id="description" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('description')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Дати проведення курсу</label>
-      <input id="dateRange" type="text" disabled />
-      <button class="edit-btn" onclick="enableEdit('dateRange')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Тип групи</label>
-      <input id="groupType" type="text" disabled />
-      <button class="edit-btn" onclick="enableEdit('groupType')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Тип доступу</label>
-      <textarea id="access" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('access')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-    
-    <div class="editable-block">
-      <label>Учасники</label>
-      <input id="participantsText" type="text" disabled />
-      <button class="edit-btn" onclick="openParticipantsModal()">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Тривалість</label>
-      <textarea id="duration" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('duration')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Ціна</label>
-      <textarea id="price" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('price')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Посилання на проведення курсу</label>
-      <textarea id="zoom" disabled></textarea>
-      <button class="edit-btn" onclick="enableEdit('zoom')">
-        <img src="../assets/edit-icon.svg" alt="Edit" />
-      </button>
-    </div>
-
-    <div class="editable-block">
-      <label>Вид курсу</label>
-      <select id="eventTypeSel" style="padding:12px;border:2px solid #E37009;border-radius:8px;background:#fffef9;min-height:48px;">
-        <option value="Курс">Курс</option>
-        <option value="Група">Група</option>
-        <option value="Супервізія">Супервізія</option>
-        <option value="Лекція">Лекція</option>
-        <option value="Семінар">Семінар</option>
-      </select>
-    </div>
-
-    <div class="editable-block" id="moderationBlock">
-      <label>Модерація</label>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="submit-btn" id="approveBtn" onclick="approveCourse()">✅ Підтвердити</button>
-        <button type="button" class="submit-btn" id="rejectBtn" onclick="rejectCourse()" style="background:#A31D1D;">❌ Відхилити</button>
-        <span id="statusHint" style="align-self:center; color:#8F8F8F; font-weight:500;"></span>
+    <div class="course-detail">
+      <h1>Деталі курсу</h1>
+      <div style="display: flex; gap: 24px; flex-wrap: wrap">
+        <div class="editable-block" style="min-width: 260px; flex: 1">
+          <label>Створив</label>
+          <input id="creatorName" type="text" disabled />
+        </div>
+        <div class="editable-block" style="min-width: 220px; flex: 1">
+          <label>Роль</label>
+          <input id="creatorRole" type="text" disabled />
+        </div>
       </div>
+      <div class="editable-block">
+        <label>Назва курсу</label>
+        <textarea id="title" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('title')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Тип (інфо)</label>
+        <textarea id="eventType" disabled></textarea>
+      </div>
+
+      <div class="editable-block">
+        <label>Підзаголовок</label>
+        <textarea id="subtitle" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('subtitle')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Опис</label>
+        <textarea id="description" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('description')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Дати проведення курсу</label>
+        <input id="dateRange" type="text" disabled />
+        <button class="edit-btn" onclick="enableEdit('dateRange')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Тип групи</label>
+        <input id="groupType" type="text" disabled />
+        <button class="edit-btn" onclick="enableEdit('groupType')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Тип доступу</label>
+        <textarea id="access" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('access')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Учасники</label>
+        <input id="participantsText" type="text" disabled />
+        <button class="edit-btn" onclick="openParticipantsModal()">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Тривалість</label>
+        <textarea id="duration" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('duration')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Ціна</label>
+        <textarea id="price" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('price')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Посилання на проведення курсу</label>
+        <textarea id="zoom" disabled></textarea>
+        <button class="edit-btn" onclick="enableEdit('zoom')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
+
+      <div class="editable-block">
+        <label>Вид курсу</label>
+        <select
+          id="eventTypeSel"
+          style="
+            padding: 12px;
+            border: 2px solid #e37009;
+            border-radius: 8px;
+            background: #fffef9;
+            min-height: 48px;
+          "
+        >
+          <option value="Курс">Курс</option>
+          <option value="Група">Група</option>
+          <option value="Супервізія">Супервізія</option>
+          <option value="Лекція">Лекція</option>
+          <option value="Семінар">Семінар</option>
+        </select>
+      </div>
+
+      <div class="editable-block" id="moderationBlock">
+        <label>Модерація</label>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button
+            type="button"
+            class="submit-btn"
+            id="approveBtn"
+            onclick="approveCourse()"
+          >
+            ✅ Підтвердити
+          </button>
+          <button
+            type="button"
+            class="submit-btn"
+            id="rejectBtn"
+            onclick="rejectCourse()"
+            style="background: #a31d1d"
+          >
+            ❌ Відхилити
+          </button>
+          <span
+            id="statusHint"
+            style="align-self: center; color: #8f8f8f; font-weight: 500"
+          ></span>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="saveChanges()">Зберегти</button>
+      <button class="submit-btn danger" id="deleteBtn" onclick="deleteCourse()">
+  🗑️ Видалити курс
+</button>
     </div>
+    <script src="admin-auth.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof renderAdminSidebar === "function") {
+          renderAdminSidebar("admin-career-requests.html");
+        }
+        if (typeof requireAdminPage === "function") {
+          requireAdminPage();
+        }
+        load();
+      });
 
-    <button class="submit-btn" onclick="saveChanges()">Зберегти</button>
-  </div>
-  <script src="admin-auth.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (typeof renderAdminSidebar === "function") {
-        renderAdminSidebar("admin-career-requests.html");
+      let courseId;
+      let allUsers = [];
+      let selectedParticipantIds = [];
+
+      function pad(n) {
+        return String(n).padStart(2, "0");
       }
-      if (typeof requireAdminPage === "function") {
-        requireAdminPage();
+      function fmtDate(d) {
+        if (!d) return "";
+        const x = new Date(d);
+        if (isNaN(x)) return "";
+        return `${pad(x.getDate())}.${pad(
+          x.getMonth() + 1
+        )}.${x.getFullYear()}`;
       }
-      load();
-    });
 
-    let courseId;
-let allUsers = [];
-let selectedParticipantIds = [];
+      function getFullName(user) {
+        return [user.firstName, user.lastName].filter(Boolean).join(" ");
+      }
 
-function pad(n){return String(n).padStart(2,'0');}
-function fmtDate(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return ''; return `${pad(x.getDate())}.${pad(x.getMonth()+1)}.${x.getFullYear()}`; }
-
-function getFullName(user) {
-  return [user.firstName, user.lastName].filter(Boolean).join(" ");
-}
-
-function computeDurationText(startIso, endIso){
-  if(!startIso || !endIso) return '';
-  const s = new Date(startIso);
-  const e = new Date(endIso);
-  if(isNaN(s) || isNaN(e)) return '';
-  // normalize to noon to avoid DST issues
-  s.setHours(12,0,0,0);
-  e.setHours(12,0,0,0);
-  const msPerDay = 24*60*60*1000;
-  const days = Math.max(0, Math.round((e - s) / msPerDay) + 1); // inclusive range
-  const weeks = Math.floor(days / 7);
-  const remDays = days % 7;
-  const weekPart = weeks ? `${weeks} тижн.` : '';
-  const dayPart = remDays ? `${remDays} дн.` : (weeks ? '' : `${days} дн.`);
-  const joiner = weekPart && dayPart ? ' ' : '';
-  return `${days} днів (${weekPart}${joiner}${dayPart})`;
-}
-
-async function loadCourseDetails() {
-  const params = new URLSearchParams(window.location.search);
-  courseId = params.get('id');
+      async function deleteCourse() {
   if (!courseId) return;
+  const ok = confirm("Точно видалити цей курс? Дію неможливо скасувати.");
+  if (!ok) return;
 
   try {
-    // Загружаем курс
-    const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
-    const course = await res.json();
-
-    document.getElementById("title").value = course.courseTitle;
-    document.getElementById("eventType").value = course.eventType;
-    document.getElementById("subtitle").value = course.courseSubtitle;
-    document.getElementById("description").value = course.courseDescription;
-    document.getElementById("access").value = course.accessType;
-    document.getElementById("duration").value = course.courseDuration;
-    document.getElementById("price").value = course.coursePrice;
-    document.getElementById("zoom").value = course.zoomLink;
-    document.getElementById("creatorName").value = course.creatorName || "";
-    document.getElementById("creatorRole").value = course.creatorRole || "";
-
-    // Fallbacks for creatorName/creatorRole using creatorId if present
-    if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
-      const fallbackName = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ') || course.creatorId.email || '';
-      document.getElementById('creatorName').value = fallbackName;
-    }
-    if ((!course.creatorRole || course.creatorRole === '') && course.creatorId) {
-      const fallbackRole = course.creatorId.role || (Array.isArray(course.creatorId.roles) ? course.creatorId.roles.join(', ') : '');
-      document.getElementById('creatorRole').value = fallbackRole;
-    }
-
-    selectedParticipantIds = (course.participants || []).map(p => typeof p === 'string' ? p : (p && p._id ? p._id : p));
-
-    // Загружаем всех пользователей
-    const usersRes = await fetch("http://157.230.121.24:5050/api/users");
-    allUsers = await usersRes.json();
-
-    const start = course.courseDates && course.courseDates.start;
-    const end   = course.courseDates && course.courseDates.end;
-
-    // Автовычисленная тривалість за датами
-    const autoDuration = computeDurationText(start, end);
-    if (autoDuration) {
-      const durEl = document.getElementById('duration');
-      if (durEl && (!durEl.value || durEl.value.trim() === '' || durEl.disabled)) {
-        durEl.value = autoDuration;
-      }
-    }
-
-    const range = start || end ? `${fmtDate(start)} – ${fmtDate(end)}` : '';
-    const group = course.accessType || '';
-    document.getElementById('dateRange').value = range;
-    document.getElementById('groupType').value = group;
-
-    // Виставляємо "Вид курсу" селект
-    const typeSel = document.getElementById('eventTypeSel');
-    if (typeSel && course.eventType) typeSel.value = course.eventType;
-
-    const et = document.getElementById('eventType');
-    if (et) et.value = course.eventType || '';
-
-    // Підказка по статусу + доступність модерації
-    const mod = document.getElementById('moderationBlock');
-    const hint = document.getElementById('statusHint');
-    if (hint) hint.textContent = course.status ? `Поточний статус: ${course.status}` : '';
-    if (mod) {
-      // Якщо вже не очікує підтвердження — показуємо, але блокуємо кнопки
-      const isWaiting = (course.status === 'WAITING_FOR_APPROVAL');
-      const approveBtn = document.getElementById('approveBtn');
-      const rejectBtn  = document.getElementById('rejectBtn');
-      if (approveBtn) approveBtn.disabled = !isWaiting;
-      if (rejectBtn)  rejectBtn.disabled  = !isWaiting;
-    }
-
-    updateParticipantsUI();
-  } catch (err) {
-    console.error("Помилка при завантаженні курсу:", err);
-  }
-}
-
-function updateParticipantsUI() {
-  const input = document.getElementById('participantsText');
-  if (!input) return;
-  const names = allUsers
-    .filter(u => selectedParticipantIds.includes(u._id))
-    .map(u => getFullName(u) || u.email);
-  input.value = names.join(', ');
-}
-
-function enableEdit(id) {
-  const textarea = document.getElementById(id);
-  textarea.disabled = false;
-  textarea.focus();
-}
-
-async function saveChanges() {
-  const updated = {
-    courseTitle: document.getElementById("title").value,
-    eventType: document.getElementById("eventTypeSel") ? document.getElementById("eventTypeSel").value : document.getElementById("eventType").value,
-    courseSubtitle: document.getElementById("subtitle").value,
-    courseDescription: document.getElementById("description").value,
-    accessType: document.getElementById("access").value,
-    courseDuration: document.getElementById("duration").value,
-    coursePrice: document.getElementById("price").value,
-    zoomLink: document.getElementById("zoom").value,
-    participants: selectedParticipantIds
-  };
-
-  try {
-    const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated)
+    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+      method: "DELETE",
+      credentials: "include", // якщо бек перевіряє куку адміна
+      headers: { "Content-Type": "application/json" }
     });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.message || "Не вдалося видалити курс");
 
-    if (res.ok) {
-      alert("Дані оновлено успішно");
-      document.querySelectorAll("textarea").forEach(t => t.disabled = true);
-      document.querySelectorAll("input[type='text']").forEach(i => i.disabled = true);
-      // оновити підказку статусу (раптом змінилася десь ще)
-      try { loadCourseDetails(); } catch(_) {}
-    } else {
-      alert("Помилка при збереженні");
-    }
-  } catch (err) {
-    console.error("Помилка при збереженні:", err);
-  }
-}
-
-async function approveCourse(){
-  if (!courseId) return;
-  try{
-    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/approve`, { method:'PUT' });
-    const data = await r.json().catch(()=>({}));
-    if (!r.ok) throw new Error(data.message || 'Не вдалося підтвердити курс');
-    alert('Курс підтверджено');
-    loadCourseDetails();
-  }catch(e){
+    alert("Курс видалено");
+    // куди повертати після видалення — за потреби змінити
+    location.href = "admin-all-courses.html";
+  } catch (e) {
     console.error(e);
-    alert(e.message || 'Помилка підтвердження');
+    alert(e.message || "Помилка видалення");
   }
 }
+      function computeDurationText(startIso, endIso) {
+        if (!startIso || !endIso) return "";
+        const s = new Date(startIso);
+        const e = new Date(endIso);
+        if (isNaN(s) || isNaN(e)) return "";
+        // normalize to noon to avoid DST issues
+        s.setHours(12, 0, 0, 0);
+        e.setHours(12, 0, 0, 0);
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const days = Math.max(0, Math.round((e - s) / msPerDay) + 1); // inclusive range
+        const weeks = Math.floor(days / 7);
+        const remDays = days % 7;
+        const weekPart = weeks ? `${weeks} тижн.` : "";
+        const dayPart = remDays ? `${remDays} дн.` : weeks ? "" : `${days} дн.`;
+        const joiner = weekPart && dayPart ? " " : "";
+        return `${days} днів (${weekPart}${joiner}${dayPart})`;
+      }
 
-async function rejectCourse(){
-  if (!courseId) return;
-  // опційно: попросити причину
-  const reason = prompt('Причина відхилення (необовʼязково):','');
-  try{
-    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/reject`, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ reason })
-    });
-    const data = await r.json().catch(()=>({}));
-    if (!r.ok) throw new Error(data.message || 'Не вдалося відхилити курс');
-    alert('Курс відхилено');
-    loadCourseDetails();
-  }catch(e){
-    console.error(e);
-    alert(e.message || 'Помилка відхилення');
-  }
-}
+      async function loadCourseDetails() {
+        const params = new URLSearchParams(window.location.search);
+        courseId = params.get("id");
+        if (!courseId) return;
 
-window.addEventListener("DOMContentLoaded", loadCourseDetails);
+        try {
+          // Загружаем курс
+          const res = await fetch(
+            `http://157.230.121.24:5050/api/courses/${courseId}`
+          );
+          const course = await res.json();
 
-async function openParticipantsModal() {
-  try {
-    const res = await fetch("http://157.230.121.24:5050/api/users");
-    allUsers = await res.json();
-    renderUserList(allUsers);
-    document.getElementById("participantsModal").style.display = "flex";
-  } catch (err) {
-    console.error("Не вдалося завантажити користувачів:", err);
-  }
-}
+          document.getElementById("title").value = course.courseTitle;
+          document.getElementById("eventType").value = course.eventType;
+          document.getElementById("subtitle").value = course.courseSubtitle;
+          document.getElementById("description").value =
+            course.courseDescription;
+          document.getElementById("access").value = course.accessType;
+          document.getElementById("duration").value = course.courseDuration;
+          document.getElementById("price").value = course.coursePrice;
+          document.getElementById("zoom").value = course.zoomLink;
+          document.getElementById("creatorName").value =
+            course.creatorName || "";
+          document.getElementById("creatorRole").value =
+            course.creatorRole || "";
 
-function renderUserList(users) {
-  const container = document.getElementById("userList");
-  container.innerHTML = "";
-  users.forEach(user => {
-    const div = document.createElement("div");
-    const fullName = getFullName(user);
-    div.innerHTML = `
+          // Fallbacks for creatorName/creatorRole using creatorId if present
+          if (
+            (!course.creatorName || course.creatorName === "") &&
+            course.creatorId
+          ) {
+            const fallbackName =
+              [course.creatorId.firstName, course.creatorId.lastName]
+                .filter(Boolean)
+                .join(" ") ||
+              course.creatorId.email ||
+              "";
+            document.getElementById("creatorName").value = fallbackName;
+          }
+          if (
+            (!course.creatorRole || course.creatorRole === "") &&
+            course.creatorId
+          ) {
+            const fallbackRole =
+              course.creatorId.role ||
+              (Array.isArray(course.creatorId.roles)
+                ? course.creatorId.roles.join(", ")
+                : "");
+            document.getElementById("creatorRole").value = fallbackRole;
+          }
+
+          selectedParticipantIds = (course.participants || []).map((p) =>
+            typeof p === "string" ? p : p && p._id ? p._id : p
+          );
+
+          // Загружаем всех пользователей
+          const usersRes = await fetch("http://157.230.121.24:5050/api/users");
+          allUsers = await usersRes.json();
+
+          const start = course.courseDates && course.courseDates.start;
+          const end = course.courseDates && course.courseDates.end;
+
+          // Автовычисленная тривалість за датами
+          const autoDuration = computeDurationText(start, end);
+          if (autoDuration) {
+            const durEl = document.getElementById("duration");
+            if (
+              durEl &&
+              (!durEl.value || durEl.value.trim() === "" || durEl.disabled)
+            ) {
+              durEl.value = autoDuration;
+            }
+          }
+
+          const range =
+            start || end ? `${fmtDate(start)} – ${fmtDate(end)}` : "";
+          const group = course.accessType || "";
+          document.getElementById("dateRange").value = range;
+          document.getElementById("groupType").value = group;
+
+          // Виставляємо "Вид курсу" селект
+          const typeSel = document.getElementById("eventTypeSel");
+          if (typeSel && course.eventType) typeSel.value = course.eventType;
+
+          const et = document.getElementById("eventType");
+          if (et) et.value = course.eventType || "";
+
+          // Підказка по статусу + доступність модерації
+          const mod = document.getElementById("moderationBlock");
+          const hint = document.getElementById("statusHint");
+          if (hint)
+            hint.textContent = course.status
+              ? `Поточний статус: ${course.status}`
+              : "";
+          if (mod) {
+            // Якщо вже не очікує підтвердження — показуємо, але блокуємо кнопки
+            const isWaiting = course.status === "WAITING_FOR_APPROVAL";
+            const approveBtn = document.getElementById("approveBtn");
+            const rejectBtn = document.getElementById("rejectBtn");
+            if (approveBtn) approveBtn.disabled = !isWaiting;
+            if (rejectBtn) rejectBtn.disabled = !isWaiting;
+          }
+
+          updateParticipantsUI();
+        } catch (err) {
+          console.error("Помилка при завантаженні курсу:", err);
+        }
+      }
+
+      function updateParticipantsUI() {
+        const input = document.getElementById("participantsText");
+        if (!input) return;
+        const names = allUsers
+          .filter((u) => selectedParticipantIds.includes(u._id))
+          .map((u) => getFullName(u) || u.email);
+        input.value = names.join(", ");
+      }
+
+      function enableEdit(id) {
+        const textarea = document.getElementById(id);
+        textarea.disabled = false;
+        textarea.focus();
+      }
+
+      async function saveChanges() {
+        const updated = {
+          courseTitle: document.getElementById("title").value,
+          eventType: document.getElementById("eventTypeSel")
+            ? document.getElementById("eventTypeSel").value
+            : document.getElementById("eventType").value,
+          courseSubtitle: document.getElementById("subtitle").value,
+          courseDescription: document.getElementById("description").value,
+          accessType: document.getElementById("access").value,
+          courseDuration: document.getElementById("duration").value,
+          coursePrice: document.getElementById("price").value,
+          zoomLink: document.getElementById("zoom").value,
+          participants: selectedParticipantIds,
+        };
+
+        try {
+          const res = await fetch(
+            `http://157.230.121.24:5050/api/courses/${courseId}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updated),
+            }
+          );
+
+          if (res.ok) {
+            alert("Дані оновлено успішно");
+            document
+              .querySelectorAll("textarea")
+              .forEach((t) => (t.disabled = true));
+            document
+              .querySelectorAll("input[type='text']")
+              .forEach((i) => (i.disabled = true));
+            // оновити підказку статусу (раптом змінилася десь ще)
+            try {
+              loadCourseDetails();
+            } catch (_) {}
+          } else {
+            alert("Помилка при збереженні");
+          }
+        } catch (err) {
+          console.error("Помилка при збереженні:", err);
+        }
+      }
+
+      async function approveCourse() {
+        if (!courseId) return;
+        try {
+          const r = await fetch(
+            `http://157.230.121.24:5050/api/courses/${courseId}/approve`,
+            { method: "PUT" }
+          );
+          const data = await r.json().catch(() => ({}));
+          if (!r.ok)
+            throw new Error(data.message || "Не вдалося підтвердити курс");
+          alert("Курс підтверджено");
+          loadCourseDetails();
+        } catch (e) {
+          console.error(e);
+          alert(e.message || "Помилка підтвердження");
+        }
+      }
+
+      async function rejectCourse() {
+        if (!courseId) return;
+        // опційно: попросити причину
+        const reason = prompt("Причина відхилення (необовʼязково):", "");
+        try {
+          const r = await fetch(
+            `http://157.230.121.24:5050/api/courses/${courseId}/reject`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ reason }),
+            }
+          );
+          const data = await r.json().catch(() => ({}));
+          if (!r.ok)
+            throw new Error(data.message || "Не вдалося відхилити курс");
+          alert("Курс відхилено");
+          loadCourseDetails();
+        } catch (e) {
+          console.error(e);
+          alert(e.message || "Помилка відхилення");
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", loadCourseDetails);
+
+      async function openParticipantsModal() {
+        try {
+          const res = await fetch("http://157.230.121.24:5050/api/users");
+          allUsers = await res.json();
+          renderUserList(allUsers);
+          document.getElementById("participantsModal").style.display = "flex";
+        } catch (err) {
+          console.error("Не вдалося завантажити користувачів:", err);
+        }
+      }
+
+      function renderUserList(users) {
+        const container = document.getElementById("userList");
+        container.innerHTML = "";
+        users.forEach((user) => {
+          const div = document.createElement("div");
+          const fullName = getFullName(user);
+          div.innerHTML = `
       <label>
-        <input type="checkbox" value="${user._id}" ${selectedParticipantIds.includes(user._id) ? 'checked' : ''} />
+        <input type="checkbox" value="${user._id}" ${
+            selectedParticipantIds.includes(user._id) ? "checked" : ""
+          } />
         ${fullName || user.email}
       </label>
     `;
-    container.appendChild(div);
-  });
-}
+          container.appendChild(div);
+        });
+      }
 
-function applySelectedParticipants() {
-  const checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');
-  selectedParticipantIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-  updateParticipantsUI();
-  closeParticipantsModal();
-}
+      function applySelectedParticipants() {
+        const checkboxes = document.querySelectorAll(
+          '#userList input[type="checkbox"]'
+        );
+        selectedParticipantIds = Array.from(checkboxes)
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
+        updateParticipantsUI();
+        closeParticipantsModal();
+      }
 
-function closeParticipantsModal() {
-  document.getElementById("participantsModal").style.display = "none";
-}
+      function closeParticipantsModal() {
+        document.getElementById("participantsModal").style.display = "none";
+      }
 
-function filterParticipants(e) {
-  const query = e.target.value.toLowerCase();
-  const filtered = allUsers.filter(u => getFullName(u).toLowerCase().includes(query));
-  renderUserList(filtered);
-}
- function logoutUser(){
-    try{
-      // чистимо локальне
-      localStorage.removeItem('user');
-      ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
-    }catch(_){}
+      function filterParticipants(e) {
+        const query = e.target.value.toLowerCase();
+        const filtered = allUsers.filter((u) =>
+          getFullName(u).toLowerCase().includes(query)
+        );
+        renderUserList(filtered);
+      }
+      function logoutUser() {
+        try {
+          // чистимо локальне
+          localStorage.removeItem("user");
+          ["token", "authToken", "jwt", "accessToken", "bearer"].forEach((k) =>
+            localStorage.removeItem(k)
+          );
+        } catch (_) {}
 
-    // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-    const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
-    fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+        // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
+        const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
+        fetch(`${API}/api/users/logout`, {
+          method: "POST",
+          credentials: "include",
+        }).catch(() => {});
 
-    // редірект на логін з поверненням
-    const back = encodeURIComponent(location.pathname + location.search);
-    location.href = `admin-login.html?returnUrl=${back}`;
-  }
+        // редірект на логін з поверненням
+        const back = encodeURIComponent(location.pathname + location.search);
+        location.href = `admin-login.html?returnUrl=${back}`;
+      }
 
-  // прив’язуємо до кнопки
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnLogout');
-    if (btn) btn.addEventListener('click', logoutUser);
-  });
+      // прив’язуємо до кнопки
+      document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.getElementById("btnLogout");
+        if (btn) btn.addEventListener("click", logoutUser);
+      });
 
-  document.addEventListener('DOMContentLoaded', () => {
-  const here = location.pathname.split('/').pop();
-  document.querySelectorAll('.sidebar nav a').forEach(a=>{
-    if (a.getAttribute('href') === here) a.classList.add('active');
-  });
-});
+      document.addEventListener("DOMContentLoaded", () => {
+        const here = location.pathname.split("/").pop();
+        document.querySelectorAll(".sidebar nav a").forEach((a) => {
+          if (a.getAttribute("href") === here) a.classList.add("active");
+        });
+      });
+    </script>
 
-  </script>
-
-  <div id="participantsModal" class="modal" style="display: none;">
-  <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
-    <h3>Редагувати учасників</h3>
-    <input type="text" placeholder="Пошук..." oninput="filterParticipants(event)" />
-    <div id="userList" style="margin: 10px 0;"></div>
-    <button onclick="applySelectedParticipants()">Застосувати</button>
-    <button onclick="closeParticipantsModal()">Скасувати</button>
-  </div>
-</div>
-
-</body>
+    <div id="participantsModal" class="modal" style="display: none">
+      <div class="modal-content" style="max-height: 70vh; overflow-y: auto">
+        <h3>Редагувати учасників</h3>
+        <input
+          type="text"
+          placeholder="Пошук..."
+          oninput="filterParticipants(event)"
+        />
+        <div id="userList" style="margin: 10px 0"></div>
+        <button onclick="applySelectedParticipants()">Застосувати</button>
+        <button onclick="closeParticipantsModal()">Скасувати</button>
+      </div>
+    </div>
+  </body>
 </html>

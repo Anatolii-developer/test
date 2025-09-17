@@ -161,10 +161,10 @@
       <div class="toolbar">
         <h1>Модерація форуму</h1>
         <div class="inline small">
-          <span id="me" class="muted">…</span>
-          <a class="btn" href="/forum/index.html">⬅ До форуму</a>
-        </div>
-      </div>
+  <button class="btn" id="btnBack">◀ Назад</button>
+  <span id="me" class="muted">…</span>
+  <a class="btn" href="/forum/index.html">⬅ До форуму</a>
+</div>
 
       <div class="row">
         <div class="inline small">
@@ -528,6 +528,18 @@
         document.getElementById("btnReload").onclick = refresh;
         await refresh();
       })();
+
+      const backBtn = document.getElementById("btnBack");
+if (backBtn) {
+  backBtn.onclick = () => {
+    if (history.length > 1) {
+      history.back();
+    } else {
+      // запасний маршрут, коли немає історії
+      location.href = "/admin/admin-requests.html";
+    }
+  };
+}
     </script>
   </body>
 </html>

@@ -321,7 +321,7 @@
         if (typeof requireAdminPage === "function") {
           requireAdminPage();
         }
-        load();
+        loadCourseDetails();
       });
 
       let courseId;
@@ -373,31 +373,36 @@
       }
 
       async function deleteCourse() {
-        if (!courseId) return;
-        const ok = confirm("Точно видалити цей курс? Дію неможливо скасувати.");
-        if (!ok) return;
+  if (!courseId) { alert("Не вказано ID курсу"); return; }
+  if (!confirm("Точно видалити цей курс? Дію неможливо скасувати.")) return;
 
-        try {
-          const r = await fetch(
-            `http://157.230.121.24:5050/api/courses/${courseId}`,
-            {
-              method: "DELETE",
-              credentials: "include", // якщо бек перевіряє куку адміна
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-          const data = await r.json().catch(() => ({}));
-          if (!r.ok)
-            throw new Error(data.message || "Не вдалося видалити курс");
+  const btn = document.getElementById('deleteBtn');
+  btn && (btn.disabled = true);
 
-          alert("Курс видалено");
-          // куди повертати після видалення — за потреби змінити
-          location.href = "admin-all-courses.html";
-        } catch (e) {
-          console.error(e);
-          alert(e.message || "Помилка видалення");
-        }
-      }
+  try {
+    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: getAuthHeaders(),
+    });
+
+    if (r.status === 404) {
+      alert("Курс не знайдено (можливо, уже видалено або невірний ID).");
+      return;
+    }
+
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.message || `HTTP ${r.status}`);
+
+    alert("Курс видалено");
+    location.href = "admin-all-courses.html";
+  } catch (e) {
+    console.error(e);
+    alert(e.message || "Помилка видалення");
+  } finally {
+    btn && (btn.disabled = false);
+  }
+}
       function computeDurationText(startIso, endIso) {
         if (!startIso || !endIso) return "";
         const s = new Date(startIso);
@@ -417,8 +422,9 @@
       }
 
       async function loadCourseDetails() {
-        const params = new URLSearchParams(window.location.search);
-        courseId = params.get("id");
+       const params = new URLSearchParams(window.location.search);
+courseId = params.get("id");
+console.log('[admin-course-details] courseId =', courseId);
         if (!courseId) return;
 
         try {
@@ -539,6 +545,18 @@
         textarea.disabled = false;
         textarea.focus();
       }
+
+
+      function getAuthHeaders() {
+  let token = null;
+  try {
+    const u = JSON.parse(localStorage.getItem('user') || 'null');
+    token = u?.token || u?.accessToken || null;
+  } catch(_) {}
+  const h = { 'Content-Type': 'application/json' };
+  if (token) h.Authorization = `Bearer ${token}`;
+  return h;
+}
 
       async function saveChanges() {
         const startIso = document.getElementById("startDate")?.value || "";

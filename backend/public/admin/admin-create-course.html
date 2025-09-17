@@ -115,6 +115,10 @@
           <label>Посилання на Zoom</label>
           <input type="text" name="zoomLink" placeholder="Вставте Zoom-посилання" />
         </div>
+        <div class="form-group">
+          <label>Посилання на сторінку курсу (на сайті)</label>
+          <input type="url" name="siteLink" placeholder="https://…" />
+        </div>
 
         <div class="save-btn-wrapper">
           <button type="submit" class="save-btn">Зберегти</button>
@@ -269,6 +273,9 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
     durationHidden.value = humanDurationFromRange(form.startDate.value, form.endDate.value);
   }
 
+  const rawSite = form.siteLink?.value?.trim() || '';
+  const siteLink = rawSite && !/^https?:\/\//i.test(rawSite) ? 'https://' + rawSite : rawSite;
+
   const formData = {
     eventType: form.eventType.value,
     courseTitle: form.courseTitle.value,
@@ -287,6 +294,11 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
     courseDuration: (durationHidden ? durationHidden.value : form.courseDuration.value),
     coursePrice: form.coursePrice.value,
     zoomLink: form.zoomLink.value,
+    siteLink,
+    publicUrl: siteLink,
+    pageUrl: siteLink,
+    website: siteLink,
+    websiteUrl: siteLink,
     participants: Array.from(selectedUserIds),
     creatorId: storedUser?._id || null,
     creatorName: `${storedUser?.firstName || ""} ${storedUser?.lastName || ""}`.trim(),

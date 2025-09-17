@@ -29,6 +29,7 @@ const courseSchema = new mongoose.Schema({
   courseDuration: String,
   coursePrice: String,
   zoomLink: String,
+  siteLink: String,  
   createdAt: { type: Date, default: Date.now }
 });
 

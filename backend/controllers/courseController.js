@@ -37,6 +37,13 @@ exports.createCourse = async (req, res) => {
       courseDuration: req.body.courseDuration,
       coursePrice: req.body.coursePrice,
       zoomLink: req.body.zoomLink,
+       siteLink:
+        req.body.siteLink ||
+        req.body.publicUrl ||
+        req.body.pageUrl ||
+        req.body.website ||
+        req.body.websiteUrl ||
+        '',
       status: 'WAITING_FOR_APPROVAL',
     });
 
@@ -172,12 +179,31 @@ exports.getCourseById = async (req, res) => {
 };
 
 
-// PUT /api/courses/:id
 exports.updateCourse = async (req, res) => {
   try {
-    const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedCourse) return res.status(404).json({ message: "Курс не знайдено" });
-    res.json(updatedCourse);
+    // Нормалізуємо дати, якщо прийшли як courseDates: { start, end }
+    if (req.body.courseDates) {
+      const s = req.body.courseDates.start;
+      const e = req.body.courseDates.end;
+      if (s) req.body['courseDates.start'] = new Date(s).toISOString();
+      if (e) req.body['courseDates.end']   = new Date(e).toISOString();
+      delete req.body.courseDates; // для findByIdAndUpdate використовуємо dot-notation
+    }
+
+    // Приймаємо siteLink з будь-якого з відомих псевдонімів
+    if (!req.body.siteLink) {
+      const alias = req.body.publicUrl || req.body.pageUrl || req.body.website || req.body.websiteUrl;
+      if (alias) req.body.siteLink = alias;
+    }
+
+    const updated = await Course.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Курс не знайдено" });
+    res.json(updated);
   } catch (err) {
     console.error("Помилка при оновленні курсу:", err);
     res.status(500).json({ message: "Помилка сервера" });
@@ -199,17 +225,12 @@ exports.getCourseParticipants = async (req, res) => {
 // DELETE /api/courses/:id
 exports.deleteCourse = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const course = await Course.findByIdAndDelete(id);
-    if (!course) {
-      return res.status(404).json({ message: 'Курс не знайдено' });
-    }
-
-    res.json({ success: true, message: 'Курс видалено', id });
+    const deleted = await Course.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: "Курс не знайдено" });
+    res.json({ success: true });
   } catch (err) {
-    console.error('❌ Error deleting course:', err);
-    res.status(500).json({ message: 'Помилка при видаленні курсу', error: err.message });
+    console.error("Помилка при видаленні курсу:", err);
+    res.status(500).json({ message: "Помилка сервера" });
   }
 };
 exports.getCurrentCourseParticipants = async (req, res) => {

@@ -442,7 +442,12 @@
           document.getElementById("creatorRole").value =
             course.creatorRole || "";
           // Публічне посилання на сторінку курсу
-          const site = course.siteLink || course.publicUrl || course.pageUrl || "";
+          let site = course.siteLink || course.publicUrl || course.pageUrl || course.website || course.websiteUrl || "";
+          // локальний фолбек: якщо бек не повертає поле (ще не підтримує) — дістаємо з localStorage
+          try {
+            const ls = JSON.parse(localStorage.getItem("course.siteLinks") || "{}");
+            if (!site && ls && ls[course._id || courseId]) site = ls[course._id || courseId];
+          } catch(_) {}
           const $site = document.getElementById("siteLink");
           if ($site) $site.value = site;
 
@@ -513,6 +518,8 @@
           }
 
           updateParticipantsUI();
+          // синхронізуємо однорядковий дисплей дат із прихованими інпутами
+          setDateRangeDisplay(document.getElementById("startDate")?.value, document.getElementById("endDate")?.value);
         } catch (err) {
           console.error("Помилка при завантаженні курсу:", err);
         }
@@ -551,13 +558,25 @@
           courseDuration: document.getElementById("duration").value,
           coursePrice: document.getElementById("price").value,
           zoomLink: document.getElementById("zoom").value,
+          // усі можливі ключі для бекенду
           siteLink,
+          publicUrl: siteLink,
+          pageUrl: siteLink,
+          website: siteLink,
+          websiteUrl: siteLink,
           participants: selectedParticipantIds,
           courseDates: {
             start: startIso ? new Date(startIso + (/-/.test(startIso) && startIso.length===10 ? 'T12:00:00' : '')).toISOString() : null,
             end:   endIso   ? new Date(endIso   + (/-/.test(endIso)   && endIso.length===10   ? 'T12:00:00' : '')).toISOString()   : null,
           },
         };
+
+        // збережемо локально як фолбек (на випадок, якщо бек поки не віддає це поле)
+        try {
+          const map = JSON.parse(localStorage.getItem("course.siteLinks") || "{}");
+          map[courseId] = siteLink;
+          localStorage.setItem("course.siteLinks", JSON.stringify(map));
+        } catch(_) {}
 
         try {
           const res = await fetch(

@@ -143,10 +143,18 @@
 
       <div class="editable-block">
         <label>Дати проведення курсу</label>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap">
+          <div>
+            <div class="meta">Початок</div>
+            <input id="startDate" type="date" />
+          </div>
+          <div>
+            <div class="meta">Кінець</div>
+            <input id="endDate" type="date" />
+          </div>
+        </div>
+        <!-- за бажанням залиште read-only поле для відображення -->
         <input id="dateRange" type="text" disabled />
-        <button class="edit-btn" onclick="enableEdit('dateRange')">
-          <img src="../assets/edit-icon.svg" alt="Edit" />
-        </button>
       </div>
 
       <div class="editable-block">
@@ -246,8 +254,8 @@
 
       <button class="submit-btn" onclick="saveChanges()">Зберегти</button>
       <button class="submit-btn danger" id="deleteBtn" onclick="deleteCourse()">
-  🗑️ Видалити курс
-</button>
+        🗑️ Видалити курс
+      </button>
     </div>
     <script src="admin-auth.js"></script>
     <script>
@@ -282,27 +290,31 @@
       }
 
       async function deleteCourse() {
-  if (!courseId) return;
-  const ok = confirm("Точно видалити цей курс? Дію неможливо скасувати.");
-  if (!ok) return;
+        if (!courseId) return;
+        const ok = confirm("Точно видалити цей курс? Дію неможливо скасувати.");
+        if (!ok) return;
 
-  try {
-    const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
-      method: "DELETE",
-      credentials: "include", // якщо бек перевіряє куку адміна
-      headers: { "Content-Type": "application/json" }
-    });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.message || "Не вдалося видалити курс");
+        try {
+          const r = await fetch(
+            `http://157.230.121.24:5050/api/courses/${courseId}`,
+            {
+              method: "DELETE",
+              credentials: "include", // якщо бек перевіряє куку адміна
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+          const data = await r.json().catch(() => ({}));
+          if (!r.ok)
+            throw new Error(data.message || "Не вдалося видалити курс");
 
-    alert("Курс видалено");
-    // куди повертати після видалення — за потреби змінити
-    location.href = "admin-all-courses.html";
-  } catch (e) {
-    console.error(e);
-    alert(e.message || "Помилка видалення");
-  }
-}
+          alert("Курс видалено");
+          // куди повертати після видалення — за потреби змінити
+          location.href = "admin-all-courses.html";
+        } catch (e) {
+          console.error(e);
+          alert(e.message || "Помилка видалення");
+        }
+      }
       function computeDurationText(startIso, endIso) {
         if (!startIso || !endIso) return "";
         const s = new Date(startIso);
@@ -383,21 +395,25 @@
           const start = course.courseDates && course.courseDates.start;
           const end = course.courseDates && course.courseDates.end;
 
-          // Автовычисленная тривалість за датами
-          const autoDuration = computeDurationText(start, end);
-          if (autoDuration) {
-            const durEl = document.getElementById("duration");
-            if (
-              durEl &&
-              (!durEl.value || durEl.value.trim() === "" || durEl.disabled)
-            ) {
-              durEl.value = autoDuration;
-            }
-          }
+          // в date inputs очікується "YYYY-MM-DD"
+          const toYMD = (iso) => {
+            if (!iso) return "";
+            const d = new Date(iso);
+            if (isNaN(d)) return "";
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
+          };
 
+          const $start = document.getElementById("startDate");
+          const $end = document.getElementById("endDate");
+          if ($start) $start.value = toYMD(start);
+          if ($end) $end.value = toYMD(end);
+
+          // красивий рядок для read-only поля
           const range =
             start || end ? `${fmtDate(start)} – ${fmtDate(end)}` : "";
-          const group = course.accessType || "";
           document.getElementById("dateRange").value = range;
           document.getElementById("groupType").value = group;
 
@@ -446,6 +462,9 @@
       }
 
       async function saveChanges() {
+        const startIso = document.getElementById("startDate")?.value || "";
+        const endIso = document.getElementById("endDate")?.value || "";
+
         const updated = {
           courseTitle: document.getElementById("title").value,
           eventType: document.getElementById("eventTypeSel")
@@ -458,6 +477,10 @@
           coursePrice: document.getElementById("price").value,
           zoomLink: document.getElementById("zoom").value,
           participants: selectedParticipantIds,
+          courseDates: {
+            start: startIso ? new Date(startIso).toISOString() : null,
+            end: endIso ? new Date(endIso).toISOString() : null,
+          },
         };
 
         try {
@@ -465,6 +488,7 @@
             `http://157.230.121.24:5050/api/courses/${courseId}`,
             {
               method: "PUT",
+              credentials: "include",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updated),
             }
@@ -478,15 +502,16 @@
             document
               .querySelectorAll("input[type='text']")
               .forEach((i) => (i.disabled = true));
-            // оновити підказку статусу (раптом змінилася десь ще)
             try {
               loadCourseDetails();
             } catch (_) {}
           } else {
-            alert("Помилка при збереженні");
+            const data = await res.json().catch(() => ({}));
+            alert(data?.message || "Помилка при збереженні");
           }
         } catch (err) {
           console.error("Помилка при збереженні:", err);
+          alert(err.message || "Помилка при збереженні");
         }
       }
 

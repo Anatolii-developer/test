@@ -149,7 +149,6 @@ function openCourseModal(course) {
       <div><span class="modal-course-label">Тип курсу:</span> <span class="modal-course-answer">${course.accessType || ""}</span></div>
       ${course.courseDuration ? `<div><span class="modal-course-label">Тривалість курсу:</span> <span class="modal-course-answer">${course.courseDuration}</span></div>` : ""}
       ${course.coursePrice ? `<div><span class="modal-course-label">Вартість курсу:</span> <span class="modal-course-answer">${course.coursePrice}</span></div>` : ""}
-      ${course.zoomLink ? `<div><span class="modal-course-label">Посилання:</span> <span class="modal-course-answer"><a href="${course.zoomLink}" target="_blank">Посилання на зустріч</a></span></div>` : ""}
       <div class="modal-course-footer">
         <a class="view-site-button" href="course-details.html?id=${course._id}">Переглянути на сайті</a>
       </div>

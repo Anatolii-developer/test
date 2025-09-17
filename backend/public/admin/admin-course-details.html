@@ -252,6 +252,13 @@
           <img src="../assets/edit-icon.svg" alt="Edit" />
         </button>
       </div>
+      <div class="editable-block">
+        <label>Посилання на сторінку курсу (на сайті)</label>
+        <input id="siteLink" type="text" disabled placeholder="https://…" />
+        <button class="edit-btn" onclick="enableEdit('siteLink')">
+          <img src="../assets/edit-icon.svg" alt="Edit" />
+        </button>
+      </div>
 
       <div class="editable-block">
         <label>Вид курсу</label>
@@ -434,6 +441,10 @@
             course.creatorName || "";
           document.getElementById("creatorRole").value =
             course.creatorRole || "";
+          // Публічне посилання на сторінку курсу
+          const site = course.siteLink || course.publicUrl || course.pageUrl || "";
+          const $site = document.getElementById("siteLink");
+          if ($site) $site.value = site;
 
           // Fallbacks for creatorName/creatorRole using creatorId if present
           if (
@@ -526,6 +537,9 @@
         const startIso = document.getElementById("startDate")?.value || "";
         const endIso = document.getElementById("endDate")?.value || "";
 
+        const rawSite = document.getElementById('siteLink')?.value?.trim() || '';
+        const siteLink = rawSite && !/^https?:\/\//i.test(rawSite) ? 'https://' + rawSite : rawSite;
+
         const updated = {
           courseTitle: document.getElementById("title").value,
           eventType: document.getElementById("eventTypeSel")
@@ -537,6 +551,7 @@
           courseDuration: document.getElementById("duration").value,
           coursePrice: document.getElementById("price").value,
           zoomLink: document.getElementById("zoom").value,
+          siteLink,
           participants: selectedParticipantIds,
           courseDates: {
             start: startIso ? new Date(startIso + (/-/.test(startIso) && startIso.length===10 ? 'T12:00:00' : '')).toISOString() : null,

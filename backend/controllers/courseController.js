@@ -196,7 +196,22 @@ exports.getCourseParticipants = async (req, res) => {
   }
 };
 
+// DELETE /api/courses/:id
+exports.deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const course = await Course.findByIdAndDelete(id);
+    if (!course) {
+      return res.status(404).json({ message: 'Курс не знайдено' });
+    }
+
+    res.json({ success: true, message: 'Курс видалено', id });
+  } catch (err) {
+    console.error('❌ Error deleting course:', err);
+    res.status(500).json({ message: 'Помилка при видаленні курсу', error: err.message });
+  }
+};
 exports.getCurrentCourseParticipants = async (req, res) => {
   try {
     const currentCourses = await Course.find({ status: 'Поточний' }).populate('participants');

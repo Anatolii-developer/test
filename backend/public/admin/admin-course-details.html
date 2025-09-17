@@ -314,591 +314,344 @@
     </div>
     <script src="admin-auth.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        if (typeof renderAdminSidebar === "function") {
-          renderAdminSidebar("admin-career-requests.html");
-        }
-        if (typeof requireAdminPage === "function") {
-          requireAdminPage();
-        }
-        loadCourseDetails();
-      });
-
-      let courseId;
-      let resolvedCourseId = null; // фактичний _id курсу після завантаження
-      let allUsers = [];
-      let selectedParticipantIds = [];
-
-      function pad(n) {
-        return String(n).padStart(2, "0");
-      }
-      function fmtDate(d) {
-        if (!d) return "";
-        const x = new Date(d);
-        if (isNaN(x)) return "";
-        return `${pad(x.getDate())}.${pad(
-          x.getMonth() + 1
-        )}.${x.getFullYear()}`;
-      }
-
-      function getFullName(user) {
-        return [user.firstName, user.lastName].filter(Boolean).join(" ");
-      }
-
-      // --- date helpers for single-range control ---
-      const pad2 = (n) => String(n).padStart(2, "0");
-      function toYMD(iso){
-        if (!iso) return "";
-        if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso; // already Y-M-D
-        const d = new Date(iso);
-        if (isNaN(d)) return "";
-        return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-      }
-      function toDMY(iso){
-        if (!iso) return "";
-        const d = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(iso+"T12:00:00") : new Date(iso);
-        if (isNaN(d)) return "";
-        return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
-      }
-      function normalizeISO(val){
-        if (!val) return "";
-        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return new Date(val+"T12:00:00").toISOString();
-        const d = new Date(val);
-        return isNaN(d) ? "" : d.toISOString();
-      }
-      function setDateRangeDisplay(startVal, endVal){
-        const sIso = normalizeISO(startVal);
-        const eIso = normalizeISO(endVal);
-        const input = document.getElementById("dateRangeInput");
-        if (input) input.value = (sIso || eIso) ? `${toDMY(sIso)} – ${toDMY(eIso)}` : "";
-      }
-
-      async function deleteCourse() {
-  const formTitle = document.getElementById("title")?.value?.trim() || "";
-  const idRaw = courseId;
-  const baseId = (resolvedCourseId || idRaw || "").trim();
-  if (!baseId) { alert("Не вказано ID курсу"); return; }
-
-  if (!confirm("Точно видалити цей курс? Дію неможливо скасувати.")) return;
-
-  const btn = document.getElementById('deleteBtn');
-  btn && (btn.disabled = true);
-
-  const idEnc = encodeURIComponent(baseId);
-  const H = getAuthHeaders();
-
-  // try several backend variants
-  async function tryDelete(id) {
-    const idSafe = encodeURIComponent(id);
-    const variants = [
-      { url: `http://157.230.121.24:5050/api/courses/${idSafe}`,        method: "DELETE" },
-      { url: `http://157.230.121.24:5050/api/courses/${idSafe}/delete`,  method: "PUT"    },
-      { url: `http://157.230.121.24:5050/api/courses/${idSafe}/delete`,  method: "POST"   },
-    ];
-    for (const v of variants) {
-      try {
-        const r = await fetch(v.url, { method: v.method, credentials: "include", headers: H });
-        if (r.status === 404) {
-          // keep trying next variant
-          continue;
-        }
-        if (r.ok) return r;
-        // read message if possible
-        let msg = "";
-        try { const d = await r.clone().json(); msg = d?.message || ""; } catch {}
-        throw new Error(msg || `HTTP ${r.status}`);
-      } catch (e) {
-        // try next variant
-      }
+  // --- Page bootstrap ---
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof renderAdminSidebar === "function") {
+      renderAdminSidebar("admin-career-requests.html");
     }
-    // if nothing worked, synthesize 404 to trigger fallback search
-    return new Response(null, { status: 404 });
+    if (typeof requireAdminPage === "function") {
+      requireAdminPage();
+    }
+    loadCourseDetails();
+    bindDateRangeUI();
+    highlightActiveSidebar();
+  });
+
+  // --- State ---
+  let courseId;
+  let allUsers = [];
+  let selectedParticipantIds = [];
+
+  // --- Utils ---
+  function $(id) { return document.getElementById(id); }
+
+  function getAuthHeaders() {
+    let token = null;
+    try {
+      const u = JSON.parse(localStorage.getItem("user") || "null");
+      token = u?.token || u?.accessToken || null;
+    } catch (_) {}
+    const h = { "Content-Type": "application/json" };
+    if (token) h.Authorization = `Bearer ${token}`;
+    return h;
   }
 
-  try {
-    // 1) first pass: attempt by current id
-    let r = await tryDelete(baseId);
+  function enableEdit(id) {
+    const el = $(id);
+    if (!el) return;
+    el.disabled = false;
+    el.focus();
+  }
 
-    if (r.status === 404) {
-      // 2) fallback: look up by exact id or exact title in list and try again
-      console.warn("[deleteCourse] 404 for id:", baseId, "— searching list by title:", formTitle);
-      const listRes = await fetch(`http://157.230.121.24:5050/api/courses`, { credentials: "include", headers: H });
-      const all = await listRes.json();
+  // --- Date helpers for single-input range control ---
+  const pad2 = (n) => String(n).padStart(2, "0");
+  function toYMD(val) {
+    if (!val) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    const d = new Date(val);
+    if (isNaN(d)) return "";
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  }
+  function toDMY(val) {
+    if (!val) return "";
+    const d = /^\d{4}-\d{2}-\d{2}$/.test(val) ? new Date(val + "T12:00:00") : new Date(val);
+    if (isNaN(d)) return "";
+    return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+  }
+  function normalizeISO(val) {
+    if (!val) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return new Date(val + "T12:00:00").toISOString();
+    const d = new Date(val);
+    return isNaN(d) ? "" : d.toISOString();
+  }
+  function setDateRangeDisplay(startVal, endVal) {
+    const sIso = normalizeISO(startVal);
+    const eIso = normalizeISO(endVal);
+    const input = $("dateRangeInput");
+    if (input) input.value = (sIso || eIso) ? `${toDMY(sIso)} – ${toDMY(eIso)}` : "";
+  }
 
-      // gather candidates
-      let candidates = all.filter(c => String(c._id) === String(idRaw));
-      if (!candidates.length && formTitle) {
-        candidates = all.filter(c => (c.courseTitle || "").trim() === formTitle);
-      }
-      if (!candidates.length && idRaw) {
-        candidates = all.filter(c =>
-          String(c._id).startsWith(String(idRaw)) || String(c._id).endsWith(String(idRaw))
-        );
-      }
-
-      if (!candidates.length) {
-        alert("Курс не знайдено (можливо, вже видалено або невірний ID).");
-        return;
-      }
-
-      // if multiple, ask user to confirm the first exact-title match else the first one
-      let chosen = candidates[0];
-      const exactByTitle = candidates.find(c => (c.courseTitle || "").trim() === formTitle) || chosen;
-
-      if (candidates.length > 1) {
-        const list = candidates.slice(0, 8).map(c => `• ${c.courseTitle || '(без назви)'} — ${c._id}`).join('\n');
-        if (!confirm("Знайдено кілька курсів:\n\n" + list + "\n\nВидалити перший збіг?\n" +
-                     `"${(exactByTitle.courseTitle || '(без назви)')}" (id: ${exactByTitle._id})`)) {
-          return;
-        }
-      } else {
-        if (!confirm(`Знайдено курс:\n"${exactByTitle.courseTitle || '(без назви)'}"\n(id: ${exactByTitle._id})\n\nВидалити його?`)) {
-          return;
-        }
-      }
-
-      // remember resolved id for this page session
-      resolvedCourseId = exactByTitle._id;
-
-      // try all server delete variants with the chosen id
-      r = await tryDelete(exactByTitle._id);
-    }
-
-    if (r.status === 404) {
-      alert("Курс не знайдено (можливо, уже видалено або невірний ID).");
+  // --- Load course ---
+  async function loadCourseDetails() {
+    const params = new URLSearchParams(window.location.search);
+    courseId = params.get("id");
+    if (!courseId) {
+      alert("Не вказано ID курсу");
+      location.href = "admin-all-courses.html";
       return;
     }
 
-    // success or handled error
-    let data = {};
-    try { data = await r.clone().json(); } catch {}
-    if (!r.ok) throw new Error(data?.message || `HTTP ${r.status}`);
-
-    alert("Курс видалено");
-    location.href = "admin-all-courses.html";
-  } catch (e) {
-    console.error(e);
-    alert(e.message || "Помилка видалення");
-  } finally {
-    btn && (btn.disabled = false);
-  }
-}
-      function computeDurationText(startIso, endIso) {
-        if (!startIso || !endIso) return "";
-        const s = new Date(startIso);
-        const e = new Date(endIso);
-        if (isNaN(s) || isNaN(e)) return "";
-        // normalize to noon to avoid DST issues
-        s.setHours(12, 0, 0, 0);
-        e.setHours(12, 0, 0, 0);
-        const msPerDay = 24 * 60 * 60 * 1000;
-        const days = Math.max(0, Math.round((e - s) / msPerDay) + 1); // inclusive range
-        const weeks = Math.floor(days / 7);
-        const remDays = days % 7;
-        const weekPart = weeks ? `${weeks} тижн.` : "";
-        const dayPart = remDays ? `${remDays} дн.` : weeks ? "" : `${days} дн.`;
-        const joiner = weekPart && dayPart ? " " : "";
-        return `${days} днів (${weekPart}${joiner}${dayPart})`;
-      }
-
-    async function loadCourseDetails() {
-  const params = new URLSearchParams(window.location.search);
-  courseId = params.get("id");
-  if (!courseId) {
-    alert("Не вказано ID курсу");
-    return;
-  }
-  console.log('[admin-course-details] courseId =', courseId);
-
-  const setBusy = (on) => {
-    ["deleteBtn"].forEach(id => {
-      const b = document.getElementById(id);
-      if (b) b.disabled = !!on;
-    });
-  };
-
-  setBusy(true);
-  try {
-    // 1) спроба прямого GET
-    let res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`);
-
-    if (res.status === 404) {
-      // 2) фолбек: шукаємо реальний _id у списку
-      const listRes = await fetch(`http://157.230.121.24:5050/api/courses`);
-      const all = await listRes.json();
-      let found = all.find(c => String(c._id) === String(courseId));
-      if (!found) {
-        found = all.find(c => String(c._id).startsWith(String(courseId)) || String(c._id).endsWith(String(courseId)));
-      }
-      if (!found) {
-        alert("Курс не знайдено (ID некоректний або запис відсутній). Повертаю назад.");
+    try {
+      const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, { credentials: "include" });
+      if (res.status === 404) {
+        alert("Курс не знайдено");
         location.href = "admin-all-courses.html";
         return;
       }
-      if (String(found._id) !== String(courseId)) {
-        const u = new URL(location.href);
-        u.searchParams.set("id", found._id);
-        location.replace(u.toString());
-        return;
-      }
-      res = await fetch(`http://157.230.121.24:5050/api/courses/${found._id}`);
-    }
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.message || `HTTP ${res.status}`);
-    }
-
-    const course = await res.json();
-    resolvedCourseId = course && course._id ? course._id : courseId;
-
-    // ====== заповнюємо поля ======
-    const $ = (id) => document.getElementById(id);
-    $("title").value = course.courseTitle || "";
-    $("eventType").value = course.eventType || "";
-    $("subtitle").value = course.courseSubtitle || "";
-    $("description").value = course.courseDescription || "";
-    $("access").value = course.accessType || "";
-    $("duration").value = course.courseDuration || "";
-    $("price").value = course.coursePrice || "";
-    $("zoom").value = course.zoomLink || "";
-
-    // Автор
-    $("creatorName").value = course.creatorName || "";
-    $("creatorRole").value = course.creatorRole || "";
-    if ((!course.creatorName || !course.creatorName.length) && course.creatorId) {
-      const nm = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(" ") || course.creatorId.email || "";
-      $("creatorName").value = nm;
-    }
-    if ((!course.creatorRole || !course.creatorRole.length) && course.creatorId) {
-      const rl = course.creatorId.role || (Array.isArray(course.creatorId.roles) ? course.creatorId.roles.join(", ") : "");
-      $("creatorRole").value = rl;
-    }
-
-    // Учасники
-    selectedParticipantIds = (course.participants || []).map(p => typeof p === 'string' ? p : (p && p._id ? p._id : p));
-    try {
-      const usersRes = await fetch("http://157.230.121.24:5050/api/users");
-      allUsers = await usersRes.json();
-      updateParticipantsUI();
-    } catch (_) {}
-
-    // Дати (приховані інпути + красивий дисплей)
-    const start = course.courseDates && course.courseDates.start;
-    const end   = course.courseDates && course.courseDates.end;
-    const $hS = $("startDate");
-    const $hE = $("endDate");
-    if ($hS) $hS.value = toYMD(start);
-    if ($hE) $hE.value = toYMD(end);
-    setDateRangeDisplay(start, end);
-
-    // Тип курсу селект
-    const typeSel = $("eventTypeSel");
-    if (typeSel && course.eventType) typeSel.value = course.eventType;
-
-    // Підказка статусу + доступність модерації
-    const hint = $("statusHint");
-    if (hint) hint.textContent = course.status ? `Поточний статус: ${course.status}` : "";
-
-    // Посилання на сторінку (siteLink/publicUrl/...)
-    let site = course.siteLink || course.publicUrl || course.pageUrl || course.website || course.websiteUrl || "";
-    try {
-      const map = JSON.parse(localStorage.getItem("course.siteLinks") || "{}");
-      if (!site && map && map[course._id || courseId]) site = map[course._id || courseId];
-    } catch(_) {}
-    const $site = $("siteLink");
-    if ($site) $site.value = site;
-
-  } catch (err) {
-    console.error("Помилка при завантаженні курсу:", err);
-    alert(err.message || "Помилка завантаження курсу");
-  } finally {
-    setBusy(false);
-  }
-}
-
-      function updateParticipantsUI() {
-        const input = document.getElementById("participantsText");
-        if (!input) return;
-        const names = allUsers
-          .filter((u) => selectedParticipantIds.includes(u._id))
-          .map((u) => getFullName(u) || u.email);
-        input.value = names.join(", ");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || `HTTP ${res.status}`);
       }
 
-      function enableEdit(id) {
-        const textarea = document.getElementById(id);
-        textarea.disabled = false;
-        textarea.focus();
-      }
+      const course = await res.json();
 
+      // Basic fields
+      $("title").value       = course.courseTitle || "";
+      $("eventType").value   = course.eventType || "";
+      $("subtitle").value    = course.courseSubtitle || "";
+      $("description").value = course.courseDescription || "";
+      $("access").value      = course.accessType || "";
+      $("duration").value    = course.courseDuration || "";
+      $("price").value       = course.coursePrice || "";
+      $("zoom").value        = course.zoomLink || "";
+      $("creatorName").value = course.creatorName || (course.creatorId ? ([course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(" ") || course.creatorId.email || "") : "");
+      $("creatorRole").value = course.creatorRole || (course.creatorId ? (course.creatorId.role || (Array.isArray(course.creatorId.roles) ? course.creatorId.roles.join(", ") : "")) : "");
 
-      function getAuthHeaders() {
-  let token = null;
-  try {
-    const u = JSON.parse(localStorage.getItem('user') || 'null');
-    token = u?.token || u?.accessToken || null;
-  } catch(_) {}
-  const h = { 'Content-Type': 'application/json' };
-  if (token) h.Authorization = `Bearer ${token}`;
-  return h;
-}
+      // Dates
+      const start = course.courseDates && course.courseDates.start;
+      const end   = course.courseDates && course.courseDates.end;
+      $("startDate").value = toYMD(start);
+      $("endDate").value   = toYMD(end);
+      setDateRangeDisplay(start, end);
 
-      async function saveChanges() {
-        const startIso = document.getElementById("startDate")?.value || "";
-        const endIso = document.getElementById("endDate")?.value || "";
+      // Select
+      if ($("eventTypeSel") && course.eventType) $("eventTypeSel").value = course.eventType;
 
-        const rawSite = document.getElementById('siteLink')?.value?.trim() || '';
-        const siteLink = rawSite && !/^https?:\/\//i.test(rawSite) ? 'https://' + rawSite : rawSite;
+      // Status hint
+      if ($("statusHint")) $("statusHint").textContent = course.status ? `Поточний статус: ${course.status}` : "";
 
-        const updated = {
-          courseTitle: document.getElementById("title").value,
-          eventType: document.getElementById("eventTypeSel")
-            ? document.getElementById("eventTypeSel").value
-            : document.getElementById("eventType").value,
-          courseSubtitle: document.getElementById("subtitle").value,
-          courseDescription: document.getElementById("description").value,
-          accessType: document.getElementById("access").value,
-          courseDuration: document.getElementById("duration").value,
-          coursePrice: document.getElementById("price").value,
-          zoomLink: document.getElementById("zoom").value,
-          // усі можливі ключі для бекенду
-          siteLink,
-          publicUrl: siteLink,
-          pageUrl: siteLink,
-          website: siteLink,
-          websiteUrl: siteLink,
-          participants: selectedParticipantIds,
-          courseDates: {
-            start: startIso ? new Date(startIso + (/-/.test(startIso) && startIso.length===10 ? 'T12:00:00' : '')).toISOString() : null,
-            end:   endIso   ? new Date(endIso   + (/-/.test(endIso)   && endIso.length===10   ? 'T12:00:00' : '')).toISOString()   : null,
-          },
-        };
+      // Optional site link (може не зберігатись на бекенді)
+      $("siteLink").value = course.siteLink || course.publicUrl || course.pageUrl || course.website || course.websiteUrl || "";
 
-        // збережемо локально як фолбек (на випадок, якщо бек поки не віддає це поле)
-        try {
-          const map = JSON.parse(localStorage.getItem("course.siteLinks") || "{}");
-          map[courseId] = siteLink;
-          localStorage.setItem("course.siteLinks", JSON.stringify(map));
-        } catch(_) {}
-
-        try {
-          const res = await fetch(
-            `http://157.230.121.24:5050/api/courses/${courseId}`,
-            {
-              method: "PUT",
-              credentials: "include",
-              headers: getAuthHeaders(),
-              body: JSON.stringify(updated),
-            }
-          );
-
-          if (res.ok) {
-            alert("Дані оновлено успішно");
-            document
-              .querySelectorAll("textarea")
-              .forEach((t) => (t.disabled = true));
-            document
-              .querySelectorAll("input[type='text']")
-              .forEach((i) => (i.disabled = true));
-            try {
-              loadCourseDetails();
-            } catch (_) {}
-          } else {
-            const data = await res.json().catch(() => ({}));
-            alert(data?.message || "Помилка при збереженні");
-          }
-        } catch (err) {
-          console.error("Помилка при збереженні:", err);
-          alert(err.message || "Помилка при збереженні");
-        }
-      }
-      // Bind popover behaviour for single date-range control
-      (function bindDateRangeUI(){
-        const input = document.getElementById("dateRangeInput");
-        const pop = document.getElementById("datePopover");
-        const pStart = document.getElementById("pickerStart");
-        const pEnd = document.getElementById("pickerEnd");
-        const btnApply = document.getElementById("applyDates");
-        const btnCancel = document.getElementById("cancelDates");
-        const editBtn = document.getElementById('dateEditBtn');
-        if (!input || !pop) return;
-
-        const hiddenStart = () => document.getElementById("startDate");
-        const hiddenEnd = () => document.getElementById("endDate");
-
-        function open(){
-          if (pStart) pStart.value = hiddenStart()?.value || "";
-          if (pEnd)   pEnd.value   = hiddenEnd()?.value   || "";
-          pop.classList.add("open");
-        }
-        function close(){ pop.classList.remove("open"); }
-
-        input.addEventListener("click", open);
-        btnCancel && btnCancel.addEventListener("click", close);
-        btnApply && btnApply.addEventListener("click", () => {
-          if (pStart && hiddenStart()) hiddenStart().value = pStart.value || "";
-          if (pEnd && hiddenEnd())     hiddenEnd().value   = pEnd.value   || "";
-          setDateRangeDisplay(pStart?.value || "", pEnd?.value || "");
-          close();
-        });
-        // Modified click handler to ignore clicks on editBtn as well
-        document.addEventListener('click', (e) => {
-          const t = e.target;
-          if (pop.contains(t) || t === input || t === editBtn) return; // не закривати при кліку на інпут/кнопку/всередині поповера
-          close();
-        });
-        // щоб кліки всередині поповера не бульбашилися до документа
-        pop.addEventListener('click', (e)=> e.stopPropagation());
-        // Click handler for edit button
-        if (editBtn) editBtn.addEventListener('click', (e)=> { e.stopPropagation(); openDateEditor(e); });
-      })();
-
-      // Function to open date popover and stop event propagation
-      function openDateEditor(event){
-        try { if (event) event.stopPropagation(); } catch(_){}
-        const pop = document.getElementById('datePopover');
-        const pStart = document.getElementById('pickerStart');
-        const pEnd = document.getElementById('pickerEnd');
-        const hStart = document.getElementById('startDate');
-        const hEnd = document.getElementById('endDate');
-        if (!pop) return;
-        if (pStart && hStart) pStart.value = hStart.value || '';
-        if (pEnd && hEnd) pEnd.value = hEnd.value || '';
-        pop.classList.add('open');
-        // фокус на перший пікер
-        setTimeout(()=>{ try { pStart && pStart.focus(); } catch(_){} }, 0);
-      }
-
-      async function approveCourse() {
-        if (!courseId) return;
-        try {
-          const r = await fetch(
-            `http://157.230.121.24:5050/api/courses/${courseId}/approve`,
-            { method: "PUT" }
-          );
-          const   data = await r.json().catch(() => ({}));
-          if (!r.ok)
-            throw new Error(data.message || "Не вдалося підтвердити курс");
-          alert("Курс підтверджено");
-          loadCourseDetails();
-        } catch (e) {
-          console.error(e);
-          alert(e.message || "Помилка підтвердження");
-        }
-      }
-
-      async function rejectCourse() {
-        if (!courseId) return;
-        // опційно: попросити причину
-        const reason = prompt("Причина відхилення (необовʼязково):", "");
-        try {
-          const r = await fetch(
-            `http://157.230.121.24:5050/api/courses/${courseId}/reject`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ reason }),
-            }
-          );
-          const data = await r.json().catch(() => ({}));
-          if (!r.ok)
-            throw new Error(data.message || "Не вдалося відхилити курс");
-          alert("Курс відхилено");
-          loadCourseDetails();
-        } catch (e) {
-          console.error(e);
-          alert(e.message || "Помилка відхилення");
-        }
-      }
-
-      // window.addEventListener("DOMContentLoaded", loadCourseDetails);
-
-      async function openParticipantsModal() {
-        try {
-          const res = await fetch("http://157.230.121.24:5050/api/users");
-          allUsers = await res.json();
-          renderUserList(allUsers);
-          document.getElementById("participantsModal").style.display = "flex";
-        } catch (err) {
-          console.error("Не вдалося завантажити користувачів:", err);
-        }
-      }
-
-      function renderUserList(users) {
-        const container = document.getElementById("userList");
-        container.innerHTML = "";
-        users.forEach((user) => {
-          const div = document.createElement("div");
-          const fullName = getFullName(user);
-          div.innerHTML = `
-      <label>
-        <input type="checkbox" value="${user._id}" ${
-            selectedParticipantIds.includes(user._id) ? "checked" : ""
-          } />
-        ${fullName || user.email}
-      </label>
-    `;
-          container.appendChild(div);
-        });
-      }
-
-      function applySelectedParticipants() {
-        const checkboxes = document.querySelectorAll(
-          '#userList input[type="checkbox"]'
-        );
-        selectedParticipantIds = Array.from(checkboxes)
-          .filter((cb) => cb.checked)
-          .map((cb) => cb.value);
+      // Participants
+      selectedParticipantIds = (course.participants || []).map(p => typeof p === "string" ? p : (p && p._id ? p._id : p));
+      try {
+        const usersRes = await fetch("http://157.230.121.24:5050/api/users");
+        allUsers = await usersRes.json();
         updateParticipantsUI();
-        closeParticipantsModal();
-      }
+      } catch (_) {}
+    } catch (err) {
+      console.error("Помилка при завантаженні курсу:", err);
+      alert(err.message || "Помилка завантаження курсу");
+    }
+  }
 
-      function closeParticipantsModal() {
-        document.getElementById("participantsModal").style.display = "none";
-      }
+  // --- Save ---
+  async function saveChanges() {
+    const startVal = $("startDate")?.value || "";
+    const endVal   = $("endDate")?.value || "";
+    const rawSite  = $("siteLink")?.value?.trim() || "";
+    const siteLink = rawSite && !/^https?:\/\//i.test(rawSite) ? "https://" + rawSite : rawSite;
 
-      function filterParticipants(e) {
-        const query = e.target.value.toLowerCase();
-        const filtered = allUsers.filter((u) =>
-          getFullName(u).toLowerCase().includes(query)
-        );
-        renderUserList(filtered);
-      }
-      function logoutUser() {
-        try {
-          // чистимо локальне
-          localStorage.removeItem("user");
-          ["token", "authToken", "jwt", "accessToken", "bearer"].forEach((k) =>
-            localStorage.removeItem(k)
-          );
-        } catch (_) {}
+    const body = {
+      eventType:        $("eventTypeSel") ? $("eventTypeSel").value : $("eventType").value,
+      courseTitle:      $("title").value,
+      courseSubtitle:   $("subtitle").value,
+      courseDescription:$("description").value,
+      accessType:       $("access").value,
+      courseDuration:   $("duration").value,
+      coursePrice:      $("price").value,
+      zoomLink:         $("zoom").value,
+      siteLink, publicUrl: siteLink, pageUrl: siteLink, website: siteLink, websiteUrl: siteLink,
+      participants:     selectedParticipantIds,
+      courseDates: {
+        start: startVal ? new Date(startVal + (startVal.length === 10 ? "T12:00:00" : "")).toISOString() : null,
+        end:   endVal   ? new Date(endVal   + (endVal.length   === 10 ? "T12:00:00" : "")).toISOString()   : null,
+      },
+    };
 
-        // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-        const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
-        fetch(`${API}/api/users/logout`, {
-          method: "POST",
-          credentials: "include",
-        }).catch(() => {});
-
-        // редірект на логін з поверненням
-        const back = encodeURIComponent(location.pathname + location.search);
-        location.href = `admin-login.html?returnUrl=${back}`;
-      }
-
-      // прив’язуємо до кнопки
-      document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.getElementById("btnLogout");
-        if (btn) btn.addEventListener("click", logoutUser);
+    try {
+      const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(body),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || `HTTP ${res.status}`);
+      }
+      alert("Дані оновлено успішно");
+      document.querySelectorAll("textarea, input[type='text']").forEach(el => el.disabled = true);
+      loadCourseDetails();
+    } catch (err) {
+      console.error("Помилка при збереженні:", err);
+      alert(err.message || "Помилка при збереженні");
+    }
+  }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const here = location.pathname.split("/").pop();
-        document.querySelectorAll(".sidebar nav a").forEach((a) => {
-          if (a.getAttribute("href") === here) a.classList.add("active");
-        });
+  // --- Delete (простая версия) ---
+  async function deleteCourse() {
+    if (!courseId) { alert("Не вказано ID курсу"); return; }
+    if (!confirm("Точно видалити цей курс? Дію неможливо скасувати.")) return;
+    try {
+      const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: getAuthHeaders(),
       });
-    </script>
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.message || `HTTP ${r.status}`);
+      }
+      alert("Курс видалено");
+      location.href = "admin-all-courses.html";
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Помилка видалення");
+    }
+  }
+
+  // --- Approve / Reject ---
+  async function approveCourse() {
+    if (!courseId) return;
+    try {
+      const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/approve`, { method: "PUT", credentials: "include" });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.message || `HTTP ${r.status}`);
+      }
+      alert("Курс підтверджено");
+      loadCourseDetails();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Помилка підтвердження");
+    }
+  }
+
+  async function rejectCourse() {
+    if (!courseId) return;
+    const reason = prompt("Причина відхилення (необовʼязково):", "");
+    try {
+      const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/reject`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.message || `HTTP ${r.status}`);
+      }
+      alert("Курс відхилено");
+      loadCourseDetails();
+    } catch (e) {
+      console.error(e);
+      alert(e.message || "Помилка відхилення");
+    }
+  }
+
+  // --- Date popover (UI) ---
+  function bindDateRangeUI() {
+    const input   = $("dateRangeInput");
+    const pop     = $("datePopover");
+    const pStart  = $("pickerStart");
+    const pEnd    = $("pickerEnd");
+    const applyBt = $("applyDates");
+    const cancelBt= $("cancelDates");
+    const editBtn = $("dateEditBtn");
+    if (!input || !pop) return;
+
+    const hiddenStart = () => $("startDate");
+    const hiddenEnd   = () => $("endDate");
+
+    function open() {
+      if (pStart) pStart.value = hiddenStart()?.value || "";
+      if (pEnd)   pEnd.value   = hiddenEnd()?.value   || "";
+      pop.classList.add("open");
+      setTimeout(() => { try { pStart && pStart.focus(); } catch(_){} }, 0);
+    }
+    function close() { pop.classList.remove("open"); }
+
+    input.addEventListener("click", open);
+    editBtn && editBtn.addEventListener("click", (e) => { e.stopPropagation(); open(); });
+    cancelBt && cancelBt.addEventListener("click", close);
+    applyBt && applyBt.addEventListener("click", () => {
+      if (pStart && hiddenStart()) hiddenStart().value = pStart.value || "";
+      if (pEnd && hiddenEnd())     hiddenEnd().value   = pEnd.value   || "";
+      setDateRangeDisplay(pStart?.value || "", pEnd?.value || "");
+      close();
+    });
+
+    document.addEventListener("click", (e) => {
+      const t = e.target;
+      if (pop.contains(t) || t === input || t === editBtn) return;
+      close();
+    });
+    pop.addEventListener("click", (e) => e.stopPropagation());
+  }
+
+  // --- Participants modal ---
+  async function openParticipantsModal() {
+    try {
+      const res = await fetch("http://157.230.121.24:5050/api/users");
+      allUsers = await res.json();
+      renderUserList(allUsers);
+      $("participantsModal").style.display = "flex";
+    } catch (err) {
+      console.error("Не вдалося завантажити користувачів:", err);
+    }
+  }
+
+  function renderUserList(users) {
+    const container = $("userList");
+    container.innerHTML = "";
+    users.forEach((user) => {
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <label>
+          <input type="checkbox" value="${user._id}" ${selectedParticipantIds.includes(user._id) ? "checked" : ""}/>
+          ${fullName || user.email}
+        </label>`;
+      container.appendChild(div);
+    });
+  }
+
+  function applySelectedParticipants() {
+    const checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');
+    selectedParticipantIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+    updateParticipantsUI();
+    closeParticipantsModal();
+  }
+
+  function closeParticipantsModal() {
+    $("participantsModal").style.display = "none";
+  }
+
+  function filterParticipants(e) {
+    const q = e.target.value.toLowerCase();
+    const filtered = allUsers.filter(u => ([u.firstName, u.lastName].filter(Boolean).join(" ").toLowerCase()).includes(q));
+    renderUserList(filtered);
+  }
+
+  function updateParticipantsUI() {
+    const input = $("participantsText");
+    if (!input) return;
+    const names = allUsers
+      .filter((u) => selectedParticipantIds.includes(u._id))
+      .map((u) => [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email);
+    input.value = names.join(", ");
+  }
+
+  // --- Sidebar active highlight (tiny helper) ---
+  function highlightActiveSidebar() {
+    const here = location.pathname.split("/").pop();
+    document.querySelectorAll(".sidebar nav a").forEach((a) => {
+      if (a.getAttribute("href") === here) a.classList.add("active");
+    });
+  }
+</script>
 
     <div id="participantsModal" class="modal" style="display: none">
       <div class="modal-content" style="max-height: 70vh; overflow-y: auto">

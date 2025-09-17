@@ -208,7 +208,6 @@ async function fetchPlannedCourses() {
               <p class="current-course-description">${course.courseDescription || ""}</p>
             </div>
             <div class="course-actions">
-              ${course.zoomLink ? `<a href="${course.zoomLink}" class="join-meeting-btn" target="_blank">Приєднатися до зустрічі</a>` : ""}
               <button class="current-show-more-btn" data-id="${course._id}">Дізнатись більше</button>
             </div>
           </div>

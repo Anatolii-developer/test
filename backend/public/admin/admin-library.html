@@ -114,9 +114,6 @@
 
   <select id="roleFilter">
     <option value="">Усі ролі</option>
-    <option value="Психолог">Психолог</option>
-    <option value="Супервізор I категорії">Супервізор I категорії</option>
-    <option value="Супервізор II категорії">Супервізор II категорії</option>
   </select>
 
   <label for="courseSelect">Оберіть курс</label>
@@ -157,137 +154,183 @@
     </div>
   </div>
   <script src="admin-auth.js"></script>
+  
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (typeof renderAdminSidebar === "function") {
-        renderAdminSidebar("admin-career-requests.html");
-      }
-      if (typeof requireAdminPage === "function") {
-        requireAdminPage();
-      }
-      load();
-    });
-    let selectAllClicked = false;
-    let allUsers = [];
+  const API_BASE = "http://157.230.121.24:5050";
+  let selectAllClicked = false;
+  let allUsers = [];
+  const rolesById = new Map();     // _id -> name
+  const rolesByName = new Map();   // name -> _id
 
-    function renderTable(users) {
-      const tbody = document.querySelector(".participants-table tbody");
-      tbody.innerHTML = "";
-
-      users.forEach((user, index) => {
-        const fullName = `${user.firstName || ""} ${user.lastName || ""}`;
-        const row = document.createElement("tr");
-        row.innerHTML = `
-  <td>${index + 1}</td>
-  <td>${fullName}</td>
-  <td>${user.email}</td>
-  <td>${user.role || "-"}</td>
-  <td>${new Date(user.dateOfBirth).toLocaleDateString("uk-UA")}</td>
-  <td>
-    <img 
-      src="images/checkbox-empty.png" 
-      alt="checkbox" 
-      class="custom-checkbox" 
-      data-role="${user.role}" 
-      data-checked="false"
-      style="width: 24px; height: 24px; cursor: pointer;" />
-  </td>
-`;
-
-        tbody.appendChild(row);
-      });
-    }
-
-    function applyFilters() {
-      const searchValue = document.getElementById("searchInput").value.toLowerCase();
-      const selectedRole = document.getElementById("roleFilter").value;
-
-      const filtered = allUsers.filter(user => {
-        const name = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
-        const matchName = name.includes(searchValue);
-        const matchRole = selectedRole ? user.role === selectedRole : true;
-        return matchName && matchRole;
-      });
-
-      renderTable(filtered);
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-  // Загружаем список курсів
-  async function loadCurrentCourses() {
-    const res = await fetch("http://157.230.121.24:5050/api/courses");
-    const allCourses = await res.json();
-    const currentCourses = allCourses.filter(c => c.status === "Поточний");
-
-    const courseSelect = document.getElementById("courseSelect");
-    courseSelect.innerHTML = `<option value="">-- Оберіть курс --</option>`;
-    currentCourses.forEach(course => {
+  async function loadRoles() {
+    const res = await fetch(`${API_BASE}/api/roles`);
+    if (!res.ok) throw new Error('Не вдалося отримати ролі');
+    const roles = await res.json(); // [{ _id, name }]
+    const sel = document.getElementById("roleFilter");
+    sel.innerHTML = `<option value="">Усі ролі</option>`;
+    roles.forEach(r => {
+      rolesById.set(String(r._id), r.name);
+      rolesByName.set(r.name, String(r._id));
       const opt = document.createElement("option");
-      opt.value = course._id;
-      opt.textContent = course.courseTitle;
-      courseSelect.appendChild(opt);
+      opt.value = String(r._id);
+      opt.textContent = r.name;
+      sel.appendChild(opt);
     });
   }
 
-  await loadCurrentCourses();
-
-  // Загружаем пользователей по умолчанию (всі approved)
-  try {
-    const response = await fetch("http://157.230.121.24:5050/api/users/approved");
-    allUsers = await response.json();
-    renderTable(allUsers);
-  } catch (err) {
-    console.error("Помилка при отриманні користувачів:", err);
+  function normalizeUserRoleIds(user){
+    if (Array.isArray(user.roleIds)) return user.roleIds.map(String);
+    if (Array.isArray(user.roles))   return user.roles.map(r => String(rolesByName.get(r) || r));
+    if (user.roleId)                 return [String(user.roleId)];
+    if (user.role)                   return [String(rolesByName.get(user.role) || user.role)];
+    return [];
   }
 
-  // Фільтрація по обраному курсу
-  document.getElementById("courseSelect").addEventListener("change", async (e) => {
-    const courseId = e.target.value;
-    if (!courseId) return;
+  function renderTable(users) {
+    const tbody = document.querySelector(".participants-table tbody");
+    tbody.innerHTML = "";
 
+    users.forEach((user, index) => {
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+      const roleIds = normalizeUserRoleIds(user);
+      const roleNames = roleIds.map(id => rolesById.get(id) || id);
+      const roleText = roleNames.length ? roleNames.join(", ") : "-";
+
+      const dob = user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString("uk-UA") : "-";
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${fullName}</td>
+        <td>${user.email || ""}</td>
+        <td>${roleText}</td>
+        <td>${dob}</td>
+        <td>
+          <img 
+            src="images/checkbox-empty.png" 
+            alt="checkbox" 
+            class="custom-checkbox" 
+            data-role-ids='${JSON.stringify(roleIds)}'
+            data-checked="false"
+            style="width: 24px; height: 24px; cursor: pointer;" />
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function applyFilters() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const selectedRoleId = document.getElementById("roleFilter").value;
+
+    const filtered = allUsers.filter(user => {
+      const name = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
+      const matchName = name.includes(searchValue);
+
+      if (!selectedRoleId) return matchName;
+
+      const roleIds = normalizeUserRoleIds(user);
+      const matchRole = roleIds.includes(String(selectedRoleId));
+      return matchName && matchRole;
+    });
+
+    renderTable(filtered);
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    if (typeof renderAdminSidebar === "function") {
+      renderAdminSidebar("admin-career-requests.html");
+    }
+    if (typeof requireAdminPage === "function") {
+      requireAdminPage();
+    }
+    if (typeof load === "function") {
+      load();
+    }
+
+    // 1) Сначала роли
     try {
-      const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/participants`);
-      const users = await res.json();
-      allUsers = users;
-      applyFilters(); // ← твоя функция фильтрации
+      await loadRoles();
+    } catch (e) {
+      console.error("Не вдалося завантажити ролі:", e);
+    }
+
+    // 2) Курси
+    async function loadCurrentCourses() {
+      const res = await fetch(`${API_BASE}/api/courses`);
+      const allCourses = await res.json();
+      const currentCourses = allCourses.filter(c => c.status === "Поточний");
+
+      const courseSelect = document.getElementById("courseSelect");
+      courseSelect.innerHTML = `<option value="">-- Оберіть курс --</option>`;
+      currentCourses.forEach(course => {
+        const opt = document.createElement("option");
+        opt.value = course._id;
+        opt.textContent = course.courseTitle;
+        courseSelect.appendChild(opt);
+      });
+    }
+    await loadCurrentCourses();
+
+    // 3) Користувачі
+    try {
+      const response = await fetch(`${API_BASE}/api/users/approved`);
+      allUsers = await response.json();
+      renderTable(allUsers);
     } catch (err) {
-      console.error("Помилка при отриманні учасників курсу:", err);
+      console.error("Помилка при отриманні користувачів:", err);
     }
+
+    // Обробники
+    document.getElementById("courseSelect").addEventListener("change", async (e) => {
+      const courseId = e.target.value;
+      if (!courseId) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/courses/${courseId}/participants`);
+        const users = await res.json();
+        allUsers = users;
+        applyFilters();
+      } catch (err) {
+        console.error("Помилка при отриманні учасників курсу:", err);
+      }
+    });
+
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("roleFilter").addEventListener("change", applyFilters);
+
+    document.getElementById("selectAllBtn").addEventListener("click", () => {
+      selectAllClicked = true;
+      const selectedRoleId = document.getElementById("roleFilter").value;
+
+      document.querySelectorAll(".custom-checkbox").forEach(cb => {
+        if (!selectedRoleId) {
+          cb.src = "images/checkbox.png";
+          cb.dataset.checked = "true";
+          return;
+        }
+        const roleIds = JSON.parse(cb.dataset.roleIds || "[]");
+        const match = roleIds.includes(String(selectedRoleId));
+        cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
+        cb.dataset.checked = match.toString();
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("custom-checkbox")) {
+        const checkbox = e.target;
+        const isChecked = checkbox.dataset.checked === "true";
+        checkbox.src = isChecked ? "images/checkbox-empty.png" : "images/checkbox.png";
+        checkbox.dataset.checked = (!isChecked).toString();
+      }
+    });
+
+    document.querySelector(".btn-green-add").addEventListener("click", () => {
+      openModal("video");
+    });
+    document.querySelector(".btn-dark-green").addEventListener("click", () => {
+      openModal("book");
+    });
   });
-
-  document.getElementById("searchInput").addEventListener("input", applyFilters);
-  document.getElementById("roleFilter").addEventListener("change", applyFilters);
-
-document.getElementById("selectAllBtn").addEventListener("click", () => {
-  selectAllClicked = true;
-
-  const selectedRole = document.getElementById("roleFilter").value;
-  document.querySelectorAll(".custom-checkbox").forEach(cb => {
-    const match = !selectedRole || cb.dataset.role === selectedRole;
-    cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
-    cb.dataset.checked = match.toString();
-  });
-});
-
-  document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("custom-checkbox")) {
-      const checkbox = e.target;
-      const isChecked = checkbox.dataset.checked === "true";
-
-      checkbox.src = isChecked ? "images/checkbox-empty.png" : "images/checkbox.png";
-      checkbox.dataset.checked = (!isChecked).toString();
-    }
-  });
-});
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelector(".btn-green-add").addEventListener("click", () => {
-    openModal("video");
-  });
-
-  document.querySelector(".btn-dark-green").addEventListener("click", () => {
-    openModal("book");
-  });
-});
 
 function openModal(type) {
   document.getElementById("addMaterialModal").style.display = "block";
@@ -309,7 +352,7 @@ async function submitMaterial() {
   const title = document.getElementById("materialTitle").value;
   const description = document.getElementById("materialDescription").value;
   const selectedCourseId = document.getElementById("courseSelect").value;
-  const selectedRole = document.getElementById("roleFilter").value;
+  const selectedRoleId = document.getElementById("roleFilter").value;
 
   const formData = new FormData();
   formData.append("type", type);
@@ -328,9 +371,11 @@ async function submitMaterial() {
   // 👉 Отмеченные участники
   const checkedUsers = [...document.querySelectorAll(".custom-checkbox")]
     .filter(cb => cb.dataset.checked === "true");
-if (selectedRole) {
+if (selectedRoleId) {
   formData.append("destination", "addons");
-  formData.append("role", selectedRole);
+  formData.append("roleId", selectedRoleId);
+  const roleName = rolesById.get(String(selectedRoleId));
+  if (roleName) formData.append("role", roleName); // на случай, если бэку нужно имя
 } else if (selectedCourseId) {
   formData.append("destination", "courses");
   formData.append("courseId", selectedCourseId);

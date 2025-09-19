@@ -257,11 +257,11 @@
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 12px 16px;
   width: 372px;
   height: 48px;
+  padding: 12px 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, opacity 0.2s ease;
   text-align: center;
 }
 
@@ -270,7 +270,50 @@
 }
 
 .cert-btn.active {
-  background-color: #3DA647;
+  background-color: #2F8B35;
+}
+.cert-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+.cert-list {
+  max-width: 1200px;
+  margin: 16px auto 40px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.cert-item {
+  border: 1px solid #E5EAF3;
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px;
+}
+.cert-item h5 {
+  margin: 0 0 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #1B263A;
+}
+.cert-item .dates {
+  font-size: 14px;
+  color: #495057;
+  margin-bottom: 10px;
+}
+.cert-item .actions {
+  display: flex;
+  gap: 8px;
+}
+.cert-item .actions a,
+.cert-item .actions span {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #E5EAF3;
+  color: #1B263A;
+  font-size: 14px;
+  text-decoration: none;
 }
 
 .main-experience h4 {
@@ -363,11 +406,13 @@
 
   <div class="certificates-section">
     <h3>Сертифікати</h3>
-    <div class="certificate-buttons">
-      <button class="cert-btn active">Підвищення кваліфікації</button>
-      <button class="cert-btn">Проходження курсів</button>
-      <button class="cert-btn">Проходження конференцій</button>
+    <div class="certificate-buttons" id="certTabs">
+      <button class="cert-btn active" data-main-type="Підвищення кваліфікації">Підвищення кваліфікації</button>
+      <button class="cert-btn" data-main-type="Курс">Проходження курсів</button>
+      <button class="cert-btn" data-main-type="Конференція">Проходження конференцій</button>
+      <button class="cert-btn" data-main-type="Група">Групи</button>
     </div>
+    <div id="certList" class="cert-list"></div>
   </div>
   <script>
 async function loadUserData() {
@@ -442,18 +487,7 @@ async function loadUserData() {
       });
     }
 
-    // Сертификаты — если хочешь сделать кнопки рабочими
-    if (user.certificates?.ua?.url) {
-      const btn1 = document.querySelector(".cert-btn:nth-child(1)");
-      btn1.classList.add("active");
-      btn1.onclick = () => window.open(user.certificates.ua.url, "_blank");
-    }
-
-    if (user.certificates?.eng?.url) {
-      const btn2 = document.querySelector(".cert-btn:nth-child(2)");
-      btn2.classList.add("active");
-      btn2.onclick = () => window.open(user.certificates.eng.url, "_blank");
-    }
+    await buildCertificatesView(user);
 
   } catch (error) {
     console.error("Помилка при завантаженні користувача:", error);
@@ -462,6 +496,83 @@ async function loadUserData() {
 }
 
 document.addEventListener("DOMContentLoaded", loadUserData);
+
+const API_BASE_PUBLIC = ""; // same origin
+
+function fmtRange(d1, d2){
+  const a = d1 ? new Date(d1) : null, b = d2 ? new Date(d2) : null;
+  const s = a && !isNaN(a) ? a.toLocaleDateString('uk-UA') : '';
+  const e = b && !isNaN(b) ? b.toLocaleDateString('uk-UA') : '';
+  return s && e ? `${s} – ${e}` : (s || e || '');
+}
+
+async function buildCertificatesView(user){
+  // 1) Собираем ID курсов из user.certificates
+  const certMap = user?.certificates || {};
+  const courseIds = Object.keys(certMap);
+  if (!courseIds.length){
+    document.getElementById('certList').innerHTML = '<p>Поки що немає доданих сертифікатів.</p>';
+    return;
+  }
+
+  // 2) Тянем все курсы и оставляем только наши
+  // (если появится API по ids — заменить на него)
+  const res = await fetch(`/api/courses`);
+  const allCourses = await res.json();
+  const myCourses = allCourses.filter(c => courseIds.includes(String(c._id)));
+
+  // 3) Группируем по mainType
+  const byType = myCourses.reduce((acc, c) => {
+    const key = c.mainType || c.eventType || 'Інше';
+    acc[key] = acc[key] || [];
+    acc[key].push(c);
+    return acc;
+  }, {});
+
+  // 4) Вкладки
+  const tabs = document.getElementById('certTabs');
+  const list = document.getElementById('certList');
+
+  function renderType(type){
+    // активная кнопка
+    tabs.querySelectorAll('.cert-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.mainType === type);
+    });
+    // элементы
+    const curr = (byType[type] || []).filter(c => c.status === 'Пройдений');
+    if (!curr.length){
+      list.innerHTML = '<p>Немає сертифікатів у цій категорії.</p>';
+      return;
+    }
+    list.innerHTML = curr.map(course=>{
+      const cert = certMap[course._id] || certMap[String(course._id)] || {};
+      const ua = cert.ua?.url || '';
+      const eng = (cert.eng?.url || cert.en?.url || '');
+
+      return `
+        <div class="cert-item">
+          <h5>${course.courseTitle || 'Без назви'}</h5>
+          <div class="dates">${fmtRange(course.courseDates?.start, course.courseDates?.end)}</div>
+          <div class="actions">
+            ${ua ? `<a href="${ua}" target="_blank">UA</a>` : `<span>UA недоступний</span>`}
+            ${eng ? `<a href="${eng}" target="_blank">EN</a>` : `<span>EN недоступний</span>`}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // обработчики вкладок
+  tabs.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.cert-btn');
+    if (!btn) return;
+    renderType(btn.dataset.mainType);
+  });
+
+  // первичный рендер (оставляем активную из разметки)
+  const initial = tabs.querySelector('.cert-btn.active')?.dataset.mainType || 'Підвищення кваліфікації';
+  renderType(initial);
+}
 </script>
 
 </body>

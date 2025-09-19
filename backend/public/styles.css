@@ -727,6 +727,21 @@ main {
 }
 
 
+.view-site-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  background: #0f77ff;
+  color: #fff;
+  cursor: pointer;
+}
+.view-site-button:hover { opacity: 0.9; }
+
 /* ========== Profile Layout ========== */
 .profile-container {
   max-width: 1110px;

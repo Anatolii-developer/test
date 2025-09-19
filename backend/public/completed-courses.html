@@ -139,8 +139,10 @@ const endFilter = endDateValue ? parseDMY(endDateValue) : null;
 
       const div = document.createElement("div");
       div.className = "certificate-block";
-    const certAvailable = certUA || certENG;
+   const siteUrl = course.siteLink || course.publicUrl || course.pageUrl || course.website || course.websiteUrl || "";
+const certAvailable = certUA || certENG;
 
+    
 div.innerHTML = `
   <div class="certificate-card">
     <div class="date-line">
@@ -160,18 +162,21 @@ div.innerHTML = `
       <p class="certificate-description">${course.courseSubtitle || ""}</p>
     </div>
 
-    ${certAvailable ? `
     <div class="card-bottom">
-      <div class="lang-toggle-wrapper">
-        <label class="switch">
-          <input type="checkbox" onchange="switchPDF(this, '${course._id}', '${certUA}', '${certENG}')">
-          <span class="slider round"></span>
-        </label>
-        <span class="lang-labels">UA EN</span>
-      </div>
-      <button class="view-button" onclick="openCertificate(document.getElementById('cert-pdf-${course._id}').src)">Переглянути</button>
+      ${certAvailable ? `
+        <div class="lang-toggle-wrapper">
+          <label class="switch">
+            <input type="checkbox" onchange="switchPDF(this, '${course._id}', '${certUA}', '${certENG}')">
+            <span class="slider round"></span>
+          </label>
+          <span class="lang-labels">UA EN</span>
+        </div>
+        <button class="view-button" onclick="openCertificate(document.getElementById('cert-pdf-${course._id}').src)">Переглянути</button>
+      ` : ``}
+      ${siteUrl ? `
+        <a class="view-site-button" href="${siteUrl}" target="_blank" rel="noopener noreferrer">Переглянути на сайті</a>
+      ` : ``}
     </div>
-    ` : ''}
   </div>
 `;
 

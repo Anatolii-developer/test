@@ -24,7 +24,8 @@ exports.createCourse = async (req, res) => {
        creatorId:   req.body.creatorId || null,
       creatorName: req.body.creatorName || '',
       creatorRole: req.body.creatorRole || '',
-      eventType: req.body.eventType,
+      mainType: req.body.mainType,             
+      formatType: req.body.formatType || null,
       courseTitle: req.body.courseTitle,
       courseSubtitle: req.body.courseSubtitle,
       courseDescription: req.body.courseDescription,
@@ -86,37 +87,35 @@ exports.approveCourse = async (req, res) => {
 
 
 
-// GET /api/courses
 exports.getCourses = async (req, res) => {
   try {
-    const courses = await Course.find()
-     .populate('creatorId', 'firstName lastName fullName email role roles') 
+    const { mainType, formatType, status } = req.query;
+    const q = {};
+    if (mainType)   q.mainType = mainType;
+    if (formatType) q.formatType = formatType;
+    if (status)     q.status = status;
+
+    const courses = await Course.find(q)
+      .populate('creatorId', 'firstName lastName fullName email role roles')
       .sort({ createdAt: -1 });
 
     const now = new Date();
 
-    // Обновляем статус каждого курса перед отправкой
+    // как и раньше — актуализируем статус по датам
     const updatedCourses = await Promise.all(
       courses.map(async (course) => {
         const start = new Date(course.courseDates.start);
         const end = new Date(course.courseDates.end);
 
         let newStatus = "Запланований";
-        if (now >= start && now <= end) {
-          newStatus = "Поточний";
-        } else if (now > end) {
-          newStatus = "Пройдений";
+        if (now >= start && now <= end) newStatus = "Поточний";
+        else if (now > end)             newStatus = "Пройдений";
+
+        if (course.status !== 'WAITING_FOR_APPROVAL' && course.status !== newStatus) {
+          course.status = newStatus;
+          await course.save();
         }
 
-       if (
-  course.status !== 'WAITING_FOR_APPROVAL' &&
-  course.status !== newStatus
-) {
-  course.status = newStatus;
-  await course.save();
-}
-
-        // Fallback for creatorName/creatorRole from creatorId, if not explicitly saved
         if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
           const fn = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ');
           course.creatorName = fn || course.creatorId.email || course.creatorName || '';
@@ -135,7 +134,6 @@ exports.getCourses = async (req, res) => {
     res.status(500).json({ message: "Помилка при отриманні курсів", error: error.message });
   }
 };
-
 
 exports.getCourseById = async (req, res) => {
   try {

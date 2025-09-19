@@ -28,16 +28,26 @@
 </div>
     <section class="create-course-content">
       <form id="createCourseForm">
-        <div class="form-group">
-          <label>Оберіть тип заходу</label>
-          <div class="radio-group">
-            <label><input type="radio" name="eventType" value="Курс" /> Курс</label>
-            <label><input type="radio" name="eventType" value="Група" /> Група</label>
-            <label><input type="radio" name="eventType" value="Супервізія" /> Супервізія</label>
-            <label><input type="radio" name="eventType" value="Лекція" /> Лекція</label>
-            <label><input type="radio" name="eventType" value="Семінар" /> Семінар</label>
-          </div>
-        </div>
+        <!-- ГОЛОВНИЙ ВИД -->
+<div class="form-group">
+  <label>Оберіть головний вид</label>
+  <div class="radio-group">
+    <label><input type="radio" name="mainType" value="Курс" /> Курс</label>
+    <label><input type="radio" name="mainType" value="Підвищення кваліфікації" /> Підвищення кваліфікації</label>
+    <label><input type="radio" name="mainType" value="Конференція" /> Конференція</label>
+  </div>
+</div>
+
+<!-- ФОРМАТ (необов’язково) -->
+<div class="form-group">
+  <label>Оберіть формат (за потреби)</label>
+  <div class="radio-group">
+    <label><input type="radio" name="formatType" value="Група" /> Група</label>
+    <label><input type="radio" name="formatType" value="Супервізія" /> Супервізія</label>
+    <label><input type="radio" name="formatType" value="Лекція" /> Лекція</label>
+    <label><input type="radio" name="formatType" value="Семінар" /> Семінар</label>
+  </div>
+</div>
 
         <div class="form-group">
           <label>Назва курсу</label>
@@ -277,7 +287,8 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
   const siteLink = rawSite && !/^https?:\/\//i.test(rawSite) ? 'https://' + rawSite : rawSite;
 
   const formData = {
-    eventType: form.eventType.value,
+    mainType: form.mainType.value,                   
+    formatType: form.formatType?.value || null,
     courseTitle: form.courseTitle.value,
     courseSubtitle: form.courseSubtitle.value,
     courseDescription: form.courseDescription.value,

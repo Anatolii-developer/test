@@ -4,7 +4,16 @@ const courseSchema = new mongoose.Schema({
   creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   creatorName: String,
   creatorRole: String,
-  eventType: String, // Курс, Група, Супервізія, Лекція, Семінар
+  mainType: {
+    type: String,
+    enum: ['Курс', 'Підвищення кваліфікації', 'Конференція'],
+    required: true
+  },
+  formatType: {
+    type: String,
+    enum: ['Група', 'Супервізія', 'Лекція', 'Семінар', null],
+    default: null
+  },
   courseTitle: String,
   courseSubtitle: String,
   courseDescription: String,

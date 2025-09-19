@@ -98,6 +98,9 @@
   background-color: #3c9359;
 }
 
+.role-filter-group { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin: 6px 0 0; }
+.role-filter-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+
   </style>
 </head>
 <body class="with-sidebar">
@@ -112,8 +115,7 @@
      <div class="filters">
   <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
 
-<select id="roleFilter" multiple size="5" title="Утримуйте Ctrl/⌘ для вибору кількох ролей">
-</select>
+<div id="roleFilterGroup" class="role-filter-group" aria-label="Фільтр за ролями"></div>
 
   <label for="courseSelect">Оберіть курс</label>
 <select id="courseSelect">
@@ -161,29 +163,34 @@
   const rolesById = new Map();     // _id -> name
   const rolesByName = new Map();   // name -> _id
 
-  async function loadRoles() {
-    const res = await fetch(`${API_BASE}/api/roles`);
-    if (!res.ok) throw new Error('Не вдалося отримати ролі');
-    const roles = await res.json(); // [{ _id, name }]
-    const sel = document.getElementById("roleFilter");
-sel.innerHTML = ""; // без опции "Усі ролі" для multiple
-roles.forEach(r => {
-  rolesById.set(String(r._id), r.name);
-  rolesByName.set(r.name, String(r._id));
-  const opt = document.createElement("option");
-  opt.value = String(r._id);
-  opt.textContent = r.name;
-  sel.appendChild(opt);
-});
-  }
+async function loadRoles() {
+  const res = await fetch(`${API_BASE}/api/roles`);
+  if (!res.ok) throw new Error('Не вдалося отримати ролі');
+  const roles = await res.json(); // [{ _id, name }]
+
+  const grp = document.getElementById("roleFilterGroup");
+  if (!grp) return;
+  grp.innerHTML = "";
+
+  roles.forEach(r => {
+    const idStr = String(r._id);
+    rolesById.set(idStr, r.name);
+    rolesByName.set(r.name, idStr);
+
+    const wrap = document.createElement("label");
+    wrap.className = "role-filter-item";
+    wrap.innerHTML = `
+      <input type="checkbox" name="roleFilter[]" value="${idStr}" />
+      <span>${r.name}</span>
+    `;
+    grp.appendChild(wrap);
+  });
+}
 
 
-  function getSelectedRoleIds() {
-  const sel = document.getElementById("roleFilter");
-  if (!sel) return [];
-  return Array.from(sel.selectedOptions)
-    .map(o => String(o.value))
-    .filter(v => v !== ""); // игнорируем пустое значение
+function getSelectedRoleIds() {
+  return Array.from(document.querySelectorAll('input[name="roleFilter[]"]:checked'))
+    .map(el => String(el.value));
 }
 
 function intersects(a, b) {
@@ -312,7 +319,12 @@ function intersects(a, b) {
     });
 
     document.getElementById("searchInput").addEventListener("input", applyFilters);
-document.getElementById("roleFilter").addEventListener("change", applyFilters);
+const roleFilterGroup = document.getElementById("roleFilterGroup");
+if (roleFilterGroup) {
+  roleFilterGroup.addEventListener("change", (e) => {
+    if (e.target && e.target.name === "roleFilter[]") applyFilters();
+  });
+}
 
     document.getElementById("selectAllBtn").addEventListener("click", () => {
   selectAllClicked = true;

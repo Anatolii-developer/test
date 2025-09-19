@@ -55,7 +55,6 @@
 
   <script src="admin-auth.js"></script>
 <script>
-
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderAdminSidebar === "function") {
       renderAdminSidebar("admin-career-requests.html");
@@ -66,22 +65,37 @@
     load();
   });
 
+  const API = "http://157.230.121.24:5050";
+
   function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const arrow = document.getElementById('toggleArrow');
     sidebar.classList.toggle('expanded');
     sidebar.classList.toggle('collapsed');
-    arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+    if (arrow) arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
   }
 
   function logoutUser() {
     window.location.href = "login.html";
   }
 
-  const API = "http://157.230.121.24:5050";
+  // ====== Helpers ======
+  function fmtDate(d) {
+    if (!d) return '-';
+    const dt = new Date(d);
+    if (isNaN(dt)) return '-';
+    return dt.toLocaleDateString('uk-UA');
+  }
+  function fullName(u) {
+    return [u.firstName, u.lastName].filter(Boolean).join(' ') || u.fullName || '';
+  }
+  function getCert(obj, lang) {
+    // поддерживаем оба варианта ключа: eng/en
+    return (obj && (obj[lang] || (lang === 'eng' ? obj['en'] : null))) || null;
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
-    const table = document.getElementById("participantsTable");
+    const tableBody = document.getElementById("participantsTable");
     const searchInput = document.getElementById("searchName");
     const modal = document.getElementById("certificateModal");
     const modalClose = document.getElementById("modalClose");
@@ -89,14 +103,26 @@
     const certificateFile = document.getElementById("certificateFile");
     const courseSelect = document.getElementById("courseSelect");
 
-    // Close modal handlers
+    let selectedLang = null;
+    let selectedUserId = null;
+    let cachedRowsUsers = []; // массив пользователей, показанных в таблице (обогащенных certificates)
+
+    // --- UI: поиск по имени ---
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.toLowerCase();
+      document.querySelectorAll("#participantsTable tr").forEach(row => {
+        const name = row.dataset.name || '';
+        row.style.display = name.includes(value) ? "" : "none";
+      });
+    });
+
+    // --- Модалка: закрытие ---
     if (modalClose) {
       modalClose.addEventListener("click", () => {
         modal.style.display = "none";
         if (certificateFile) certificateFile.value = "";
       });
     }
-    // Click outside content closes the modal
     if (modal) {
       modal.addEventListener("click", (e) => {
         if (e.target === modal) {
@@ -105,7 +131,6 @@
         }
       });
     }
-    // ESC key closes the modal
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && modal && modal.style.display === "block") {
         modal.style.display = "none";
@@ -113,17 +138,7 @@
       }
     });
 
-    let selectedLang = null;
-    let selectedUserId = null;
-
-    searchInput.addEventListener("input", () => {
-      const value = searchInput.value.toLowerCase();
-      document.querySelectorAll("#participantsTable tr").forEach(row => {
-        const name = row.cells[1].textContent.toLowerCase();
-        row.style.display = name.includes(value) ? "" : "none";
-      });
-    });
-
+    // --- Загрузка сертификата ---
     uploadBtn.onclick = async () => {
       if (!certificateFile.files.length || !selectedUserId || !selectedLang || !courseSelect.value) return;
 
@@ -137,12 +152,14 @@
         });
 
         if (res.ok) {
-          alert(`Сертифікат (${selectedLang}) додано успішно`);
+          alert(`Сертифікат (${selectedLang.toUpperCase()}) додано успішно`);
           modal.style.display = "none";
+          certificateFile.value = "";
+          // Перерисовать текущую таблицу, чтобы кнопка стала "View …"
           courseSelect.dispatchEvent(new Event("change"));
         } else {
-          const error = await res.json();
-          console.error("❌ Server error:", error.message);
+          const error = await res.json().catch(() => ({}));
+          console.error("❌ Server error:", error?.message);
           alert("Помилка при завантаженні сертифікату");
         }
       } catch (err) {
@@ -151,97 +168,121 @@
       }
     };
 
+    // --- Смена курса: грузим участников + дотягиваем certificates ---
     courseSelect.addEventListener("change", async () => {
       const courseId = courseSelect.value;
+      tableBody.innerHTML = "";
+      cachedRowsUsers = [];
       if (!courseId) return;
 
-      const res = await fetch(`${API}/api/courses/${courseId}/participants`);
-      const users = await res.json();
+      try {
+        const res = await fetch(`${API}/api/courses/${courseId}/participants`);
+        let users = await res.json();
 
-      table.innerHTML = users.map((user, i) => {
-        const certs = user.certificates?.[courseId] || {};
+        // Дотягиваем полноценные данные по каждому участнику (для доступа к certificates)
+        const enriched = await Promise.all(
+          users.map(async (u) => {
+            try {
+              const ru = await fetch(`${API}/api/users/${u._id}`);
+              const full = await ru.json();
+              return { ...u, ...full }; // мерджим, чтобы были и базовые поля, и certificates
+            } catch {
+              return u;
+            }
+          })
+        );
+
+        cachedRowsUsers = enriched;
+        renderTable(enriched, courseId);
+      } catch (err) {
+        console.error("Помилка при отриманні учасників:", err);
+        alert("Не вдалося отримати список учасників");
+      }
+    });
+
+    function renderTable(users, courseId) {
+      tableBody.innerHTML = users.map((user, i) => {
+        const certBlock = user.certificates?.[courseId] || user.certificates?.[String(courseId)] || null;
+        const ua = getCert(certBlock, 'ua');
+        const eng = getCert(certBlock, 'eng');
+
+        const uaBtnText = ua && ua.url ? "View UA" : "Add UA";
+        const enBtnText = eng && eng.url ? "View ENG" : "Add ENG";
+
         return `
-          <tr>
+          <tr data-name="${fullName(user).toLowerCase()}">
             <td>${i + 1}</td>
-            <td>${user.firstName} ${user.lastName}</td>
-            <td>${user.email}</td>
+            <td>${fullName(user)}</td>
+            <td>${user.email || '-'}</td>
             <td>${user.role || '-'}</td>
-            <td>${user.dateOfBirth || '-'}</td>
+            <td>${fmtDate(user.dateOfBirth)}</td>
             <td>
-              <button class="add-cert-btn" data-id="${user._id}" data-lang="ua">
-                ${certs.ua ? "View UA" : "Add UA"}
-              </button>
-              <button class="add-cert-btn" data-id="${user._id}" data-lang="eng">
-                ${certs.eng ? "View ENG" : "Add ENG"}
-              </button>
+              <button class="add-cert-btn" data-id="${user._id}" data-lang="ua" data-url="${ua?.url || ''}">${uaBtnText}</button>
+              <button class="add-cert-btn" data-id="${user._id}" data-lang="eng" data-url="${eng?.url || ''}">${enBtnText}</button>
             </td>
           </tr>
         `;
       }).join("");
 
+      // навешиваем обработчики на кнопки
       document.querySelectorAll(".add-cert-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           selectedUserId = btn.dataset.id;
           selectedLang = btn.dataset.lang;
+          const url = btn.dataset.url;
 
-          const courseId = courseSelect.value;
-          const user = users.find(u => u._id === selectedUserId);
-          const cert = user.certificates?.[courseId]?.[selectedLang];
-
-          if (cert && cert.url) {
-            window.open(cert.url, "_blank");
+          if (url) {
+            window.open(url, "_blank");
           } else {
-            modal.style.display = "block";
+            // открываем модалку на загрузку
+            const modal = document.getElementById("certificateModal");
+            if (modal) modal.style.display = "block";
           }
         });
       });
-    });
+    }
 
+    // --- Загружаем только «Пройдений» курсы для выпадашки ---
     async function loadCompletedCourses() {
-      const res = await fetch(`${API}/api/courses?status=Пройдений`);
-      const courses = await res.json();
-
-      courseSelect.innerHTML = `<option value="">Оберіть курс</option>`;
-      courses.forEach(course => {
-        const opt = document.createElement("option");
-        opt.value = course._id;
-        opt.textContent = course.courseTitle;
-        courseSelect.appendChild(opt);
-      });
+      try {
+        const res = await fetch(`${API}/api/courses?status=Пройдений`);
+        const courses = await res.json();
+        courseSelect.innerHTML = `<option value="">Оберіть курс</option>`;
+        courses.forEach(course => {
+          const opt = document.createElement("option");
+          opt.value = course._id;
+          opt.textContent = course.courseTitle;
+          courseSelect.appendChild(opt);
+        });
+      } catch (e) {
+        console.error("Помилка при завантаженні курсів:", e);
+      }
     }
 
     loadCompletedCourses();
   });
 
-   function logoutUser(){
+  // Logout helpers and active link highlight
+  function logoutUser(){
     try{
-      // чистимо локальне
       localStorage.removeItem('user');
       ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
     }catch(_){}
-
-    // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-    const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
+    const API = "";
     fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
-
-    // редірект на логін з поверненням
     const back = encodeURIComponent(location.pathname + location.search);
     location.href = `admin-login.html?returnUrl=${back}`;
   }
-
-  // прив’язуємо до кнопки
   document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('btnLogout');
     if (btn) btn.addEventListener('click', logoutUser);
   });
-
   document.addEventListener('DOMContentLoaded', () => {
-  const here = location.pathname.split('/').pop();
-  document.querySelectorAll('.sidebar nav a').forEach(a=>{
-    if (a.getAttribute('href') === here) a.classList.add('active');
+    const here = location.pathname.split('/').pop();
+    document.querySelectorAll('.sidebar nav a').forEach(a=>{
+      if (a.getAttribute('href') === here) a.classList.add('active');
+    });
   });
-});
-
 </script>
 
 </body>

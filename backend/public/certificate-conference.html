@@ -1,87 +1,215 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Підвищення кваліфікації</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Проходження конференцій</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <aside class="sidebar collapsed" id="sidebar">
-    <div class="toggle-button" onclick="toggleSidebar()">
-      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
-    </div>
-    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
-    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
-    <nav>
-      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
-      <a href="mycertificates.html"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
-      <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
-      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
-      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
-      <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
-      <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
-      <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
-      <a href="#"><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a>
-    </nav>
-    <div class="logout">
-      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
-      <span>Вийти з акаунту</span>
-    </div>
-  </aside>
-  <main class="cert-page">
+      <div class="toggle-button" onclick="toggleSidebar()">
+        <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+      </div>
+      <img
+        class="logo"
+        src="assets/sidebar/IPS Logo (2).svg"
+        alt="Logo"
+        id="logoExpanded"
+      />
+      <img
+        class="logo-collapsed"
+        src="assets/sidebar/IPS Logo (1).svg"
+        alt="Logo Small"
+        id="logoCollapsed"
+      />
+      <img
+        class="profile"
+        src="assets/profile-photo.png"
+        alt="User"
+        width="40"
+        height="40"
+      />
+      <nav>
+        <a href="profile.html"
+          ><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a
+        >
+        <a href="mycertificates.html"
+          ><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a
+        >
+        <a href="career-faq.html"
+          ><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a
+        >
+        <a href="library.html"
+          ><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a
+        >
+        <a href="my-courses.html"
+          ><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a
+        >
+        <a href="#"><img src="assets/sidebar/8.svg" /><span>Облік</span></a>
+        <a href="#"><img src="assets/sidebar/4.svg" /><span>Здоров’я</span></a>
+        <a href="#"><img src="assets/sidebar/9.svg" /><span>Фінанси</span></a>
+        <a href="#"
+          ><img src="assets/sidebar/6.svg" /><span>Нерухомість</span></a
+        >
+      </nav>
+      <div class="logout">
+        <img
+          src="assets/sidebar/log-out.svg"
+          alt="Logout Icon"
+          width="20"
+          height="20"
+        />
+        <span>Вийти з акаунту</span>
+      </div>
+    </aside>
 
-     <div class="main-header">
-      <h2>Проходження конференцій</h2>
-      <img src="assets/certificates/certificate1.png" alt="Main Image" />
-    </div>
-    <!-- Навигация -->
-    <div class="cert-nav">
-      <a href="./mycertificates.html" class="cert-btn back"><span>&larr;</span> Головна</a>
-      <a href="./certificate-upgrade.html" class="cert-btn active">Підвищення кваліфікації</a>
-      <a href="./certificate-completing.html" class="cert-btn">Проходження курсів</a>
-      <a href="./certificate-conference.html" class="cert-btn">Проходження конференцій</a>
-    </div>
-
-    <!-- Сертификаты -->
-    <div class="cert-grid">
-      <div class="cert-card">
-        <img src="assets/certificates/certificate1.png" alt="Certificate 1" class="cert-image" />
-        <h3 class="cert-title">Дослідження воєнного часу</h3>
-        <p class="cert-dates">16.03.2025 – 24.04.2025</p>
-        <div class="cert-footer">
-          <div class="lang-switch">
-            <span>UA</span>
-            <label class="switch">
-              <input type="checkbox" />
-              <span class="slider round"></span>
-            </label>
-            <span>EN</span>
-          </div>
-          <a href="#" class="view-btn">Переглянути</a>
-        </div>
+    <main class="cert-page">
+      <div class="main-header">
+        <h2>Проходження конференцій</h2>
+        <img src="assets/certificates/certificate1.png" alt="Main Image" />
       </div>
 
-      <div class="cert-card">
-        <img src="assets/certificates/certificate2.png" alt="Certificate 2" class="cert-image" />
-        <h3 class="cert-title">Дослідження воєнного часу</h3>
-        <p class="cert-dates">16.03.2025 – 24.04.2025</p>
-        <div class="cert-footer">
-          <div class="lang-switch">
-            <span>UA</span>
-            <label class="switch">
-              <input type="checkbox" />
-              <span class="slider round"></span>
-            </label>
-            <span>EN</span>
-          </div>
-          <a href="#" class="view-btn">Переглянути</a>
-        </div>
+      <div class="cert-nav">
+        <a href="./mycertificates.html" class="cert-btn back"
+          ><span>&larr;</span> Головна</a
+        >
+        <a href="./certificate-upgrade.html" class="cert-btn"
+          >Підвищення кваліфікації</a
+        >
+        <a href="./certificate-completing.html" class="cert-btn"
+          >Проходження курсів</a
+        >
+        <a href="./certificate-conference.html" class="cert-btn active"
+          >Проходження конференцій</a
+        >
       </div>
-    </div>
-  </main>
-  <script src="script.js"></script>
-</body>
+
+      <div class="cert-grid" id="certGrid"></div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+      const API_BASE = "http://157.230.121.24:5050";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadUserCertificatesByMainType("Конференція");
+      });
+
+      function renderPreview(url, id) {
+        if (!url)
+          return `<div class="cert-placeholder" id="cert-preview-${id}" style="display:flex;align-items:center;justify-content:center;min-height:220px;border:1px dashed #ccc;border-radius:12px;">Сертифікат ще не додано</div>`;
+        const isPdf = /\.pdf(\?|$)/i.test(url);
+        return isPdf
+          ? `<embed src="${url}" type="application/pdf" class="cert-embed" id="cert-preview-${id}" style="width:100%;height:260px;border-radius:12px;" />`
+          : `<img src="${url}" alt="Certificate" class="cert-image" id="cert-preview-${id}" style="width:100%;height:auto;border-radius:12px;object-fit:cover;max-height:260px;" />`;
+      }
+
+      function renderCertCard({ course, uaUrl, engUrl }) {
+        const hasUA = !!uaUrl,
+          hasEN = !!engUrl;
+        const initialUrl = uaUrl || engUrl || null;
+        return `
+        <div class="cert-card" data-course="${course._id}">
+          <div class="cert-preview" id="cert-preview-wrap-${course._id}">
+            ${renderPreview(initialUrl, course._id)}
+          </div>
+          <h3 class="cert-title">${course.courseTitle || "Без назви"}</h3>
+          <p class="cert-dates">
+            ${
+              course.courseDates?.start
+                ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+                : ""
+            }
+            ${
+              course.courseDates?.end
+                ? " – " +
+                  new Date(course.courseDates.end).toLocaleDateString("uk-UA")
+                : ""
+            }
+          </p>
+          <div class="cert-footer">
+            <div class="lang-switch">
+              <span>UA</span>
+              <label class="switch">
+                <input type="checkbox" ${
+                  hasUA ? "" : hasEN ? "checked" : "disabled"
+                } onchange="switchUserCert(this, '${course._id}', '${
+          uaUrl || ""
+        }', '${engUrl || ""}')"/>
+                <span class="slider round"></span>
+              </label>
+              <span>EN</span>
+            </div>
+            ${
+              initialUrl
+                ? `<a href="${initialUrl}" target="_blank" class="view-btn" id="view-btn-${course._id}">Переглянути</a>`
+                : `<span class="view-btn" style="pointer-events:none;opacity:.6">Немає сертифікату</span>`
+            }
+          </div>
+        </div>`;
+      }
+
+      function switchUserCert(toggle, courseId, uaUrl, enUrl) {
+        const btn = document.getElementById("view-btn-" + courseId);
+        const wrap = document.getElementById("cert-preview-wrap-" + courseId);
+        const url = toggle.checked ? enUrl || uaUrl : uaUrl || enUrl;
+        if (btn) {
+          if (url) {
+            btn.href = url;
+            btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
+          } else {
+            btn.removeAttribute("href");
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = ".6";
+          }
+        }
+        if (wrap) wrap.innerHTML = renderPreview(url, courseId);
+      }
+
+      async function loadUserCertificatesByMainType(MAIN_TYPE) {
+        const grid =
+          document.getElementById("certGrid") ||
+          document.querySelector(".cert-grid");
+        if (!grid) return;
+        const rawUser = localStorage.getItem("user");
+        if (!rawUser) {
+          grid.innerHTML =
+            "<p>Щоб переглянути сертифікати, увійдіть у систему.</p>";
+          return;
+        }
+        const user = JSON.parse(rawUser);
+        try {
+          const resUser = await fetch(`${API_BASE}/api/users/${user._id}`);
+          const freshUser = await resUser.json();
+          const resCourses = await fetch(
+            `${API_BASE}/api/courses?mainType=${encodeURIComponent(
+              MAIN_TYPE
+            )}&status=${encodeURIComponent("Пройдений")}`
+          );
+          const courses = await resCourses.json();
+          const cards = [];
+          courses.forEach((course) => {
+            const cert = freshUser.certificates?.[course._id];
+            const uaUrl = cert?.ua?.url || "";
+            const engUrl = cert?.eng?.url || "";
+            if (uaUrl || engUrl)
+              cards.push(renderCertCard({ course, uaUrl, engUrl }));
+          });
+          grid.innerHTML = cards.length
+            ? cards.join("")
+            : "<p>Поки що немає доданих сертифікатів за цією категорією.</p>";
+        } catch (e) {
+          console.error("Помилка завантаження сертифікатів:", e);
+          grid.innerHTML =
+            "<p>Сталася помилка під час завантаження сертифікатів.</p>";
+        }
+      }
+    </script>
+  </body>
 </html>

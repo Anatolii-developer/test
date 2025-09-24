@@ -370,8 +370,11 @@ function closeModal() {
   document.getElementById("addMaterialModal").style.display = "none";
 }
 
-document.getElementById("materialType").addEventListener("change", e => {
-  toggleInputs(e.target.value);
+document.addEventListener("DOMContentLoaded", () => {
+  const mt = document.getElementById("materialType");
+  if (mt) {
+    mt.addEventListener("change", (e) => toggleInputs(e.target.value));
+  }
 });
 
 
@@ -381,10 +384,7 @@ async function submitMaterial() {
   const description = document.getElementById("materialDescription").value?.trim();
   const selectedCourseId = document.getElementById("courseSelect").value;
 
-  // множественный выбор ролей
-  const selectedRoleIds = Array.from(document.getElementById("roleFilter").selectedOptions)
-    .map(o => String(o.value))
-    .filter(v => v !== "");
+const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксів
 
   // базовая валидация
   if (!title) return alert("Введіть назву матеріалу");
@@ -558,7 +558,7 @@ function toggleInputs(type) {
       <label for="materialType">Тип матеріалу</label>
       <select id="materialType">
         <option value="video">🎥 Відео (YouTube)</option>
-        <option value="book">📘 Книга (PDF)</option>
+        <option value="book">📘 Файл (PDF / DOC / DOCX / PPT / PPTX)</option>
       </select>
     </div>
 

@@ -186,19 +186,6 @@
   const rolesById = new Map();     // _id -> name
   const rolesByName = new Map();   // name -> _id
 
-  // --- sections (folders) state ---
-  const knownSections = new Set(["Тиждень 1", "Тиждень 2"]);
-  function ensureSectionOption(name) {
-    const sel = document.getElementById("sectionSelect");
-    if (!sel || !name) return;
-    const exists = Array.from(sel.options).some(o => o.value === name);
-    if (!exists) {
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      sel.appendChild(opt);
-    }
-  }
 
 async function loadRoles() {
   const res = await fetch(`${API_BASE}/api/roles`);
@@ -406,24 +393,18 @@ function openModal(type) {
   if (mt) mt.value = type;
   toggleInputs(type);
 
-  // reset section UI
+  // reset section UI (default to "new")
   const modeEl = document.getElementById("sectionMode");
   const selEl = document.getElementById("sectionSelect");
   const nameEl = document.getElementById("sectionName");
-  if (modeEl) modeEl.value = "existing";
+  if (modeEl) modeEl.value = "new";
   if (selEl) {
-    // rebuild options from knownSections
-    const keepFirst = selEl.querySelector('option[value=""]');
-    selEl.innerHTML = "";
-    const base = document.createElement("option");
-    base.value = "";
-    base.textContent = "— Без папки —";
-    selEl.appendChild(base);
-    Array.from(knownSections).forEach(s => ensureSectionOption(s));
+    selEl.value = "";
+    selEl.style.display = "none";
   }
   if (nameEl) {
     nameEl.value = "";
-    nameEl.style.display = "none";
+    nameEl.style.display = "block";
   }
 }
 function closeModal() {
@@ -592,21 +573,23 @@ const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксі�
 
     alert("Успішно додано!");
     closeModal();
+// Section mode toggler for modal (new/existing folder)
 document.addEventListener("DOMContentLoaded", () => {
   const modeEl = document.getElementById("sectionMode");
   const selEl = document.getElementById("sectionSelect");
   const nameEl = document.getElementById("sectionName");
-  if (modeEl) {
-    modeEl.addEventListener("change", () => {
-      if (modeEl.value === "new") {
-        if (selEl) selEl.style.display = "none";
-        if (nameEl) nameEl.style.display = "block";
-      } else {
-        if (selEl) selEl.style.display = "block";
-        if (nameEl) nameEl.style.display = "none";
-      }
-    });
-  }
+  if (!modeEl) return;
+  const apply = () => {
+    if (modeEl.value === "new") {
+      if (selEl) selEl.style.display = "none";
+      if (nameEl) nameEl.style.display = "block";
+    } else {
+      if (selEl) selEl.style.display = "block";
+      if (nameEl) nameEl.style.display = "none";
+    }
+  };
+  modeEl.addEventListener("change", apply);
+  apply(); // set initial state
 });
   } catch (err) {
     console.error(err);
@@ -683,8 +666,6 @@ function toggleInputs(type) {
         </select>
         <select id="sectionSelect" class="folder-select">
           <option value="">— Без папки —</option>
-          <option value="Тиждень 1">Тиждень 1</option>
-          <option value="Тиждень 2">Тиждень 2</option>
         </select>
       </div>
       <input type="text" id="sectionName" placeholder="Назва папки (наприклад, Тиждень 3)" style="display:none; margin-top:8px;" />

@@ -108,6 +108,7 @@ router.get("/roles-with-users", async (_req, res) => {
 router.post("/recovery/send", userCtrl.sendRecoveryCode);
 router.post("/recovery/verify", userCtrl.verifyRecoveryCode); // можно не использовать, если проверяешь в reset
 router.post("/recovery/reset", userCtrl.resetPassword);
+router.post("/forgot-password", userCtrl.sendRecoveryCode);
 
 // ===== спец-роуты ДО /:id =====
 router.post(
@@ -171,5 +172,5 @@ router.get("/", userCtrl.getAllUsers);
 router.get("/:id", userCtrl.getUserById);
 router.put("/:id/status", userCtrl.updateUserStatus);
 router.put("/:id", userCtrl.updateUser);
-
+router.post("/forgot-password", userCtrl.sendRecoveryCode);
 module.exports = router;

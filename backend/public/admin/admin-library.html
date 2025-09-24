@@ -61,7 +61,7 @@
   margin-bottom: 18px;
 }
 
-.form-group label {
+    .form-group label {
   font-weight: 500;
   font-size: 14px;
 }
@@ -100,6 +100,29 @@
 
 .role-filter-group { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin: 6px 0 0; }
 .role-filter-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+
+  /* --- Folders (Sections) UI --- */
+  .folder-select,
+  #sectionMode,
+  #sectionName {
+    padding: 10px 12px;
+    border: 1px solid #e6c7a7;
+    background: #FFEED9; /* requested color */
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+  }
+  .hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #666;
+  }
+  .form-row-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
 
   </style>
 </head>
@@ -162,6 +185,20 @@
   let allUsers = [];
   const rolesById = new Map();     // _id -> name
   const rolesByName = new Map();   // name -> _id
+
+  // --- sections (folders) state ---
+  const knownSections = new Set(["Тиждень 1", "Тиждень 2"]);
+  function ensureSectionOption(name) {
+    const sel = document.getElementById("sectionSelect");
+    if (!sel || !name) return;
+    const exists = Array.from(sel.options).some(o => o.value === name);
+    if (!exists) {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    }
+  }
 
 async function loadRoles() {
   const res = await fetch(`${API_BASE}/api/roles`);
@@ -362,9 +399,32 @@ if (roleFilterGroup) {
   });
 
 function openModal(type) {
-  document.getElementById("addMaterialModal").style.display = "block";
-  document.getElementById("materialType").value = type;
+  const modal = document.getElementById("addMaterialModal");
+  if (!modal) return;
+  modal.style.display = "block";
+  const mt = document.getElementById("materialType");
+  if (mt) mt.value = type;
   toggleInputs(type);
+
+  // reset section UI
+  const modeEl = document.getElementById("sectionMode");
+  const selEl = document.getElementById("sectionSelect");
+  const nameEl = document.getElementById("sectionName");
+  if (modeEl) modeEl.value = "existing";
+  if (selEl) {
+    // rebuild options from knownSections
+    const keepFirst = selEl.querySelector('option[value=""]');
+    selEl.innerHTML = "";
+    const base = document.createElement("option");
+    base.value = "";
+    base.textContent = "— Без папки —";
+    selEl.appendChild(base);
+    Array.from(knownSections).forEach(s => ensureSectionOption(s));
+  }
+  if (nameEl) {
+    nameEl.value = "";
+    nameEl.style.display = "none";
+  }
 }
 function closeModal() {
   document.getElementById("addMaterialModal").style.display = "none";
@@ -402,24 +462,38 @@ const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксі�
       if (!link) { alert("Вкажіть посилання на YouTube"); return null; }
       fd.append("videoLink", link);
     } else {
-     const file = document.getElementById("bookFile").files[0];
-if (!file) { alert("Оберіть файл (PDF/DOC/DOCX/PPT/PPTX)"); return null; }
+      const file = document.getElementById("bookFile").files[0];
+      if (!file) { alert("Оберіть файл (PDF/DOC/DOCX/PPT/PPTX)"); return null; }
 
-const okExt = /\.(pdf|doc|docx|ppt|pptx)$/i.test(file.name);
-const okMime = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/vnd.ms-powerpoint",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-].includes(file.type) || file.type === ""; // інколи браузери не ставлять type
+      const okExt = /\.(pdf|doc|docx|ppt|pptx)$/i.test(file.name);
+      const okMime = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      ].includes(file.type) || file.type === ""; // деякі браузери не ставлять type
 
-if (!okExt && !okMime) {
-  alert("Підтримуються лише PDF/DOC/DOCX/PPT/PPTX");
-  return null;
-}
+      if (!okExt && !okMime) {
+        alert("Підтримуються лише PDF/DOC/DOCX/PPT/PPTX");
+        return null;
+      }
 
-fd.append("bookFile", file);
+      fd.append("bookFile", file);
+    }
+
+    // section/folder
+    const modeEl = document.getElementById("sectionMode");
+    const selEl = document.getElementById("sectionSelect");
+    const nameEl = document.getElementById("sectionName");
+    let section = "";
+    if (modeEl) {
+      section = modeEl.value === "new"
+        ? (nameEl?.value || "").trim()
+        : (selEl?.value || "").trim();
+    }
+    if (section) {
+      fd.append("section", section);
     }
     return fd;
   };
@@ -505,8 +579,35 @@ fd.append("bookFile", file);
       }
     }
 
+      // remember section if provided
+      const modeEl = document.getElementById("sectionMode");
+      const selEl = document.getElementById("sectionSelect");
+      const nameEl = document.getElementById("sectionName");
+      const sectionChosen = modeEl && modeEl.value === "new"
+        ? (nameEl?.value || "").trim()
+        : (selEl?.value || "").trim();
+      if (sectionChosen) {
+        knownSections.add(sectionChosen);
+      }
+
     alert("Успішно додано!");
     closeModal();
+document.addEventListener("DOMContentLoaded", () => {
+  const modeEl = document.getElementById("sectionMode");
+  const selEl = document.getElementById("sectionSelect");
+  const nameEl = document.getElementById("sectionName");
+  if (modeEl) {
+    modeEl.addEventListener("change", () => {
+      if (modeEl.value === "new") {
+        if (selEl) selEl.style.display = "none";
+        if (nameEl) nameEl.style.display = "block";
+      } else {
+        if (selEl) selEl.style.display = "block";
+        if (nameEl) nameEl.style.display = "none";
+      }
+    });
+  }
+});
   } catch (err) {
     console.error(err);
     alert(err.message || "Помилка при завантаженні.");
@@ -570,6 +671,24 @@ function toggleInputs(type) {
     <div class="form-group">
       <label for="materialDescription">Опис</label>
       <textarea id="materialDescription" placeholder="Короткий опис..."></textarea>
+    </div>
+
+    <!-- Section / Folder selector -->
+    <div class="form-group">
+      <label>Папка / розділ</label>
+      <div class="form-row-inline">
+        <select id="sectionMode">
+          <option value="existing">Обрати існуючу</option>
+          <option value="new">Створити нову</option>
+        </select>
+        <select id="sectionSelect" class="folder-select">
+          <option value="">— Без папки —</option>
+          <option value="Тиждень 1">Тиждень 1</option>
+          <option value="Тиждень 2">Тиждень 2</option>
+        </select>
+      </div>
+      <input type="text" id="sectionName" placeholder="Назва папки (наприклад, Тиждень 3)" style="display:none; margin-top:8px;" />
+      <small class="hint">Папка групує матеріали курсу (наприклад, «Тиждень 1»). Адмін може ввести будь‑яку назву.</small>
     </div>
 
     <div class="form-group" id="videoInput" style="display: none;">

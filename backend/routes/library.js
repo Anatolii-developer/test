@@ -1,3 +1,4 @@
+// backend/routes/libraryRoutes.js
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -5,67 +6,155 @@ const path = require("path");
 const fs = require("fs");
 const Library = require("../models/LibraryModel");
 
-// Проверка и создание папки, если её нет
-const uploadPath = path.join(__dirname, "..", "uploads", "books");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+// === upload dir (публичная папка!) ===
+const uploadDir = path.join(__dirname, "../public/uploads/books");
+fs.mkdirSync(uploadDir, { recursive: true });
 
-// Multer конфигурация
+// === Multer: имя файла + фильтр расширений ===
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadPath),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const base = path
+      .basename(file.originalname)
+      .replace(/[^\w.\-]+/g, "_"); // слегка обезопасим
+    cb(null, Date.now() + "-" + base);
+  },
 });
-const upload = multer({ storage });
 
-// 📥 POST /api/library
+const ALLOWED_EXT = /\.(pdf|doc|docx|ppt|pptx)$/i;
+const fileFilter = (_req, file, cb) => {
+  // иногда mime пустой, поэтому проверим и имя, и mime
+  if (ALLOWED_EXT.test(file.originalname)) return cb(null, true);
+  return cb(new Error("Only PDF/DOC/DOCX/PPT/PPTX allowed"));
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+});
+
+// ---------- CREATE ----------
 router.post("/", upload.single("bookFile"), async (req, res) => {
   try {
-    const { type, title, description, videoLink, destination, courseId } = req.body;
-
-    const newItem = {
+    const {
       type,
       title,
       description,
-      destination, // ← збережи
-      date: new Date(),
+      videoLink,
+      destination,
+      courseId,
+      role,
+      section,
+    } = req.body;
+
+    const doc = {
+      type,
+      title,
+      description,
+      destination,
+      section: section?.trim() || "", // «папка»
     };
 
-    if (destination === "courses" && courseId) {
-      newItem.courseId = courseId;
-    } else if (destination === "addons" && req.body.role) {
-      newItem.role = req.body.role; // ← додай сюди
-    }
+    if (destination === "courses" && courseId) doc.courseId = courseId;
+    if (destination === "addons" && role) doc.role = role;
 
     if (type === "video") {
-      newItem.videoLink = videoLink;
-    } else if (req.file) {
-      newItem.filePath = req.file.path.replace(/\\/g, "/");
+      if (!videoLink) return res.status(400).json({ message: "videoLink required" });
+      doc.videoLink = videoLink;
+    } else {
+      // файл обязателен для book
+      if (!req.file) return res.status(400).json({ message: "file required" });
+      // сохраняем ВЕБ-путь
+      doc.filePath = `/uploads/books/${req.file.filename}`;
     }
 
-    const saved = await Library.create(newItem);
+    const saved = await Library.create(doc);
     res.status(201).json(saved);
   } catch (err) {
-    console.error("❌ Помилка при створенні матеріалу:", err);
-    res.status(500).send("Server error");
+    console.error("❌ Create library item:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-
-// 📤 GET /api/library
+// ---------- LIST ----------
 router.get("/", async (req, res) => {
   try {
-    const { destination, courseId } = req.query;
+    const { destination, courseId, section, role } = req.query;
+    const q = {};
+    if (destination) q.destination = destination;
+    if (courseId) q.courseId = courseId;
+    if (section) q.section = section;
+    if (role) q.role = role;
 
-    const query = {};
-    if (destination) query.destination = destination;
-    if (courseId) query.courseId = courseId;
-
-    const all = await Library.find(query).sort({ date: -1 });
-    res.json(all);
+    const items = await Library.find(q).sort({ date: -1 });
+    res.json(items);
   } catch (err) {
-    console.error("❌ Помилка при завантаженні:", err);
-    res.status(500).send("Server error");
+    console.error("❌ Get library items:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ---------- DISTINCT SECTIONS (для выпадашек по курсу) ----------
+router.get("/sections", async (req, res) => {
+  try {
+    const { courseId } = req.query;
+    const match = { destination: "courses" };
+    if (courseId) match.courseId = courseId;
+
+    const sections = await Library.distinct("section", match);
+    res.json(sections.filter(Boolean)); // без пустых
+  } catch (err) {
+    console.error("❌ List sections:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ---------- READ ONE ----------
+router.get("/:id", async (req, res) => {
+  try {
+    const item = await Library.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Not found" });
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ---------- UPDATE ----------
+router.put("/:id", upload.single("bookFile"), async (req, res) => {
+  try {
+    const { title, description, videoLink, section, role } = req.body;
+    const update = {};
+    if (title !== undefined) update.title = title;
+    if (description !== undefined) update.description = description;
+    if (section !== undefined) update.section = section;
+    if (role !== undefined) update.role = role;
+
+    if (req.file) {
+      update.filePath = `/uploads/books/${req.file.filename}`;
+    }
+    if (videoLink !== undefined) update.videoLink = videoLink;
+
+    const item = await Library.findByIdAndUpdate(req.params.id, update, {
+      new: true,
+    });
+    if (!item) return res.status(404).json({ message: "Not found" });
+    res.json(item);
+  } catch (err) {
+    console.error("❌ Update library item:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ---------- DELETE ----------
+router.delete("/:id", async (req, res) => {
+  try {
+    const item = await Library.findByIdAndDelete(req.params.id);
+    if (!item) return res.status(404).json({ message: "Not found" });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 

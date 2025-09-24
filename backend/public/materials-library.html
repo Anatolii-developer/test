@@ -6,6 +6,79 @@
   <title>Матеріали моїх курсів</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Section (folder) dropdowns */
+    .section {
+      margin: 12px 0 16px;
+      border-radius: 12px;
+      background: #FFEED9;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .section summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      list-style: none;
+      padding: 14px 16px;
+      font-weight: 600;
+      user-select: none;
+    }
+    .section[open] summary {
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .section summary::-webkit-details-marker { display: none; }
+
+    .materials {
+      padding: 12px 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .material-row {
+      display: grid;
+      gap: 8px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid #eee;
+    }
+    .material-row .row-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .material-title {
+      font-weight: 600;
+    }
+    .material-desc {
+      opacity: 0.8;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .view-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #D97A1C;
+      background: transparent;
+      color: #D97A1C;
+      cursor: pointer;
+    }
+    .preview {
+      margin-top: 10px;
+      display: none;
+    }
+    .preview.active { display: block; }
+    .preview iframe, .preview embed {
+      width: 100%;
+      height: 420px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff;
+    }
+  </style>
 </head>
 <body>
    <aside class="sidebar collapsed" id="sidebar">
@@ -133,86 +206,185 @@
   </main>
   <script src="script.js"></script>
   <script>
+    const API_BASE = "http://157.230.121.24:5050";
+
     window.onload = () => {
-  loadCourseMaterials(); // загрузка при старте
-};
+      loadCourseMaterials(); // загрузка при старті
+    };
 
-// 🔄 Получение и отрисовка материалов
-async function loadCourseMaterials() {
-  try {
-    const response = await fetch("http://157.230.121.24:5050/api/library?destination=courses");
-    const materials = await response.json();
-
-    const courseList = document.querySelector(".course-list");
-    courseList.innerHTML = ""; // очистка
-
-    if (materials.length === 0) {
-      courseList.innerHTML = "<p>Наразі матеріали відсутні.</p>";
-      return;
+    function getYouTubeEmbedUrl(link) {
+      const m = String(link || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+      return m ? `https://www.youtube.com/embed/${m[1]}` : "";
     }
 
-    // Группируем по заголовку (если в будущем будет courseId — группируй по нему)
-    const grouped = {};
-    materials.forEach((item) => {
-      const key = item.title || "Інші матеріали";
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(item);
-    });
+    // 🔄 Отримання та рендер матеріалів: групуємо за курсом, потім за папкою (section)
+    async function loadCourseMaterials() {
+      try {
+        const res = await fetch(`${API_BASE}/api/library?destination=courses`);
+        const materials = await res.json();
 
-    for (const title in grouped) {
-      const courseItem = document.createElement("div");
-      courseItem.classList.add("course-item");
+        const courseList = document.querySelector(".course-list");
+        courseList.innerHTML = "";
 
-      courseItem.innerHTML = `
-        <h4 class="course-title">${title}</h4>
-        <p class="course-description">Матеріали, що відносяться до курсу "${title}"</p>
-        <div class="week-block">
-          <button class="accordion-toggle">Матеріали до лекції</button>
-          <div class="accordion-content"></div>
-        </div>
-      `;
-
-      const contentBlock = courseItem.querySelector(".accordion-content");
-
-      grouped[title].forEach((mat) => {
-        const row = document.createElement("div");
-        row.classList.add("lecture-row");
-
-        if (mat.type === "video") {
-          row.innerHTML = `
-            <span>Відео-матеріали</span>
-            <a class="view-btn" href="${mat.videoLink}" target="_blank">Переглянути</a>
-          `;
-        } else if (mat.type === "book") {
-          row.innerHTML = `
-            <span>Книжкові матеріали</span>
-            <a class="view-btn" href="http://157.230.121.24:5050/${mat.filePath}" target="_blank">Завантажити</a>
-          `;
+        if (!Array.isArray(materials) || !materials.length) {
+          courseList.innerHTML = "<p>Наразі матеріали відсутні.</p>";
+          return;
         }
 
-        contentBlock.appendChild(row);
-      });
+        // Унікальні courseId
+        const byCourse = new Map(); // courseKey -> items[]
+        const courseIds = new Set();
+        for (const it of materials) {
+          const key = it.courseId || "_no_course_";
+          if (!byCourse.has(key)) byCourse.set(key, []);
+          byCourse.get(key).push(it);
+          if (it.courseId) courseIds.add(String(it.courseId));
+        }
 
-      courseList.appendChild(courseItem);
+        // Підтягнемо дані курсів
+        const courseMeta = new Map(); // id -> { title, description }
+        for (const cid of courseIds) {
+          try {
+            const r = await fetch(`${API_BASE}/api/courses/${cid}`);
+            if (r.ok) {
+              const c = await r.json();
+              courseMeta.set(cid, {
+                title: c.courseTitle || "Курс",
+                description: c.courseSubtitle || c.courseDescription || ""
+              });
+            }
+          } catch (_) {}
+        }
+
+        // Побудова DOM
+        for (const [courseKey, items] of byCourse.entries()) {
+          const meta = courseMeta.get(String(courseKey)) || {
+            title: inferCourseTitle(items),
+            description: "Матеріали, додані до цього курсу"
+          };
+
+          const courseItem = document.createElement("div");
+          courseItem.className = "course-item";
+          courseItem.innerHTML = `
+            <h4 class="course-title">${escapeHtml(meta.title)}</h4>
+            <p class="course-description">${escapeHtml(meta.description)}</p>
+          `;
+
+          // Групуємо за папкою (section); якщо відсутня — "Матеріали"
+          const bySection = new Map();
+          for (const it of items) {
+            const section = (it.section && String(it.section).trim()) || "Матеріали";
+            if (!bySection.has(section)) bySection.set(section, []);
+            bySection.get(section).push(it);
+          }
+
+          for (const [sectionName, sItems] of bySection.entries()) {
+            const details = document.createElement("details");
+            details.className = "section";
+            details.innerHTML = `
+              <summary class="section-summary">📁 ${escapeHtml(sectionName)}</summary>
+              <div class="materials"></div>
+            `;
+            const materialsWrap = details.querySelector(".materials");
+
+            sItems.forEach((mat, idx) => {
+              const row = document.createElement("div");
+              row.className = "material-row";
+
+              const title = mat.itemTitle || mat.title || (mat.type === "video" ? "Відео" : "Файл");
+              const desc  = mat.description || "";
+
+              row.innerHTML = `
+                <div class="row-head">
+                  <div>
+                    <div class="material-title">${escapeHtml(title)}</div>
+                    ${desc ? `<div class="material-desc">${escapeHtml(desc)}</div>` : ""}
+                  </div>
+                  <button class="view-btn" type="button">Переглянути</button>
+                </div>
+                <div class="preview" id="prev-${courseKey}-${cssSafe(sectionName)}-${idx}"></div>
+              `;
+
+              const btn = row.querySelector(".view-btn");
+              const preview = row.querySelector(".preview");
+              btn.addEventListener("click", () => renderPreview(preview, mat));
+
+              materialsWrap.appendChild(row);
+            });
+
+            courseItem.appendChild(details);
+          }
+
+          courseList.appendChild(courseItem);
+        }
+
+        initAccordionDefaults();
+
+      } catch (err) {
+        console.error("Помилка при завантаженні матеріалів:", err);
+        const courseList = document.querySelector(".course-list");
+        if (courseList) courseList.innerHTML = "<p>Помилка завантаження матеріалів.</p>";
+      }
     }
 
-    initAccordionToggles(); // инициализация аккордеонов
+    function renderPreview(container, mat) {
+      if (!container) return;
+      // Перемикач відображення
+      const isActive = container.classList.contains("active");
+      document.querySelectorAll(".preview.active").forEach(el => el.classList.remove("active"));
+      if (isActive) { container.classList.remove("active"); container.innerHTML = ""; return; }
+      container.classList.add("active");
 
-  } catch (err) {
-    console.error("Помилка при завантаженні матеріалів:", err);
-  }
-}
+      if (mat.type === "video") {
+        const src = getYouTubeEmbedUrl(mat.videoLink);
+        container.innerHTML = src
+          ? `<iframe src="${src}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Відео"></iframe>`
+          : `<div class="material-desc">Невірне посилання на відео.</div>`;
+        return;
+      }
 
-// ⏬ Аккордеоны
-function initAccordionToggles() {
-  document.querySelectorAll(".accordion-toggle").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const content = btn.nextElementSibling;
-      content.style.display = content.style.display === "block" ? "none" : "block";
-    });
-  });
-}
+      // Файли
+      const rawPath = mat.filePath || "";
+      const url = rawPath.startsWith("http") ? rawPath : `${API_BASE}/${rawPath.replace(/^\/+/, '')}`;
 
+      const ext = (rawPath.split(".").pop() || "").toLowerCase();
+      if (ext === "pdf") {
+        container.innerHTML = `<embed src="${url}" type="application/pdf" />`;
+      } else if (["doc","docx","ppt","pptx"].includes(ext)) {
+        const gview = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+        container.innerHTML = `<iframe src="${gview}" title="Прев'ю файлу"></iframe>`;
+      } else {
+        container.innerHTML = `
+          <div class="material-desc">Попередній перегляд недоступний. 
+            <a href="${url}" target="_blank" rel="noopener">Відкрити файл</a>
+          </div>`;
+      }
+    }
+
+    function initAccordionDefaults() {
+      // за замовчуванням залишаємо згорнутими; розгортанням керує користувач
+    }
+
+    function inferCourseTitle(items) {
+      // Фолбек, якщо немає метаданих курсу: берем перший title
+      const t = items.find(i => i.courseTitle) ?.courseTitle
+            || items.find(i => i.title)?.title
+            || "Курс";
+      return t;
+    }
+
+    function escapeHtml(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function cssSafe(s) {
+      return String(s || "").replace(/[^a-z0-9_-]+/gi, "-");
+    }
+
+    // ⏬ Аккордеоны (старий код більше не потрібен)
   </script>
 </body>
 </html>

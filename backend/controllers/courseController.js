@@ -86,7 +86,6 @@ exports.approveCourse = async (req, res) => {
 };
 
 
-
 exports.getCourses = async (req, res) => {
   try {
     const { mainType, formatType, status } = req.query;
@@ -101,27 +100,31 @@ exports.getCourses = async (req, res) => {
 
     const now = new Date();
 
-    // как и раньше — актуализируем статус по датам
     const updatedCourses = await Promise.all(
       courses.map(async (course) => {
-        const start = new Date(course.courseDates.start);
-        const end = new Date(course.courseDates.end);
+        const hasDates = course.courseDates && course.courseDates.start && course.courseDates.end;
+        const start = hasDates ? new Date(course.courseDates.start) : null;
+        const end   = hasDates ? new Date(course.courseDates.end)   : null;
 
-        let newStatus = "Запланований";
-        if (now >= start && now <= end) newStatus = "Поточний";
-        else if (now > end)             newStatus = "Пройдений";
+        let newStatus = course.status || "WAITING_FOR_APPROVAL";
+        if (start && end) {
+          if (now >= start && now <= end) newStatus = "Поточний";
+          else if (now > end)             newStatus = "Пройдений";
+          else                            newStatus = "Запланований";
+        }
 
-        if (course.status !== 'WAITING_FOR_APPROVAL' && course.status !== newStatus) {
+        if (course.status !== "WAITING_FOR_APPROVAL" && course.status !== newStatus) {
           course.status = newStatus;
           await course.save();
         }
 
+        // Автоматическое заполнение имени и роли
         if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
           const fn = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ');
-          course.creatorName = fn || course.creatorId.email || course.creatorName || '';
+          course.creatorName = fn || course.creatorId.email || '';
         }
         if ((!course.creatorRole || course.creatorRole === '') && course.creatorId) {
-          course.creatorRole = course.creatorId.role || course.creatorRole || '';
+          course.creatorRole = course.creatorId.role || '';
         }
 
         return course;

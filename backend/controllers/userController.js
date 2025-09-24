@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const sendRegistrationEmail = require('../mailer'); // твоя функция-рассылка
+const sendRecoveryCodeEmail = require('../mailer/sendRecoveryCodeEmail');
+
+function genCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // 6 цифр
+}
+
 
 function signUser(user) {
   return jwt.sign(
@@ -214,22 +219,83 @@ async function updateUser(req, res) {
   }
 }
 
-// (оставь свою реализацию отправки письма восстановления; главное — чтобы тут не падало)
+// 1) отправить код
 async function sendRecoveryCode(req, res) {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: 'Email is required' });
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+  try {
+    const user = await User.findOne({ email: String(email).trim() });
+    // Чтобы не палить наличие аккаунта, отвечаем одинаково.
+    if (!user) {
+      return res.json({ message: 'Якщо аккаунт існує, код надіслано' });
+    }
+
+    const code = genCode();
     user.recoveryCode = code;
+    user.recoveryCodeExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 мин
     await user.save();
 
-    // TODO: отправка письма (не менял твою инфраструктуру)
-    res.json({ message: 'Код згенеровано та збережено' });
+    await sendRecoveryCodeEmail(user.email, code);
+    res.json({ message: 'Код надіслано (якщо аккаунт існує)' });
   } catch (e) {
-    res.status(500).json({ message: 'Не вдалося надіслати лист' });
+    console.error('sendRecoveryCode error:', e);
+    res.status(500).json({ message: 'Не вдалося надіслати код' });
+  }
+}
+
+
+// 2) проверить код (опционально, можно пропустить и проверять в reset)
+async function verifyRecoveryCode(req, res) {
+  const { email, code } = req.body;
+  if (!email || !code) return res.status(400).json({ message: 'Email і код обовʼязкові' });
+
+  try {
+    const user = await User.findOne({ email: String(email).trim() });
+    if (!user || !user.recoveryCode || !user.recoveryCodeExpires) {
+      return res.status(400).json({ message: 'Невірний код' });
+    }
+    if (user.recoveryCode !== String(code).trim()) {
+      return res.status(400).json({ message: 'Невірний код' });
+    }
+    if (new Date() > user.recoveryCodeExpires) {
+      return res.status(400).json({ message: 'Код прострочено' });
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ message: 'Помилка перевірки коду' });
+  }
+}
+
+
+// 3) сброс пароля
+async function resetPassword(req, res) {
+  const { email, code, newPassword } = req.body;
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({ message: 'Email, код та новий пароль обовʼязкові' });
+  }
+
+  try {
+    const user = await User.findOne({ email: String(email).trim() });
+    if (!user || !user.recoveryCode || !user.recoveryCodeExpires) {
+      return res.status(400).json({ message: 'Невірний код' });
+    }
+    if (user.recoveryCode !== String(code).trim()) {
+      return res.status(400).json({ message: 'Невірний код' });
+    }
+    if (new Date() > user.recoveryCodeExpires) {
+      return res.status(400).json({ message: 'Код прострочено' });
+    }
+
+    user.password = await bcrypt.hash(String(newPassword), 10);
+    user.recoveryCode = null;
+    user.recoveryCodeExpires = null;
+    await user.save();
+
+    res.json({ ok: true, message: 'Пароль змінено' });
+  } catch (e) {
+    console.error('resetPassword error:', e);
+    res.status(500).json({ message: 'Не вдалося оновити пароль' });
   }
 }
 
@@ -255,6 +321,8 @@ module.exports = {
   getUserById,
   updateUserStatus,
   updateUser,
-  sendRecoveryCode,
   uploadUserPhoto,
+  sendRecoveryCode,
+  verifyRecoveryCode,
+  resetPassword,
 };

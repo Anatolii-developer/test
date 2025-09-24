@@ -47,6 +47,8 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 forumBlocked: { type: Boolean, default: false },   // полный бан форума
 forumMutedUntil: { type: Date, default: null },    // мут (до даты); null = нет мута
+recoveryCode: { type: String, default: null },
+  recoveryCodeExpires: { type: Date, default: null },
 });
 
 // хеширование пароля перед сохранением

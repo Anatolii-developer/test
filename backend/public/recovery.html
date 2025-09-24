@@ -1,47 +1,126 @@
+<!-- public/recovery.html (твой файл) -->
 <!DOCTYPE html>
 <html lang="uk">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Реєстрація - Psychologist Platform</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <header>
-      <a href="https://mamko-prof-supervision.com/" target="_blank" rel="noopener noreferrer">
-        <img class="logo" src="assets/logo.png" alt="Institute Logo" />
-      </a> 
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Відновлення - Psychologist Platform</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <img class="logo" src="assets/logo.png" alt="Institute Logo" />
+    <div class="language-select">UA ▼</div>
+  </header>
 
-    <main>
-      <div class="login-card">
-        <h1 class="h1" style="color: #D97A1C; text-align: center;">Реєстрація</h1>
+  <main>
+    <div class="login-card">
+      <h1 class="h1" style="color: #D97A1C; text-align: center;">Відновлення</h1>
 
-        <label for="username" class="s1">Username</label>
-        <div class="input-wrapper">
-          <img src="assets/icon-user.png" class="input-icon" alt="user icon" />
-          <input type="text" id="username" placeholder="Enter your username" />
-        </div>
-
-        <label for="password" class="s1">Password</label>
-       <div class="input-wrapper">
-  <img src="assets/icon-lock.png" class="input-icon" alt="lock icon" />
-  <input type="password" id="password" placeholder="Enter your password" />
-  <img src="assets/icon-eye.png" class="toggle-password" alt="toggle visibility" onclick="togglePassword(this)" />
-</div>
-
-        <label for="confirm-password" class="s1">Confirm password</label>
-        <div class="input-wrapper">
-  <img src="assets/icon-lock.png" class="input-icon" alt="lock icon" />
-  <input type="password" id="confirm-password" placeholder="Enter your password" />
-  <img src="assets/icon-eye.png" class="toggle-password" alt="toggle visibility" onclick="togglePassword(this)" />
-</div>
-
-        <button onclick="saveLoginAndContinue()">Next</button>
+      <label for="email" class="s1">Email</label>
+      <div class="input-wrapper">
+        <img src="assets/icon-user.png" class="input-icon" alt="email icon" />
+        <input type="email" id="email" placeholder="Enter your email" />
       </div>
-    </main>
 
-    <script src="script.js"></script>
-  </body>
+      <button id="btnSend" onclick="sendRecoveryCode()">Надіслати код</button>
+
+      <!-- Шаг 2: код -->
+      <div id="codeBlock" style="display:none; margin-top:16px;">
+        <label for="code" class="s1">Код з листа</label>
+        <div class="input-wrapper">
+          <input type="text" id="code" placeholder="6-значний код" />
+        </div>
+        <button id="btnVerify" onclick="verifyCode()">Підтвердити код</button>
+      </div>
+
+      <!-- Шаг 3: новый пароль -->
+      <div id="resetBlock" style="display:none; margin-top:16px;">
+        <label for="newPassword" class="s1">Новий пароль</label>
+        <div class="input-wrapper">
+          <input type="password" id="newPassword" placeholder="Введіть новий пароль" />
+        </div>
+        <label for="newPassword2" class="s1" style="margin-top:8px;">Підтвердження</label>
+        <div class="input-wrapper">
+          <input type="password" id="newPassword2" placeholder="Повторіть пароль" />
+        </div>
+        <button id="btnReset" onclick="resetPassword()">Змінити пароль</button>
+      </div>
+
+      <button style="background-color: #aaa; margin-top: 12px;" onclick="history.back()">Повернутись назад</button>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = window.API_BASE || ''; // если фронт и бэк на одном домене — оставь ''
+
+    async function sendRecoveryCode(){
+      const email = document.getElementById('email').value.trim();
+      if(!email) return alert('Вкажіть email');
+
+      try{
+        const r = await fetch(`${API_BASE}/api/users/recovery/send`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email })
+        });
+        // Всегда показываем следующий шаг
+        document.getElementById('codeBlock').style.display = 'block';
+        alert('Якщо аккаунт існує — код надіслано на e-mail');
+      }catch(e){
+        alert('Помилка відправки коду');
+        console.error(e);
+      }
+    }
+
+    async function verifyCode(){
+      const email = document.getElementById('email').value.trim();
+      const code  = document.getElementById('code').value.trim();
+      if(!email || !code) return alert('Вкажіть email та код');
+
+      try{
+        const r = await fetch(`${API_BASE}/api/users/recovery/verify`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email, code })
+        });
+        if(!r.ok){
+          const e = await r.json().catch(()=>({}));
+          return alert(e.message || 'Невірний код');
+        }
+        document.getElementById('resetBlock').style.display = 'block';
+        alert('Код підтверджено, задайте новий пароль');
+      }catch(e){
+        alert('Помилка перевірки коду');
+      }
+    }
+
+    async function resetPassword(){
+      const email = document.getElementById('email').value.trim();
+      const code  = document.getElementById('code').value.trim();
+      const p1    = document.getElementById('newPassword').value;
+      const p2    = document.getElementById('newPassword2').value;
+
+      if(!email || !code) return alert('Немає e-mail або коду');
+      if(!p1 || p1.length < 6) return alert('Мінімум 6 символів');
+      if(p1 !== p2) return alert('Паролі не співпадають');
+
+      try{
+        const r = await fetch(`${API_BASE}/api/users/recovery/reset`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email, code, newPassword: p1 })
+        });
+        const data = await r.json().catch(()=>({}));
+        if(!r.ok) return alert(data.message || 'Не вдалося змінити пароль');
+
+        alert('Пароль змінено! Тепер увійдіть з новим паролем.');
+        location.href = 'login.html';
+      }catch(e){
+        alert('Помилка зміни пароля');
+      }
+    }
+  </script>
+</body>
 </html>

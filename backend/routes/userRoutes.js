@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
-// ✅ ЕДИНЫЙ корректный импорт контроллера
+// ✅ единый корректный импорт контроллера
 const userCtrl = require("../controllers/userController");
 const User = require("../models/User");
 
@@ -20,30 +20,34 @@ const certStorage = multer.diskStorage({
 });
 const certUpload = multer({ storage: certStorage });
 
+// ===== Auth middlewares =====
 function auth(req, res, next) {
-  const headerToken = (req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim() || null;
+  const headerToken =
+    (req.headers.authorization || "").replace(/^Bearer\s+/i, "").trim() || null;
   const cookieToken = req.cookies?.token || null;
 
-  // 1) Сначала пробуем куку (она httpOnly и надёжнее)
+  // сначала пробуем httpOnly cookie, затем header
   let token = cookieToken || headerToken;
-  if (!token) return res.status(401).json({ ok: false, message: 'Unauthorized' });
+  if (!token)
+    return res.status(401).json({ ok: false, message: "Unauthorized" });
 
-  const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+  const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
-  // Если в приоритете оказался headerToken, но он невалиден — попробуем куку
   try {
     req.user = jwt.verify(token, JWT_SECRET);
     return next();
   } catch (_) {
+    // если ломается header, пробуем cookie
     if (token === headerToken && cookieToken) {
       try {
         req.user = jwt.verify(cookieToken, JWT_SECRET);
         return next();
       } catch {}
     }
-    return res.status(401).json({ ok: false, message: 'Invalid token' });
+    return res.status(401).json({ ok: false, message: "Invalid token" });
   }
 }
+
 function adminOnly(req, res, next) {
   const roles = Array.isArray(req.user?.roles)
     ? req.user.roles.map((r) => String(r).toLowerCase())
@@ -52,15 +56,15 @@ function adminOnly(req, res, next) {
   return res.status(403).json({ ok: false, message: "Forbidden: admin only" });
 }
 
-// ===== Auth
+// ===== Auth =====
 router.post("/register", userCtrl.registerUser); // письмо уходит внутри контроллера
 router.post("/login", userCtrl.loginUser);
 router.post("/admin/login", userCtrl.adminLogin);
 router.get("/profile", auth, userCtrl.profile);
 router.get("/admin/profile", auth, adminOnly, userCtrl.profile);
 
-// ===== Lists / helpers
-router.get("/approved", async (req, res) => {
+// ===== Lists / helpers =====
+router.get("/approved", async (_req, res) => {
   try {
     const users = await User.find({ status: "APPROVED" });
     res.json(users);
@@ -100,31 +104,18 @@ router.get("/roles-with-users", async (_req, res) => {
   }
 });
 
-async function updateUser(req, res) {
-  try {
-    const body = req.body || {};
-    const update = { ...body };
+// ===== Восстановление пароля (email) =====
+router.post("/recovery/send", userCtrl.sendRecoveryCode);
+router.post("/recovery/verify", userCtrl.verifyRecoveryCode); // можно не использовать, если проверяешь в reset
+router.post("/recovery/reset", userCtrl.resetPassword);
 
-    // ⬇️ якщо поля прийшли — приводимо до масиву
-    if (body.directions !== undefined) update.directions = toArray(body.directions);
-    if (body.topics !== undefined) update.topics = toArray(body.topics);
-
-    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-}
-
-router.post("/forgot-password", userCtrl.sendRecoveryCode);
-
-// ===== CRUD порядок: спец-роуты ДО /:id
+// ===== спец-роуты ДО /:id =====
 router.post(
   "/:id/photo",
   profilePhotoUpload.single("photo"),
   userCtrl.uploadUserPhoto
 );
+
 router.post(
   "/:id/certificate",
   certUpload.single("certificate"),
@@ -175,7 +166,7 @@ router.post(
   }
 );
 
-// ===== Generic CRUD
+// ===== Generic CRUD (в самом конце) =====
 router.get("/", userCtrl.getAllUsers);
 router.get("/:id", userCtrl.getUserById);
 router.put("/:id/status", userCtrl.updateUserStatus);

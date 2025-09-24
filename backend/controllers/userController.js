@@ -187,6 +187,23 @@ async function updateUser(req, res) {
   }
 }
 
+
+
+async function updateUserStatus(req, res) {
+  try {
+    const { status, roles } = req.body;
+    const update = {};
+    if (typeof status === 'string' && status.trim()) update.status = status.trim();
+    if (Array.isArray(roles)) update.roles = roles;
+
+    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json(user);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+}
 async function updateUser(req, res) {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });

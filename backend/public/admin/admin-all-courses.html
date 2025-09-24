@@ -54,9 +54,28 @@
         if (typeof requireAdminPage === "function") {
           requireAdminPage();
         }
-        load();
+        if (typeof load === "function") {
+          load();
+        }
+
+        const defaultStatus = "WAITING_FOR_APPROVAL";
+        fetchCourses(defaultStatus);
+
+        // Подсветить кнопку по умолчанию
+        const defaultBtn = document.querySelector(`.completed-nav-button[data-status="${defaultStatus}"]`);
+        if (defaultBtn) defaultBtn.classList.add("active");
+
+        // Назначить обработчики для кнопок (один раз)
+        document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
+          button.addEventListener('click', () => {
+            const status = button.getAttribute('data-status');
+            fetchCourses(status);
+
+            document.querySelectorAll('.completed-nav-button').forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+          });
+        });
       });
- document.addEventListener('DOMContentLoaded', requireAdminPage);
   const API_BASE = "http://157.230.121.24:5050";
 
   function creatorDisplayName(course) {
@@ -113,16 +132,6 @@
     return '-';
   }
 
-
-  function logoutUser() {
-    window.location.href = "login.html";
-  }
-
-  function formatDate(dateString) {
-    if (!dateString) return "-";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("uk-UA");
-  }
 
   async function fetchCourses(filterStatus = "WAITING_FOR_APPROVAL") {
     try {
@@ -187,42 +196,14 @@
     }
   }
 
- document.addEventListener("DOMContentLoaded", () => {
-  const defaultStatus = "WAITING_FOR_APPROVAL";
-  fetchCourses(defaultStatus);
 
-  // Подсветить кнопку по умолчанию
-  const defaultBtn = document.querySelector(`.completed-nav-button[data-status="${defaultStatus}"]`);
-  if (defaultBtn) defaultBtn.classList.add("active");
+  function formatDate(dateString) {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("uk-UA");
+  }
 
-  // Назначить обработчики для кнопок
-  document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
-    button.addEventListener('click', () => {
-      const status = button.getAttribute('data-status');
-      fetchCourses(status);
-
-      // Убрать активность со всех
-      document.querySelectorAll('.completed-nav-button').forEach(btn => btn.classList.remove("active"));
-      // Добавить активность текущей
-      button.classList.add("active");
-    });
-  });
-});
-
-
-  document.querySelectorAll('.completed-nav-button[data-status]').forEach(button => {
-  button.addEventListener('click', () => {
-    const status = button.getAttribute('data-status');
-    fetchCourses(status);
-
-    document.querySelectorAll('.completed-nav-button').forEach(btn => {
-      btn.classList.remove('active');
-    });
-    button.classList.add('active');
-  });
-});
-
- function logoutUser(){
+  function logoutUser(){
     try{
       // чистимо локальне
       localStorage.removeItem('user');

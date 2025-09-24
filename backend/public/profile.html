@@ -251,6 +251,7 @@
     <input type="checkbox" id="formatOffline" onchange="toggleCityField()" /> Офлайн
   </label>
   <input type="text" id="offlineCity" placeholder="Місто проведення" style="display:none; margin-top:8px;" />
+  <button type="button" id="saveFormatBtn" class="small-button" style="margin-top:8px;">Зберегти формат</button>
 </div>
 
     </div>
@@ -422,6 +423,9 @@ function populateFormat(freshUser) {
       setIfExists(document.getElementById('profileLanguageTextarea'), freshUser.language);
       setIfExists(document.getElementById('profileFormatTextarea'), freshUser.format);
 
+      // Apply format (checkboxes + city) from user
+      populateFormat(freshUser);
+
       // Optional: fill step 1 spans if they are empty (defensive)
       const fillSpan = (id, val) => {
         const el = document.getElementById(id);
@@ -510,6 +514,70 @@ function populateFormat(freshUser) {
     });
     // Keep height in sync on viewport changes
     window.addEventListener('resize', () => autoResize(document.getElementById('profileCoursesTextarea')));
+
+    // debounce helper
+    function debounce(fn, wait){
+      let t;
+      return function(...args){
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), wait);
+      };
+    }
+
+    // Save format (Онлайн/Офлайн) + city to backend
+    async function saveFormatSection() {
+      try {
+        const rawUser = localStorage.getItem('user');
+        if (!rawUser) return alert('Увійдіть у систему');
+        const user = JSON.parse(rawUser);
+
+        const payload = { format: [], city: '' };
+
+        const online = document.getElementById('formatOnline')?.checked;
+        const offline = document.getElementById('formatOffline')?.checked;
+        const city = (document.getElementById('offlineCity')?.value || '').trim();
+
+        if (online)  payload.format.push('Онлайн');
+        if (offline) payload.format.push('Офлайн');
+        if (offline) payload.city = city; // only save city when offline selected
+
+        const res = await fetch(`${typeof API_BASE !== 'undefined' ? API_BASE : ''}/api/users/${user._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Помилка збереження');
+        }
+
+        const updated = await res.json();
+        // Update localStorage snapshot to keep UI consistent
+        localStorage.setItem('user', JSON.stringify(updated));
+        alert('Збережено');
+      } catch(e) {
+        console.error(e);
+        alert(e.message || 'Сталася помилка під час збереження');
+      }
+    }
+
+    const debouncedSaveFormat = debounce(() => {
+      // auto-save after quick changes
+      saveFormatSection();
+    }, 500);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const onlineCb  = document.getElementById('formatOnline');
+      const offlineCb = document.getElementById('formatOffline');
+      const cityInput = document.getElementById('offlineCity');
+      const saveBtn   = document.getElementById('saveFormatBtn');
+
+      if (onlineCb)  onlineCb.addEventListener('change', () => { toggleCityField(); debouncedSaveFormat(); });
+      if (offlineCb) offlineCb.addEventListener('change', () => { toggleCityField(); debouncedSaveFormat(); });
+      if (cityInput) cityInput.addEventListener('input', debouncedSaveFormat);
+      if (saveBtn)   saveBtn.addEventListener('click', saveFormatSection);
+    });
   </script>
 </body>
 </html>

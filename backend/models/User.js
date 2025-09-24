@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
   qualifications: String,
   experienceExtra: String,
   language: String,
-  format: String,
+  format: [String],     
+  city: String,         
   lectures: String,                   // ➕ новое
   seminars: String,                   // ➕ новое
   colloquiums: String,                // ➕ новое

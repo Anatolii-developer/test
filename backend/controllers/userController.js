@@ -78,9 +78,29 @@ function toArray(val) {
   return [];
 }
 
+
+function normalizeFormatAndCity(body) {
+  let format = toArray(body.format);
+
+  // подхват флагов, если они пришли с чекбоксов
+  const yes = (v) => v === true || v === 'true' || v === 'on' || v === '1' || v === 1;
+
+  if (yes(body.formatOnline) && !format.includes('Онлайн')) format.push('Онлайн');
+  if (yes(body.formatOffline) && !format.includes('Офлайн')) format.push('Офлайн');
+
+  format = Array.from(new Set(format)); // на всякий случай уникальные
+
+  let city = (body.city || body.offlineCity || '').trim();
+  // если офлайн не выбран — город не сохраняем
+  if (!format.includes('Офлайн')) city = '';
+
+  return { format, city };
+}
 async function registerUser(req, res) {
   try {
     const body = req.body || {};
+    const { format, city } = normalizeFormatAndCity(body);
+
     const user = new User({
       username: body.username,
       password: body.password,
@@ -93,10 +113,12 @@ async function registerUser(req, res) {
       gender: body.gender,
       experience: body.experience,
       education: body.education,
-
-      // ⬇️ критично
       directions: toArray(body.directions),
       topics: toArray(body.topics),
+
+      // ⬇️ новые поля
+      format,
+      city,
 
       status: body.status || 'WAIT FOR REVIEW',
       createdAt: body.createdAt || new Date()
@@ -135,16 +157,30 @@ async function getUserById(req, res) {
   }
 }
 
-async function updateUserStatus(req, res) {
+async function updateUser(req, res) {
   try {
-    const { status, roles } = req.body;
-    const update = {};
-    if (status) update.status = status;
-    if (Array.isArray(roles)) update.roles = roles;
+    const body = req.body || {};
+    const update = { ...body };
+
+    // нормализуем формат/город, если пришли поля
+    if (
+      body.format !== undefined ||
+      body.formatOnline !== undefined ||
+      body.formatOffline !== undefined ||
+      body.city !== undefined ||
+      body.offlineCity !== undefined
+    ) {
+      const { format, city } = normalizeFormatAndCity(body);
+      update.format = format;
+      update.city = city;
+      // уберём вспомогательные флаги, чтобы не лезли в базу
+      delete update.formatOnline;
+      delete update.formatOffline;
+      delete update.offlineCity;
+    }
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     res.json(user);
   } catch (e) {
     res.status(500).json({ error: e.message });

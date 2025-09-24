@@ -496,9 +496,9 @@ const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксі�
         ? (nameEl?.value || "").trim()
         : (selEl?.value || "").trim();
     }
-    if (section) {
-      fd.append("section", section);
-    }
+   if (section) {
+  fd.append("folder", section);
+}
     return fd;
   };
 

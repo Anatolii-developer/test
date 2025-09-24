@@ -320,7 +320,7 @@ module.exports = {
   getAllUsers,
   getUserById,
   updateUserStatus,
-  updateUser,
+  updateUser,            
   uploadUserPhoto,
   sendRecoveryCode,
   verifyRecoveryCode,

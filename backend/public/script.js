@@ -827,26 +827,34 @@ function handleSubmit() {
 
 
 async function sendRecoveryCode() {
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email")?.value.trim();
   if (!email) {
     alert("Будь ласка, введіть email.");
     return;
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/users/forgot-password`, {
+    const res = await fetch(`${API_BASE}/api/users/recovery/send`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
 
-    const result = await res.json();
+    // Безпечний парсинг відповіді (може бути і text/html при помилці з проксі)
+    const raw = await res.text();
+    let data;
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      data = { message: raw };
+    }
+
     if (res.ok) {
-      alert("✅ Код надіслано на пошту.");
-      // Можна перейти на сторінку введення коду (якщо є)
+      alert("✅ Код надіслано на пошту (якщо акаунт існує). Перевірте вхідні та спам.");
+      // За потреби можна перейти на сторінку введення коду:
       // window.location.href = "reset-code.html";
     } else {
-      alert("❌ " + result.message);
+      alert("❌ " + (data?.message || "Помилка відправки коду"));
     }
   } catch (err) {
     console.error("Server error:", err);

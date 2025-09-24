@@ -65,18 +65,20 @@ exports.approveCourse = async (req, res) => {
     if (!course) return res.status(404).json({ message: "Курс не знайдено" });
 
     const now = new Date();
-    const start = new Date(course.courseDates.start);
-    const end = new Date(course.courseDates.end);
+    const hasDates = course.courseDates && course.courseDates.start && course.courseDates.end;
+    const start = hasDates ? new Date(course.courseDates.start) : null;
+    const end   = hasDates ? new Date(course.courseDates.end)   : null;
 
-    let newStatus = "Запланований";
-    if (now >= start && now <= end) {
-      newStatus = "Поточний";
-    } else if (now > end) {
-      newStatus = "Пройдений";
+    let newStatus = course.status || "WAITING_FOR_APPROVAL";
+    if (start && end) {
+      if (now >= start && now <= end) newStatus = "Поточний";
+      else if (now > end)             newStatus = "Пройдений";
+      else                            newStatus = "Запланований";
     }
 
-    course.status = newStatus;
-    await course.save();
+    // Обновляем точечно без триггера полной валидации
+    await Course.updateOne({ _id: course._id }, { $set: { status: newStatus } }, { runValidators: false });
+    course.status = newStatus; // чтобы вернуть актуальный статус
 
     res.json({ success: true, course });
   } catch (err) {
@@ -113,12 +115,17 @@ exports.getCourses = async (req, res) => {
           else                            newStatus = "Запланований";
         }
 
-        if (course.status !== "WAITING_FOR_APPROVAL" && course.status !== newStatus) {
-          course.status = newStatus;
-          await course.save();
+        // Обновляем статус точечно, без полной валидации документа
+        if (course.status !== 'WAITING_FOR_APPROVAL' && course.status !== newStatus) {
+          await Course.updateOne(
+            { _id: course._id },
+            { $set: { status: newStatus } },
+            { runValidators: false }
+          );
+          course.status = newStatus; // синхронизируем в объекте ответа
         }
 
-        // Автоматическое заполнение имени и роли
+        // Автоматическое заполнение имени и роли по creatorId
         if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
           const fn = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ');
           course.creatorName = fn || course.creatorId.email || '';
@@ -146,25 +153,27 @@ exports.getCourseById = async (req, res) => {
 
     if (!course) return res.status(404).json({ message: "Курс не знайдено" });
 
-    // 🟡 Пересчитываем статус
     const now = new Date();
-    const start = new Date(course.courseDates.start);
-    const end = new Date(course.courseDates.end);
+    const hasDates = course.courseDates && course.courseDates.start && course.courseDates.end;
+    const start = hasDates ? new Date(course.courseDates.start) : null;
+    const end   = hasDates ? new Date(course.courseDates.end)   : null;
 
-    let newStatus = "Запланований";
-    if (now >= start && now <= end) {
-      newStatus = "Поточний";
-    } else if (now > end) {
-      newStatus = "Пройдений";
+    let newStatus = course.status || 'WAITING_FOR_APPROVAL';
+    if (start && end) {
+      if (now >= start && now <= end) newStatus = 'Поточний';
+      else if (now > end)             newStatus = 'Пройдений';
+      else                            newStatus = 'Запланований';
     }
 
-    // 🟡 Если статус отличается — обновляем в базе
     if (course.status !== newStatus) {
+      await Course.updateOne(
+        { _id: course._id },
+        { $set: { status: newStatus } },
+        { runValidators: false }
+      );
       course.status = newStatus;
-      await course.save();
     }
 
-    // Ensure creatorName/creatorRole present in response
     if ((!course.creatorName || course.creatorName === '') && course.creatorId) {
       const fn = [course.creatorId.firstName, course.creatorId.lastName].filter(Boolean).join(' ');
       course.creatorName = fn || course.creatorId.email || course.creatorName || '';

@@ -183,16 +183,12 @@
       </div>
 
       <!-- Editable Fields -->
-   <p class="label-with-textarea">Формат проведення:</p>
+     <p class="label-with-textarea">Про мене:</p>
 <div class="textarea-wrapper">
-  <label>
-    <input type="checkbox" id="formatOnline" /> Онлайн
-  </label>
-  <label>
-    <input type="checkbox" id="formatOffline" onchange="toggleCityField()" /> Офлайн
-  </label>
-  <input type="text" id="offlineCity" placeholder="Місто проведення" style="display:none; margin-top:8px;" />
+  <textarea id="profileAboutTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
+  <img src="assets/check-icon.svg" class="check-icon" id="aboutCheckIcon" style="display: none;" />
 </div>
+
 
    <p class="label-with-textarea">Курси, які були пройдені в IPS:</p>
 <div class="textarea-wrapper">
@@ -246,10 +242,15 @@
 </div>
 
       
-     <p class="label-with-textarea">Формат проведення:</p>
+    <p class="label-with-textarea">Формат проведення:</p>
 <div class="textarea-wrapper">
-  <textarea id="profileFormatTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
-  <img src="assets/check-icon.svg" class="check-icon" id="formatCheckIcon" style="display: none;" />
+  <label>
+    <input type="checkbox" id="formatOnline" /> Онлайн
+  </label>
+  <label>
+    <input type="checkbox" id="formatOffline" onchange="toggleCityField()" /> Офлайн
+  </label>
+  <input type="text" id="offlineCity" placeholder="Місто проведення" style="display:none; margin-top:8px;" />
 </div>
 
     </div>
@@ -352,6 +353,24 @@
 
   <script src="script.js"></script>
   <script>
+
+
+function toggleCityField() {
+  const offline = document.getElementById('formatOffline').checked;
+  document.getElementById('offlineCity').style.display = offline ? 'block' : 'none';
+}
+
+// при заполнении профиля
+function populateFormat(freshUser) {
+  document.getElementById('formatOnline').checked =
+    freshUser.format?.includes('Онлайн');
+  const isOffline = freshUser.format?.includes('Офлайн');
+  document.getElementById('formatOffline').checked = isOffline;
+  if (isOffline) {
+    document.getElementById('offlineCity').style.display = 'block';
+    document.getElementById('offlineCity').value = freshUser.city || '';
+  }
+}
     // Make autoResize available globally
     function autoResize(el) {
       if (!el) return;
@@ -380,24 +399,6 @@
       el.value = value;
       autoResize(el);
     }
-
-
-    function toggleCityField() {
-  const offline = document.getElementById('formatOffline').checked;
-  document.getElementById('offlineCity').style.display = offline ? 'block' : 'none';
-}
-
-// при заполнении профиля
-function populateFormat(freshUser) {
-  document.getElementById('formatOnline').checked =
-    freshUser.format?.includes('Онлайн');
-  const isOffline = freshUser.format?.includes('Офлайн');
-  document.getElementById('formatOffline').checked = isOffline;
-  if (isOffline) {
-    document.getElementById('offlineCity').style.display = 'block';
-    document.getElementById('offlineCity').value = freshUser.city || '';
-  }
-}
 
     async function populateStep2FromUser() {
       // Pull fresh user from API

@@ -402,9 +402,24 @@ async function submitMaterial() {
       if (!link) { alert("Вкажіть посилання на YouTube"); return null; }
       fd.append("videoLink", link);
     } else {
-      const file = document.getElementById("bookFile").files[0];
-      if (!file) { alert("Оберіть PDF файл"); return null; }
-      fd.append("bookFile", file);
+     const file = document.getElementById("bookFile").files[0];
+if (!file) { alert("Оберіть файл (PDF/DOC/DOCX/PPT/PPTX)"); return null; }
+
+const okExt = /\.(pdf|doc|docx|ppt|pptx)$/i.test(file.name);
+const okMime = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+].includes(file.type) || file.type === ""; // інколи браузери не ставлять type
+
+if (!okExt && !okMime) {
+  alert("Підтримуються лише PDF/DOC/DOCX/PPT/PPTX");
+  return null;
+}
+
+fd.append("bookFile", file);
     }
     return fd;
   };
@@ -563,9 +578,17 @@ function toggleInputs(type) {
     </div>
 
     <div class="form-group" id="bookInput" style="display: none;">
-      <label for="bookFile">PDF файл</label>
-      <input type="file" id="bookFile" accept="application/pdf" />
-    </div>
+  <label for="bookFile">Файл (PDF / DOC / DOCX / PPT / PPTX)</label>
+  <input
+    type="file"
+    id="bookFile"
+    accept="application/pdf,
+            application/msword,
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+            application/vnd.ms-powerpoint,
+            application/vnd.openxmlformats-officedocument.presentationml.presentation,
+            .pdf,.doc,.docx,.ppt,.pptx" />
+</div>
 
     <button class="submit-btn" onclick="submitMaterial()">Завантажити</button>
   </div>

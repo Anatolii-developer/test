@@ -183,8 +183,29 @@
   const API_BASE = "http://157.230.121.24:5050";
   let selectAllClicked = false;
   let allUsers = [];
-  const rolesById = new Map();     // _id -> name
-  const rolesByName = new Map();   // name -> _id
+const rolesById = new Map();     // _id -> name
+const rolesByName = new Map();   // name -> _id
+
+// Known folder/section names (remembered locally during the session)
+const knownSections = new Set();
+function refreshSectionSelect() {
+  const selEl = document.getElementById("sectionSelect");
+  if (!selEl) return;
+  // keep the first option as "— Без папки —"
+  const keepFirst = selEl.querySelector("option[value='']");
+  selEl.innerHTML = "";
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = "— Без папки —";
+  selEl.appendChild(first);
+  // add remembered sections
+  Array.from(knownSections).sort().forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    selEl.appendChild(opt);
+  });
+}
 
 
 async function loadRoles() {
@@ -285,6 +306,7 @@ function intersects(a, b) {
 }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    refreshSectionSelect();
     if (typeof renderAdminSidebar === "function") {
       renderAdminSidebar("admin-career-requests.html");
     }
@@ -406,6 +428,7 @@ function openModal(type) {
     nameEl.value = "";
     nameEl.style.display = "block";
   }
+  refreshSectionSelect();
 }
 function closeModal() {
   document.getElementById("addMaterialModal").style.display = "none";
@@ -569,28 +592,11 @@ const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксі�
         : (selEl?.value || "").trim();
       if (sectionChosen) {
         knownSections.add(sectionChosen);
+        refreshSectionSelect();
       }
 
-    alert("Успішно додано!");
-    closeModal();
-// Section mode toggler for modal (new/existing folder)
-document.addEventListener("DOMContentLoaded", () => {
-  const modeEl = document.getElementById("sectionMode");
-  const selEl = document.getElementById("sectionSelect");
-  const nameEl = document.getElementById("sectionName");
-  if (!modeEl) return;
-  const apply = () => {
-    if (modeEl.value === "new") {
-      if (selEl) selEl.style.display = "none";
-      if (nameEl) nameEl.style.display = "block";
-    } else {
-      if (selEl) selEl.style.display = "block";
-      if (nameEl) nameEl.style.display = "none";
-    }
-  };
-  modeEl.addEventListener("change", apply);
-  apply(); // set initial state
-});
+      alert("Успішно додано!");
+      closeModal();
   } catch (err) {
     console.error(err);
     alert(err.message || "Помилка при завантаженні.");

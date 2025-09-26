@@ -139,8 +139,10 @@
   <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
 
 <div id="roleFilterGroup" class="role-filter-group" aria-label="Фільтр за ролями"></div>
-
-</select>
+  <label for="courseSelect" style="margin-left:8px;">Оберіть курс</label>
+  <select id="courseSelect">
+    <option value="">-- Оберіть курс --</option>
+  </select>
 
   <label for="listFolderFilter" style="margin-left:8px;">Папка</label>
   <select id="listFolderFilter" class="folder-select">
@@ -234,6 +236,27 @@ async function loadRoles() {
     `;
     grp.appendChild(wrap);
   });
+}
+
+// Завантаження поточних курсів у селект
+async function loadCurrentCourses() {
+  try {
+    const res = await fetch(`${API_BASE}/api/courses`);
+    if (!res.ok) return;
+    const allCourses = await res.json();
+    const current = Array.isArray(allCourses) ? allCourses.filter(c => c.status === "Поточний") : [];
+    const sel = document.getElementById("courseSelect");
+    if (!sel) return;
+    sel.innerHTML = `<option value="">-- Оберіть курс --</option>`;
+    current.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c._id;
+      opt.textContent = c.courseTitle || "Курс";
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    console.warn("Не вдалося завантажити курси:", e);
+  }
 }
 
 
@@ -330,20 +353,6 @@ function intersects(a, b) {
     }
 
     // 2) Курси
-    async function loadCurrentCourses() {
-      const res = await fetch(`${API_BASE}/api/courses`);
-      const allCourses = await res.json();
-      const currentCourses = allCourses.filter(c => c.status === "Поточний");
-
-      const courseSelect = document.getElementById("courseSelect");
-      courseSelect.innerHTML = `<option value="">-- Оберіть курс --</option>`;
-      currentCourses.forEach(course => {
-        const opt = document.createElement("option");
-        opt.value = course._id;
-        opt.textContent = course.courseTitle;
-        courseSelect.appendChild(opt);
-      });
-    }
     await loadCurrentCourses();
 
     // 3) Користувачі
@@ -690,73 +699,6 @@ function toggleInputs(type) {
   });
 });
 
-  </script>
- <div id="addMaterialModal" class="modal" style="display:none;">
-  <div class="modal-overlay" onclick="closeModal()"></div>
-  <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">×</span>
-    <h2>Додати матеріал</h2>
-
-    <div class="form-group">
-      <label for="materialType">Тип матеріалу</label>
-      <select id="materialType">
-        <option value="video">🎥 Відео (YouTube)</option>
-        <option value="book">📘 Файл (PDF / DOC / DOCX / PPT / PPTX)</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="materialTitle">Назва</label>
-      <input type="text" id="materialTitle" placeholder="Введіть назву" />
-    </div>
-
-    <div class="form-group">
-      <label for="materialDescription">Опис</label>
-      <textarea id="materialDescription" placeholder="Короткий опис..."></textarea>
-    </div>
-
-    <!-- Section / Folder selector -->
-    <div class="form-group">
-      <label>Папка / розділ</label>
-      <div class="form-row-inline">
-        <select id="sectionMode">
-          <option value="existing">Обрати існуючу</option>
-          <option value="new">Створити нову</option>
-        </select>
-        <select id="sectionSelect" class="folder-select">
-          <option value="">— Без папки —</option>
-        </select>
-      </div>
-      <input type="text" id="sectionName" placeholder="Назва папки (наприклад, Тиждень 3)" style="display:none; margin-top:8px;" />
-      <small class="hint">Папка групує матеріали курсу (наприклад, «Тиждень 1»). Адмін може ввести будь‑яку назву.</small>
-    </div>
-
-    <div class="form-group" id="videoInput" style="display: none;">
-      <label for="videoLink">Посилання на YouTube</label>
-      <input type="url" id="videoLink" placeholder="https://www.youtube.com/watch?v=..." />
-    </div>
-
-    <div class="form-group" id="bookInput" style="display: none;">
-  <label for="bookFile">Файл (PDF / DOC / DOCX / PPT / PPTX)</label>
-  <input
-    type="file"
-    id="bookFile"
-    accept="application/pdf,
-            application/msword,
-            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-            application/vnd.ms-powerpoint,
-            application/vnd.openxmlformats-officedocument.presentationml.presentation,
-            .pdf,.doc,.docx,.ppt,.pptx" />
-</div>
-
-    <button class="submit-btn" onclick="submitMaterial()">Завантажити</button>
-  </div>
-</div>
-
-</div>
-</body>
-</html>
-
   // ======== MATERIALS LIST / EDIT / DELETE ========
 
   function getCurrentDestination() {
@@ -1001,3 +943,65 @@ function toggleInputs(type) {
       folderSel.addEventListener("change", loadExistingMaterials);
     }
   });
+  </script>
+ <div id="addMaterialModal" class="modal" style="display:none;">
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">×</span>
+    <h2>Додати матеріал</h2>
+
+    <div class="form-group">
+      <label for="materialType">Тип матеріалу</label>
+      <select id="materialType">
+        <option value="video">🎥 Відео (YouTube)</option>
+        <option value="book">📘 Файл (PDF / DOC / DOCX / PPT / PPTX)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="materialTitle">Назва</label>
+      <input type="text" id="materialTitle" placeholder="Введіть назву" />
+    </div>
+
+    <div class="form-group">
+      <label for="materialDescription">Опис</label>
+      <textarea id="materialDescription" placeholder="Короткий опис..."></textarea>
+    </div>
+
+    <!-- Section / Folder selector -->
+    <div class="form-group">
+      <label>Папка / розділ</label>
+      <div class="form-row-inline">
+        <select id="sectionMode">
+          <option value="existing">Обрати існуючу</option>
+          <option value="new">Створити нову</option>
+        </select>
+        <select id="sectionSelect" class="folder-select">
+          <option value="">— Без папки —</option>
+        </select>
+      </div>
+      <input type="text" id="sectionName" placeholder="Назва папки (наприклад, Тиждень 3)" style="display:none; margin-top:8px;" />
+      <small class="hint">Папка групує матеріали курсу (наприклад, «Тиждень 1»). Адмін може ввести будь‑яку назву.</small>
+    </div>
+
+    <div class="form-group" id="videoInput" style="display: none;">
+      <label for="videoLink">Посилання на YouTube</label>
+      <input type="url" id="videoLink" placeholder="https://www.youtube.com/watch?v=..." />
+    </div>
+
+    <div class="form-group" id="bookInput" style="display: none;">
+  <label for="bookFile">Файл (PDF / DOC / DOCX / PPT / PPTX)</label>
+  <input
+    type="file"
+    id="bookFile"
+    accept="application/pdf,
+            application/msword,
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+            application/vnd.ms-powerpoint,
+            application/vnd.openxmlformats-officedocument.presentationml.presentation,
+            .pdf,.doc,.docx,.ppt,.pptx" />
+</div>
+
+    <button class="submit-btn" onclick="submitMaterial()">Завантажити</button>
+  </div>
+</div>

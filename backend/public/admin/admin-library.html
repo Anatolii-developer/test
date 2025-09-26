@@ -276,6 +276,7 @@ function intersects(a, b) {
             src="images/checkbox-empty.png" 
             alt="checkbox" 
             class="custom-checkbox" 
+            data-user-id="${user._id || ''}"
             data-role-ids='${JSON.stringify(roleIds)}'
             data-checked="false"
             style="width: 24px; height: 24px; cursor: pointer;" />
@@ -357,8 +358,19 @@ function intersects(a, b) {
       try {
         const res = await fetch(`${API_BASE}/api/courses/${courseId}/participants`);
         const users = await res.json();
-        allUsers = users;
-        applyFilters();
+        allUsers = users; applyFilters();
+        // load folders for the selected course to allow choosing existing sections
+        try {
+          const fr = await fetch(`${API_BASE}/api/library/folders?destination=courses&amp;courseId=${courseId}`);
+          if (fr.ok) {
+            const folders = await fr.json();
+            knownSections.clear();
+            folders.filter(Boolean).forEach(n => knownSections.add(n));
+            refreshSectionSelect();
+          }
+        } catch (e2) {
+          console.warn('Не вдалося завантажити папки курсу:', e2);
+        }
       } catch (err) {
         console.error("Помилка при отриманні учасників курсу:", err);
       }
@@ -441,6 +453,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const modeEl = document.getElementById("sectionMode");
+  const selEl  = document.getElementById("sectionSelect");
+  const nameEl = document.getElementById("sectionName");
+  if (modeEl && selEl && nameEl) {
+    const sync = () => {
+      if (modeEl.value === "new") {
+        nameEl.style.display = "block";
+        selEl.style.display  = "none";
+      } else {
+        nameEl.style.display = "none";
+        selEl.style.display  = "block";
+      }
+    };
+    modeEl.addEventListener("change", sync);
+    sync();
+  }
+});
+
 
 async function submitMaterial() {
   const type = document.getElementById("materialType").value;
@@ -449,6 +480,11 @@ async function submitMaterial() {
   const selectedCourseId = document.getElementById("courseSelect").value;
 
 const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксів
+  // конкретні користувачі (галочки у таблиці)
+  const selectedUserIds = Array
+    .from(document.querySelectorAll('.custom-checkbox[data-checked="true"]'))
+    .map(cb => cb.dataset.userId)
+    .filter(Boolean);
 
   // базовая валидация
   if (!title) return alert("Введіть назву матеріалу");
@@ -499,6 +535,8 @@ const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксі�
    if (section) {
   fd.append("folder", section);
 }
+    // адресати (якщо обрані конкретні користувачі)
+    selectedUserIds.forEach(id => fd.append('users[]', id));
     return fd;
   };
 

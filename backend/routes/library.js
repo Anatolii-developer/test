@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs");
 
 // ВАЖНО: используем ту модель, где есть поле `folder`
-const Library = require("../models/Library"); // ← было ../models/LibraryModel
+const Library = require("../models/LibraryModel"); // ← было ../models/LibraryModel
 
 // === upload dir (публичная папка!) ===
 const uploadDir = path.join(__dirname, "../public/uploads/books");

@@ -140,11 +140,12 @@
 
 <div id="roleFilterGroup" class="role-filter-group" aria-label="Фільтр за ролями"></div>
 
-  <label for="courseSelect">Оберіть курс</label>
-<select id="courseSelect">
-  <option value="">-- Оберіть курс --</option>
 </select>
 
+  <label for="listFolderFilter" style="margin-left:8px;">Папка</label>
+  <select id="listFolderFilter" class="folder-select">
+    <option value="">— Усі папки —</option>
+  </select>
 
   <button id="selectAllBtn" class="btn-light-green">Виділити всіх</button>
 </div>
@@ -175,6 +176,9 @@
       </div>
 
       <button class="submit-button">Submit</button>
+      <hr style="margin:24px 0;">
+      <h3>Існуючі матеріали</h3>
+      <div id="materialsList" style="display:grid; gap:12px;"></div>
     </div>
   </div>
   <script src="admin-auth.js"></script>
@@ -361,7 +365,7 @@ function intersects(a, b) {
         allUsers = users; applyFilters();
         // load folders for the selected course to allow choosing existing sections
         try {
-          const fr = await fetch(`${API_BASE}/api/library/folders?destination=courses&amp;courseId=${courseId}`);
+          const fr = await fetch(`${API_BASE}/api/library/folders?destination=courses&courseId=${courseId}`);
           if (fr.ok) {
             const folders = await fr.json();
             knownSections.clear();
@@ -443,7 +447,18 @@ function openModal(type) {
   refreshSectionSelect();
 }
 function closeModal() {
-  document.getElementById("addMaterialModal").style.display = "none";
+  const m = document.getElementById("addMaterialModal");
+  if (!m) return;
+  m.style.display = "none";
+  // clear edit mode flag
+  delete m.dataset.editId;
+  // clear fields
+  document.getElementById("materialTitle").value = "";
+  document.getElementById("materialDescription").value = "";
+  const vl = document.getElementById("videoLink"); if (vl) vl.value = "";
+  const bf = document.getElementById("bookFile"); if (bf) bf.value = "";
+  const nameEl = document.getElementById("sectionName"); if (nameEl) nameEl.value = "";
+  const selEl  = document.getElementById("sectionSelect"); if (selEl) selEl.value = "";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -741,3 +756,248 @@ function toggleInputs(type) {
 </div>
 </body>
 </html>
+
+  // ======== MATERIALS LIST / EDIT / DELETE ========
+
+  function getCurrentDestination() {
+    const selectedRoleIds = getSelectedRoleIds();
+    const courseId = document.getElementById("courseSelect").value;
+    if (selectedRoleIds.length > 0) return { destination: "addons", courseId: "", roleIds: selectedRoleIds };
+    if (courseId) return { destination: "courses", courseId, roleIds: [] };
+    return { destination: "general", courseId: "", roleIds: [] };
+  }
+
+  async function refreshFolderFilter() {
+    const { destination, courseId } = getCurrentDestination();
+    // populate folder filter based on current destination
+    const sel = document.getElementById("listFolderFilter");
+    if (!sel) return;
+    sel.innerHTML = `<option value="">— Усі папки —</option>`;
+    const params = new URLSearchParams();
+    if (destination) params.set("destination", destination);
+    if (courseId && destination === "courses") params.set("courseId", courseId);
+    try {
+      const r = await fetch(`${API_BASE}/api/library/folders?${params.toString()}`);
+      if (r.ok) {
+        const folders = await r.json();
+        folders.filter(Boolean).sort().forEach(f => {
+          const opt = document.createElement("option");
+          opt.value = f;
+          opt.textContent = f;
+          sel.appendChild(opt);
+        });
+      }
+    } catch (e) {
+      console.warn("Не вдалося оновити список папок:", e);
+    }
+  }
+
+  async function loadExistingMaterials() {
+    const listEl = document.getElementById("materialsList");
+    if (!listEl) return;
+    listEl.innerHTML = "<div>Завантаження...</div>";
+
+    const { destination, courseId } = getCurrentDestination();
+    const folder = document.getElementById("listFolderFilter")?.value || "";
+
+    const params = new URLSearchParams();
+    params.set("destination", destination);
+    if (courseId && destination === "courses") params.set("courseId", courseId);
+    if (folder) params.set("folder", folder);
+
+    try {
+      const r = await fetch(`${API_BASE}/api/library?${params.toString()}`);
+      const items = r.ok ? await r.json() : [];
+      renderMaterialsList(items);
+    } catch (e) {
+      console.error(e);
+      listEl.innerHTML = "<div>Помилка завантаження списку.</div>";
+    }
+  }
+
+  function renderMaterialsList(items) {
+    const listEl = document.getElementById("materialsList");
+    if (!listEl) return;
+    if (!Array.isArray(items) || !items.length) {
+      listEl.innerHTML = "<div>Нічого не знайдено для поточних фільтрів.</div>";
+      return;
+    }
+    listEl.innerHTML = "";
+    items.forEach(it => {
+      const row = document.createElement("div");
+      row.style.border = "1px solid #eee";
+      row.style.borderRadius = "10px";
+      row.style.padding = "12px";
+      row.style.background = "#fff";
+
+      const meta = [
+        it.destination ? `📦 ${it.destination}` : "",
+        it.folder ? `📁 ${it.folder}` : "",
+        it.courseId ? `🎓 ${it.courseId}` : "",
+        it.role ? `👥 ${it.role}` : ""
+      ].filter(Boolean).join(" • ");
+
+      const title = it.title || (it.type === "video" ? "Відео" : "Файл");
+      const desc  = it.description || "";
+
+      const openPreview = () => {
+        if (it.type === "video" && it.videoLink) {
+          window.open(it.videoLink, "_blank", "noopener");
+        } else if (it.filePath) {
+          const url = it.filePath.startsWith("http") ? it.filePath : `${API_BASE}/${it.filePath.replace(/^\/+/, "")}`;
+          window.open(url, "_blank", "noopener");
+        }
+      };
+
+      row.innerHTML = `
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+          <div style="flex:1 1 auto;">
+            <div style="font-weight:600;">${escapeHtml(title)}</div>
+            ${desc ? `<div style="opacity:.8; font-size:14px;">${escapeHtml(desc)}</div>` : ""}
+            ${meta ? `<div style="margin-top:6px; font-size:12px; opacity:.7;">${escapeHtml(meta)}</div>` : ""}
+          </div>
+          <div style="display:flex; gap:8px; flex:0 0 auto;">
+            <button type="button" class="view-btn" data-id="${it._id}">Відкрити</button>
+            <button type="button" class="view-btn" data-action="edit" data-id="${it._id}">✏️ Редагувати</button>
+            <button type="button" class="view-btn" data-action="delete" data-id="${it._id}" style="border-color:#b3261e; color:#b3261e;">🗑 Видалити</button>
+          </div>
+        </div>
+      `;
+
+      row.querySelector('[data-id]').addEventListener('click', openPreview);
+      row.querySelector('[data-action="edit"]').addEventListener('click', () => openEditModal(it));
+      row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteMaterial(it._id));
+
+      listEl.appendChild(row);
+    });
+  }
+
+  async function deleteMaterial(id) {
+    if (!confirm("Видалити матеріал?")) return;
+    try {
+      const r = await fetch(`${API_BASE}/api/library/${id}`, { method: "DELETE" });
+      if (!r.ok) throw new Error("Не вдалося видалити");
+      await loadExistingMaterials();
+    } catch (e) {
+      alert(e.message || "Помилка видалення");
+    }
+  }
+
+  // ----- EDIT MODAL -----
+  function openEditModal(item) {
+    // переиспользуем існуюче модальне вікно додавання
+    openModal(item.type);
+    // проставляємо значення
+    document.getElementById("materialTitle").value = item.title || "";
+    document.getElementById("materialDescription").value = item.description || "";
+    const modeEl = document.getElementById("sectionMode");
+    const selEl  = document.getElementById("sectionSelect");
+    const nameEl = document.getElementById("sectionName");
+
+    // Якщо є папка — покажемо як existing, і поставимо значення
+    if (item.folder) {
+      if (modeEl) modeEl.value = "existing";
+      if (selEl) {
+        refreshSectionSelect();
+        selEl.style.display = "block";
+        selEl.value = item.folder;
+      }
+      if (nameEl) nameEl.style.display = "none";
+    } else {
+      if (modeEl) modeEl.value = "existing";
+      if (selEl) { refreshSectionSelect(); selEl.value = ""; selEl.style.display = "block"; }
+      if (nameEl) nameEl.style.display = "none";
+    }
+
+    // для відео — вставимо посилання
+    if (item.type === "video") {
+      document.getElementById("videoLink").value = item.videoLink || "";
+    }
+
+    // помітимо, що це режим редагування
+    document.getElementById("addMaterialModal").dataset.editId = item._id;
+  }
+
+  // перехватываем submitMaterial для режиму редагування
+  const originalSubmitMaterial = submitMaterial;
+  submitMaterial = async function () {
+    const editId = document.getElementById("addMaterialModal").dataset.editId;
+    if (!editId) {
+      // звичайне створення
+      return originalSubmitMaterial();
+    }
+
+    // збирання даних як у створенні
+    const type = document.getElementById("materialType").value;
+    const title = document.getElementById("materialTitle").value?.trim();
+    const description = document.getElementById("materialDescription").value?.trim();
+
+    if (!title) return alert("Введіть назву матеріалу");
+
+    const fd = new FormData();
+    fd.append("title", title);
+    fd.append("description", description || "");
+
+    // folder
+    const modeEl = document.getElementById("sectionMode");
+    const selEl  = document.getElementById("sectionSelect");
+    const nameEl = document.getElementById("sectionName");
+    let folder = "";
+    if (modeEl) {
+      folder = modeEl.value === "new"
+        ? (nameEl?.value || "").trim()
+        : (selEl?.value || "").trim();
+    }
+    fd.append("folder", folder);
+
+    if (type === "video") {
+      const link = document.getElementById("videoLink").value?.trim() || "";
+      fd.append("videoLink", link);
+    } else {
+      const file = document.getElementById("bookFile").files[0];
+      if (file) {
+        // опціонально можна замінити файл
+        fd.append("bookFile", file);
+      }
+    }
+
+    try {
+      const r = await fetch(`${API_BASE}/api/library/${editId}`, {
+        method: "PUT",
+        body: fd
+      });
+      if (!r.ok) throw new Error("Не вдалося зберегти зміни");
+      // зачистка режиму редагування
+      delete document.getElementById("addMaterialModal").dataset.editId;
+      closeModal();
+      await loadExistingMaterials();
+      alert("Змінено");
+    } catch (e) {
+      alert(e.message || "Помилка збереження");
+    }
+  };
+
+  // оновлювати список при зміні фільтрів
+  document.addEventListener("DOMContentLoaded", () => {
+    // перше завантаження
+    refreshFolderFilter().then(loadExistingMaterials);
+    // оновлювати при зміні курсу/ролей/папки
+    const courseSel = document.getElementById("courseSelect");
+    if (courseSel) {
+      courseSel.addEventListener("change", async () => {
+        await refreshFolderFilter();
+        await loadExistingMaterials();
+      });
+    }
+    const roleFilterGroup = document.getElementById("roleFilterGroup");
+    if (roleFilterGroup) {
+      roleFilterGroup.addEventListener("change", async () => {
+        await refreshFolderFilter();
+        await loadExistingMaterials();
+      });
+    }
+    const folderSel = document.getElementById("listFolderFilter");
+    if (folderSel) {
+      folderSel.addEventListener("change", loadExistingMaterials);
+    }
+  });

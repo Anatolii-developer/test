@@ -244,7 +244,7 @@ body{
       <div class="filters">
         <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
 
-        <div id="roleFilterWrap" style="display: none">
+        <div id="roleFilterWrap">
           <div
             id="roleFilterGroup"
             class="role-filter-group"
@@ -252,22 +252,20 @@ body{
           ></div>
         </div>
 
+        <label for="listFolderFilter" style="margin-left: 8px">Папка</label>
+        <select id="listFolderFilter" class="folder-select">
+          <option value="">— Усі папки —</option>
+        </select>
+
+        <button id="selectAllBtn" class="btn-light-green">
+          Виділити всіх
+        </button>
+
         <div id="courseFilterWrap" style="display: none">
-          <label for="courseSelect" style="margin-left: 8px"
-            >Оберіть курс</label
-          >
+          <label for="courseSelect" style="margin-left: 8px">Оберіть курс</label>
           <select id="courseSelect">
             <option value="">-- Оберіть курс --</option>
           </select>
-
-          <label for="listFolderFilter" style="margin-left: 8px">Папка</label>
-          <select id="listFolderFilter" class="folder-select">
-            <option value="">— Усі папки —</option>
-          </select>
-
-          <button id="selectAllBtn" class="btn-light-green">
-            Виділити всіх
-          </button>
         </div>
       </div>
       <div class="table-wrap">
@@ -395,10 +393,8 @@ body{
 
         const roleWrap = document.getElementById("roleFilterWrap");
         const courseWrap = document.getElementById("courseFilterWrap");
-        if (roleWrap)
-          roleWrap.style.display = dest === "addons" ? "block" : "none";
-        if (courseWrap)
-          courseWrap.style.display = dest === "courses" ? "block" : "none";
+        if (roleWrap) roleWrap.style.display = "block"; // ролі видно всюди
+        if (courseWrap) courseWrap.style.display = dest === "courses" ? "block" : "none"; // курс тільки для "Матеріали курсу"
 
         refreshFolderFilter().then(loadExistingMaterials);
       }
@@ -750,22 +746,11 @@ body{
           return fd;
         };
 
-        // КУДА слать: роли / курс / всем
-        const destinationByRoles = selectedRoleIds.length > 0;
-        const destinationByCourse = !destinationByRoles && !!selectedCourseId;
-        const destinationGeneral =
-          !destinationByRoles &&
-          !destinationByCourse &&
-          !!window.selectAllClicked;
+        // Куди слати: залежить тільки від активної вкладки
+        const dest = currentDestination; // "general" | "addons" | "courses"
 
-        if (
-          !destinationByRoles &&
-          !destinationByCourse &&
-          !destinationGeneral
-        ) {
-          alert(
-            "Будь ласка, виберіть курс, ролі або натисніть 'Виділити всіх'"
-          );
+        if (dest === "courses" && !selectedCourseId) {
+          alert("Оберіть курс");
           return;
         }
 
@@ -779,74 +764,53 @@ body{
         };
 
         try {
-          if (destinationByRoles) {
-            // ===== 1) сначала пробуем одним запросом с массивом roleIds[] =====
-            let fd = buildBaseForm();
-            if (!fd) return;
+          let fd = buildBaseForm();
+          if (!fd) return;
 
+          if (dest === "general") {
+            fd.append("destination", "general");
+          } else if (dest === "addons") {
             fd.append("destination", "addons");
+            // Якщо адміністратор вибрав ролі — додаємо масив roleIds[]
             selectedRoleIds.forEach((id) => fd.append("roleIds[]", id));
-            // имена ролей на всякий (если бэку пригодятся)
             selectedRoleIds
               .map((id) => rolesById.get(String(id)))
               .filter(Boolean)
               .forEach((name) => fd.append("roles[]", name));
-
-            let res = await sendOnce(fd);
-
-            if (!res.ok) {
-              // ===== 2) фолбек — по одному запросу на каждую роль =====
-              // полезно, если бэк принимает только roleId (не массив)
-              for (const roleId of selectedRoleIds) {
-                let fdOne = buildBaseForm();
-                if (!fdOne) return;
-                fdOne.append("destination", "addons");
-                fdOne.append("roleId", roleId);
-                const roleName = rolesById.get(String(roleId));
-                if (roleName) fdOne.append("role", roleName);
-
-                const r = await sendOnce(fdOne);
-                if (!r.ok) {
-                  let msg = "Помилка при завантаженні.";
-                  try {
-                    const j = await r.clone().json();
-                    msg = j?.message || msg;
-                  } catch {}
-                  throw new Error(msg);
-                }
-              }
-            }
-          } else if (destinationByCourse) {
-            // отправка для выбранного курса
-            let fd = buildBaseForm();
-            if (!fd) return;
+          } else if (dest === "courses") {
             fd.append("destination", "courses");
             fd.append("courseId", selectedCourseId);
+          }
 
-            const res = await sendOnce(fd);
-            if (!res.ok) {
-              let msg = "Помилка при завантаженні.";
-              try {
-                const j = await res.clone().json();
-                msg = j?.message || msg;
-              } catch {}
-              throw new Error(msg);
-            }
-          } else if (destinationGeneral) {
-            // отправка всем
-            let fd = buildBaseForm();
-            if (!fd) return;
-            fd.append("destination", "general");
+          const res = await sendOnce(fd);
 
-            const res = await sendOnce(fd);
-            if (!res.ok) {
-              let msg = "Помилка при завантаженні.";
-              try {
-                const j = await res.clone().json();
-                msg = j?.message || msg;
-              } catch {}
-              throw new Error(msg);
+          // Фолбек: якщо бекенд не прийняв roleIds[] масив — шлемо по одній ролі
+          if (!res.ok && dest === "addons" && selectedRoleIds.length) {
+            for (const roleId of selectedRoleIds) {
+              let fdOne = buildBaseForm();
+              if (!fdOne) return;
+              fdOne.append("destination", "addons");
+              fdOne.append("roleId", roleId);
+              const roleName = rolesById.get(String(roleId));
+              if (roleName) fdOne.append("role", roleName);
+
+              const r = await sendOnce(fdOne);
+              if (!r.ok) {
+                let msg = "Помилка при завантаженні.";
+                try {
+                  const j = await r.clone().json();
+                  msg = j?.message || msg;
+                } catch {}
+                throw new Error(msg);
+              }
             }
+          } else if (!res.ok) {
+            let msg = "Помилка при завантаженні.";
+            try {
+              const j = await res.clone().json();
+              msg = j?.message || msg;
+            } catch {}
+            throw new Error(msg);
           }
 
           // remember section if provided
@@ -1218,7 +1182,7 @@ body{
         }
       });
     </script>
-    <div id="addMaterialModal" class="modal" style="display: none">
+      <div id="addMaterialModal" class="modal" style="display: none">
       <div class="modal-overlay" onclick="closeModal()"></div>
       <div class="modal-content">
         <span class="close-btn" onclick="closeModal()">×</span>

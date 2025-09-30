@@ -1,181 +1,298 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Бібліотека курсів</title>
-  <link rel="stylesheet" href="admin-styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Бібліотека курсів</title>
+    <link rel="stylesheet" href="admin-styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-.modal-overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-}
+      .modal-overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+      }
 
-.modal-content {
-  position: relative;
-  background: #fff;
-  border-radius: 16px;
-  max-width: 480px;
-  width: 90%;
-  padding: 32px;
-  z-index: 10;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  font-family: 'Poppins', sans-serif;
-}
+      .modal-content {
+        position: relative;
+        background: #fff;
+        border-radius: 16px;
+        max-width: 480px;
+        width: 90%;
+        padding: 32px;
+        z-index: 10;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        font-family: "Poppins", sans-serif;
+      }
 
-.modal-content h2 {
-  margin-top: 0;
-  font-size: 22px;
-  margin-bottom: 20px;
-  text-align: center;
-}
+      .modal-content h2 {
+        margin-top: 0;
+        font-size: 22px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
 
-.close-btn {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #888;
-}
+      .close-btn {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #888;
+      }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 18px;
-}
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
 
-    .form-group label {
-  font-weight: 500;
-  font-size: 14px;
-}
+      .form-group label {
+        font-weight: 500;
+        font-size: 14px;
+      }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: 'Poppins', sans-serif;
-}
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: "Poppins", sans-serif;
+      }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-}
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
 
-.submit-btn {
-  width: 100%;
-  background-color: #48a868;
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+      .submit-btn {
+        width: 100%;
+        background-color: #48a868;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
 
-.submit-btn:hover {
-  background-color: #3c9359;
-}
+      .submit-btn:hover {
+        background-color: #3c9359;
+      }
 
-.role-filter-group { display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin: 6px 0 0; }
-.role-filter-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+      .role-filter-group {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        margin: 6px 0 0;
+      }
+      .role-filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
 
-  /* --- Folders (Sections) UI --- */
-  .folder-select,
-  #sectionMode,
-  #sectionName {
-    padding: 10px 12px;
-    border: 1px solid #e6c7a7;
-    background: #FFEED9; /* requested color */
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-  }
-  .hint {
-    display: block;
-    margin-top: 6px;
-    font-size: 12px;
-    color: #666;
-  }
-  .form-row-inline {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
+      /* --- Folders (Sections) UI --- */
+      .folder-select,
+      #sectionMode,
+      #sectionName {
+        padding: 10px 12px;
+        border: 1px solid #e6c7a7;
+        background: #ffeed9; /* requested color */
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: "Poppins", sans-serif;
+      }
+      .hint {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #666;
+      }
+      .form-row-inline {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
 
-  /* Destination tabs */
-.dest-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.dest-tab{
-  background:#275D2B;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  padding:10px 14px;
-  font-size:14px;
-  cursor:pointer;
-  transition:background .15s, box-shadow .15s;
-}
-.dest-tab:hover{background:#2F6F37}
-.dest-tab.active{
-  background:#4FA369; /* світліший для активної */
-  box-shadow:0 0 0 2px rgba(79,163,105,.25) inset;
-}
+      /* Destination tabs */
+      .dest-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      .dest-tab {
+        background: #275d2b;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.15s, box-shadow 0.15s;
+      }
+      .dest-tab:hover {
+        background: #2f6f37;
+      }
+      .dest-tab.active {
+        background: #4fa369; /* світліший для активної */
+        box-shadow: 0 0 0 2px rgba(79, 163, 105, 0.25) inset;
+      }
 
-  </style>
-</head>
-<body class="with-sidebar">
-  <aside class="sidebar" id="sidebar"></aside>
+      /* ----- Layout fixes ----- */
+      .content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 16px;
+        box-sizing: border-box;
+      }
+      .materials-header {
+        max-width: 1200px;
+        margin: 12px auto 8px;
+        padding: 0 16px;
+      }
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 12px;
+        margin: 12px auto 16px;
+        max-width: 1200px;
+        padding: 0 16px;
+      }
+      .participants-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto 16px;
+        max-width: 1200px;
+      }
+      .participants-table th,
+      .participants-table td {
+        border-bottom: 1px solid #eee;
+        padding: 10px 12px;
+        text-align: left;
+        font-size: 14px;
+      }
+      .date-time,
+      .action-buttons {
+        max-width: 1200px;
+        margin: 0 auto 16px;
+        padding: 0 16px;
+      }
+      .submit-button {
+        display: block;
+        margin: 0 auto 24px;
+      }
 
-   <div class="materials-header">
-  <div class="dest-tabs" role="tablist" aria-label="Тип матеріалів">
-    <button type="button" class="dest-tab active" data-dest="general" aria-pressed="true">Загальні матеріали</button>
-    <button type="button" class="dest-tab" data-dest="addons" aria-pressed="false">Додаткові матеріали</button>
-    <button type="button" class="dest-tab" data-dest="courses" aria-pressed="false">Матеріали курсу</button>
-  </div>
-</div>
+      /* Модалка поверх всего */
+      .modal {
+        z-index: 9999;
+      }
 
-     <div class="filters">
-  <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
+      /* Вкладки (активная — светлее) */
+      .dest-tab {
+        background: #275d2b;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.15s, box-shadow 0.15s;
+      }
+      .dest-tab:hover {
+        background: #2f6f37;
+      }
+      .dest-tab.active {
+        background: #4fa369;
+        box-shadow: 0 0 0 2px rgba(79, 163, 105, 0.25) inset;
+      }
+    </style>
+  </head>
+  <body class="with-sidebar">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <div class="materials-header">
+        <div class="dest-tabs" role="tablist" aria-label="Тип матеріалів">
+          <button
+            type="button"
+            class="dest-tab active"
+            data-dest="general"
+            aria-pressed="true"
+          >
+            Загальні матеріали
+          </button>
+          <button
+            type="button"
+            class="dest-tab"
+            data-dest="addons"
+            aria-pressed="false"
+          >
+            Додаткові матеріали
+          </button>
+          <button
+            type="button"
+            class="dest-tab"
+            data-dest="courses"
+            aria-pressed="false"
+          >
+            Матеріали курсу
+          </button>
+        </div>
+      </div>
 
-<div id="roleFilterWrap" style="display:none;">
-  <div id="roleFilterGroup" class="role-filter-group" aria-label="Фільтр за ролями"></div>
-</div>
+      <div class="filters">
+        <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
 
-<div id="courseFilterWrap" style="display:none;">
-  <label for="courseSelect" style="margin-left:8px;">Оберіть курс</label>
-  <select id="courseSelect">
-    <option value="">-- Оберіть курс --</option>
-  </select>
+        <div id="roleFilterWrap" style="display: none">
+          <div
+            id="roleFilterGroup"
+            class="role-filter-group"
+            aria-label="Фільтр за ролями"
+          ></div>
+        </div>
 
-  <label for="listFolderFilter" style="margin-left:8px;">Папка</label>
-  <select id="listFolderFilter" class="folder-select">
-    <option value="">— Усі папки —</option>
-  </select>
+        <div id="courseFilterWrap" style="display: none">
+          <label for="courseSelect" style="margin-left: 8px"
+            >Оберіть курс</label
+          >
+          <select id="courseSelect">
+            <option value="">-- Оберіть курс --</option>
+          </select>
 
-  <button id="selectAllBtn" class="btn-light-green">Виділити всіх</button>
-</div>
+          <label for="listFolderFilter" style="margin-left: 8px">Папка</label>
+          <select id="listFolderFilter" class="folder-select">
+            <option value="">— Усі папки —</option>
+          </select>
 
+          <button id="selectAllBtn" class="btn-light-green">
+            Виділити всіх
+          </button>
+        </div>
+      </div>
       <table class="participants-table">
         <thead>
           <tr>
@@ -202,137 +319,143 @@
       </div>
 
       <button class="submit-button">Submit</button>
-      <hr style="margin:24px 0;">
+      <hr style="margin: 24px 0" />
       <h3>Існуючі матеріали</h3>
-      <div id="materialsList" style="display:grid; gap:12px;"></div>
+      <div id="materialsList" style="display: grid; gap: 12px"></div>
     </div>
-  </div>
-  <script src="admin-auth.js"></script>
-  
-  <script>
-  const API_BASE = "http://157.230.121.24:5050";
-  let selectAllClicked = false;
-  let allUsers = [];
-const rolesById = new Map();     // _id -> name
-const rolesByName = new Map();   // name -> _id
+    <script src="admin-auth.js"></script>
 
-// Known folder/section names (remembered locally during the session)
-const knownSections = new Set();
-function refreshSectionSelect() {
-  const selEl = document.getElementById("sectionSelect");
-  if (!selEl) return;
-  // keep the first option as "— Без папки —"
-  const keepFirst = selEl.querySelector("option[value='']");
-  selEl.innerHTML = "";
-  const first = document.createElement("option");
-  first.value = "";
-  first.textContent = "— Без папки —";
-  selEl.appendChild(first);
-  // add remembered sections
-  Array.from(knownSections).sort().forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    selEl.appendChild(opt);
-  });
-}
+    <script>
+      const API_BASE = "http://157.230.121.24:5050";
+      let selectAllClicked = false;
+      let allUsers = [];
+      const rolesById = new Map(); // _id -> name
+      const rolesByName = new Map(); // name -> _id
 
+      // Known folder/section names (remembered locally during the session)
+      const knownSections = new Set();
+      function refreshSectionSelect() {
+        const selEl = document.getElementById("sectionSelect");
+        if (!selEl) return;
+        // keep the first option as "— Без папки —"
+        const keepFirst = selEl.querySelector("option[value='']");
+        selEl.innerHTML = "";
+        const first = document.createElement("option");
+        first.value = "";
+        first.textContent = "— Без папки —";
+        selEl.appendChild(first);
+        // add remembered sections
+        Array.from(knownSections)
+          .sort()
+          .forEach((name) => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.textContent = name;
+            selEl.appendChild(opt);
+          });
+      }
 
-async function loadRoles() {
-  const res = await fetch(`${API_BASE}/api/roles`);
-  if (!res.ok) throw new Error('Не вдалося отримати ролі');
-  const roles = await res.json(); // [{ _id, name }]
+      async function loadRoles() {
+        const res = await fetch(`${API_BASE}/api/roles`);
+        if (!res.ok) throw new Error("Не вдалося отримати ролі");
+        const roles = await res.json(); // [{ _id, name }]
 
-  const grp = document.getElementById("roleFilterGroup");
-  if (!grp) return;
-  grp.innerHTML = "";
+        const grp = document.getElementById("roleFilterGroup");
+        if (!grp) return;
+        grp.innerHTML = "";
 
-  roles.forEach(r => {
-    const idStr = String(r._id);
-    rolesById.set(idStr, r.name);
-    rolesByName.set(r.name, idStr);
+        roles.forEach((r) => {
+          const idStr = String(r._id);
+          rolesById.set(idStr, r.name);
+          rolesByName.set(r.name, idStr);
 
-    const wrap = document.createElement("label");
-    wrap.className = "role-filter-item";
-    wrap.innerHTML = `
+          const wrap = document.createElement("label");
+          wrap.className = "role-filter-item";
+          wrap.innerHTML = `
       <input type="checkbox" name="roleFilter[]" value="${idStr}" />
       <span>${r.name}</span>
     `;
-    grp.appendChild(wrap);
-  });
-}
+          grp.appendChild(wrap);
+        });
+      }
 
-// Завантаження поточних курсів у селект
-async function loadCurrentCourses() {
-  try {
-    const res = await fetch(`${API_BASE}/api/courses`);
-    if (!res.ok) return;
-    const allCourses = await res.json();
-    const sel = document.getElementById("courseSelect");
-    if (!sel) return;
-    sel.innerHTML = `<option value="">-- Оберіть курс --</option>`;
-    (Array.isArray(allCourses) ? allCourses : []).forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c._id;
-      opt.textContent = c.courseTitle || "Курс";
-      sel.appendChild(opt);
-    });
-  } catch (e) {
-    console.warn("Не вдалося завантажити курси:", e);
-  }
-}
+      // Завантаження поточних курсів у селект
+      async function loadCurrentCourses() {
+        try {
+          const res = await fetch(`${API_BASE}/api/courses`);
+          if (!res.ok) return;
+          const allCourses = await res.json();
+          const sel = document.getElementById("courseSelect");
+          if (!sel) return;
+          sel.innerHTML = `<option value="">-- Оберіть курс --</option>`;
+          (Array.isArray(allCourses) ? allCourses : []).forEach((c) => {
+            const opt = document.createElement("option");
+            opt.value = c._id;
+            opt.textContent = c.courseTitle || "Курс";
+            sel.appendChild(opt);
+          });
+        } catch (e) {
+          console.warn("Не вдалося завантажити курси:", e);
+        }
+      }
 
+      function getSelectedRoleIds() {
+        return Array.from(
+          document.querySelectorAll('input[name="roleFilter[]"]:checked')
+        ).map((el) => String(el.value));
+      }
 
-function getSelectedRoleIds() {
-  return Array.from(document.querySelectorAll('input[name="roleFilter[]"]:checked'))
-    .map(el => String(el.value));
-}
+      let currentDestination = "general";
+      function setDestination(dest) {
+        currentDestination = dest;
+        document.querySelectorAll(".dest-tab").forEach((btn) => {
+          const active = btn.dataset.dest === dest;
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-pressed", active ? "true" : "false");
+        });
 
+        const roleWrap = document.getElementById("roleFilterWrap");
+        const courseWrap = document.getElementById("courseFilterWrap");
+        if (roleWrap)
+          roleWrap.style.display = dest === "addons" ? "block" : "none";
+        if (courseWrap)
+          courseWrap.style.display = dest === "courses" ? "block" : "none";
 
-let currentDestination = 'general';
-function setDestination(dest){
-  currentDestination = dest;
-  document.querySelectorAll('.dest-tab').forEach(btn=>{
-    const active = btn.dataset.dest === dest;
-    btn.classList.toggle('active', active);
-    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-  });
+        refreshFolderFilter().then(loadExistingMaterials);
+      }
+      function intersects(a, b) {
+        if (!a || !b || a.length === 0 || b.length === 0) return false;
+        const setB = new Set(b.map(String));
+        return a.some((x) => setB.has(String(x)));
+      }
 
-  const roleWrap = document.getElementById('roleFilterWrap');
-  const courseWrap = document.getElementById('courseFilterWrap');
-  if (roleWrap) roleWrap.style.display = (dest === 'addons') ? 'block' : 'none';
-  if (courseWrap) courseWrap.style.display = (dest === 'courses') ? 'block' : 'none';
+      function normalizeUserRoleIds(user) {
+        if (Array.isArray(user.roleIds)) return user.roleIds.map(String);
+        if (Array.isArray(user.roles))
+          return user.roles.map((r) => String(rolesByName.get(r) || r));
+        if (user.roleId) return [String(user.roleId)];
+        if (user.role) return [String(rolesByName.get(user.role) || user.role)];
+        return [];
+      }
 
-  refreshFolderFilter().then(loadExistingMaterials);
-}
-function intersects(a, b) {
-  if (!a || !b || a.length === 0 || b.length === 0) return false;
-  const setB = new Set(b.map(String));
-  return a.some(x => setB.has(String(x)));
-}
+      function renderTable(users) {
+        const tbody = document.querySelector(".participants-table tbody");
+        tbody.innerHTML = "";
 
-  function normalizeUserRoleIds(user){
-    if (Array.isArray(user.roleIds)) return user.roleIds.map(String);
-    if (Array.isArray(user.roles))   return user.roles.map(r => String(rolesByName.get(r) || r));
-    if (user.roleId)                 return [String(user.roleId)];
-    if (user.role)                   return [String(rolesByName.get(user.role) || user.role)];
-    return [];
-  }
+        users.forEach((user, index) => {
+          const fullName = `${user.firstName || ""} ${
+            user.lastName || ""
+          }`.trim();
+          const roleIds = normalizeUserRoleIds(user);
+          const roleNames = roleIds.map((id) => rolesById.get(id) || id);
+          const roleText = roleNames.length ? roleNames.join(", ") : "-";
 
-  function renderTable(users) {
-    const tbody = document.querySelector(".participants-table tbody");
-    tbody.innerHTML = "";
+          const dob = user.dateOfBirth
+            ? new Date(user.dateOfBirth).toLocaleDateString("uk-UA")
+            : "-";
 
-    users.forEach((user, index) => {
-      const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-      const roleIds = normalizeUserRoleIds(user);
-      const roleNames = roleIds.map(id => rolesById.get(id) || id);
-      const roleText = roleNames.length ? roleNames.join(", ") : "-";
-
-      const dob = user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString("uk-UA") : "-";
-
-      const row = document.createElement("tr");
-      row.innerHTML = `
+          const row = document.createElement("tr");
+          row.innerHTML = `
         <td>${index + 1}</td>
         <td>${fullName}</td>
         <td>${user.email || ""}</td>
@@ -343,725 +466,859 @@ function intersects(a, b) {
             src="images/checkbox-empty.png" 
             alt="checkbox" 
             class="custom-checkbox" 
-            data-user-id="${user._id || ''}"
+            data-user-id="${user._id || ""}"
             data-role-ids='${JSON.stringify(roleIds)}'
             data-checked="false"
             style="width: 24px; height: 24px; cursor: pointer;" />
         </td>
       `;
-      tbody.appendChild(row);
-    });
-  }
-
-  function applyFilters() {
-  const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const selectedRoleIds = getSelectedRoleIds(); // теперь массив выбранных ролей (может быть пустым)
-
-  const filtered = allUsers.filter(user => {
-    const name = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
-    const matchName = name.includes(searchValue);
-
-    if (selectedRoleIds.length === 0) {
-      return matchName; // ролями не фильтруем
-    }
-
-    const roleIds = normalizeUserRoleIds(user); // роли пользователя (ids)
-    const matchRole = intersects(roleIds, selectedRoleIds);
-    return matchName && matchRole;
-  });
-
-  renderTable(filtered);
-}
-
-  document.addEventListener("DOMContentLoaded", async () => {
-    refreshSectionSelect();
-    if (typeof renderAdminSidebar === "function") {
-      renderAdminSidebar("admin-career-requests.html");
-    }
-    if (typeof requireAdminPage === "function") {
-      requireAdminPage();
-    }
-    if (typeof load === "function") {
-      load();
-    }
-
-    // 1) Сначала роли
-    try {
-      await loadRoles();
-    } catch (e) {
-      console.error("Не вдалося завантажити ролі:", e);
-    }
-
-    // 2) Курси
-    await loadCurrentCourses();
-
-    // 3) Користувачі
-    try {
-      const response = await fetch(`${API_BASE}/api/users/approved`);
-      allUsers = await response.json();
-      renderTable(allUsers);
-    } catch (err) {
-      console.error("Помилка при отриманні користувачів:", err);
-    }
-
-    // Обробники
-    document.querySelectorAll('.dest-tab').forEach(btn => {
-  btn.addEventListener('click', () => setDestination(btn.dataset.dest));
-});
-
-
-setDestination(currentDestination);
-
-    document.getElementById("courseSelect").addEventListener("change", async (e) => {
-      const courseId = e.target.value;
-      if (!courseId) return;
-      try {
-        const res = await fetch(`${API_BASE}/api/courses/${courseId}/participants`);
-        const users = await res.json();
-        allUsers = users; applyFilters();
-        // load folders for the selected course to allow choosing existing sections
-        try {
-          const fr = await fetch(`${API_BASE}/api/library/folders?destination=courses&courseId=${courseId}`);
-          if (fr.ok) {
-            const folders = await fr.json();
-            knownSections.clear();
-            folders.filter(Boolean).forEach(n => knownSections.add(n));
-            refreshSectionSelect();
-          }
-        } catch (e2) {
-          console.warn('Не вдалося завантажити папки курсу:', e2);
-        }
-      } catch (err) {
-        console.error("Помилка при отриманні учасників курсу:", err);
-      }
-    });
-
-    document.getElementById("searchInput").addEventListener("input", applyFilters);
-const roleFilterGroup = document.getElementById("roleFilterGroup");
-if (roleFilterGroup) {
-  roleFilterGroup.addEventListener("change", (e) => {
-    if (e.target && e.target.name === "roleFilter[]") applyFilters();
-  });
-}
-
-    document.getElementById("selectAllBtn").addEventListener("click", () => {
-  selectAllClicked = true;
-  const selectedRoleIds = getSelectedRoleIds(); // массив
-
-  document.querySelectorAll(".custom-checkbox").forEach(cb => {
-    if (selectedRoleIds.length === 0) {
-      // если роли не выбраны — отмечаем всех
-      cb.src = "images/checkbox.png";
-      cb.dataset.checked = "true";
-      return;
-    }
-    const roleIds = JSON.parse(cb.dataset.roleIds || "[]");
-    const match = intersects(roleIds, selectedRoleIds);
-    cb.src = match ? "images/checkbox.png" : "images/checkbox-empty.png";
-    cb.dataset.checked = match.toString();
-  });
-});
-
-    document.addEventListener("click", (e) => {
-      if (e.target.classList.contains("custom-checkbox")) {
-        const checkbox = e.target;
-        const isChecked = checkbox.dataset.checked === "true";
-        checkbox.src = isChecked ? "images/checkbox-empty.png" : "images/checkbox.png";
-        checkbox.dataset.checked = (!isChecked).toString();
-      }
-    });
-
-    document.querySelector(".btn-green-add").addEventListener("click", () => {
-      openModal("video");
-    });
-    document.querySelector(".btn-dark-green").addEventListener("click", () => {
-      openModal("book");
-    });
-  });
-
-function openModal(type) {
-  const modal = document.getElementById("addMaterialModal");
-  if (!modal) return;
-  modal.style.display = "block";
-  const mt = document.getElementById("materialType");
-  if (mt) mt.value = type;
-  toggleInputs(type);
-
-  // reset section UI (default to "new")
-  const modeEl = document.getElementById("sectionMode");
-  const selEl = document.getElementById("sectionSelect");
-  const nameEl = document.getElementById("sectionName");
-  if (modeEl) modeEl.value = "new";
-  if (selEl) {
-    selEl.value = "";
-    selEl.style.display = "none";
-  }
-  if (nameEl) {
-    nameEl.value = "";
-    nameEl.style.display = "block";
-  }
-  refreshSectionSelect();
-}
-function closeModal() {
-  const m = document.getElementById("addMaterialModal");
-  if (!m) return;
-  m.style.display = "none";
-  // clear edit mode flag
-  delete m.dataset.editId;
-  // clear fields
-  document.getElementById("materialTitle").value = "";
-  document.getElementById("materialDescription").value = "";
-  const vl = document.getElementById("videoLink"); if (vl) vl.value = "";
-  const bf = document.getElementById("bookFile"); if (bf) bf.value = "";
-  const nameEl = document.getElementById("sectionName"); if (nameEl) nameEl.value = "";
-  const selEl  = document.getElementById("sectionSelect"); if (selEl) selEl.value = "";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const mt = document.getElementById("materialType");
-  if (mt) {
-    mt.addEventListener("change", (e) => toggleInputs(e.target.value));
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const modeEl = document.getElementById("sectionMode");
-  const selEl  = document.getElementById("sectionSelect");
-  const nameEl = document.getElementById("sectionName");
-  if (modeEl && selEl && nameEl) {
-    const sync = () => {
-      if (modeEl.value === "new") {
-        nameEl.style.display = "block";
-        selEl.style.display  = "none";
-      } else {
-        nameEl.style.display = "none";
-        selEl.style.display  = "block";
-      }
-    };
-    modeEl.addEventListener("change", sync);
-    sync();
-  }
-});
-
-
-async function submitMaterial() {
-  const type = document.getElementById("materialType").value;
-  const title = document.getElementById("materialTitle").value?.trim();
-  const description = document.getElementById("materialDescription").value?.trim();
-  const selectedCourseId = document.getElementById("courseSelect").value;
-
-const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксів
-  // конкретні користувачі (галочки у таблиці)
-  const selectedUserIds = Array
-    .from(document.querySelectorAll('.custom-checkbox[data-checked="true"]'))
-    .map(cb => cb.dataset.userId)
-    .filter(Boolean);
-
-  // базовая валидация
-  if (!title) return alert("Введіть назву матеріалу");
-  if (type !== "video" && type !== "book") return alert("Оберіть тип матеріалу");
-
-  // функция сборки общих полей
-  const buildBaseForm = () => {
-    const fd = new FormData();
-    fd.append("type", type);
-    fd.append("title", title);
-    fd.append("description", description || "");
-
-    if (type === "video") {
-      const link = document.getElementById("videoLink").value?.trim();
-      if (!link) { alert("Вкажіть посилання на YouTube"); return null; }
-      fd.append("videoLink", link);
-    } else {
-      const file = document.getElementById("bookFile").files[0];
-      if (!file) { alert("Оберіть файл (PDF/DOC/DOCX/PPT/PPTX)"); return null; }
-
-      const okExt = /\.(pdf|doc|docx|ppt|pptx)$/i.test(file.name);
-      const okMime = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.ms-powerpoint",
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-      ].includes(file.type) || file.type === ""; // деякі браузери не ставлять type
-
-      if (!okExt && !okMime) {
-        alert("Підтримуються лише PDF/DOC/DOCX/PPT/PPTX");
-        return null;
-      }
-
-      fd.append("bookFile", file);
-    }
-
-    // section/folder
-    const modeEl = document.getElementById("sectionMode");
-    const selEl = document.getElementById("sectionSelect");
-    const nameEl = document.getElementById("sectionName");
-    let section = "";
-    if (modeEl) {
-      section = modeEl.value === "new"
-        ? (nameEl?.value || "").trim()
-        : (selEl?.value || "").trim();
-    }
-   if (section) {
-  fd.append("folder", section);
-}
-    // адресати (якщо обрані конкретні користувачі)
-    selectedUserIds.forEach(id => fd.append('users[]', id));
-    return fd;
-  };
-
-  // КУДА слать: роли / курс / всем
-  const destinationByRoles = selectedRoleIds.length > 0;
-  const destinationByCourse = !destinationByRoles && !!selectedCourseId;
-  const destinationGeneral  = !destinationByRoles && !destinationByCourse && !!window.selectAllClicked;
-
-  if (!destinationByRoles && !destinationByCourse && !destinationGeneral) {
-    alert("Будь ласка, виберіть курс, ролі або натисніть 'Виділити всіх'");
-    return;
-  }
-
-  // отправка одного FormData
-  const sendOnce = async (fd) => {
-    const res = await fetch("http://157.230.121.24:5050/api/library", {
-      method: "POST",
-      body: fd
-    });
-    return res;
-  };
-
-  try {
-    if (destinationByRoles) {
-      // ===== 1) сначала пробуем одним запросом с массивом roleIds[] =====
-      let fd = buildBaseForm();
-      if (!fd) return;
-
-      fd.append("destination", "addons");
-      selectedRoleIds.forEach(id => fd.append("roleIds[]", id));
-      // имена ролей на всякий (если бэку пригодятся)
-      selectedRoleIds
-        .map(id => rolesById.get(String(id)))
-        .filter(Boolean)
-        .forEach(name => fd.append("roles[]", name));
-
-      let res = await sendOnce(fd);
-
-      if (!res.ok) {
-        // ===== 2) фолбек — по одному запросу на каждую роль =====
-        // полезно, если бэк принимает только roleId (не массив)
-        for (const roleId of selectedRoleIds) {
-          let fdOne = buildBaseForm();
-          if (!fdOne) return;
-          fdOne.append("destination", "addons");
-          fdOne.append("roleId", roleId);
-          const roleName = rolesById.get(String(roleId));
-          if (roleName) fdOne.append("role", roleName);
-
-          const r = await sendOnce(fdOne);
-          if (!r.ok) {
-            let msg = "Помилка при завантаженні.";
-            try { const j = await r.clone().json(); msg = j?.message || msg; } catch {}
-            throw new Error(msg);
-          }
-        }
-      }
-    } else if (destinationByCourse) {
-      // отправка для выбранного курса
-      let fd = buildBaseForm();
-      if (!fd) return;
-      fd.append("destination", "courses");
-      fd.append("courseId", selectedCourseId);
-
-      const res = await sendOnce(fd);
-      if (!res.ok) {
-        let msg = "Помилка при завантаженні.";
-        try { const j = await res.clone().json(); msg = j?.message || msg; } catch {}
-        throw new Error(msg);
-      }
-    } else if (destinationGeneral) {
-      // отправка всем
-      let fd = buildBaseForm();
-      if (!fd) return;
-      fd.append("destination", "general");
-
-      const res = await sendOnce(fd);
-      if (!res.ok) {
-        let msg = "Помилка при завантаженні.";
-        try { const j = await res.clone().json(); msg = j?.message || msg; } catch {}
-        throw new Error(msg);
-      }
-    }
-
-      // remember section if provided
-      const modeEl = document.getElementById("sectionMode");
-      const selEl = document.getElementById("sectionSelect");
-      const nameEl = document.getElementById("sectionName");
-      const sectionChosen = modeEl && modeEl.value === "new"
-        ? (nameEl?.value || "").trim()
-        : (selEl?.value || "").trim();
-      if (sectionChosen) {
-        knownSections.add(sectionChosen);
-        refreshSectionSelect();
-      }
-
-      alert("Успішно додано!");
-      closeModal();
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Помилка при завантаженні.");
-  }
-}
-
-function toggleInputs(type) {
-  document.getElementById("videoInput").style.display = type === "video" ? "block" : "none";
-  document.getElementById("bookInput").style.display = type === "book" ? "block" : "none";
-}
-
-     function logoutUser(){
-    try{
-      // чистимо локальне
-      localStorage.removeItem('user');
-      ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
-    }catch(_){}
-
-    // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-    const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
-    fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
-
-    // редірект на логін з поверненням
-    const back = encodeURIComponent(location.pathname + location.search);
-    location.href = `admin-login.html?returnUrl=${back}`;
-  }
-
-  // прив’язуємо до кнопки
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnLogout');
-    if (btn) btn.addEventListener('click', logoutUser);
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-     refreshFolderFilter().then(loadExistingMaterials);
-  const here = location.pathname.split('/').pop();
-  document.querySelectorAll('.sidebar nav a').forEach(a=>{
-    if (a.getAttribute('href') === here) a.classList.add('active');
-  });
-});
-
-  // ======== MATERIALS LIST / EDIT / DELETE ========
-
-function getCurrentDestination() {
-  const courseId = document.getElementById("courseSelect").value;
-  if (currentDestination === 'addons') {
-    return { destination: "addons", courseId: "", roleIds: getSelectedRoleIds() };
-  }
-  if (currentDestination === 'courses') {
-    return { destination: "courses", courseId, roleIds: [] };
-  }
-  return { destination: "general", courseId: "", roleIds: [] };
-}
-
-  async function refreshFolderFilter() {
-    const { destination, courseId } = getCurrentDestination();
-    // populate folder filter based on current destination
-    const sel = document.getElementById("listFolderFilter");
-    if (!sel) return;
-    sel.innerHTML = `<option value="">— Усі папки —</option>`;
-    const params = new URLSearchParams();
-    if (destination) params.set("destination", destination);
-    if (courseId && destination === "courses") params.set("courseId", courseId);
-    try {
-      const r = await fetch(`${API_BASE}/api/library/folders?${params.toString()}`);
-      if (r.ok) {
-        const folders = await r.json();
-        folders.filter(Boolean).sort().forEach(f => {
-          const opt = document.createElement("option");
-          opt.value = f;
-          opt.textContent = f;
-          sel.appendChild(opt);
+          tbody.appendChild(row);
         });
       }
-    } catch (e) {
-      console.warn("Не вдалося оновити список папок:", e);
-    }
-  }
 
-  async function loadExistingMaterials() {
-    const listEl = document.getElementById("materialsList");
-    if (!listEl) return;
-    listEl.innerHTML = "<div>Завантаження...</div>";
+      function applyFilters() {
+        const searchValue = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const selectedRoleIds = getSelectedRoleIds(); // теперь массив выбранных ролей (может быть пустым)
 
-    const { destination, courseId } = getCurrentDestination();
-    const folder = document.getElementById("listFolderFilter")?.value || "";
+        const filtered = allUsers.filter((user) => {
+          const name = `${user.firstName || ""} ${
+            user.lastName || ""
+          }`.toLowerCase();
+          const matchName = name.includes(searchValue);
 
-    const params = new URLSearchParams();
-    params.set("destination", destination);
-    if (courseId && destination === "courses") params.set("courseId", courseId);
-    if (folder) params.set("folder", folder);
+          if (selectedRoleIds.length === 0) {
+            return matchName; // ролями не фильтруем
+          }
 
-    try {
-      const r = await fetch(`${API_BASE}/api/library?${params.toString()}`);
-      const items = r.ok ? await r.json() : [];
-      renderMaterialsList(items);
-    } catch (e) {
-      console.error(e);
-      listEl.innerHTML = "<div>Помилка завантаження списку.</div>";
-    }
-  }
+          const roleIds = normalizeUserRoleIds(user); // роли пользователя (ids)
+          const matchRole = intersects(roleIds, selectedRoleIds);
+          return matchName && matchRole;
+        });
 
-  function renderMaterialsList(items) {
-    const listEl = document.getElementById("materialsList");
-    if (!listEl) return;
-    if (!Array.isArray(items) || !items.length) {
-      listEl.innerHTML = "<div>Нічого не знайдено для поточних фільтрів.</div>";
-      return;
-    }
-    listEl.innerHTML = "";
-    items.forEach(it => {
-      const row = document.createElement("div");
-      row.style.border = "1px solid #eee";
-      row.style.borderRadius = "10px";
-      row.style.padding = "12px";
-      row.style.background = "#fff";
+        renderTable(filtered);
+      }
 
-      const meta = [
-        it.destination ? `📦 ${it.destination}` : "",
-        it.folder ? `📁 ${it.folder}` : "",
-        it.courseId ? `🎓 ${it.courseId}` : "",
-        it.role ? `👥 ${it.role}` : ""
-      ].filter(Boolean).join(" • ");
-
-      const title = it.title || (it.type === "video" ? "Відео" : "Файл");
-      const desc  = it.description || "";
-
-      const openPreview = () => {
-        if (it.type === "video" && it.videoLink) {
-          window.open(it.videoLink, "_blank", "noopener");
-        } else if (it.filePath) {
-          const url = it.filePath.startsWith("http") ? it.filePath : `${API_BASE}/${it.filePath.replace(/^\/+/, "")}`;
-          window.open(url, "_blank", "noopener");
+      document.addEventListener("DOMContentLoaded", async () => {
+        refreshSectionSelect();
+        if (typeof renderAdminSidebar === "function") {
+          renderAdminSidebar("admin-career-requests.html");
         }
-      };
+        if (typeof requireAdminPage === "function") {
+          requireAdminPage();
+        }
+        if (typeof load === "function") {
+          load();
+        }
 
-      function escapeHtml(s) {
-  return String(s || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+        // 1) Сначала роли
+        try {
+          await loadRoles();
+        } catch (e) {
+          console.error("Не вдалося завантажити ролі:", e);
+        }
 
-      row.innerHTML = `
+        // 2) Курси
+        await loadCurrentCourses();
+
+        // 3) Користувачі
+        try {
+          const response = await fetch(`${API_BASE}/api/users/approved`);
+          allUsers = await response.json();
+          renderTable(allUsers);
+        } catch (err) {
+          console.error("Помилка при отриманні користувачів:", err);
+        }
+
+        // Обробники
+        document.querySelectorAll(".dest-tab").forEach((btn) => {
+          btn.addEventListener("click", () => setDestination(btn.dataset.dest));
+        });
+
+        setDestination(currentDestination);
+
+        document
+          .getElementById("courseSelect")
+          .addEventListener("change", async (e) => {
+            const courseId = e.target.value;
+            if (!courseId) return;
+            try {
+              const res = await fetch(
+                `${API_BASE}/api/courses/${courseId}/participants`
+              );
+              const users = await res.json();
+              allUsers = users;
+              applyFilters();
+              // load folders for the selected course to allow choosing existing sections
+              try {
+                const fr = await fetch(
+                  `${API_BASE}/api/library/folders?destination=courses&courseId=${courseId}`
+                );
+                if (fr.ok) {
+                  const folders = await fr.json();
+                  knownSections.clear();
+                  folders.filter(Boolean).forEach((n) => knownSections.add(n));
+                  refreshSectionSelect();
+                }
+              } catch (e2) {
+                console.warn("Не вдалося завантажити папки курсу:", e2);
+              }
+            } catch (err) {
+              console.error("Помилка при отриманні учасників курсу:", err);
+            }
+          });
+
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", applyFilters);
+        const roleFilterGroup = document.getElementById("roleFilterGroup");
+        if (roleFilterGroup) {
+          roleFilterGroup.addEventListener("change", (e) => {
+            if (e.target && e.target.name === "roleFilter[]") applyFilters();
+          });
+        }
+
+        document
+          .getElementById("selectAllBtn")
+          .addEventListener("click", () => {
+            selectAllClicked = true;
+            const selectedRoleIds = getSelectedRoleIds(); // массив
+
+            document.querySelectorAll(".custom-checkbox").forEach((cb) => {
+              if (selectedRoleIds.length === 0) {
+                // если роли не выбраны — отмечаем всех
+                cb.src = "images/checkbox.png";
+                cb.dataset.checked = "true";
+                return;
+              }
+              const roleIds = JSON.parse(cb.dataset.roleIds || "[]");
+              const match = intersects(roleIds, selectedRoleIds);
+              cb.src = match
+                ? "images/checkbox.png"
+                : "images/checkbox-empty.png";
+              cb.dataset.checked = match.toString();
+            });
+          });
+
+        document.addEventListener("click", (e) => {
+          if (e.target.classList.contains("custom-checkbox")) {
+            const checkbox = e.target;
+            const isChecked = checkbox.dataset.checked === "true";
+            checkbox.src = isChecked
+              ? "images/checkbox-empty.png"
+              : "images/checkbox.png";
+            checkbox.dataset.checked = (!isChecked).toString();
+          }
+        });
+
+        document
+          .querySelector(".btn-green-add")
+          .addEventListener("click", () => {
+            openModal("video");
+          });
+        document
+          .querySelector(".btn-dark-green")
+          .addEventListener("click", () => {
+            openModal("book");
+          });
+      });
+
+      function openModal(type) {
+        const modal = document.getElementById("addMaterialModal");
+        if (!modal) return;
+        modal.style.display = "block";
+        const mt = document.getElementById("materialType");
+        if (mt) mt.value = type;
+        toggleInputs(type);
+
+        // reset section UI (default to "new")
+        const modeEl = document.getElementById("sectionMode");
+        const selEl = document.getElementById("sectionSelect");
+        const nameEl = document.getElementById("sectionName");
+        if (modeEl) modeEl.value = "new";
+        if (selEl) {
+          selEl.value = "";
+          selEl.style.display = "none";
+        }
+        if (nameEl) {
+          nameEl.value = "";
+          nameEl.style.display = "block";
+        }
+        refreshSectionSelect();
+      }
+      function closeModal() {
+        const m = document.getElementById("addMaterialModal");
+        if (!m) return;
+        m.style.display = "none";
+        // clear edit mode flag
+        delete m.dataset.editId;
+        // clear fields
+        document.getElementById("materialTitle").value = "";
+        document.getElementById("materialDescription").value = "";
+        const vl = document.getElementById("videoLink");
+        if (vl) vl.value = "";
+        const bf = document.getElementById("bookFile");
+        if (bf) bf.value = "";
+        const nameEl = document.getElementById("sectionName");
+        if (nameEl) nameEl.value = "";
+        const selEl = document.getElementById("sectionSelect");
+        if (selEl) selEl.value = "";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const mt = document.getElementById("materialType");
+        if (mt) {
+          mt.addEventListener("change", (e) => toggleInputs(e.target.value));
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const modeEl = document.getElementById("sectionMode");
+        const selEl = document.getElementById("sectionSelect");
+        const nameEl = document.getElementById("sectionName");
+        if (modeEl && selEl && nameEl) {
+          const sync = () => {
+            if (modeEl.value === "new") {
+              nameEl.style.display = "block";
+              selEl.style.display = "none";
+            } else {
+              nameEl.style.display = "none";
+              selEl.style.display = "block";
+            }
+          };
+          modeEl.addEventListener("change", sync);
+          sync();
+        }
+      });
+
+      async function submitMaterial() {
+        const type = document.getElementById("materialType").value;
+        const title = document.getElementById("materialTitle").value?.trim();
+        const description = document
+          .getElementById("materialDescription")
+          .value?.trim();
+        const selectedCourseId = document.getElementById("courseSelect").value;
+
+        const selectedRoleIds = getSelectedRoleIds(); // роли из чекбоксів
+        // конкретні користувачі (галочки у таблиці)
+        const selectedUserIds = Array.from(
+          document.querySelectorAll('.custom-checkbox[data-checked="true"]')
+        )
+          .map((cb) => cb.dataset.userId)
+          .filter(Boolean);
+
+        // базовая валидация
+        if (!title) return alert("Введіть назву матеріалу");
+        if (type !== "video" && type !== "book")
+          return alert("Оберіть тип матеріалу");
+
+        // функция сборки общих полей
+        const buildBaseForm = () => {
+          const fd = new FormData();
+          fd.append("type", type);
+          fd.append("title", title);
+          fd.append("description", description || "");
+
+          if (type === "video") {
+            const link = document.getElementById("videoLink").value?.trim();
+            if (!link) {
+              alert("Вкажіть посилання на YouTube");
+              return null;
+            }
+            fd.append("videoLink", link);
+          } else {
+            const file = document.getElementById("bookFile").files[0];
+            if (!file) {
+              alert("Оберіть файл (PDF/DOC/DOCX/PPT/PPTX)");
+              return null;
+            }
+
+            const okExt = /\.(pdf|doc|docx|ppt|pptx)$/i.test(file.name);
+            const okMime =
+              [
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+              ].includes(file.type) || file.type === ""; // деякі браузери не ставлять type
+
+            if (!okExt && !okMime) {
+              alert("Підтримуються лише PDF/DOC/DOCX/PPT/PPTX");
+              return null;
+            }
+
+            fd.append("bookFile", file);
+          }
+
+          // section/folder
+          const modeEl = document.getElementById("sectionMode");
+          const selEl = document.getElementById("sectionSelect");
+          const nameEl = document.getElementById("sectionName");
+          let section = "";
+          if (modeEl) {
+            section =
+              modeEl.value === "new"
+                ? (nameEl?.value || "").trim()
+                : (selEl?.value || "").trim();
+          }
+          if (section) {
+            fd.append("folder", section);
+          }
+          // адресати (якщо обрані конкретні користувачі)
+          selectedUserIds.forEach((id) => fd.append("users[]", id));
+          return fd;
+        };
+
+        // КУДА слать: роли / курс / всем
+        const destinationByRoles = selectedRoleIds.length > 0;
+        const destinationByCourse = !destinationByRoles && !!selectedCourseId;
+        const destinationGeneral =
+          !destinationByRoles &&
+          !destinationByCourse &&
+          !!window.selectAllClicked;
+
+        if (
+          !destinationByRoles &&
+          !destinationByCourse &&
+          !destinationGeneral
+        ) {
+          alert(
+            "Будь ласка, виберіть курс, ролі або натисніть 'Виділити всіх'"
+          );
+          return;
+        }
+
+        // отправка одного FormData
+        const sendOnce = async (fd) => {
+          const res = await fetch("http://157.230.121.24:5050/api/library", {
+            method: "POST",
+            body: fd,
+          });
+          return res;
+        };
+
+        try {
+          if (destinationByRoles) {
+            // ===== 1) сначала пробуем одним запросом с массивом roleIds[] =====
+            let fd = buildBaseForm();
+            if (!fd) return;
+
+            fd.append("destination", "addons");
+            selectedRoleIds.forEach((id) => fd.append("roleIds[]", id));
+            // имена ролей на всякий (если бэку пригодятся)
+            selectedRoleIds
+              .map((id) => rolesById.get(String(id)))
+              .filter(Boolean)
+              .forEach((name) => fd.append("roles[]", name));
+
+            let res = await sendOnce(fd);
+
+            if (!res.ok) {
+              // ===== 2) фолбек — по одному запросу на каждую роль =====
+              // полезно, если бэк принимает только roleId (не массив)
+              for (const roleId of selectedRoleIds) {
+                let fdOne = buildBaseForm();
+                if (!fdOne) return;
+                fdOne.append("destination", "addons");
+                fdOne.append("roleId", roleId);
+                const roleName = rolesById.get(String(roleId));
+                if (roleName) fdOne.append("role", roleName);
+
+                const r = await sendOnce(fdOne);
+                if (!r.ok) {
+                  let msg = "Помилка при завантаженні.";
+                  try {
+                    const j = await r.clone().json();
+                    msg = j?.message || msg;
+                  } catch {}
+                  throw new Error(msg);
+                }
+              }
+            }
+          } else if (destinationByCourse) {
+            // отправка для выбранного курса
+            let fd = buildBaseForm();
+            if (!fd) return;
+            fd.append("destination", "courses");
+            fd.append("courseId", selectedCourseId);
+
+            const res = await sendOnce(fd);
+            if (!res.ok) {
+              let msg = "Помилка при завантаженні.";
+              try {
+                const j = await res.clone().json();
+                msg = j?.message || msg;
+              } catch {}
+              throw new Error(msg);
+            }
+          } else if (destinationGeneral) {
+            // отправка всем
+            let fd = buildBaseForm();
+            if (!fd) return;
+            fd.append("destination", "general");
+
+            const res = await sendOnce(fd);
+            if (!res.ok) {
+              let msg = "Помилка при завантаженні.";
+              try {
+                const j = await res.clone().json();
+                msg = j?.message || msg;
+              } catch {}
+              throw new Error(msg);
+            }
+          }
+
+          // remember section if provided
+          const modeEl = document.getElementById("sectionMode");
+          const selEl = document.getElementById("sectionSelect");
+          const nameEl = document.getElementById("sectionName");
+          const sectionChosen =
+            modeEl && modeEl.value === "new"
+              ? (nameEl?.value || "").trim()
+              : (selEl?.value || "").trim();
+          if (sectionChosen) {
+            knownSections.add(sectionChosen);
+            refreshSectionSelect();
+          }
+
+          alert("Успішно додано!");
+          closeModal();
+        } catch (err) {
+          console.error(err);
+          alert(err.message || "Помилка при завантаженні.");
+        }
+      }
+
+      function toggleInputs(type) {
+        document.getElementById("videoInput").style.display =
+          type === "video" ? "block" : "none";
+        document.getElementById("bookInput").style.display =
+          type === "book" ? "block" : "none";
+      }
+
+      function logoutUser() {
+        try {
+          // чистимо локальне
+          localStorage.removeItem("user");
+          ["token", "authToken", "jwt", "accessToken", "bearer"].forEach((k) =>
+            localStorage.removeItem(k)
+          );
+        } catch (_) {}
+
+        // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
+        const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
+        fetch(`${API}/api/users/logout`, {
+          method: "POST",
+          credentials: "include",
+        }).catch(() => {});
+
+        // редірект на логін з поверненням
+        const back = encodeURIComponent(location.pathname + location.search);
+        location.href = `admin-login.html?returnUrl=${back}`;
+      }
+
+      // прив’язуємо до кнопки
+      document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.getElementById("btnLogout");
+        if (btn) btn.addEventListener("click", logoutUser);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        refreshFolderFilter().then(loadExistingMaterials);
+        const here = location.pathname.split("/").pop();
+        document.querySelectorAll(".sidebar nav a").forEach((a) => {
+          if (a.getAttribute("href") === here) a.classList.add("active");
+        });
+      });
+
+      // ======== MATERIALS LIST / EDIT / DELETE ========
+
+      function getCurrentDestination() {
+        const courseId = document.getElementById("courseSelect").value;
+        if (currentDestination === "addons") {
+          return {
+            destination: "addons",
+            courseId: "",
+            roleIds: getSelectedRoleIds(),
+          };
+        }
+        if (currentDestination === "courses") {
+          return { destination: "courses", courseId, roleIds: [] };
+        }
+        return { destination: "general", courseId: "", roleIds: [] };
+      }
+
+      async function refreshFolderFilter() {
+        const { destination, courseId } = getCurrentDestination();
+        // populate folder filter based on current destination
+        const sel = document.getElementById("listFolderFilter");
+        if (!sel) return;
+        sel.innerHTML = `<option value="">— Усі папки —</option>`;
+        const params = new URLSearchParams();
+        if (destination) params.set("destination", destination);
+        if (courseId && destination === "courses")
+          params.set("courseId", courseId);
+        try {
+          const r = await fetch(
+            `${API_BASE}/api/library/folders?${params.toString()}`
+          );
+          if (r.ok) {
+            const folders = await r.json();
+            folders
+              .filter(Boolean)
+              .sort()
+              .forEach((f) => {
+                const opt = document.createElement("option");
+                opt.value = f;
+                opt.textContent = f;
+                sel.appendChild(opt);
+              });
+          }
+        } catch (e) {
+          console.warn("Не вдалося оновити список папок:", e);
+        }
+      }
+
+      async function loadExistingMaterials() {
+        const listEl = document.getElementById("materialsList");
+        if (!listEl) return;
+        listEl.innerHTML = "<div>Завантаження...</div>";
+
+        const { destination, courseId } = getCurrentDestination();
+        const folder = document.getElementById("listFolderFilter")?.value || "";
+
+        const params = new URLSearchParams();
+        params.set("destination", destination);
+        if (courseId && destination === "courses")
+          params.set("courseId", courseId);
+        if (folder) params.set("folder", folder);
+
+        try {
+          const r = await fetch(`${API_BASE}/api/library?${params.toString()}`);
+          const items = r.ok ? await r.json() : [];
+          renderMaterialsList(items);
+        } catch (e) {
+          console.error(e);
+          listEl.innerHTML = "<div>Помилка завантаження списку.</div>";
+        }
+      }
+
+      function renderMaterialsList(items) {
+        const listEl = document.getElementById("materialsList");
+        if (!listEl) return;
+        if (!Array.isArray(items) || !items.length) {
+          listEl.innerHTML =
+            "<div>Нічого не знайдено для поточних фільтрів.</div>";
+          return;
+        }
+        listEl.innerHTML = "";
+        items.forEach((it) => {
+          const row = document.createElement("div");
+          row.style.border = "1px solid #eee";
+          row.style.borderRadius = "10px";
+          row.style.padding = "12px";
+          row.style.background = "#fff";
+
+          const meta = [
+            it.destination ? `📦 ${it.destination}` : "",
+            it.folder ? `📁 ${it.folder}` : "",
+            it.courseId ? `🎓 ${it.courseId}` : "",
+            it.role ? `👥 ${it.role}` : "",
+          ]
+            .filter(Boolean)
+            .join(" • ");
+
+          const title = it.title || (it.type === "video" ? "Відео" : "Файл");
+          const desc = it.description || "";
+
+          const openPreview = () => {
+            if (it.type === "video" && it.videoLink) {
+              window.open(it.videoLink, "_blank", "noopener");
+            } else if (it.filePath) {
+              const url = it.filePath.startsWith("http")
+                ? it.filePath
+                : `${API_BASE}/${it.filePath.replace(/^\/+/, "")}`;
+              window.open(url, "_blank", "noopener");
+            }
+          };
+
+          function escapeHtml(s) {
+            return String(s || "")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#39;");
+          }
+
+          row.innerHTML = `
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
           <div style="flex:1 1 auto;">
             <div style="font-weight:600;">${escapeHtml(title)}</div>
-            ${desc ? `<div style="opacity:.8; font-size:14px;">${escapeHtml(desc)}</div>` : ""}
-            ${meta ? `<div style="margin-top:6px; font-size:12px; opacity:.7;">${escapeHtml(meta)}</div>` : ""}
+            ${
+              desc
+                ? `<div style="opacity:.8; font-size:14px;">${escapeHtml(
+                    desc
+                  )}</div>`
+                : ""
+            }
+            ${
+              meta
+                ? `<div style="margin-top:6px; font-size:12px; opacity:.7;">${escapeHtml(
+                    meta
+                  )}</div>`
+                : ""
+            }
           </div>
           <div style="display:flex; gap:8px; flex:0 0 auto;">
-            <button type="button" class="view-btn" data-id="${it._id}">Відкрити</button>
-            <button type="button" class="view-btn" data-action="edit" data-id="${it._id}">✏️ Редагувати</button>
-            <button type="button" class="view-btn" data-action="delete" data-id="${it._id}" style="border-color:#b3261e; color:#b3261e;">🗑 Видалити</button>
+            <button type="button" class="view-btn" data-id="${
+              it._id
+            }">Відкрити</button>
+            <button type="button" class="view-btn" data-action="edit" data-id="${
+              it._id
+            }">✏️ Редагувати</button>
+            <button type="button" class="view-btn" data-action="delete" data-id="${
+              it._id
+            }" style="border-color:#b3261e; color:#b3261e;">🗑 Видалити</button>
           </div>
         </div>
       `;
 
-      row.querySelector('[data-id]').addEventListener('click', openPreview);
-      row.querySelector('[data-action="edit"]').addEventListener('click', () => openEditModal(it));
-      row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteMaterial(it._id));
+          row.querySelector("[data-id]").addEventListener("click", openPreview);
+          row
+            .querySelector('[data-action="edit"]')
+            .addEventListener("click", () => openEditModal(it));
+          row
+            .querySelector('[data-action="delete"]')
+            .addEventListener("click", () => deleteMaterial(it._id));
 
-      listEl.appendChild(row);
-    });
-  }
-
-  async function deleteMaterial(id) {
-    if (!confirm("Видалити матеріал?")) return;
-    try {
-      const r = await fetch(`${API_BASE}/api/library/${id}`, { method: "DELETE" });
-      if (!r.ok) throw new Error("Не вдалося видалити");
-      await loadExistingMaterials();
-    } catch (e) {
-      alert(e.message || "Помилка видалення");
-    }
-  }
-
-  // ----- EDIT MODAL -----
-  function openEditModal(item) {
-    // переиспользуем існуюче модальне вікно додавання
-    openModal(item.type);
-    // проставляємо значення
-    document.getElementById("materialTitle").value = item.title || "";
-    document.getElementById("materialDescription").value = item.description || "";
-    const modeEl = document.getElementById("sectionMode");
-    const selEl  = document.getElementById("sectionSelect");
-    const nameEl = document.getElementById("sectionName");
-
-    // Якщо є папка — покажемо як existing, і поставимо значення
-    if (item.folder) {
-      if (modeEl) modeEl.value = "existing";
-      if (selEl) {
-        refreshSectionSelect();
-        selEl.style.display = "block";
-        selEl.value = item.folder;
+          listEl.appendChild(row);
+        });
       }
-      if (nameEl) nameEl.style.display = "none";
-    } else {
-      if (modeEl) modeEl.value = "existing";
-      if (selEl) { refreshSectionSelect(); selEl.value = ""; selEl.style.display = "block"; }
-      if (nameEl) nameEl.style.display = "none";
-    }
 
-    // для відео — вставимо посилання
-    if (item.type === "video") {
-      document.getElementById("videoLink").value = item.videoLink || "";
-    }
-
-    // помітимо, що це режим редагування
-    document.getElementById("addMaterialModal").dataset.editId = item._id;
-  }
-
-  // перехватываем submitMaterial для режиму редагування
-  const originalSubmitMaterial = submitMaterial;
-  submitMaterial = async function () {
-    const editId = document.getElementById("addMaterialModal").dataset.editId;
-    if (!editId) {
-      // звичайне створення
-      return originalSubmitMaterial();
-    }
-
-    // збирання даних як у створенні
-    const type = document.getElementById("materialType").value;
-    const title = document.getElementById("materialTitle").value?.trim();
-    const description = document.getElementById("materialDescription").value?.trim();
-
-    if (!title) return alert("Введіть назву матеріалу");
-
-    const fd = new FormData();
-    fd.append("title", title);
-    fd.append("description", description || "");
-
-    // folder
-    const modeEl = document.getElementById("sectionMode");
-    const selEl  = document.getElementById("sectionSelect");
-    const nameEl = document.getElementById("sectionName");
-    let folder = "";
-    if (modeEl) {
-      folder = modeEl.value === "new"
-        ? (nameEl?.value || "").trim()
-        : (selEl?.value || "").trim();
-    }
-    fd.append("folder", folder);
-
-    if (type === "video") {
-      const link = document.getElementById("videoLink").value?.trim() || "";
-      fd.append("videoLink", link);
-    } else {
-      const file = document.getElementById("bookFile").files[0];
-      if (file) {
-        // опціонально можна замінити файл
-        fd.append("bookFile", file);
+      async function deleteMaterial(id) {
+        if (!confirm("Видалити матеріал?")) return;
+        try {
+          const r = await fetch(`${API_BASE}/api/library/${id}`, {
+            method: "DELETE",
+          });
+          if (!r.ok) throw new Error("Не вдалося видалити");
+          await loadExistingMaterials();
+        } catch (e) {
+          alert(e.message || "Помилка видалення");
+        }
       }
-    }
 
-    try {
-      const r = await fetch(`${API_BASE}/api/library/${editId}`, {
-        method: "PUT",
-        body: fd
+      // ----- EDIT MODAL -----
+      function openEditModal(item) {
+        // переиспользуем існуюче модальне вікно додавання
+        openModal(item.type);
+        // проставляємо значення
+        document.getElementById("materialTitle").value = item.title || "";
+        document.getElementById("materialDescription").value =
+          item.description || "";
+        const modeEl = document.getElementById("sectionMode");
+        const selEl = document.getElementById("sectionSelect");
+        const nameEl = document.getElementById("sectionName");
+
+        // Якщо є папка — покажемо як existing, і поставимо значення
+        if (item.folder) {
+          if (modeEl) modeEl.value = "existing";
+          if (selEl) {
+            refreshSectionSelect();
+            selEl.style.display = "block";
+            selEl.value = item.folder;
+          }
+          if (nameEl) nameEl.style.display = "none";
+        } else {
+          if (modeEl) modeEl.value = "existing";
+          if (selEl) {
+            refreshSectionSelect();
+            selEl.value = "";
+            selEl.style.display = "block";
+          }
+          if (nameEl) nameEl.style.display = "none";
+        }
+
+        // для відео — вставимо посилання
+        if (item.type === "video") {
+          document.getElementById("videoLink").value = item.videoLink || "";
+        }
+
+        // помітимо, що це режим редагування
+        document.getElementById("addMaterialModal").dataset.editId = item._id;
+      }
+
+      // перехватываем submitMaterial для режиму редагування
+      const originalSubmitMaterial = submitMaterial;
+      submitMaterial = async function () {
+        const editId =
+          document.getElementById("addMaterialModal").dataset.editId;
+        if (!editId) {
+          // звичайне створення
+          return originalSubmitMaterial();
+        }
+
+        // збирання даних як у створенні
+        const type = document.getElementById("materialType").value;
+        const title = document.getElementById("materialTitle").value?.trim();
+        const description = document
+          .getElementById("materialDescription")
+          .value?.trim();
+
+        if (!title) return alert("Введіть назву матеріалу");
+
+        const fd = new FormData();
+        fd.append("title", title);
+        fd.append("description", description || "");
+
+        // folder
+        const modeEl = document.getElementById("sectionMode");
+        const selEl = document.getElementById("sectionSelect");
+        const nameEl = document.getElementById("sectionName");
+        let folder = "";
+        if (modeEl) {
+          folder =
+            modeEl.value === "new"
+              ? (nameEl?.value || "").trim()
+              : (selEl?.value || "").trim();
+        }
+        fd.append("folder", folder);
+
+        if (type === "video") {
+          const link = document.getElementById("videoLink").value?.trim() || "";
+          fd.append("videoLink", link);
+        } else {
+          const file = document.getElementById("bookFile").files[0];
+          if (file) {
+            // опціонально можна замінити файл
+            fd.append("bookFile", file);
+          }
+        }
+
+        try {
+          const r = await fetch(`${API_BASE}/api/library/${editId}`, {
+            method: "PUT",
+            body: fd,
+          });
+          if (!r.ok) throw new Error("Не вдалося зберегти зміни");
+          // зачистка режиму редагування
+          delete document.getElementById("addMaterialModal").dataset.editId;
+          closeModal();
+          await loadExistingMaterials();
+          alert("Змінено");
+        } catch (e) {
+          alert(e.message || "Помилка збереження");
+        }
+      };
+
+      // оновлювати список при зміні фільтрів
+      document.addEventListener("DOMContentLoaded", () => {
+        // перше завантаження
+        setDestination(currentDestination);
+        // оновлювати при зміні курсу/ролей/папки
+        const courseSel = document.getElementById("courseSelect");
+        if (courseSel) {
+          courseSel.addEventListener("change", async () => {
+            await refreshFolderFilter();
+            await loadExistingMaterials();
+          });
+        }
+        const roleFilterGroup = document.getElementById("roleFilterGroup");
+        if (roleFilterGroup) {
+          roleFilterGroup.addEventListener("change", async () => {
+            await refreshFolderFilter();
+            await loadExistingMaterials();
+          });
+        }
+        const folderSel = document.getElementById("listFolderFilter");
+        if (folderSel) {
+          folderSel.addEventListener("change", loadExistingMaterials);
+        }
       });
-      if (!r.ok) throw new Error("Не вдалося зберегти зміни");
-      // зачистка режиму редагування
-      delete document.getElementById("addMaterialModal").dataset.editId;
-      closeModal();
-      await loadExistingMaterials();
-      alert("Змінено");
-    } catch (e) {
-      alert(e.message || "Помилка збереження");
-    }
-  };
+    </script>
+    <div id="addMaterialModal" class="modal" style="display: none">
+      <div class="modal-overlay" onclick="closeModal()"></div>
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <h2>Додати матеріал</h2>
 
-  // оновлювати список при зміні фільтрів
-  document.addEventListener("DOMContentLoaded", () => {
-    // перше завантаження
-    setDestination(currentDestination);
-    // оновлювати при зміні курсу/ролей/папки
-    const courseSel = document.getElementById("courseSelect");
-    if (courseSel) {
-      courseSel.addEventListener("change", async () => {
-        await refreshFolderFilter();
-        await loadExistingMaterials();
-      });
-    }
-    const roleFilterGroup = document.getElementById("roleFilterGroup");
-    if (roleFilterGroup) {
-      roleFilterGroup.addEventListener("change", async () => {
-        await refreshFolderFilter();
-        await loadExistingMaterials();
-      });
-    }
-    const folderSel = document.getElementById("listFolderFilter");
-    if (folderSel) {
-      folderSel.addEventListener("change", loadExistingMaterials);
-    }
-  });
-  </script>
- <div id="addMaterialModal" class="modal" style="display:none;">
-  <div class="modal-overlay" onclick="closeModal()"></div>
-  <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">×</span>
-    <h2>Додати матеріал</h2>
+        <div class="form-group">
+          <label for="materialType">Тип матеріалу</label>
+          <select id="materialType">
+            <option value="video">🎥 Відео (YouTube)</option>
+            <option value="book">
+              📘 Файл (PDF / DOC / DOCX / PPT / PPTX)
+            </option>
+          </select>
+        </div>
 
-    <div class="form-group">
-      <label for="materialType">Тип матеріалу</label>
-      <select id="materialType">
-        <option value="video">🎥 Відео (YouTube)</option>
-        <option value="book">📘 Файл (PDF / DOC / DOCX / PPT / PPTX)</option>
-      </select>
-    </div>
+        <div class="form-group">
+          <label for="materialTitle">Назва</label>
+          <input type="text" id="materialTitle" placeholder="Введіть назву" />
+        </div>
 
-    <div class="form-group">
-      <label for="materialTitle">Назва</label>
-      <input type="text" id="materialTitle" placeholder="Введіть назву" />
-    </div>
+        <div class="form-group">
+          <label for="materialDescription">Опис</label>
+          <textarea
+            id="materialDescription"
+            placeholder="Короткий опис..."
+          ></textarea>
+        </div>
 
-    <div class="form-group">
-      <label for="materialDescription">Опис</label>
-      <textarea id="materialDescription" placeholder="Короткий опис..."></textarea>
-    </div>
+        <!-- Section / Folder selector -->
+        <div class="form-group">
+          <label>Папка / розділ</label>
+          <div class="form-row-inline">
+            <select id="sectionMode">
+              <option value="existing">Обрати існуючу</option>
+              <option value="new">Створити нову</option>
+            </select>
+            <select id="sectionSelect" class="folder-select">
+              <option value="">— Без папки —</option>
+            </select>
+          </div>
+          <input
+            type="text"
+            id="sectionName"
+            placeholder="Назва папки (наприклад, Тиждень 3)"
+            style="display: none; margin-top: 8px"
+          />
+          <small class="hint"
+            >Папка групує матеріали курсу (наприклад, «Тиждень 1»). Адмін може
+            ввести будь‑яку назву.</small
+          >
+        </div>
 
-    <!-- Section / Folder selector -->
-    <div class="form-group">
-      <label>Папка / розділ</label>
-      <div class="form-row-inline">
-        <select id="sectionMode">
-          <option value="existing">Обрати існуючу</option>
-          <option value="new">Створити нову</option>
-        </select>
-        <select id="sectionSelect" class="folder-select">
-          <option value="">— Без папки —</option>
-        </select>
-      </div>
-      <input type="text" id="sectionName" placeholder="Назва папки (наприклад, Тиждень 3)" style="display:none; margin-top:8px;" />
-      <small class="hint">Папка групує матеріали курсу (наприклад, «Тиждень 1»). Адмін може ввести будь‑яку назву.</small>
-    </div>
+        <div class="form-group" id="videoInput" style="display: none">
+          <label for="videoLink">Посилання на YouTube</label>
+          <input
+            type="url"
+            id="videoLink"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+        </div>
 
-    <div class="form-group" id="videoInput" style="display: none;">
-      <label for="videoLink">Посилання на YouTube</label>
-      <input type="url" id="videoLink" placeholder="https://www.youtube.com/watch?v=..." />
-    </div>
-
-    <div class="form-group" id="bookInput" style="display: none;">
-  <label for="bookFile">Файл (PDF / DOC / DOCX / PPT / PPTX)</label>
-  <input
-    type="file"
-    id="bookFile"
-    accept="application/pdf,
+        <div class="form-group" id="bookInput" style="display: none">
+          <label for="bookFile">Файл (PDF / DOC / DOCX / PPT / PPTX)</label>
+          <input
+            type="file"
+            id="bookFile"
+            accept="application/pdf,
             application/msword,
             application/vnd.openxmlformats-officedocument.wordprocessingml.document,
             application/vnd.ms-powerpoint,
             application/vnd.openxmlformats-officedocument.presentationml.presentation,
-            .pdf,.doc,.docx,.ppt,.pptx" />
-</div>
+            .pdf,.doc,.docx,.ppt,.pptx"
+          />
+        </div>
 
-    <button class="submit-btn" onclick="submitMaterial()">Завантажити</button>
-  </div>
-</div>
+        <button class="submit-btn" onclick="submitMaterial()">
+          Завантажити
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

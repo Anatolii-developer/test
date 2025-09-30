@@ -354,6 +354,23 @@
   <script src="script.js"></script>
   <script>
 
+  // Resolve image URL coming from backend (can be '/uploads/...' or full URL)
+  function resolvePhotoUrl(url) {
+    if (!url) return '';
+    try {
+      // already absolute?
+      if (/^https?:\/\//i.test(url)) return url;
+      // if starts with // (protocol-relative)
+      if (/^\/\//.test(url)) return window.location.protocol + url;
+      // else prefix with API_BASE
+      const base = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE.replace(/\/+$/, '') : '';
+      const path = url.startsWith('/') ? url : '/' + url;
+      return base + path;
+    } catch (_) {
+      return url;
+    }
+  }
+
 
 function toggleCityField() {
   const offline = document.getElementById('formatOffline').checked;
@@ -445,7 +462,14 @@ function populateFormat(freshUser) {
       // Photo (if exists)
       const photoEl = document.getElementById('profilePhoto');
       if (photoEl && freshUser.photoUrl) {
-        photoEl.src = freshUser.photoUrl;
+        photoEl.src = resolvePhotoUrl(freshUser.photoUrl);
+        photoEl.alt = 'Profile photo';
+        if (photoEl) {
+          photoEl.onerror = function () {
+            // fallback to placeholder if broken link
+            this.src = 'assets/profile-photo.png';
+          };
+        }
       }
 
       // Step 2 textareas
@@ -611,6 +635,62 @@ function populateFormat(freshUser) {
       setupTextareaSave('profileExperienceExtraTextarea', 'experienceExtra', 'experienceExtraCheckIcon');
       setupTextareaSave('profileLanguageTextarea', 'language', 'languageCheckIcon');
     });
+    // Override previewPhoto to guarantee preview + upload + final URL from backend
+    window.previewPhoto = async function (event) {
+      const file = event?.target?.files?.[0];
+      const img = document.getElementById('profilePhoto');
+      if (!file || !img) return;
+
+      // 1) Instant preview
+      const reader = new FileReader();
+      reader.onload = function () {
+        img.src = reader.result; // show immediately
+      };
+      reader.readAsDataURL(file);
+
+      // 2) Upload to backend
+      try {
+        const rawUser = localStorage.getItem('user');
+        if (!rawUser) return alert('Будь ласка, увійдіть у систему.');
+        const user = JSON.parse(rawUser);
+
+        const formData = new FormData();
+        formData.append('photo', file);
+
+        const res = await fetch(`${API_BASE}/api/users/${user._id}/photo`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data?.message || 'Помилка завантаження фото');
+        }
+
+        // 3) Use backend URL (handles CDN/static hosting)
+        if (data?.photoUrl) {
+          const finalUrl = resolvePhotoUrl(data.photoUrl);
+          img.src = finalUrl;
+
+          // keep local user snapshot in sync
+          try {
+            const fresh = await (await fetch(`${API_BASE}/api/users/${user._id}`, { credentials: 'include' })).json();
+            localStorage.setItem('user', JSON.stringify(fresh));
+          } catch (_) {
+            // fallback: minimally store photoUrl
+            const u = JSON.parse(localStorage.getItem('user') || '{}');
+            u.photoUrl = data.photoUrl;
+            localStorage.setItem('user', JSON.stringify(u));
+          }
+        }
+
+        alert('Фото оновлено!');
+      } catch (e) {
+        console.error('Upload error:', e);
+        alert(e.message || 'Серверна помилка.');
+      }
+    };
   </script>
 </body>
 </html>

@@ -9,7 +9,17 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
+:    <style>
+/* Assignees chips */
+.assignees{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:#f2f7ff;border:1px solid #dfe9f7;font-size:12px}
+.chip .x{cursor:pointer;opacity:.6}
+.chip .x:hover{opacity:1}
+/* Assign modal list */
+#assignUsersList{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px}
+#assignUsersList .row{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px dashed #eef}
+#assignUsersList .row:last-child{border-bottom:0}
+#assignUsersActions{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
 :root{
   --bg:#f6f7fb;
   --card:#ffffff;
@@ -306,6 +316,15 @@ body{
       const API_BASE = "http://157.230.121.24:5050";
       let selectAllClicked = false;
       let allUsers = [];
+      const usersById = new Map(); // cache for quick name lookup
+      function userNameById(id){
+        const k = String(id || "");
+        if (usersById.has(k)) return usersById.get(k);
+        const u = allUsers.find(x => String(x._id) === k);
+        const name = u ? (`${u.firstName || ""} ${u.lastName || ""}`.trim() || u.email || k) : k;
+        usersById.set(k, name);
+        return name;
+      }
       const rolesById = new Map(); // _id -> name
       const rolesByName = new Map(); // name -> _id
 
@@ -501,6 +520,7 @@ body{
         try {
           const response = await fetch(`${API_BASE}/api/users/approved`);
           allUsers = await response.json();
+          usersById.clear(); allUsers.forEach(u => usersById.set(String(u._id), (`${u.firstName || ""} ${u.lastName || ""}`.trim() || u.email || String(u._id))));
           renderTable(allUsers);
         } catch (err) {
           console.error("Помилка при отриманні користувачів:", err);
@@ -941,6 +961,7 @@ body{
         try {
           const r = await fetch(`${API_BASE}/api/library?${params.toString()}`);
           const items = r.ok ? await r.json() : [];
+          items.sort((a,b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
           renderMaterialsList(items);
         } catch (e) {
           console.error(e);
@@ -964,14 +985,14 @@ body{
           row.style.padding = "12px";
           row.style.background = "#fff";
 
+          const assignees = Array.isArray(it.users) ? it.users : (Array.isArray(it.assignedUsers) ? it.assignedUsers : []);
           const meta = [
             it.destination ? `📦 ${it.destination}` : "",
             it.folder ? `📁 ${it.folder}` : "",
             it.courseId ? `🎓 ${it.courseId}` : "",
-            it.role ? `👥 ${it.role}` : "",
-          ]
-            .filter(Boolean)
-            .join(" • ");
+            it.role ? `👥 роль: ${it.role}` : "",
+            assignees.length ? `👤 призначено: ${assignees.length}` : ""
+          ].filter(Boolean).join(" • ");
 
           const title = it.title || (it.type === "video" ? "Відео" : "Файл");
           const desc = it.description || "";
@@ -1014,11 +1035,19 @@ body{
                   )}</div>`
                 : ""
             }
+            ${
+              assignees.length
+                ? `<div class="assignees">${
+                    assignees.slice(0,5).map(uid => `<span class="chip" data-uid="${uid}">${escapeHtml(userNameById(uid))}</span>`).join("")
+                  }${assignees.length > 5 ? `<span class="chip">+${assignees.length - 5}</span>` : ""}</div>`
+                : ""
+            }
           </div>
           <div style="display:flex; gap:8px; flex:0 0 auto;">
             <button type="button" class="view-btn" data-id="${
               it._id
             }">Відкрити</button>
+            <button type="button" class="view-btn" data-action="assign" data-id="${it._id}">👤 Призначення</button>
             <button type="button" class="view-btn" data-action="edit" data-id="${
               it._id
             }">✏️ Редагувати</button>
@@ -1031,6 +1060,9 @@ body{
 
           row.querySelector("[data-id]").addEventListener("click", openPreview);
           row
+            .querySelector('[data-action="assign"]')
+            .addEventListener('click', () => openAssignModal(it));
+          row
             .querySelector('[data-action="edit"]')
             .addEventListener("click", () => openEditModal(it));
           row
@@ -1040,6 +1072,98 @@ body{
           listEl.appendChild(row);
         });
       }
+      function getCurrentlyVisibleUsers(){
+        // return users currently in the table (respecting search/role filters)
+        const ids = Array.from(document.querySelectorAll('.participants-table tbody tr img.custom-checkbox')).map(img => img.getAttribute('data-user-id')).filter(Boolean);
+        return allUsers.filter(u => ids.includes(String(u._id)));
+      }
+
+      function openAssignModal(item){
+        const modal = document.getElementById('assignUsersModal');
+        if(!modal) return;
+        modal.style.display = 'block';
+        modal.dataset.itemId = item._id;
+        // source of selectable users = those visible in table (after filters) to keep parity with "Виділити всіх"
+        const pool = getCurrentlyVisibleUsers();
+        const selected = new Set((Array.isArray(item.users) ? item.users : (Array.isArray(item.assignedUsers) ? item.assignedUsers : [])).map(String));
+
+        const list = document.getElementById('assignUsersList');
+        list.innerHTML = '';
+        pool.forEach(u => {
+          const id = String(u._id);
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.innerHTML = `
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+              <input type="checkbox" value="${id}" ${selected.has(id) ? 'checked' : ''}/>
+              <span>${userNameById(id)}</span>
+              ${u.email ? `<span style="opacity:.6;font-size:12px">(${u.email})</span>` : ''}
+            </label>
+          `;
+          list.appendChild(row);
+        });
+        // prefill counters
+        updateAssignCounters();
+      }
+
+      function closeAssignModal(){
+        const modal = document.getElementById('assignUsersModal');
+        if(!modal) return;
+        modal.style.display = 'none';
+        delete modal.dataset.itemId;
+      }
+
+      function updateAssignCounters(){
+        const list = document.getElementById('assignUsersList');
+        const total = list.querySelectorAll('input[type="checkbox"]').length;
+        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
+        const lbl = document.getElementById('assignSelectedCount');
+        if(lbl) lbl.textContent = `${checked}/${total}`;
+      }
+
+      function toggleAssignAll(checked){
+        const list = document.getElementById('assignUsersList');
+        list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = !!checked);
+        updateAssignCounters();
+      }
+
+      async function saveAssignedUsers(){
+        const modal = document.getElementById('assignUsersModal');
+        const id = modal.dataset.itemId;
+        if(!id) return;
+        const list = document.getElementById('assignUsersList');
+        const ids = Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+
+        const fd = new FormData();
+        ids.forEach(uid => fd.append('users[]', uid));
+
+        try{
+          const r = await fetch(`${API_BASE}/api/library/${id}`, { method:'PUT', body: fd });
+          if(!r.ok){
+            let msg = 'Не вдалося зберегти призначення';
+            try{ const j = await r.clone().json(); msg = j?.message || msg; }catch{}
+            throw new Error(msg);
+          }
+          closeAssignModal();
+          await loadExistingMaterials();
+          alert('Призначення збережено');
+        }catch(e){
+          alert(e.message || 'Помилка збереження призначень');
+        }
+      }
+      // ----- EDIT MODAL -----
+      // Assign modal handlers
+      document.addEventListener('change', (e) => {
+        if(e.target.closest('#assignUsersList')) updateAssignCounters();
+      });
+      const btnAssignAll = document.getElementById('btnAssignAll');
+      if(btnAssignAll) btnAssignAll.addEventListener('click', () => toggleAssignAll(true));
+      const btnAssignNone = document.getElementById('btnAssignNone');
+      if(btnAssignNone) btnAssignNone.addEventListener('click', () => toggleAssignAll(false));
+      const btnAssignSave = document.getElementById('btnAssignSave');
+      if(btnAssignSave) btnAssignSave.addEventListener('click', saveAssignedUsers);
+      const btnAssignClose = document.getElementById('btnAssignClose');
+      if(btnAssignClose) btnAssignClose.addEventListener('click', closeAssignModal);
 
       async function deleteMaterial(id) {
         if (!confirm("Видалити матеріал?")) return;
@@ -1265,3 +1389,23 @@ body{
     </div>
   </body>
 </html>
+
+  <div id="assignUsersModal" class="modal" style="display:none">
+    <div class="modal-overlay" onclick="closeAssignModal()"></div>
+    <div class="modal-content">
+      <span class="close-btn" id="btnAssignClose">×</span>
+      <h2>Призначити користувачів</h2>
+      <div id="assignUsersActions">
+        <div class="hint">Обрано: <strong id="assignSelectedCount">0/0</strong></div>
+        <div style="display:flex;gap:8px">
+          <button type="button" class="btn-light-green" id="btnAssignAll">Виділити всіх</button>
+          <button type="button" class="btn" id="btnAssignNone">Скасувати вибір</button>
+        </div>
+      </div>
+      <div id="assignUsersList"></div>
+      <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:10px">
+        <button type="button" class="btn" onclick="closeAssignModal()">Скасувати</button>
+        <button type="button" class="btn-dark-green" id="btnAssignSave">Зберегти</button>
+      </div>
+    </div>
+  </div>

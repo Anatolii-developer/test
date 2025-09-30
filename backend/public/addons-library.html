@@ -164,39 +164,70 @@ function getRoleNames(u){
 async function loadAddonsMaterials(){
   const videoList = document.querySelector(".video-list");
   const bookList  = document.querySelector(".book-list");
-  videoList.innerHTML=""; bookList.innerHTML="";
+  videoList.innerHTML = ""; 
+  bookList.innerHTML  = "";
 
   const me = getCurrentUser();
-  const myRoles = getRoleNames(me);
+  const myRoles = getRoleNames(me); // масив назв ролей (якщо є)
 
-  let items = [];
-  if (myRoles.length){
-    // підтягуємо по кожній ролі та мерджимо
-    const chunks = await Promise.all(myRoles.map(r=>fetch(`${API_BASE}/api/library?destination=addons&role=${encodeURIComponent(r)}`).then(x=>x.json()).catch(()=>[])));
-    const seen = new Set();
-    chunks.flat().forEach(i=>{ if(!seen.has(i._id)){ seen.add(i._id); items.push(i);} });
-  } else {
-    // фолбек — якщо ролей нема в localStorage
-    const r = await fetch(`${API_BASE}/api/library?destination=addons`);
-    items = await r.json();
+  // завжди тягнемо базовий список (без фільтра за роллю)
+  const requests = [
+    fetch(`${API_BASE}/api/library?destination=addons`).then(r=>r.json()).catch(()=>[])
+  ];
+
+  // якщо ролі є — додаємо запити з role=...
+  if (Array.isArray(myRoles) && myRoles.length){
+    myRoles.forEach(r => {
+      const qs = `${API_BASE}/api/library?destination=addons&role=${encodeURIComponent(r)}`;
+      requests.push(fetch(qs).then(x=>x.json()).catch(()=>[]));
+    });
+  }
+
+  // об'єднуємо всі відповіді у один масив і прибираємо дублікати по _id
+  const chunks = await Promise.all(requests);
+  const seen = new Set();
+  const items = [];
+  chunks.flat().forEach(it => {
+    if (!it || typeof it !== 'object') return;
+    const arr = Array.isArray(it) ? it : [it];
+    arr.forEach(x => {
+      const id = x && (x._id || x.id || `${x.type}:${x.title}:${x.filePath || x.videoLink}`);
+      if (!seen.has(id)) { seen.add(id); items.push(x); }
+    });
+  });
+
+  // сортуємо за датою (спочатку найсвіжіші)
+  const toDate = v => { const d = v ? new Date(v) : null; return (d && !isNaN(d)) ? d : null; };
+  items.sort((a,b)=>{
+    const da = toDate(a.date || a.createdAt) || new Date(0);
+    const db = toDate(b.date || b.createdAt) || new Date(0);
+    return db - da;
+  });
+
+  // рендеримо
+  if (!items.length){
+    videoList.innerHTML = '<div style="opacity:.7">Матеріали відсутні</div>';
+    bookList.innerHTML  = '';
+    return;
   }
 
   for (const it of items){
-    if (it.type==="video"){
-      const el = document.createElement("div");
-      el.className = "video-item";
+    if (it.type === 'video'){
+      const src = getYouTubeEmbedUrl(it.videoLink) || it.videoLink || '';
+      const el = document.createElement('div');
+      el.className = 'video-item';
       el.innerHTML = `
         <h4>${esc(it.title)}</h4>
         <p>${esc(it.description)}</p>
         <div class="video-thumb">
-          <iframe src="${getYouTubeEmbedUrl(it.videoLink)}" frameborder="0" allowfullscreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+          <iframe src="${src}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>`;
       videoList.appendChild(el);
-    } else if (it.type==="book"){
-      const url = it.filePath?.startsWith("http") ? it.filePath : `${API_BASE}/${String(it.filePath||"").replace(/^\/+/, "")}`;
-      const el = document.createElement("div");
-      el.className = "book-item";
+    } else if (it.type === 'book'){
+      const raw = String(it.filePath || '');
+      const url = raw.startsWith('http') ? raw : `${API_BASE}/${raw.replace(/^\/+/, '')}`;
+      const el = document.createElement('div');
+      el.className = 'book-item';
       el.innerHTML = `
         <div class="book-info">
           <h4>${esc(it.title)}</h4>

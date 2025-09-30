@@ -6,6 +6,9 @@
   <title>Створити курс</title>
   <link rel="stylesheet" href="admin-styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
 </head>
 <body class="with-sidebar">
   <aside class="sidebar" id="sidebar"></aside>
@@ -67,8 +70,8 @@
         <div class="form-group">
           <label>Оберіть дати проведення курсу</label>
           <div class="date-range">
-            <input type="date" name="startDate" />
-            <input type="date" name="endDate" />
+            <input type="text" name="startDate" class="date-pick" placeholder="дд.мм.рррр" />
+            <input type="text" name="endDate" class="date-pick" placeholder="дд.мм.рррр" />
           </div>
           <input type="text" id="durationHuman" placeholder="Тривалість (обчислюється)" disabled />
           <input type="hidden" name="courseDuration" id="courseDuration" />
@@ -454,6 +457,21 @@ async function createNewUser() {
   });
 });
 
+  </script>
+
+  <script>
+    // Initialize Flatpickr on the two date inputs
+    document.addEventListener('DOMContentLoaded', function () {
+      const opts = {
+        locale: flatpickr.l10ns.uk,
+        altInput: true,          // show pretty format to user
+        altFormat: 'd.m.Y',      // DD.MM.YYYY display
+        dateFormat: 'Y-m-d',     // keep ISO value for scripts/back-end
+        allowInput: true
+      };
+      flatpickr('input[name="startDate"]', opts);
+      flatpickr('input[name="endDate"]', opts);
+    });
   </script>
 
 <div id="userModal" class="modal" style="display: none;">

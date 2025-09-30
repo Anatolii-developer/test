@@ -89,6 +89,10 @@
         opacity: 0.7;
         padding: 8px 0;
       }
+
+      /* Buckets (Поточні / Заплановані / Пройдені) */
+      .bucket { margin: 28px 0; }
+      .bucket-title { font-weight: 700; font-size: 20px; margin: 8px 0 14px; }
     </style>
   </head>
   <body>
@@ -206,130 +210,182 @@ async function loadCourseMaterials(){
   const list = document.getElementById("courseList");
   list.innerHTML = '<div class="empty-note">Завантаження…</div>';
 
+  // Read date filters
   const dFromVal = document.getElementById('dateFrom').value;
   const dToVal   = document.getElementById('dateTo').value;
   const dateFrom = dFromVal ? new Date(dFromVal + "T00:00:00") : null;
   const dateTo   = dToVal ? new Date(dToVal + "T23:59:59") : null;
 
+  // Current user (for filtering by my courses)
   const me = getMe();
   const myId = me?._id || me?.id || null;
 
-  // 1) Всі material-entries по destination=courses
-  const libRes = await fetch(`${API_BASE}/api/library?destination=courses`);
-  const libAll = (await libRes.json()) || [];
+  // Helper: normalize bucket name from course.status
+  const statusToBucket = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s.includes('заплан')) return 'Заплановані';
+    if (s.includes('пройден')) return 'Пройдені';
+    return 'Поточні';
+  };
 
-  // 2) Дістаємо список курсів і фільтруємо «мої»
-  let myCourseIds = new Set();
-  try{
-    const cr = await fetch(`${API_BASE}/api/courses`);
-    const courses = (await cr.json()) || [];
+  try {
+    // Fetch library items and all courses in parallel
+    const [libRes, coursesRes] = await Promise.all([
+      fetch(`${API_BASE}/api/library?destination=courses`),
+      fetch(`${API_BASE}/api/courses`)
+    ]);
+
+    const libAll = (await libRes.json()) || [];
+    const courses = (await coursesRes.json()) || [];
+
+    // Map courses by id + compute the set of "my" courses
+    const courseMap = new Map();
+    let myCourseIds = new Set();
     for (const c of courses){
-      const parts = Array.isArray(c.participants) ? c.participants.map(String) : [];
-      if (!myId || parts.includes(String(myId))){
-        myCourseIds.add(String(c._id));
+      const id = String(c._id || c.id || '');
+      if (!id) continue;
+      courseMap.set(id, c);
+      const participants = Array.isArray(c.participants) ? c.participants.map(String) : [];
+      if (!myId || participants.includes(String(myId))) {
+        myCourseIds.add(id);
       }
     }
-  } catch(_){
-    // якщо не вдалось визначити мої курси — будемо вважати, що дозволено все
-    myCourseIds = null; // «нема обмеження»
-  }
+    // If we couldn't resolve any course as "mine" (e.g., no user), don't restrict
+    if (!myId) myCourseIds = null;
 
-  // 3) Фільтруємо materials: дати + мої курси
-  const filtered = libAll.filter(it=>{
-    const dt = parseISO(it.date || it.createdAt);
-    if (dateFrom && dt && dt<dateFrom) return false;
-    if (dateTo && dt && dt>dateTo) return false;
-    if (myCourseIds && it.courseId && !myCourseIds.has(String(it.courseId))) return false;
-    return true;
-  });
+    // Filter by date and (optionally) by my courses
+    const filtered = libAll.filter(it => {
+      const dt = parseISO(it.date || it.createdAt);
+      if (dateFrom && dt && dt < dateFrom) return false;
+      if (dateTo && dt && dt > dateTo) return false;
+      if (myCourseIds && it.courseId && !myCourseIds.has(String(it.courseId))) return false;
+      return true;
+    });
 
-  if (!filtered.length){
-    list.innerHTML = "<p>Наразі матеріали відсутні.</p>";
-    return;
-  }
-
-  // 4) Групуємо за курсом → за папкою
-  const byCourse = new Map();
-  const courseIds = new Set();
-  for (const it of filtered){
-    const key = it.courseId || "_no_course_";
-    if (!byCourse.has(key)) byCourse.set(key, []);
-    byCourse.get(key).push(it);
-    if (it.courseId) courseIds.add(String(it.courseId));
-  }
-
-  // 5) Метадані курсів
-  const meta = new Map();
-  for (const cid of courseIds){
-    try{
-      const r = await fetch(`${API_BASE}/api/courses/${cid}`);
-      if (r.ok){
-        const c = await r.json();
-        meta.set(cid, {
-          title: c.courseTitle || "Курс",
-          description: c.courseSubtitle || c.courseDescription || ""
-        });
-      }
-    }catch(_){}
-  }
-
-  list.innerHTML = "";
-
-  for (const [courseKey, items] of byCourse.entries()){
-    const m = meta.get(String(courseKey)) || {title:"Курс", description:"Матеріали курсу"};
-    const courseItem = document.createElement("div");
-    courseItem.className = "course-item";
-    courseItem.innerHTML = `
-      <h4 class="course-title">${esc(m.title)}</h4>
-      <p class="course-description">${esc(m.description)}</p>
-    `;
-
-    const byFolder = new Map();
-    for (const it of items){
-      const folder = (it.folder && String(it.folder).trim()) || "Матеріали";
-      if (!byFolder.has(folder)) byFolder.set(folder, []);
-      byFolder.get(folder).push(it);
+    if (!filtered.length){
+      list.innerHTML = '<p>Наразі матеріали відсутні.</p>';
+      return;
     }
 
-    for (const [folderName, sItems] of byFolder.entries()){
-      const details = document.createElement("details");
-      details.className = "section";
-      details.innerHTML = `
-        <summary class="section-summary">📁 ${esc(folderName)}</summary>
-        <div class="materials"></div>`;
-      const wrap = details.querySelector(".materials");
+    // Group materials by courseId
+    const byCourse = new Map();
+    for (const it of filtered){
+      const key = String(it.courseId || '_no_course_');
+      if (!byCourse.has(key)) byCourse.set(key, []);
+      byCourse.get(key).push(it);
+    }
 
-      sItems.forEach((mat, idx)=>{
-        const row = document.createElement("div");
-        row.className = "material-row";
-        const title = mat.itemTitle || mat.title || (mat.type==="video" ? "Відео" : "Файл");
-        const desc  = mat.description || "";
-        const prevId = `prev-${courseKey}-${cssSafe(folderName)}-${idx}`;
+    // Build buckets: Поточні / Заплановані / Пройдені
+    const buckets = { 'Поточні': [], 'Заплановані': [], 'Пройдені': [] };
 
-        row.innerHTML = `
-          <div class="row-head">
-            <div>
-              <div class="material-title">${esc(title)}</div>
-              ${desc?`<div class="material-desc">${esc(desc)}</div>`:""}
+    // For each course, collect meta + latest material date, then push to bucket
+    for (const [cid, items] of byCourse.entries()){
+      const meta = courseMap.get(String(cid)) || {};
+      // Latest material date for sorting recency
+      const latest = items.reduce((acc, it) => {
+        const d = parseISO(it.date || it.createdAt) || 0;
+        return d && (!acc || d > acc) ? d : acc;
+      }, null) || 0;
+
+      const payload = { courseId: cid, meta, items, latest };
+      const b = statusToBucket(meta.status);
+      (buckets[b] ||= []).push(payload);
+    }
+
+    // Sort each bucket by recency (latest first)
+    for (const k of Object.keys(buckets)){
+      buckets[k].sort((a,b) => (b.latest || 0) - (a.latest || 0));
+    }
+
+    // Render
+    list.innerHTML = '';
+
+    const renderCourseBlock = (co) => {
+      const m = co.meta || {};
+      const title = m.courseTitle || 'Курс';
+      const descr = m.courseSubtitle || m.courseDescription || 'Матеріали курсу';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'course-item';
+      wrap.innerHTML = `
+        <h4 class="course-title">${esc(title)}</h4>
+        <p class="course-description">${esc(descr)}</p>
+      `;
+
+      // Group by folder
+      const byFolder = new Map();
+      for (const it of co.items){
+        const folder = (it.folder && String(it.folder).trim()) || 'Матеріали';
+        if (!byFolder.has(folder)) byFolder.set(folder, []);
+        byFolder.get(folder).push(it);
+      }
+
+      for (const [folderName, sItems] of byFolder.entries()){
+        const details = document.createElement('details');
+        details.className = 'section';
+        details.innerHTML = `
+          <summary class="section-summary">📁 ${esc(folderName)}</summary>
+          <div class="materials"></div>
+        `;
+        const matWrap = details.querySelector('.materials');
+
+        sItems.forEach((mat, idx) => {
+          const row = document.createElement('div');
+          row.className = 'material-row';
+          const t = mat.itemTitle || mat.title || (mat.type === 'video' ? 'Відео' : 'Файл');
+          const d = mat.description || '';
+          const prevId = `prev-${co.courseId}-${cssSafe(folderName)}-${idx}`;
+
+          row.innerHTML = `
+            <div class="row-head">
+              <div>
+                <div class="material-title">${esc(t)}</div>
+                ${d ? `<div class="material-desc">${esc(d)}</div>` : ''}
+              </div>
+              <button class="view-btn" type="button" data-target="${prevId}">Переглянути</button>
             </div>
-            <button class="view-btn" type="button" data-target="${prevId}">Переглянути</button>
-          </div>
-          <div class="preview" id="${prevId}"></div>`;
+            <div class="preview" id="${prevId}"></div>
+          `;
 
-        row.querySelector(".view-btn").addEventListener("click", ()=>{
-          renderPreview(document.getElementById(prevId), mat);
+          row.querySelector('.view-btn').addEventListener('click', () => {
+            renderPreview(document.getElementById(prevId), mat);
+          });
+
+          matWrap.appendChild(row);
         });
 
-        wrap.appendChild(row);
-      });
+        wrap.appendChild(details);
+      }
 
-      courseItem.appendChild(details);
+      return wrap;
+    };
+
+    const order = ['Поточні', 'Заплановані', 'Пройдені'];
+    let renderedAny = false;
+    for (const bucketName of order){
+      const arr = buckets[bucketName] || [];
+      if (!arr.length) continue;
+      renderedAny = true;
+
+      const bucketEl = document.createElement('div');
+      bucketEl.className = 'bucket';
+      const h = document.createElement('h3');
+      h.className = 'bucket-title';
+      h.textContent = bucketName;
+      bucketEl.appendChild(h);
+
+      arr.forEach(co => bucketEl.appendChild(renderCourseBlock(co)));
+      list.appendChild(bucketEl);
     }
 
-    list.appendChild(courseItem);
+    if (!renderedAny){
+      list.innerHTML = '<p>Наразі матеріали відсутні.</p>';
+    }
+  } catch (err) {
+    console.error('Помилка при завантаженні матеріалів:', err);
+    list.innerHTML = '<p>Помилка завантаження матеріалів.</p>';
   }
 }
-
 function renderPreview(container, mat){
   if (!container) return;
   const wasActive = container.classList.contains("active");

@@ -187,196 +187,180 @@
 
     <script src="script.js"></script>
     <script>
-  const API_BASE = "http://157.230.121.24:5050";
+const API_BASE = "http://157.230.121.24:5050";
 
-  window.addEventListener("load", () => {
-    loadCourseMaterials();
-    document.getElementById("btnFilter").addEventListener("click", loadCourseMaterials);
+function getYouTubeEmbedUrl(link){
+  const m = String(link||"").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : "";
+}
+const esc = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const cssSafe = s => String(s||"").replace(/[^a-z0-9_-]+/gi,"-");
+const parseISO = v => { const d = v?new Date(v):null; return isNaN(d?.getTime?.())?null:d; };
+
+function getMe(){
+  // очікуємо з localStorage (як у адмінці)
+  try { return JSON.parse(localStorage.getItem("user")||"null"); } catch(_){ return null; }
+}
+
+async function loadCourseMaterials(){
+  const list = document.getElementById("courseList");
+  list.innerHTML = '<div class="empty-note">Завантаження…</div>';
+
+  const dFromVal = document.getElementById('dateFrom').value;
+  const dToVal   = document.getElementById('dateTo').value;
+  const dateFrom = dFromVal ? new Date(dFromVal + "T00:00:00") : null;
+  const dateTo   = dToVal ? new Date(dToVal + "T23:59:59") : null;
+
+  const me = getMe();
+  const myId = me?._id || me?.id || null;
+
+  // 1) Всі material-entries по destination=courses
+  const libRes = await fetch(`${API_BASE}/api/library?destination=courses`);
+  const libAll = (await libRes.json()) || [];
+
+  // 2) Дістаємо список курсів і фільтруємо «мої»
+  let myCourseIds = new Set();
+  try{
+    const cr = await fetch(`${API_BASE}/api/courses`);
+    const courses = (await cr.json()) || [];
+    for (const c of courses){
+      const parts = Array.isArray(c.participants) ? c.participants.map(String) : [];
+      if (!myId || parts.includes(String(myId))){
+        myCourseIds.add(String(c._id));
+      }
+    }
+  } catch(_){
+    // якщо не вдалось визначити мої курси — будемо вважати, що дозволено все
+    myCourseIds = null; // «нема обмеження»
+  }
+
+  // 3) Фільтруємо materials: дати + мої курси
+  const filtered = libAll.filter(it=>{
+    const dt = parseISO(it.date || it.createdAt);
+    if (dateFrom && dt && dt<dateFrom) return false;
+    if (dateTo && dt && dt>dateTo) return false;
+    if (myCourseIds && it.courseId && !myCourseIds.has(String(it.courseId))) return false;
+    return true;
   });
 
-  function getYouTubeEmbedUrl(link) {
-    const m = String(link || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
-    return m ? `https://www.youtube.com/embed/${m[1]}` : "";
+  if (!filtered.length){
+    list.innerHTML = "<p>Наразі матеріали відсутні.</p>";
+    return;
   }
 
-  function escapeHtml(s) {
-    return String(s || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+  // 4) Групуємо за курсом → за папкою
+  const byCourse = new Map();
+  const courseIds = new Set();
+  for (const it of filtered){
+    const key = it.courseId || "_no_course_";
+    if (!byCourse.has(key)) byCourse.set(key, []);
+    byCourse.get(key).push(it);
+    if (it.courseId) courseIds.add(String(it.courseId));
   }
-  function cssSafe(s) { return String(s || "").replace(/[^a-z0-9_-]+/gi, "-"); }
-  function parseISODate(v){ const d = v ? new Date(v) : null; return isNaN(d?.getTime?.()) ? null : d; }
 
-  async function loadCourseMaterials() {
-    const list = document.getElementById("courseList");
-    list.innerHTML = '<div class="empty-note">Завантаження…</div>';
+  // 5) Метадані курсів
+  const meta = new Map();
+  for (const cid of courseIds){
+    try{
+      const r = await fetch(`${API_BASE}/api/courses/${cid}`);
+      if (r.ok){
+        const c = await r.json();
+        meta.set(cid, {
+          title: c.courseTitle || "Курс",
+          description: c.courseSubtitle || c.courseDescription || ""
+        });
+      }
+    }catch(_){}
+  }
 
-    // зчитуємо фільтри
-    const dFromVal = document.getElementById('dateFrom').value;
-    const dToVal   = document.getElementById('dateTo').value;
-    const dateFrom = dFromVal ? new Date(dFromVal + "T00:00:00") : null;
-    const dateTo   = dToVal ? new Date(dToVal + "T23:59:59") : null;
+  list.innerHTML = "";
 
-    try {
-      const res = await fetch(`${API_BASE}/api/library?destination=courses`);
-      const data = await res.json();
-      const materials = Array.isArray(data) ? data : [];
+  for (const [courseKey, items] of byCourse.entries()){
+    const m = meta.get(String(courseKey)) || {title:"Курс", description:"Матеріали курсу"};
+    const courseItem = document.createElement("div");
+    courseItem.className = "course-item";
+    courseItem.innerHTML = `
+      <h4 class="course-title">${esc(m.title)}</h4>
+      <p class="course-description">${esc(m.description)}</p>
+    `;
 
-      // фільтруємо по датам (беремо createdAt або date)
-      const filtered = materials.filter(it => {
-        const dt = parseISODate(it.date || it.createdAt);
-        if (!dt) return true;
-        if (dateFrom && dt < dateFrom) return false;
-        if (dateTo && dt > dateTo) return false;
-        return true;
+    const byFolder = new Map();
+    for (const it of items){
+      const folder = (it.folder && String(it.folder).trim()) || "Матеріали";
+      if (!byFolder.has(folder)) byFolder.set(folder, []);
+      byFolder.get(folder).push(it);
+    }
+
+    for (const [folderName, sItems] of byFolder.entries()){
+      const details = document.createElement("details");
+      details.className = "section";
+      details.innerHTML = `
+        <summary class="section-summary">📁 ${esc(folderName)}</summary>
+        <div class="materials"></div>`;
+      const wrap = details.querySelector(".materials");
+
+      sItems.forEach((mat, idx)=>{
+        const row = document.createElement("div");
+        row.className = "material-row";
+        const title = mat.itemTitle || mat.title || (mat.type==="video" ? "Відео" : "Файл");
+        const desc  = mat.description || "";
+        const prevId = `prev-${courseKey}-${cssSafe(folderName)}-${idx}`;
+
+        row.innerHTML = `
+          <div class="row-head">
+            <div>
+              <div class="material-title">${esc(title)}</div>
+              ${desc?`<div class="material-desc">${esc(desc)}</div>`:""}
+            </div>
+            <button class="view-btn" type="button" data-target="${prevId}">Переглянути</button>
+          </div>
+          <div class="preview" id="${prevId}"></div>`;
+
+        row.querySelector(".view-btn").addEventListener("click", ()=>{
+          renderPreview(document.getElementById(prevId), mat);
+        });
+
+        wrap.appendChild(row);
       });
 
-      if (!filtered.length) {
-        list.innerHTML = "<p>Наразі матеріали відсутні.</p>";
-        return;
-      }
-
-      // Групування за courseId
-      const byCourse = new Map();
-      const courseIds = new Set();
-      for (const it of filtered) {
-        const key = it.courseId || "_no_course_";
-        if (!byCourse.has(key)) byCourse.set(key, []);
-        byCourse.get(key).push(it);
-        if (it.courseId) courseIds.add(String(it.courseId));
-      }
-
-      // Підтягуємо назви/описи курсів
-      const meta = new Map();
-      for (const cid of courseIds) {
-        try {
-          const r = await fetch(`${API_BASE}/api/courses/${cid}`);
-          if (r.ok) {
-            const c = await r.json();
-            meta.set(cid, {
-              title: c.courseTitle || "Курс",
-              description: c.courseSubtitle || c.courseDescription || ""
-            });
-          }
-        } catch(_) {}
-      }
-
-      list.innerHTML = "";
-
-      for (const [courseKey, items] of byCourse.entries()) {
-        const m = meta.get(String(courseKey)) || {
-          title: inferCourseTitle(items),
-          description: "Матеріали, додані до цього курсу"
-        };
-
-        const courseItem = document.createElement("div");
-        courseItem.className = "course-item";
-        courseItem.innerHTML = `
-          <h4 class="course-title">${escapeHtml(m.title)}</h4>
-          <p class="course-description">${escapeHtml(m.description)}</p>
-        `;
-
-        // групування за папкою (folder); якщо пусто — “Матеріали”
-        const byFolder = new Map();
-        for (const it of items) {
-          const folder = (it.folder && String(it.folder).trim()) || "Матеріали";
-          if (!byFolder.has(folder)) byFolder.set(folder, []);
-          byFolder.get(folder).push(it);
-        }
-
-        for (const [folderName, sItems] of byFolder.entries()) {
-          const details = document.createElement("details");
-          details.className = "section";
-          details.innerHTML = `
-            <summary class="section-summary">📁 ${escapeHtml(folderName)}</summary>
-            <div class="materials"></div>
-          `;
-          const materialsWrap = details.querySelector(".materials");
-
-          sItems.forEach((mat, idx) => {
-            const row = document.createElement("div");
-            row.className = "material-row";
-
-            const title = mat.itemTitle || mat.title || (mat.type === "video" ? "Відео" : "Файл");
-            const desc  = mat.description || "";
-
-            row.innerHTML = `
-              <div class="row-head">
-                <div>
-                  <div class="material-title">${escapeHtml(title)}</div>
-                  ${desc ? `<div class="material-desc">${escapeHtml(desc)}</div>` : ""}
-                </div>
-                <button class="view-btn" type="button">Переглянути</button>
-              </div>
-              <div class="preview" id="prev-${courseKey}-${cssSafe(folderName)}-${idx}"></div>
-            `;
-
-            const btn = row.querySelector(".view-btn");
-            const preview = row.querySelector(".preview");
-            btn.addEventListener("click", () => renderPreview(preview, mat));
-
-            materialsWrap.appendChild(row);
-          });
-
-          courseItem.appendChild(details);
-        }
-
-        list.appendChild(courseItem);
-      }
-    } catch (err) {
-      console.error("Помилка при завантаженні матеріалів:", err);
-      list.innerHTML = "<p>Помилка завантаження матеріалів.</p>";
-    }
-  }
-
-  function renderPreview(container, mat) {
-    if (!container) return;
-
-    // Тоггл
-    const wasActive = container.classList.contains("active");
-    document.querySelectorAll(".preview.active").forEach(el => { el.classList.remove("active"); el.innerHTML = ""; });
-    if (wasActive) { container.classList.remove("active"); return; }
-    container.classList.add("active");
-
-    if (mat.type === "video") {
-      const src = getYouTubeEmbedUrl(mat.videoLink);
-      container.innerHTML = src
-        ? `<iframe src="${src}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Відео"></iframe>`
-        : `<div class="material-desc">Невірне посилання на відео.</div>`;
-      return;
+      courseItem.appendChild(details);
     }
 
-    // Файлы
-    const rawPath = mat.filePath || "";
-    const url = rawPath.startsWith("http") ? rawPath : `${API_BASE}/${rawPath.replace(/^\/+/, '')}`;
-    const ext = (rawPath.split(".").pop() || "").toLowerCase();
+    list.appendChild(courseItem);
+  }
+}
 
-    if (ext === "pdf") {
-      container.innerHTML = `<embed src="${url}" type="application/pdf" />`;
-    } else if (["doc","docx","ppt","pptx"].includes(ext)) {
-      // Без HTTPS — даём ссылку
-      container.innerHTML = `
-        <div class="material-desc">
-          Попередній перегляд недоступний без HTTPS.
-          <a href="${url}" target="_blank" rel="noopener">Відкрити / Завантажити</a>
-        </div>`;
-      // Если переведёшь домен на HTTPS — включи офисный вьювер:
-      // const office = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
-      // container.innerHTML = `<iframe src="${office}" title="Прев'ю файлу"></iframe>`;
-    } else {
-      container.innerHTML = `
-        <div class="material-desc">Попередній перегляд недоступний.
-          <a href="${url}" target="_blank" rel="noopener">Відкрити файл</a>
-        </div>`;
-    }
+function renderPreview(container, mat){
+  if (!container) return;
+  const wasActive = container.classList.contains("active");
+  document.querySelectorAll(".preview.active").forEach(el=>{ el.classList.remove("active"); el.innerHTML=""; });
+  if (wasActive){ container.classList.remove("active"); return; }
+  container.classList.add("active");
+
+  if (mat.type==="video"){
+    const src = getYouTubeEmbedUrl(mat.videoLink);
+    container.innerHTML = src
+      ? `<iframe src="${src}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Відео"></iframe>`
+      : `<div class="material-desc">Невірне посилання на відео.</div>`;
+    return;
   }
 
-  function inferCourseTitle(items) {
-    return items.find(i => i.courseTitle)?.courseTitle
-        || items.find(i => i.title)?.title
-        || "Курс";
+  const raw = mat.filePath || "";
+  const url = raw.startsWith("http") ? raw : `${API_BASE}/${raw.replace(/^\/+/, "")}`;
+  const ext = (raw.split(".").pop()||"").toLowerCase();
+  if (ext==="pdf"){
+    container.innerHTML = `<embed src="${url}" type="application/pdf" />`;
+  } else if (["doc","docx","ppt","pptx"].includes(ext)){
+    container.innerHTML = `<div class="material-desc">Попередній перегляд недоступний без HTTPS. <a href="${url}" target="_blank" rel="noopener">Відкрити / Завантажити</a></div>`;
+  } else {
+    container.innerHTML = `<div class="material-desc">Попередній перегляд недоступний. <a href="${url}" target="_blank" rel="noopener">Відкрити файл</a></div>`;
   }
+}
+
+window.addEventListener("load", ()=>{
+  document.getElementById("btnFilter").addEventListener("click", loadCourseMaterials);
+  loadCourseMaterials().catch(console.error);
+});
 </script>
   </body>
 </html>

@@ -127,47 +127,91 @@
   </main>
 
   <script src="script.js"></script>
-  <script>async function loadAddonsMaterials() {
-  try {
-    const response = await fetch("http://157.230.121.24:5050/api/library?destination=addons");
-    const data = await response.json();
+  <script>
+const API_BASE = "http://157.230.121.24:5050";
 
-    const videoList = document.querySelector(".video-list");
-    const bookList = document.querySelector(".book-list");
+function getYouTubeEmbedUrl(link){
+  const m = String(link||"").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : "";
+}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-    // Очистка старых
-    videoList.innerHTML = "";
-    bookList.innerHTML = "";
+function wireTabs(){
+  const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
+  const video = document.querySelector(".video-list");
+  const books = document.querySelector(".book-list");
+  tabs[0].dataset.type="video"; tabs[1].dataset.type="book";
+  tabs.forEach(t=>t.addEventListener("click", ()=>{
+    tabs.forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const want = t.dataset.type;
+    video.style.display = want==="video" ? "grid" : "none";
+    books.style.display = want==="book" ? "grid" : "none";
+  }));
+}
 
-    data.forEach((item) => {
-      if (item.type === "video") {
-        const videoItem = document.createElement("div");
-        videoItem.classList.add("video-item");
-        videoItem.innerHTML = `
-          <h4>${item.title}</h4>
-          <p>${item.description}</p>
-          <div class="video-thumb">
-            <iframe src="${item.videoLink}" frameborder="0" allowfullscreen></iframe>
-          </div>`;
-        videoList.appendChild(videoItem);
-      }
+function getCurrentUser(){
+  // очікуємо, що ви десь кладете юзера в localStorage
+  try { return JSON.parse(localStorage.getItem("user")||"null"); } catch(_){ return null; }
+}
+function getRoleNames(u){
+  if (!u) return [];
+  if (Array.isArray(u.roles)) return u.roles.map(String);
+  if (u.role) return [String(u.role)];
+  return [];
+}
 
-      if (item.type === "book") {
-        const bookItem = document.createElement("div");
-        bookItem.classList.add("book-item");
-        bookItem.innerHTML = `
-          <div class="book-info">
-            <h4>${item.title}</h4>
-            <p>${item.description}</p>
-          </div>
-          <a class="book-download-btn" href="http://157.230.121.24:5050/${item.filePath}" target="_blank">Завантажити</a>`;
-        bookList.appendChild(bookItem);
-      }
-    });
-  } catch (err) {
-    console.error("Помилка при завантаженні додаткових матеріалів", err);
+async function loadAddonsMaterials(){
+  const videoList = document.querySelector(".video-list");
+  const bookList  = document.querySelector(".book-list");
+  videoList.innerHTML=""; bookList.innerHTML="";
+
+  const me = getCurrentUser();
+  const myRoles = getRoleNames(me);
+
+  let items = [];
+  if (myRoles.length){
+    // підтягуємо по кожній ролі та мерджимо
+    const chunks = await Promise.all(myRoles.map(r=>fetch(`${API_BASE}/api/library?destination=addons&role=${encodeURIComponent(r)}`).then(x=>x.json()).catch(()=>[])));
+    const seen = new Set();
+    chunks.flat().forEach(i=>{ if(!seen.has(i._id)){ seen.add(i._id); items.push(i);} });
+  } else {
+    // фолбек — якщо ролей нема в localStorage
+    const r = await fetch(`${API_BASE}/api/library?destination=addons`);
+    items = await r.json();
+  }
+
+  for (const it of items){
+    if (it.type==="video"){
+      const el = document.createElement("div");
+      el.className = "video-item";
+      el.innerHTML = `
+        <h4>${esc(it.title)}</h4>
+        <p>${esc(it.description)}</p>
+        <div class="video-thumb">
+          <iframe src="${getYouTubeEmbedUrl(it.videoLink)}" frameborder="0" allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>`;
+      videoList.appendChild(el);
+    } else if (it.type==="book"){
+      const url = it.filePath?.startsWith("http") ? it.filePath : `${API_BASE}/${String(it.filePath||"").replace(/^\/+/, "")}`;
+      const el = document.createElement("div");
+      el.className = "book-item";
+      el.innerHTML = `
+        <div class="book-info">
+          <h4>${esc(it.title)}</h4>
+          <p>${esc(it.description)}</p>
+        </div>
+        <a class="book-download-btn" href="${url}" target="_blank" rel="noopener">Завантажити</a>`;
+      bookList.appendChild(el);
+    }
   }
 }
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  wireTabs();
+  loadAddonsMaterials().catch(console.error);
+});
 </script>
 </body>
 </html>

@@ -28,8 +28,16 @@ API_BASE = "http://157.230.121.24:5050";
 })();
 
 async function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+   const usernameEl = document.getElementById("username");
+  const passwordEl = document.getElementById("password");
+  const username = usernameEl.value.trim();
+  const password = passwordEl.value.trim();
+
+  if (!username || !password) {
+    alert("Введіть username і пароль.");
+    if (!username) usernameEl.focus(); else passwordEl.focus();
+    return;
+  }
 
   console.log("[LOGIN] Введено:", { username, password });
 
@@ -87,90 +95,109 @@ function safeSetValue(id, value) {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-  // проверяем, если это profile.html
-  if (window.location.pathname.includes("profile.html")) {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
+  // Только для profile.html
+  if (!window.location.pathname.includes("profile.html")) return;
+
+  try {
+    // 1) Проверяем реальную авторизацию на сервере
+    const pr = await fetch(`${API_BASE}/api/users/profile`, { credentials: "include" });
+    const prData = await pr.json().catch(() => ({}));
+
+    if (!pr.ok || !prData?.ok || !prData?.user?._id) {
+      // Нет валидной сессии — чистим локальные следы и уходим на логин
+      try {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("jwt");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("bearer");
+      } catch(_) {}
       alert("Please log in first.");
       window.location.href = "index.html";
       return;
     }
 
-    try {
-     const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, { credentials: "include" });
-      const user = await res.json();
-      document.getElementById("profileUsername").textContent = user.username || "";
-      document.getElementById("profileFirstName").textContent = user.firstName || "";
-      document.getElementById("profileLastName").textContent = user.lastName || "";
-      document.getElementById("profileMiddleName").textContent = user.middleName || "";
-      document.getElementById("profileEmail").textContent = user.email || "";
-      document.getElementById("profilePhone").textContent = user.phone || "";
-      document.getElementById("profileGender").textContent = user.gender || "";
-      document.getElementById("profileExperience").textContent = user.experience || "";
-      document.getElementById("profileEducation").textContent = user.education || "";
-      document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
-      document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
-      document.getElementById("profileAboutTextarea").value = user.about || "";
-      document.getElementById("profileCoursesTextarea").value = user.courses || "";
-      document.getElementById("profileRoleTextarea").value = user.role || "";
-      document.getElementById("profileCostTextarea").value = user.cost || "";
-      const videoTextarea = document.getElementById("profileVideoTextarea");
+    // 2) Доверяемся серверу, обновляем локальный слепок
+    const sessionUser = prData.user;
+    try { localStorage.setItem("user", JSON.stringify(sessionUser)); } catch(_) {}
+
+    // 3) Грузим свежие данные пользователя по id
+    const res = await fetch(`${API_BASE}/api/users/${sessionUser._id}`, { credentials: "include" });
+    const user = await res.json();
+
+    // 4) Заполняем профиль
+    document.getElementById("profileUsername").textContent = user.username || "";
+    document.getElementById("profileFirstName").textContent = user.firstName || "";
+    document.getElementById("profileLastName").textContent = user.lastName || "";
+    document.getElementById("profileMiddleName").textContent = user.middleName || "";
+    document.getElementById("profileEmail").textContent = user.email || "";
+    document.getElementById("profilePhone").textContent = user.phone || "";
+    document.getElementById("profileGender").textContent = user.gender || "";
+    document.getElementById("profileExperience").textContent = user.experience || "";
+    document.getElementById("profileEducation").textContent = user.education || "";
+    document.getElementById("profileDirections").textContent = (user.directions || []).join(", ");
+    document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
+    document.getElementById("profileAboutTextarea").value = user.about || "";
+    document.getElementById("profileCoursesTextarea").value = user.courses || "";
+    document.getElementById("profileRoleTextarea").value = user.role || "";
+    document.getElementById("profileCostTextarea").value = user.cost || "";
+
+    const videoTextarea = document.getElementById("profileVideoTextarea");
     if (videoTextarea) {
       videoTextarea.value = user.videoLink || "";
-      }
-      safeSetValue("profileQualificationsTextarea", user.qualifications);
-      safeSetValue("profileExperienceExtraTextarea", user.experienceExtra);
-      const languageTextarea = document.getElementById("profileLanguageTextarea");
-if (languageTextarea) {
-  languageTextarea.value = user.language || "";
-}
-      const formatTextarea = document.getElementById("profileFormatTextarea");
-if (formatTextarea) {
-  formatTextarea.value = user.format || "";
-}
-      
-      window.currentUser = user;
-      // ✅ Инициализация textarea "Про мене"
-const coursesTextarea = document.getElementById("profileCoursesTextarea");
-const coursesCheckIcon = document.getElementById("coursesCheckIcon");
+    }
+    safeSetValue("profileQualificationsTextarea", user.qualifications);
+    safeSetValue("profileExperienceExtraTextarea", user.experienceExtra);
 
-if (coursesTextarea && coursesCheckIcon) {
-  coursesTextarea.value = user.courses || "";
+    const languageTextarea = document.getElementById("profileLanguageTextarea");
+    if (languageTextarea) {
+      languageTextarea.value = user.language || "";
+    }
+    const formatTextarea = document.getElementById("profileFormatTextarea");
+    if (formatTextarea) {
+      formatTextarea.value = user.format || "";
+    }
 
-  coursesTextarea.addEventListener("input", () => {
-    coursesCheckIcon.style.display = "inline";
-  });
+    window.currentUser = user;
 
-  coursesCheckIcon.addEventListener("click", async () => {
-    const newValue = coursesTextarea.value.trim();
+    // ✅ Ініціалізація textarea "Курси"
+    const coursesTextarea = document.getElementById("profileCoursesTextarea");
+    const coursesCheckIcon = document.getElementById("coursesCheckIcon");
 
-    try {
-      const res = await fetch(`${API_BASE}/api/users/${user._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ courses: newValue }),
+    if (coursesTextarea && coursesCheckIcon) {
+      coursesTextarea.value = user.courses || "";
+      coursesTextarea.addEventListener("input", () => {
+        coursesCheckIcon.style.display = "inline";
       });
 
-      const result = await res.json();
-      if (res.ok) {
-        coursesCheckIcon.style.display = "none";
-        alert("Збережено!");
-      } else {
-        alert("Помилка при збереженні: " + result.message);
-      }
-    } catch (err) {
-      console.error("❌ Error:", err);
-      alert("Серверна помилка.");
-    }
-  });
-}
+      coursesCheckIcon.addEventListener("click", async () => {
+        const newValue = (coursesTextarea.value || "").trim();
+        try {
+          const upd = await fetch(`${API_BASE}/api/users/${user._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ courses: newValue }),
+          });
 
-
-    } catch (err) {
-      console.error("Failed to load user data:", err);
-      alert("Failed to load user data.");
+          const result = await upd.json().catch(() => ({}));
+          if (upd.ok) {
+            coursesCheckIcon.style.display = "none";
+            alert("Збережено!");
+          } else {
+            alert("Помилка при збереженні: " + (result.message || "невідома"));
+          }
+        } catch (err) {
+          console.error("❌ Error:", err);
+          alert("Серверна помилка.");
+        }
+      });
     }
+  } catch (err) {
+    console.error("Failed to load user data:", err);
+    alert("Failed to load user data.");
+    window.location.href = "index.html";
   }
 });
 

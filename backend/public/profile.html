@@ -354,22 +354,16 @@
   <script src="script.js"></script>
   <script>
 
-  // Resolve image URL coming from backend (can be '/uploads/...' or full URL)
   function resolvePhotoUrl(url) {
-    if (!url) return '';
-    try {
-      // already absolute?
-      if (/^https?:\/\//i.test(url)) return url;
-      // if starts with // (protocol-relative)
-      if (/^\/\//.test(url)) return window.location.protocol + url;
-      // else prefix with API_BASE
-      const base = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE.replace(/\/+$/, '') : '';
-      const path = url.startsWith('/') ? url : '/' + url;
-      return base + path;
-    } catch (_) {
-      return url;
-    }
-  }
+  if (!url) return '';
+  try {
+    if (/^https?:\/\//i.test(url)) return url;           // вже абсолютний
+    if (/^\/\//.test(url)) return window.location.protocol + url; // //host/...
+    const base = (typeof API_BASE !== 'undefined' ? API_BASE : '').replace(/\/+$/, '');
+    const path = url.startsWith('/') ? url : '/' + url;
+    return base + path;
+  } catch { return url; }
+}
 
 
 function toggleCityField() {
@@ -460,17 +454,16 @@ function populateFormat(freshUser) {
       if (!freshUser) return;
 
       // Photo (if exists)
-      const photoEl = document.getElementById('profilePhoto');
-      if (photoEl && freshUser.photoUrl) {
-        photoEl.src = resolvePhotoUrl(freshUser.photoUrl);
-        photoEl.alt = 'Profile photo';
-        if (photoEl) {
-          photoEl.onerror = function () {
-            // fallback to placeholder if broken link
-            this.src = 'assets/profile-photo.png';
-          };
-        }
-      }
+     const photoEl = document.getElementById("profilePhoto");
+if (photoEl) {
+  if (user.photoUrl) {
+    const finalUrl = resolvePhotoUrl(user.photoUrl) + `?v=${Date.now()}`; // кеш-бастинг
+    photoEl.src = finalUrl;
+    photoEl.onerror = () => { photoEl.src = 'assets/profile-photo.png'; };
+  } else {
+    photoEl.src = 'assets/profile-photo.png';
+  }
+}
 
       // Step 2 textareas
       setIfExists(document.getElementById('profileAboutTextarea'), freshUser.about);

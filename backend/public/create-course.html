@@ -6,6 +6,9 @@
   <title>Створити курс</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
 </head>
 <body>
  <aside class="sidebar collapsed" id="sidebar">
@@ -76,8 +79,8 @@
         <div class="form-group">
           <label>Оберіть дати проведення курсу</label>
           <div class="date-range">
-            <input type="date" name="startDate" />
-            <input type="date" name="endDate" />
+            <input type="text" name="startDate" class="datepicker" placeholder="дд.мм.рррр" />
+            <input type="text" name="endDate" class="datepicker" placeholder="дд.мм.рррр" />
           </div>
         </div>
 
@@ -165,5 +168,18 @@
 
 
   <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.flatpickr) {
+        flatpickr('.datepicker', {
+          dateFormat: 'Y-m-d',   // value sent/stored
+          altInput: true,
+          altFormat: 'd.m.Y',    // what user sees
+          allowInput: true,
+          locale: window.flatpickr.l10ns.uk
+        });
+      }
+    });
+  </script>
 </body>
 </html>

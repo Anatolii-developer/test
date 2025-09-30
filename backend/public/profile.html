@@ -400,6 +400,43 @@ function populateFormat(freshUser) {
       autoResize(el);
     }
 
+    // Step 2: helper for saving textareas and wiring up check icons
+    function setupTextareaSave(textareaId, mongoKey, checkIconId){
+      const textarea = document.getElementById(textareaId);
+      const checkIcon = document.getElementById(checkIconId);
+      if (!textarea || !checkIcon) return;
+
+      // show the check icon when the user types
+      textarea.addEventListener('input', () => {
+        checkIcon.style.display = 'inline';
+      });
+
+      checkIcon.addEventListener('click', async () => {
+        const rawUser = localStorage.getItem('user');
+        if (!rawUser) { alert('Увійдіть у систему'); return; }
+        const user = JSON.parse(rawUser);
+        const payload = { [mongoKey]: (textarea.value || '').trim() };
+
+        try {
+          const res = await fetch(`${API_BASE}/api/users/${user._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+          });
+          const result = await res.json().catch(()=>({}));
+          if (!res.ok) throw new Error(result.message || 'Помилка збереження');
+          checkIcon.style.display = 'none';
+          // optionally refresh local snapshot
+          localStorage.setItem('user', JSON.stringify(result));
+          alert('Збережено!');
+        } catch(e){
+          console.error(e);
+          alert(e.message || 'Сталася помилка під час збереження');
+        }
+      });
+    }
+
     async function populateStep2FromUser() {
       // Pull fresh user from API
       const freshUser = await fetchFreshUser();
@@ -420,7 +457,7 @@ function populateFormat(freshUser) {
       setIfExists(document.getElementById('profileQualificationsTextarea'), freshUser.qualifications);
       setIfExists(document.getElementById('profileExperienceExtraTextarea'), freshUser.experienceExtra);
       setIfExists(document.getElementById('profileLanguageTextarea'), freshUser.language);
-      setIfExists(document.getElementById('profileFormatTextarea'), freshUser.format);
+      // Removed setIfExists for profileFormatTextarea (no such element)
 
       // Apply format (checkboxes + city) from user
       populateFormat(freshUser);
@@ -514,14 +551,6 @@ function populateFormat(freshUser) {
     // Keep height in sync on viewport changes
     window.addEventListener('resize', () => autoResize(document.getElementById('profileCoursesTextarea')));
 
-    // debounce helper
-    function debounce(fn, wait){
-      let t;
-      return function(...args){
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(this, args), wait);
-      };
-    }
 
     // Save format (Онлайн/Офлайн) + city to backend
     async function saveFormatSection() {
@@ -561,21 +590,26 @@ function populateFormat(freshUser) {
       }
     }
 
-    const debouncedSaveFormat = debounce(() => {
-      // auto-save after quick changes
-      saveFormatSection();
-    }, 500);
-
     document.addEventListener('DOMContentLoaded', () => {
       const onlineCb  = document.getElementById('formatOnline');
       const offlineCb = document.getElementById('formatOffline');
       const cityInput = document.getElementById('offlineCity');
       const saveBtn   = document.getElementById('saveFormatBtn');
 
-      if (onlineCb)  onlineCb.addEventListener('change', () => { toggleCityField(); debouncedSaveFormat(); });
-      if (offlineCb) offlineCb.addEventListener('change', () => { toggleCityField(); debouncedSaveFormat(); });
-      if (cityInput) cityInput.addEventListener('input', debouncedSaveFormat);
+      if (onlineCb)  onlineCb.addEventListener('change', () => { toggleCityField(); });
+      if (offlineCb) offlineCb.addEventListener('change', () => { toggleCityField(); });
+      // no auto-save on input/change
       if (saveBtn)   saveBtn.addEventListener('click', saveFormatSection);
+    });
+
+    // Step 2: wire up textarea saves after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      setupTextareaSave('profileAboutTextarea', 'about', 'aboutCheckIcon');
+      setupTextareaSave('profileCostTextarea', 'cost', 'costCheckIcon');
+      setupTextareaSave('profileVideoTextarea', 'videoLink', 'videoCheckIcon');
+      setupTextareaSave('profileQualificationsTextarea', 'qualifications', 'qualificationsCheckIcon');
+      setupTextareaSave('profileExperienceExtraTextarea', 'experienceExtra', 'experienceExtraCheckIcon');
+      setupTextareaSave('profileLanguageTextarea', 'language', 'languageCheckIcon');
     });
   </script>
 </body>

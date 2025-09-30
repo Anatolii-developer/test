@@ -10,9 +10,15 @@ const router = express.Router();
 const userCtrl = require("../controllers/userController");
 const User = require("../models/User");
 
-// ===== Multer =====
-const profilePhotoUpload = multer({ dest: "uploads/" });
+const profileStorage = multer.diskStorage({
+  destination: (req, file, cb) =>
+    cb(null, path.join(__dirname, "../public/uploads")),
+  filename: (req, file, cb) =>
+    cb(null, Date.now() + "-" + file.originalname),
+});
+const profilePhotoUpload = multer({ storage: profileStorage });
 
+// сертификаты уже ок: ../public/uploads/certificates
 const certStorage = multer.diskStorage({
   destination: (req, file, cb) =>
     cb(null, path.join(__dirname, "../public/uploads/certificates")),

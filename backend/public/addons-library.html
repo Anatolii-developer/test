@@ -12,6 +12,10 @@
       display: grid;
       gap: 16px;
     }
+    .book-list{
+      display: grid;
+      gap: 16px;
+    }
     .video-item .video-thumb{
       width: 100%;
       background: #000;
@@ -93,8 +97,8 @@
       <section class="library-content">
         <!-- Tabs -->
         <div class="tabs">
-          <button class="tab active">Відео</button>
-          <button class="tab">Книги</button>
+          <button class="tab active" data-type="video">Відео</button>
+          <button class="tab" data-type="book">Книги</button>
         </div>
 
         <!-- Filter -->
@@ -109,54 +113,12 @@
           </div>
         </div>
 
-        <!-- Video Items -->
-        <div class="video-list">
-          <div class="video-item">
-            <h4>Назва для відео</h4>
-            <p>Підпис для відео, в якому буде міститись основна інформація, що потрібно знати клієнту про нього</p>
-            <div class="video-thumb"></div>
-          </div>
-
-          <div class="video-item">
-            <h4>Назва для відео</h4>
-            <p>Підпис для відео, в якому буде міститись основна інформація, що потрібно знати клієнту про нього</p>
-            <div class="video-thumb"></div>
-          </div>
-
-          <div class="video-item">
-            <h4>Назва для відео</h4>
-            <p>Підпис для відео, в якому буде міститись основна інформація, що потрібно знати клієнту про нього</p>
-            <div class="video-thumb"></div>
-          </div>
-        </div>
+        <!-- Video Items (filled dynamically) -->
+        <div class="video-list"></div>
 
 
-        <!-- Books Items -->
-<div class="book-list" style="display: none;">
-  <div class="book-item">
-    <div class="book-info">
-      <h4>Назва для книги</h4>
-      <p>Підпис для книги, в якому буде міститись основна інформація, що потрібно знати клієнту про неї</p>
-    </div>
-    <button class="book-download-btn">Завантажити</button>
-  </div>
-
-  <div class="book-item">
-    <div class="book-info">
-      <h4>Назва для книги</h4>
-      <p>Підпис для книги, в якому буде міститись основна інформація, що потрібно знати клієнту про неї</p>
-    </div>
-    <button class="book-download-btn">Завантажити</button>
-  </div>
-
-  <div class="book-item">
-    <div class="book-info">
-      <h4>Назва для книги</h4>
-      <p>Підпис для книги, в якому буде міститись основна інформація, що потрібно знати клієнту про неї</p>
-    </div>
-    <button class="book-download-btn">Завантажити</button>
-  </div>
-</div>
+        <!-- Books Items (filled dynamically) -->
+        <div class="book-list" style="display:none"></div>
 
       </section>
   </main>
@@ -175,14 +137,15 @@ function wireTabs(){
   const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
   const video = document.querySelector(".video-list");
   const books = document.querySelector(".book-list");
-  tabs[0].dataset.type="video"; tabs[1].dataset.type="book";
-  tabs.forEach(t=>t.addEventListener("click", ()=>{
-    tabs.forEach(x=>x.classList.remove("active"));
-    t.classList.add("active");
-    const want = t.dataset.type;
-    video.style.display = want==="video" ? "grid" : "none";
-    books.style.display = want==="book" ? "grid" : "none";
-  }));
+  tabs.forEach(t=>{
+    t.addEventListener("click", ()=>{
+      tabs.forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      const want = t.dataset.type;
+      video.style.display = want==="video" ? "grid" : "none";
+      books.style.display = want==="book" ? "grid" : "none";
+    });
+  });
 }
 
 function getCurrentUser(){

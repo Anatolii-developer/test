@@ -124,21 +124,45 @@
     gap: 8px;
   }
 
+  /* Destination tabs */
+.dest-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.dest-tab{
+  background:#275D2B;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:10px 14px;
+  font-size:14px;
+  cursor:pointer;
+  transition:background .15s, box-shadow .15s;
+}
+.dest-tab:hover{background:#2F6F37}
+.dest-tab.active{
+  background:#4FA369; /* світліший для активної */
+  box-shadow:0 0 0 2px rgba(79,163,105,.25) inset;
+}
+
   </style>
 </head>
 <body class="with-sidebar">
   <aside class="sidebar" id="sidebar"></aside>
 
-    <div class="main-content">
-      <div class="materials-header">
-        <button class="btn-green">Додати матеріали до курсів</button>
-        <button class="btn-light-green">Додати матеріали групи</button>
-      </div>
+   <div class="materials-header">
+  <div class="dest-tabs" role="tablist" aria-label="Тип матеріалів">
+    <button type="button" class="dest-tab active" data-dest="general" aria-pressed="true">Загальні матеріали</button>
+    <button type="button" class="dest-tab" data-dest="addons" aria-pressed="false">Додаткові матеріали</button>
+    <button type="button" class="dest-tab" data-dest="courses" aria-pressed="false">Матеріали курсу</button>
+  </div>
+</div>
 
      <div class="filters">
   <input type="text" id="searchInput" placeholder="Пошук за ім'ям" />
 
-<div id="roleFilterGroup" class="role-filter-group" aria-label="Фільтр за ролями"></div>
+<div id="roleFilterWrap" style="display:none;">
+  <div id="roleFilterGroup" class="role-filter-group" aria-label="Фільтр за ролями"></div>
+</div>
+
+<div id="courseFilterWrap" style="display:none;">
   <label for="courseSelect" style="margin-left:8px;">Оберіть курс</label>
   <select id="courseSelect">
     <option value="">-- Оберіть курс --</option>
@@ -244,11 +268,10 @@ async function loadCurrentCourses() {
     const res = await fetch(`${API_BASE}/api/courses`);
     if (!res.ok) return;
     const allCourses = await res.json();
-    const current = Array.isArray(allCourses) ? allCourses.filter(c => c.status === "Поточний") : [];
     const sel = document.getElementById("courseSelect");
     if (!sel) return;
     sel.innerHTML = `<option value="">-- Оберіть курс --</option>`;
-    current.forEach(c => {
+    (Array.isArray(allCourses) ? allCourses : []).forEach(c => {
       const opt = document.createElement("option");
       opt.value = c._id;
       opt.textContent = c.courseTitle || "Курс";
@@ -265,6 +288,23 @@ function getSelectedRoleIds() {
     .map(el => String(el.value));
 }
 
+
+let currentDestination = 'general';
+function setDestination(dest){
+  currentDestination = dest;
+  document.querySelectorAll('.dest-tab').forEach(btn=>{
+    const active = btn.dataset.dest === dest;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+
+  const roleWrap = document.getElementById('roleFilterWrap');
+  const courseWrap = document.getElementById('courseFilterWrap');
+  if (roleWrap) roleWrap.style.display = (dest === 'addons') ? 'block' : 'none';
+  if (courseWrap) courseWrap.style.display = (dest === 'courses') ? 'block' : 'none';
+
+  refreshFolderFilter().then(loadExistingMaterials);
+}
 function intersects(a, b) {
   if (!a || !b || a.length === 0 || b.length === 0) return false;
   const setB = new Set(b.map(String));
@@ -365,6 +405,13 @@ function intersects(a, b) {
     }
 
     // Обробники
+    document.querySelectorAll('.dest-tab').forEach(btn => {
+  btn.addEventListener('click', () => setDestination(btn.dataset.dest));
+});
+
+
+setDestination(currentDestination);
+
     document.getElementById("courseSelect").addEventListener("change", async (e) => {
       const courseId = e.target.value;
       if (!courseId) return;
@@ -693,6 +740,7 @@ function toggleInputs(type) {
   });
 
   document.addEventListener('DOMContentLoaded', () => {
+     refreshFolderFilter().then(loadExistingMaterials);
   const here = location.pathname.split('/').pop();
   document.querySelectorAll('.sidebar nav a').forEach(a=>{
     if (a.getAttribute('href') === here) a.classList.add('active');
@@ -701,13 +749,16 @@ function toggleInputs(type) {
 
   // ======== MATERIALS LIST / EDIT / DELETE ========
 
-  function getCurrentDestination() {
-    const selectedRoleIds = getSelectedRoleIds();
-    const courseId = document.getElementById("courseSelect").value;
-    if (selectedRoleIds.length > 0) return { destination: "addons", courseId: "", roleIds: selectedRoleIds };
-    if (courseId) return { destination: "courses", courseId, roleIds: [] };
-    return { destination: "general", courseId: "", roleIds: [] };
+function getCurrentDestination() {
+  const courseId = document.getElementById("courseSelect").value;
+  if (currentDestination === 'addons') {
+    return { destination: "addons", courseId: "", roleIds: getSelectedRoleIds() };
   }
+  if (currentDestination === 'courses') {
+    return { destination: "courses", courseId, roleIds: [] };
+  }
+  return { destination: "general", courseId: "", roleIds: [] };
+}
 
   async function refreshFolderFilter() {
     const { destination, courseId } = getCurrentDestination();
@@ -931,7 +982,7 @@ function toggleInputs(type) {
   // оновлювати список при зміні фільтрів
   document.addEventListener("DOMContentLoaded", () => {
     // перше завантаження
-    refreshFolderFilter().then(loadExistingMaterials);
+    setDestination(currentDestination);
     // оновлювати при зміні курсу/ролей/папки
     const courseSel = document.getElementById("courseSelect");
     if (courseSel) {

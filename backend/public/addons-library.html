@@ -6,6 +6,41 @@
   <title>Додаткові матеріали</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Make video iframes fill the thumb container with a 16:9 ratio */
+    .video-list{
+      display: grid;
+      gap: 16px;
+    }
+    .video-item .video-thumb{
+      width: 100%;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      /* Modern browsers: reserve 16:9 area so the iframe can be 100% */
+      aspect-ratio: 16 / 9;
+    }
+    .video-item .video-thumb iframe{
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Fallback for browsers without aspect-ratio support */
+    @supports not (aspect-ratio: 16 / 9) {
+      .video-item .video-thumb{
+        position: relative;
+        padding-top: 56.25%; /* 16:9 */
+      }
+      .video-item .video-thumb iframe{
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <aside class="sidebar collapsed" id="sidebar">

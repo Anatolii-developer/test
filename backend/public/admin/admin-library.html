@@ -1156,14 +1156,19 @@ body{
       document.addEventListener('change', (e) => {
         if(e.target.closest('#assignUsersList')) updateAssignCounters();
       });
-      const btnAssignAll = document.getElementById('btnAssignAll');
-      if(btnAssignAll) btnAssignAll.addEventListener('click', () => toggleAssignAll(true));
-      const btnAssignNone = document.getElementById('btnAssignNone');
-      if(btnAssignNone) btnAssignNone.addEventListener('click', () => toggleAssignAll(false));
-      const btnAssignSave = document.getElementById('btnAssignSave');
-      if(btnAssignSave) btnAssignSave.addEventListener('click', saveAssignedUsers);
-      const btnAssignClose = document.getElementById('btnAssignClose');
-      if(btnAssignClose) btnAssignClose.addEventListener('click', closeAssignModal);
+      document.addEventListener('click', (e) => {
+        const t = e.target;
+        if (!t) return;
+        if (t.id === 'btnAssignAll') {
+          toggleAssignAll(true);
+        } else if (t.id === 'btnAssignNone') {
+          toggleAssignAll(false);
+        } else if (t.id === 'btnAssignSave') {
+          saveAssignedUsers();
+        } else if (t.id === 'btnAssignClose') {
+          closeAssignModal();
+        }
+      });
 
       async function deleteMaterial(id) {
         if (!confirm("Видалити матеріал?")) return;
@@ -1387,25 +1392,24 @@ body{
         </button>
       </div>
     </div>
-  </body>
-</html>
-
-  <div id="assignUsersModal" class="modal" style="display:none">
-    <div class="modal-overlay" onclick="closeAssignModal()"></div>
-    <div class="modal-content">
-      <span class="close-btn" id="btnAssignClose">×</span>
-      <h2>Призначити користувачів</h2>
-      <div id="assignUsersActions">
-        <div class="hint">Обрано: <strong id="assignSelectedCount">0/0</strong></div>
-        <div style="display:flex;gap:8px">
-          <button type="button" class="btn-light-green" id="btnAssignAll">Виділити всіх</button>
-          <button type="button" class="btn" id="btnAssignNone">Скасувати вибір</button>
+    <div id="assignUsersModal" class="modal" style="display:none">
+      <div class="modal-overlay" onclick="closeAssignModal()"></div>
+      <div class="modal-content">
+        <span class="close-btn" id="btnAssignClose">×</span>
+        <h2>Призначити користувачів</h2>
+        <div id="assignUsersActions">
+          <div class="hint">Обрано: <strong id="assignSelectedCount">0/0</strong></div>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn-light-green" id="btnAssignAll">Виділити всіх</button>
+            <button type="button" class="btn" id="btnAssignNone">Скасувати вибір</button>
+          </div>
+        </div>
+        <div id="assignUsersList"></div>
+        <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:10px">
+          <button type="button" class="btn" onclick="closeAssignModal()">Скасувати</button>
+          <button type="button" class="btn-dark-green" id="btnAssignSave">Зберегти</button>
         </div>
       </div>
-      <div id="assignUsersList"></div>
-      <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:10px">
-        <button type="button" class="btn" onclick="closeAssignModal()">Скасувати</button>
-        <button type="button" class="btn-dark-green" id="btnAssignSave">Зберегти</button>
-      </div>
     </div>
-  </div>
+  </body>
+</html>

@@ -314,7 +314,17 @@
     </div>
     <script src="admin-auth.js"></script>
     <script>
-  // Ensure logoutUser is globally available for admin-auth.js
+
+      const API = "http://157.230.121.24:5050";
+
+      
+    function isApproved(user) {
+    const s = String(user.status || "").toUpperCase().trim();
+    // сервер отдаёт approved, но подстрахуемся под варианты
+    return ["APPROVED"].includes(s);
+  }
+
+
   function logoutUser() {
     try {
       localStorage.removeItem("user");
@@ -669,33 +679,89 @@
   // --- Participants modal ---
   async function openParticipantsModal() {
     try {
-      const res = await fetch("http://157.230.121.24:5050/api/users");
-      allUsers = await res.json();
-      renderUserList(allUsers);
+      // тянем только approved с бэка; если 404/нет роута — берём всех и фильтруем на клиенте
+      let users = [];
+      let res = await fetch(`${API}/api/users/approved`, { credentials: "include" });
+      if (res.ok) {
+        users = await res.json();
+      } else {
+        // fallback
+        res = await fetch(`${API}/api/users`, { credentials: "include" });
+        users = res.ok ? await res.json() : [];
+        users = users.filter(isApproved);
+      }
+
+      // Отсортируем по ФИО
+      users.sort((a,b)=>{
+        const an = `${a.firstName||""} ${a.lastName||""}`.trim().toLowerCase();
+        const bn = `${b.firstName||""} ${b.lastName||""}`.trim().toLowerCase();
+        return an.localeCompare(bn);
+      });
+
+      allUsers = users;                 // только approved
+      renderUserList(allUsers);         // отрисовали список
       $("participantsModal").style.display = "flex";
     } catch (err) {
       console.error("Не вдалося завантажити користувачів:", err);
+      alert("Помилка завантаження списку користувачів");
     }
   }
 
-  function renderUserList(users) {
+
+ function renderUserList(users) {
     const container = $("userList");
     container.innerHTML = "";
+
+    // Панель массовых операций
+    const bar = document.createElement("div");
+    bar.style.cssText = "display:flex;gap:8px;align-items:center;position:sticky;top:0;background:#fffef9;padding:6px 0;";
+    bar.innerHTML = `
+      <label style="display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="checkAllBox" />
+        Виділити всіх (видимих)
+      </label>
+      <button type="button" id="clearAllBtn" class="submit-btn" style="padding:6px 10px;background:#888;">Очистити</button>
+    `;
+    container.appendChild(bar);
+
+    const list = document.createElement("div");
+    list.id = "userListInner";
+    container.appendChild(list);
+
+    // Сами чекбоксы
     users.forEach((user) => {
-      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <label>
-          <input type="checkbox" value="${user._id}" ${selectedParticipantIds.includes(user._id) ? "checked" : ""}/>
-          ${fullName || user.email}
-        </label>`;
-      container.appendChild(div);
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+      const label = fullName || user.email || "(без імені)";
+      const id = user._id || user.id;
+
+      const row = document.createElement("label");
+      row.style.display = "block";
+      row.style.padding = "6px 0";
+      row.innerHTML = `
+        <input type="checkbox" value="${id}" ${selectedParticipantIds.includes(id) ? "checked" : ""}/>
+        ${label}
+      `;
+      list.appendChild(row);
     });
+
+    // “Виділити всіх (видимих)”
+    const checkAll = $("checkAllBox");
+    checkAll.onchange = () => {
+      const boxes = list.querySelectorAll('input[type="checkbox"]');
+      boxes.forEach(cb => { cb.checked = checkAll.checked; });
+    };
+
+    // “Очистити”
+    $("clearAllBtn").onclick = () => {
+      const boxes = list.querySelectorAll('input[type="checkbox"]');
+      boxes.forEach(cb => { cb.checked = false; });
+      if (checkAll) checkAll.checked = false;
+    };
   }
 
-  function applySelectedParticipants() {
-    const checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');
-    selectedParticipantIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+   function applySelectedParticipants() {
+    const boxes = document.querySelectorAll('#userListInner input[type="checkbox"]');
+    selectedParticipantIds = Array.from(boxes).filter(cb => cb.checked).map(cb => cb.value);
     updateParticipantsUI();
     closeParticipantsModal();
   }
@@ -705,8 +771,12 @@
   }
 
   function filterParticipants(e) {
-    const q = e.target.value.toLowerCase();
-    const filtered = allUsers.filter(u => ([u.firstName, u.lastName].filter(Boolean).join(" ").toLowerCase()).includes(q));
+    const q = (e.target.value || "").toLowerCase().trim();
+    const filtered = allUsers.filter(u => {
+      const name = [u.firstName, u.lastName].filter(Boolean).join(" ").toLowerCase();
+      const email = String(u.email || "").toLowerCase();
+      return name.includes(q) || email.includes(q);
+    });
     renderUserList(filtered);
   }
 

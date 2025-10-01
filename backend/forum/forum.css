@@ -147,20 +147,22 @@ body.with-sidebar .wrap {
   object-fit: contain; 
 }
 
-.login-hint {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 16px;
-    color: #151515;
-    text-align: left;
+.login-hint{ 
+  font-family: Poppins; 
+  font-weight: 400; 
+  font-style: normal; 
+  font-size: 16px; 
+  color: #151515; 
+  text-align: left; 
+  width: 100%; 
 }
-.login-name {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-style: normal;
-    font-size: 16px;
-    color: #275D2B;
+
+.login-name{ 
+  font-family: Poppins; 
+  font-weight: 600; 
+  font-style: normal; 
+  font-size: 16px; 
+  color: #275D2B; 
 }
 
 

@@ -44,10 +44,7 @@ body {
     color: var(--text);
 }
 
-/* ========= Layout ========= */
-body.with-sidebar .wrap {
-    margin-left: 250px;
-}
+
 
 .wrap {
     width: 1110px;

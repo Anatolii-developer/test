@@ -71,56 +71,93 @@ body.with-sidebar .wrap {
 }
 
 /* ========= Action bar (search + publish) ========= */
-.action-bar {
-    width: 1110px;
-    height: 141px;
-    margin: 0 auto 24px;
-    background: #FFFFF9;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
-    padding: 0 24px;
+.action-bar{
+  width: 1110px;
+  min-height: 141px;                 /* за ТЗ */
+  margin: 0 auto 24px;
+  background: var(--card);
+  border-radius: var(--radius16);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.action-bar .avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex: 0 0 46px;
+.action-top{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.action-bottom{
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.action-bar .search-bar {
-    width: 702px;
-    height: 48px;
-    border-radius: 16px;
-    padding: 12px;
-    background: #ECF5EB;
-    border: none;
-    outline: none;
-    font: 16px 'Poppins', sans-serif;
-    color: #333;
+.action-bar .avatar{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 
-.action-bar .publish-btn {
-    width: 130px;
-    height: 44px;
-    border-radius: 24px;
-    padding: 10px 53px;
-    background: #E37009;
-    color: #fff;
-    border: none;
-    font: 500 16px 'Poppins', sans-serif;
-    cursor: pointer;
+.action-bar .search-bar{
+  width: 702px;
+  max-width: 100%;
+  height: 48px;
+  border-radius: var(--radius16);
+  padding: 12px;
+  background: var(--field);
+  border: none;
+  outline: none;
+  font: 16px 'Poppins', sans-serif;
+  color: #333;
+}
+
+.action-bar .search-bar::placeholder{
+  color: #97C194;
+}
+
+.action-bar .publish-btn{
+  width: 130px;
+  height: 44px;
+  border-radius: 24px;
+  padding: 10px 53px;           /* з макета */
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font: 500 16px 'Poppins', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;      /* <— центр */
+  cursor: pointer;
 }
 
 .action-bar .publish-btn:hover {
     background: #cf5d00;
 }
 
+
+.info-icon{
+  width: 37px;
+  height: 37px;
+  display: block;
+  object-fit: contain; 
+}
+
+.login-hint{ font-size: 20px; color: #151515; }
+.login-name{ color: #275D2B; font-weight: 600; }
+
+
+@media (max-width:1200px){
+  .action-bar{ width: min(1110px, 92vw); }
+}
+@media (max-width:720px){
+  .action-top{ flex-wrap: wrap; }
+  .action-bar .publish-btn{ width: 100%; }
+}
 /* ========= Header title / meta ========= */
 .forum-header {
     background: transparent;

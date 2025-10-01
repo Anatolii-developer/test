@@ -134,10 +134,34 @@
       </div>
 
       <div class="action-bar">
-        <img class="avatar" src="/assets/profile-photo.png" alt="User" />
-        <input id="q" class="search-bar" type="text" placeholder="Пошук тем..." />
-        <button class="publish-btn" id="btnNewThread">Публікувати</button>
-      </div>
+  <!-- верхній рядок: аватар + поле + кнопка -->
+  <div class="action-top">
+    <img class="avatar" src="/assets/profile-photo.png" alt="User" />
+    <input
+      id="q"
+      class="search-bar"
+      type="text"
+      placeholder="Уведіть текст"
+    />
+    <button class="publish-btn" id="btnNewThread"><span>Публікувати</span></button>
+  </div>
+
+  <!-- нижній рядок: іконка + хто увійшов -->
+  <div class="action-bottom">
+   <img
+  class="info-icon"
+  src="/assets/forum/action-icon.svg"
+  alt="info"
+  width="37"
+  height="37"
+/>
+    <div class="login-hint">
+      Ви увійшли як
+      <span id="loginName" class="login-name">—</span>
+      (<span id="loginRole">—</span>)
+    </div>
+  </div>
+</div>
 
       <div class="forum-header">
         <div>
@@ -162,7 +186,17 @@
         if (typeof renderAdminSidebar === "function")
           renderAdminSidebar("forum/index.html");
 
-        await Forum.init();                 // загрузка профиля/ролей/сессии
+        await Forum.init();          
+        const me = Forum?.me || {};
+const name =
+  me.fullName ||
+  [me.firstName, me.lastName].filter(Boolean).join(" ") ||
+  me.email || "Користувач";
+const role =
+  (Array.isArray(me.roles) && me.roles.length ? me.roles.join(", ") : me.role) || "—";
+
+document.getElementById("loginName").textContent = name;
+document.getElementById("loginRole").textContent = role;
         Forum.renderRoleHint("#roleHint");
 
         const btnNew = document.getElementById("btnNewThread");

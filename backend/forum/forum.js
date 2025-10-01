@@ -224,7 +224,58 @@ function can(action){
   return false;
 }
 
-  // ---- API ----
+// ---- Display helpers (name & roles for UI) ----
+function getUser(){
+  return currentUser;
+}
+
+function getDisplayName(){
+  const u = currentUser || readUser();
+  if (!u) return '';
+  // prefer fullName if exists
+  const fullName = u.fullName || u.name || '';
+  if (fullName && String(fullName).trim()) return String(fullName).trim();
+  // try first + last
+  const first = u.firstName || '';
+  const last  = u.lastName  || '';
+  const combo = [first, last].filter(Boolean).join(' ').trim();
+  if (combo) return combo;
+  // fallback to username/email
+  return u.username || u.email || 'Користувач';
+}
+
+function getDisplayRoles(){
+  const u = currentUser || readUser();
+  if (!u) return [];
+  const raw = [];
+  // roles can be array of strings or objects with name
+  if (Array.isArray(u.roles)){
+    for (const r of u.roles){
+      if (!r) continue;
+      if (typeof r === 'string') raw.push(r);
+      else if (r && typeof r === 'object' && r.name) raw.push(String(r.name));
+    }
+  }
+  // singular role may be string or object with name
+  if (u.role){
+    if (typeof u.role === 'string') raw.push(u.role);
+    else if (u.role && typeof u.role === 'object' && u.role.name) raw.push(String(u.role.name));
+  }
+  // de-duplicate case-insensitively but keep first-seen casing
+  const seen = new Set();
+  const out = [];
+  for (const r of raw){
+    const key = String(r).trim().toLowerCase();
+    if (!key) continue;
+    if (!seen.has(key)){
+      seen.add(key);
+      out.push(String(r).trim());
+    }
+  }
+  return out;
+}
+
+// ---- API ----
   const api = {
     async listThreads({ q } = {}) {
       const url = new URL('/api/forum/threads', location.origin);
@@ -382,9 +433,10 @@ function can(action){
   function renderRoleHint(sel) {
     const el = document.querySelector(sel);
     if (!el) return;
-    const roles = Array.from(roleSet);
+    const name  = getDisplayName();
+    const roles = getDisplayRoles();
     el.textContent = currentUser
-      ? `Ви увійшли як ${currentUser.username || currentUser.email || 'user'} (${roles.join(', ') || 'без ролі'})`
+      ? `Ви увійшли як ${name} (${roles.length ? roles.join(', ') : '—'})`
       : 'Ви не авторизовані';
   }
 
@@ -430,5 +482,5 @@ function can(action){
 
 
 
-  return { init, api, can, renderRoleHint, renderThreadList, renderThreadHead, renderPosts };
+  return { init, api, can, renderRoleHint, renderThreadList, renderThreadHead, renderPosts, getUser, getDisplayName, getDisplayRoles };
 })();

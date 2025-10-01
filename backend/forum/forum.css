@@ -91,7 +91,7 @@ body.with-sidebar .wrap {
 }
 .action-bottom{
   display: flex;
-  align-items: center;
+  align-items: left;
   gap: 12px;
 }
 

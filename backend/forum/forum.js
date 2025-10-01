@@ -441,33 +441,43 @@ function getDisplayRoles(){
   }
 
   function renderThreadList(sel, items, emptySel) {
-    const $list = document.querySelector(sel);
-    const $empty = document.querySelector(emptySel);
-    if (!$list) return;
-    $list.innerHTML = '';
-    if (!items || !items.length) {
-      if ($empty) $empty.style.display = 'block';
-      return;
-    }
-    if ($empty) $empty.style.display = 'none';
+  const $list  = document.querySelector(sel);
+  const $empty = document.querySelector(emptySel);
+  if (!$list) return;
+  $list.innerHTML = '';
 
-    items.forEach(t => {
-      const a = document.createElement('a');
-      a.href = `./thread.html?id=${t._id}`;
-      a.className = 'thread-item';
-      a.innerHTML = `
-        <div>
-          <div style="font-weight:600">${escapeHtml(t.title)}
-            ${t.pinned ? '<span class="tag">📌 Закріплено</span>' : ''}
-            ${t.locked ? '<span class="tag">🔒 Закрито</span>' : ''}
-          </div>
-          <div class="thread-meta">Створив: ${escapeHtml(t.author?.username || t.author?.email || '-')}, ${fmtDate(t.createdAt)} • Відповідей: ${t.postsCount || 0}</div>
-        </div>
-        <div class="thread-meta">${short(escapeHtml(t.preview || t.lastPostPreview || ''), 64)}</div>
-      `;
-      $list.appendChild(a);
-    });
+  if (!items || !items.length) {
+    if ($empty) $empty.style.display = 'block';
+    return;
   }
+  if ($empty) $empty.style.display = 'none';
+
+  items.forEach(t => {
+    const title   = escapeHtml(t.title || '');
+    const name    = escapeHtml(t.author?.fullName || t.author?.username || t.author?.email || '—');
+    const avatar  = t.author?.photoUrl || '/assets/profile-photo.png';
+    const when    = fmtDate(t.createdAt);               // можно заменить на "3 дні тому", если есть функция relative
+    const replies = Number(t.postsCount || 0);
+
+    const a = document.createElement('a');
+    a.href = `./thread.html?id=${t._id}`;
+    a.className = 'thread-item';
+    a.innerHTML = `
+      <div class="thread-left">
+        <div class="thread-title">${title}</div>
+        <div class="thread-author">
+          <img class="thread-avatar" src="${avatar}" alt="${name}" />
+          <div class="thread-author-col">
+            <div class="thread-author-name">${name}</div>
+            <div class="thread-author-meta">${when}</div>
+          </div>
+        </div>
+      </div>
+      <div class="thread-answers">${replies} відповідей</div>
+    `;
+    $list.appendChild(a);
+  });
+}
 
   function renderThreadHead(thread, selTitle, selMeta, selActions) {
     const $t = document.querySelector(selTitle);

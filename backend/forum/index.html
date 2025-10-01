@@ -4,138 +4,82 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Форум</title>
-   <link rel="stylesheet" href="./forum.css">
-
+    <link rel="stylesheet" href="/forum.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body.with-sidebar .wrap {
-        margin-left: 250px;
-      }
-      .wrap {
-        width: 1110px;
-        margin: 0 auto 40px;
-        background: transparent;
-        border-radius: 24px;
-        padding: 0 0 40px;
-      }
-
-      /* --- Forum page visual per spec --- */
-      body { background: #97C194; }
-
-      .forum-hero {
-        width: 100%;
-        height: 700px;
-        margin: 32px 0 16px;
-        overflow: hidden;
-        border-radius: 0;
-      }
-      .forum-hero img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-
-      .action-bar {
-        width: 1110px;
-        height: 141px;
-        margin: 0 auto 24px;
-        background: #FFFFF9;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,.08);
-        padding: 0 24px;
-      }
-      .action-bar .avatar {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex: 0 0 46px;
-      }
-      .action-bar .search-bar {
-        width: 702px;
-        height: 48px;
-        border-radius: 16px;
-        padding: 12px;
-        background: #ECF5EB;
-        border: none;
-        outline: none;
-        font: 16px 'Poppins', sans-serif;
-        color: #333;
-      }
-      .action-bar .publish-btn {
-        width: 130px;
-        height: 44px;
-        border-radius: 24px;
-        padding: 10px 53px;
-        background: #E37009;
-        color: #fff;
-        border: none;
-        font: 500 16px 'Poppins', sans-serif;
-        cursor: pointer;
-      }
-      .action-bar .publish-btn:hover { background: #cf5d00; }
-
-      .forum-header {
-        background: transparent;
-        padding: 0;
-        margin: 0 0 12px;
-      }
-      .forum-title { font-size: 28px; font-weight: 700; }
-
-      @media (max-width: 1180px) {
-        body.with-sidebar .wrap {
-          margin-left: 0;
-        }
-        .wrap {
-          width: 90%;
-          padding: 30px;
-        }
-      }
-    </style>
   </head>
   <body class="with-sidebar">
     <aside class="sidebar collapsed" id="sidebar">
-    <div class="toggle-button" onclick="toggleSidebar()">
-      <img src="/assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
-    </div>
-    <img class="logo" src="/assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
-    <img class="logo-collapsed" src="/assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
-    <img class="profile" src="/assets/profile-photo.png" alt="User" width="40" height="40" />
-    <nav>
-      <a href="/profile.html"><img src="/assets/sidebar/profile.svg" /><span>Про Мене</span></a>
-      <a href="/mycertificates.html"><img src="/assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
-      <a href="/career-faq.html"><img src="/assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
-      <a href="/library.html"><img src="/assets/sidebar/3.svg" /><span>Бібліотека</span></a>
-      <a href="/my-courses.html"><img src="/assets/sidebar/5.svg" /><span>Мої Курси</span></a>
-       <a href="/forum/index.html">
-  <img src="/assets/sidebar/forum.svg" alt="Форум"/>
-  <span>Форум</span>
-</a>
-    </nav>
-    <div class="logout">
-      <img src="/assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
-      <span>Вийти з акаунту</span>
-    </div>
-  </aside>
-
+      <div class="toggle-button" onclick="toggleSidebar()">
+        <img src="/assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+      </div>
+      <img
+        class="logo"
+        src="/assets/sidebar/IPS Logo (2).svg"
+        alt="Logo"
+        id="logoExpanded"
+      />
+      <img
+        class="logo-collapsed"
+        src="/assets/sidebar/IPS Logo (1).svg"
+        alt="Logo Small"
+        id="logoCollapsed"
+      />
+      <img
+        class="profile"
+        src="/assets/profile-photo.png"
+        alt="User"
+        width="40"
+        height="40"
+      />
+      <nav>
+        <a href="/profile.html"
+          ><img src="/assets/sidebar/profile.svg" /><span>Про Мене</span></a
+        >
+        <a href="/mycertificates.html"
+          ><img src="/assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a
+        >
+        <a href="/career-faq.html"
+          ><img src="/assets/sidebar/10.svg" /><span
+            >Планування Кар'єри</span
+          ></a
+        >
+        <a href="/library.html"
+          ><img src="/assets/sidebar/3.svg" /><span>Бібліотека</span></a
+        >
+        <a href="/my-courses.html"
+          ><img src="/assets/sidebar/5.svg" /><span>Мої Курси</span></a
+        >
+        <a href="/forum/index.html">
+          <img src="/assets/sidebar/forum.svg" alt="Форум" /><span>Форум</span>
+        </a>
+      </nav>
+      <div class="logout">
+        <img
+          src="/assets/sidebar/log-out.svg"
+          alt="Logout Icon"
+          width="20"
+          height="20"
+        />
+        <span>Вийти з акаунту</span>
+      </div>
+    </aside>
 
     <main class="wrap">
-
       <div class="forum-hero">
         <img src="/assets/forum/main-img.jpg" alt="Forum hero" />
       </div>
 
       <div class="action-bar">
         <img class="avatar" src="/assets/profile-photo.png" alt="User" />
-        <input id="q" class="search-bar" type="text" placeholder="Пошук тем..." />
+        <input
+          id="q"
+          class="search-bar"
+          type="text"
+          placeholder="Пошук тем..."
+        />
         <button class="publish-btn" id="btnNewThread">Публікувати</button>
       </div>
 
@@ -162,19 +106,13 @@
         if (typeof renderAdminSidebar === "function")
           renderAdminSidebar("forum/index.html");
 
-        await Forum.init();                 // загрузка профиля/ролей/сессии
+        await Forum.init();
         Forum.renderRoleHint("#roleHint");
 
         const btnNew = document.getElementById("btnNewThread");
 
-        // 1) Скрыть кнопку "Нова тема", если нет прав (не авторизован)
-        // На фронте считаем, что достаточно быть залогиненым, чтобы мочь створювати тему.
-        // Если на бэке логика строже — все равно поймаем 403 ниже.
-        if (!Forum.can("post:create")) {
-          btnNew.style.display = "none";
-        }
+        if (!Forum.can("post:create")) btnNew.style.display = "none";
 
-        // 2) Загрузка списка
         const load = async () => {
           try {
             const q = document.getElementById("q").value.trim();
@@ -185,17 +123,14 @@
             alert("Не вдалося завантажити список тем.");
           }
         };
-        document.getElementById("btnSearch")?.addEventListener("click", load);
         document.getElementById("q").addEventListener("keydown", (e) => {
           if (e.key === "Enter") load();
         });
 
-        // 3) Создать тему с внятной обработкой 401/403
         btnNew.addEventListener("click", async () => {
           const title = prompt("Заголовок теми:");
           if (!title) return;
           const content = prompt("Перший пост:") || "";
-
           try {
             const t = await Forum.api.createThread({ title, content });
             if (t && t._id) location.href = `./thread.html?id=${t._id}`;
@@ -204,7 +139,7 @@
             if (/unauthorized/i.test(msg) || /401/.test(msg)) {
               alert("Потрібно увійти в акаунт, щоб створити тему.");
             } else if (/forbidden/i.test(msg) || /403/.test(msg)) {
-              alert("У вас немає прав створювати теми (403). Зверніться до адміністратора.");
+              alert("У вас немає прав створювати теми (403).");
             } else {
               alert("Не вдалося створити тему: " + msg);
             }
@@ -212,14 +147,13 @@
         });
 
         await load();
-      });
 
-  let t;
-  document.getElementById("q").addEventListener("input", () => {
-    clearTimeout(t);
-    t = setTimeout(load, 350);
-  });
+        let t;
+        document.getElementById("q").addEventListener("input", () => {
+          clearTimeout(t);
+          t = setTimeout(load, 350);
+        });
+      });
     </script>
-    
   </body>
 </html>

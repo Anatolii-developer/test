@@ -15,80 +15,81 @@
         margin-left: 250px;
       }
       .wrap {
-        width: 890px;
-        margin: 32px auto;
-        background: #fff;
+        width: 1110px;
+        margin: 0 auto 40px;
+        background: transparent;
         border-radius: 24px;
-        padding: 40px 60px;
+        padding: 0 0 40px;
       }
-      .forum-header {
+
+      /* --- Forum page visual per spec --- */
+      body { background: #97C194; }
+
+      .forum-hero {
+        width: 100%;
+        height: 700px;
+        margin: 32px 0 16px;
+        overflow: hidden;
+        border-radius: 0;
+      }
+      .forum-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .action-bar {
+        width: 1110px;
+        height: 141px;
+        margin: 0 auto 24px;
+        background: #FFFFF9;
+        border-radius: 16px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        justify-content: center;
+        gap: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        padding: 0 24px;
       }
-      .forum-title {
-        font-size: 24px;
-        font-weight: 600;
+      .action-bar .avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex: 0 0 46px;
       }
-      .btn {
+      .action-bar .search-bar {
+        width: 702px;
+        height: 48px;
+        border-radius: 16px;
+        padding: 12px;
+        background: #ECF5EB;
         border: none;
-        border-radius: 10px;
-        padding: 10px 14px;
-        cursor: pointer;
-        font-weight: 600;
+        outline: none;
+        font: 16px 'Poppins', sans-serif;
+        color: #333;
       }
-      .btn-primary {
-        background: #275d2b;
+      .action-bar .publish-btn {
+        width: 130px;
+        height: 44px;
+        border-radius: 24px;
+        padding: 10px 53px;
+        background: #E37009;
         color: #fff;
+        border: none;
+        font: 500 16px 'Poppins', sans-serif;
+        cursor: pointer;
       }
-      .btn-ghost {
-        background: #f3f4f6;
+      .action-bar .publish-btn:hover { background: #cf5d00; }
+
+      .forum-header {
+        background: transparent;
+        padding: 0;
+        margin: 0 0 12px;
       }
-      .thread-list {
-        margin-top: 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-      .thread-item {
-        border: 1px solid #e37009;
-        border-radius: 12px;
-        padding: 14px 16px;
-        background: #fffdf7;
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-      }
-      .thread-meta {
-        color: #777;
-        font-size: 12px;
-      }
-      .tag {
-        display: inline-block;
-        background: #ecf5eb;
-        color: #275d2b;
-        border-radius: 999px;
-        padding: 2px 8px;
-        font-size: 12px;
-        margin-left: 6px;
-      }
-      .toolbar {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-      .search {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-      .search input {
-        padding: 10px 12px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        width: 260px;
-      }
+      .forum-title { font-size: 28px; font-weight: 700; }
+
       @media (max-width: 1180px) {
         body.with-sidebar .wrap {
           margin-left: 0;
@@ -101,20 +102,47 @@
     </style>
   </head>
   <body class="with-sidebar">
-    <aside class="sidebar" id="sidebar"></aside>
+    <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+    </div>
+    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+    <nav>
+      <a href="profile.html"><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a>
+      <a href="mycertificates.html"><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
+      <a href="career-faq.html"><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
+      <a href="library.html"><img src="assets/sidebar/3.svg" /><span>Бібліотека</span></a>
+      <a href="my-courses.html"><img src="assets/sidebar/5.svg" /><span>Мої Курси</span></a>
+       <a href="forum/index.html">
+  <img src="assets/sidebar/forum.svg" alt="Форум"/>
+  <span>Форум</span>
+</a>
+    </nav>
+    <div class="logout">
+      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+      <span>Вийти з акаунту</span>
+    </div>
+  </aside>
+
 
     <main class="wrap">
+
+      <div class="forum-hero">
+        <img src="assets/forum/hero.png" alt="Forum hero" />
+      </div>
+
+      <div class="action-bar">
+        <img class="avatar" src="assets/profile-photo.png" alt="User" />
+        <input id="q" class="search-bar" type="text" placeholder="Пошук тем..." />
+        <button class="publish-btn" id="btnNewThread">Публікувати</button>
+      </div>
+
       <div class="forum-header">
         <div>
           <div class="forum-title">Форум</div>
           <div id="roleHint" class="thread-meta"></div>
-        </div>
-        <div class="toolbar">
-          <div class="search">
-            <input id="q" type="text" placeholder="Пошук тем..." />
-            <button class="btn btn-ghost" id="btnSearch">Шукати</button>
-          </div>
-          <button class="btn btn-primary" id="btnNewThread">Нова тема</button>
         </div>
       </div>
 
@@ -133,97 +161,64 @@
       document.addEventListener("DOMContentLoaded", async () => {
         if (typeof renderAdminSidebar === "function")
           renderAdminSidebar("forum/index.html");
-        await Forum.init(); // загрузка профиля, ролей, сайдбара
+
+        await Forum.init();                 // загрузка профиля/ролей/сессии
         Forum.renderRoleHint("#roleHint");
 
-        // список тем
+        const btnNew = document.getElementById("btnNewThread");
+
+        // 1) Скрыть кнопку "Нова тема", если нет прав (не авторизован)
+        // На фронте считаем, что достаточно быть залогиненым, чтобы мочь створювати тему.
+        // Если на бэке логика строже — все равно поймаем 403 ниже.
+        if (!Forum.can("post:create")) {
+          btnNew.style.display = "none";
+        }
+
+        // 2) Загрузка списка
         const load = async () => {
-          const q = document.getElementById("q").value.trim();
-          const data = await Forum.api.listThreads({ q });
-          Forum.renderThreadList("#list", data, "#empty");
+          try {
+            const q = document.getElementById("q").value.trim();
+            const data = await Forum.api.listThreads({ q });
+            Forum.renderThreadList("#list", data, "#empty");
+          } catch (e) {
+            console.warn(e);
+            alert("Не вдалося завантажити список тем.");
+          }
         };
-        document.getElementById("btnSearch").addEventListener("click", load);
+        document.getElementById("btnSearch")?.addEventListener("click", load);
         document.getElementById("q").addEventListener("keydown", (e) => {
           if (e.key === "Enter") load();
         });
 
-        // создать тему
-        document
-          .getElementById("btnNewThread")
-          .addEventListener("click", async () => {
-            const title = prompt("Заголовок теми:");
-            if (!title) return;
-            const content = prompt("Перший пост:");
-            if (!content) return;
+        // 3) Создать тему с внятной обработкой 401/403
+        btnNew.addEventListener("click", async () => {
+          const title = prompt("Заголовок теми:");
+          if (!title) return;
+          const content = prompt("Перший пост:") || "";
+
+          try {
             const t = await Forum.api.createThread({ title, content });
             if (t && t._id) location.href = `./thread.html?id=${t._id}`;
-          });
+          } catch (err) {
+            const msg = String(err.message || err);
+            if (/unauthorized/i.test(msg) || /401/.test(msg)) {
+              alert("Потрібно увійти в акаунт, щоб створити тему.");
+            } else if (/forbidden/i.test(msg) || /403/.test(msg)) {
+              alert("У вас немає прав створювати теми (403). Зверніться до адміністратора.");
+            } else {
+              alert("Не вдалося створити тему: " + msg);
+            }
+          }
+        });
 
         await load();
       });
 
-
-      document.addEventListener("DOMContentLoaded", async () => {
-    if (typeof renderAdminSidebar === "function")
-      renderAdminSidebar("forum/index.html");
-
-    await Forum.init();                 // загрузка профиля/ролей/сессии
-    Forum.renderRoleHint("#roleHint");
-
-    const btnNew = document.getElementById("btnNewThread");
-
-    // 1) Скрыть кнопку "Нова тема", если нет прав (не авторизован)
-    // На фронте считаем, что достаточно быть залогиненым, чтобы мочь створювати тему.
-    // Если на бэке логика строже — все равно поймаем 403 ниже.
-    if (!Forum.can("post:create")) {
-      btnNew.style.display = "none";
-    }
-
-    // 2) Загрузка списка
-    const load = async () => {
-      try {
-        const q = document.getElementById("q").value.trim();
-        const data = await Forum.api.listThreads({ q });
-        Forum.renderThreadList("#list", data, "#empty");
-      } catch (e) {
-        console.warn(e);
-        alert("Не вдалося завантажити список тем.");
-      }
-    };
-    document.getElementById("btnSearch").addEventListener("click", load);
-    document.getElementById("q").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") load();
-    });
-
-    // 3) Создать тему с внятной обработкой 401/403
-    btnNew.addEventListener("click", async () => {
-      const title = prompt("Заголовок теми:");
-      if (!title) return;
-      const content = prompt("Перший пост:") || "";
-
-      try {
-        const t = await Forum.api.createThread({ title, content });
-        if (t && t._id) location.href = `./thread.html?id=${t._id}`;
-      } catch (err) {
-        const msg = String(err.message || err);
-        if (/unauthorized/i.test(msg) || /401/.test(msg)) {
-          alert("Потрібно увійти в акаунт, щоб створити тему.");
-        } else if (/forbidden/i.test(msg) || /403/.test(msg)) {
-          alert("У вас немає прав створювати теми (403). Зверніться до адміністратора.");
-        } else {
-          alert("Не вдалося створити тему: " + msg);
-        }
-      }
-    });
-
-    await load();
-  });
-
   let t;
-document.getElementById("q").addEventListener("input", () => {
-  clearTimeout(t);
-  t = setTimeout(load, 350);
-});
+  document.getElementById("q").addEventListener("input", () => {
+    clearTimeout(t);
+    t = setTimeout(load, 350);
+  });
     </script>
     
   </body>

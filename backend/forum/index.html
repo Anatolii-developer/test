@@ -99,6 +99,13 @@
           padding: 30px;
         }
       }
+
+      /* login hint formatting */
+      .login-hint .login-name { color:#275D2B; font-weight:700; }
+      .action-bottom { display:flex; align-items:center; gap:12px; margin-top:12px; }
+      .action-top { width:100%; display:flex; align-items:center; gap:16px; justify-content:center; }
+      .publish-btn { display:flex; align-items:center; justify-content:center; } /* center text */
+      .search-bar::placeholder { color:#97C194; } /* "Уведіть текст" color */
     </style>
   </head>
   <body class="with-sidebar">
@@ -186,22 +193,22 @@
         if (typeof renderAdminSidebar === "function")
           renderAdminSidebar("forum/index.html");
 
-        await Forum.init();          
-        const me = Forum?.me || {};
-const name =
-  me.fullName ||
-  [me.firstName, me.lastName].filter(Boolean).join(" ") ||
-  me.email || "Користувач";
-const role =
-  (Array.isArray(me.roles) && me.roles.length ? me.roles.join(", ") : me.role) || "—";
+        await Forum.init();
 
-document.getElementById("loginName").textContent = name;
-document.getElementById("loginRole").textContent = role;
+        // take consistent name + roles from Forum helpers
+        const me   = Forum.getUser() || {};
+        const name = Forum.getDisplayName();
+        const roles = Forum.getDisplayRoles();
+
+        // fill the "Ви увійшли як …" line
+        document.getElementById('loginName').textContent = name || (me.email || 'Користувач');
+        document.getElementById('loginRole').textContent = (roles && roles.length) ? roles.join(', ') : '—';
+
         Forum.renderRoleHint("#roleHint");
 
         const btnNew = document.getElementById("btnNewThread");
 
-        // 1) Скрыть кнопку "Нова тема", если нет прав (не авторизован)
+        // 1) Скрыть кнопку "Нова тема", якщо немає прав (не авторизован)
         // На фронте считаем, что достаточно быть залогиненым, чтобы мочь створювати тему.
         // Если на бэке логика строже — все равно поймаем 403 ниже.
         if (!Forum.can("post:create")) {

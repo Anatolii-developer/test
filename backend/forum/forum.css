@@ -94,8 +94,8 @@ body.with-sidebar .wrap {
 }
 .action-bottom{
   display: flex;
-  align-items: center;        /* valid value */
-  justify-content: center;    /* center the bottom row horizontally */
+  align-items: left;        /* valid value */
+  justify-content: left;    /* center the bottom row horizontally */
   gap: 12px;
 }
 

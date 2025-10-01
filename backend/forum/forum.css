@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap&amp;subset=cyrillic');
+
 /* ========= Design tokens ========= */
 :root {
-    --font-family: 'Poppins', sans-serif;
+    --font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
 
     --green: #275D2B;
     --green-100: #ECF5EB;
@@ -92,8 +94,8 @@ body.with-sidebar .wrap {
 }
 .action-bottom{
   display: flex;
-  align-items: left;        /* valid value */
-  justify-content: left;    /* center the bottom row horizontally */
+  align-items: center;        /* valid value */
+  justify-content: center;    /* center the bottom row horizontally */
   gap: 12px;
 }
 
@@ -154,6 +156,7 @@ body.with-sidebar .wrap {
   font-weight: 400; 
   font-style: normal; 
   font-size: 16px; 
+  font-family: var(--font-family);
   color: #151515; 
   text-align: left;          /* text left-aligned */
   /* no forced width to keep the row centered */
@@ -164,6 +167,7 @@ body.with-sidebar .wrap {
   font-weight: 600; 
   font-style: normal; 
   font-size: 16px; 
+  font-family: var(--font-family);
   color: #275D2B; 
 }
 

@@ -27,6 +27,113 @@ window.Forum = (function () {
     }
   }
 
+
+
+
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+  const arrow = document.getElementById('toggleArrow');
+  const logoExpanded = document.getElementById('logoExpanded');
+  const logoCollapsed = document.getElementById('logoCollapsed');
+
+  sidebar.classList.toggle('expanded');
+  sidebar.classList.toggle('collapsed');
+  if (sidebar.classList.contains('expanded')) {
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    arrow.style.transform = 'rotate(0deg)';
+  }
+}
+
+// === Sidebar hover-to-open + pin state ===
+let sidebarPinned = false;
+
+// Try to restore pin state
+try {
+  sidebarPinned = JSON.parse(localStorage.getItem('sidebarPinned') || 'false');
+} catch (_) {
+  sidebarPinned = false;
+}
+
+function isTouchDevice(){
+  return (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+}
+
+function applySidebarState() {
+  const sidebar = document.getElementById('sidebar');
+  const arrow = document.getElementById('toggleArrow');
+  if (!sidebar) return;
+
+  if (sidebarPinned) {
+    sidebar.classList.add('expanded');
+    sidebar.classList.remove('collapsed');
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+  } else {
+    sidebar.classList.remove('expanded');
+    sidebar.classList.add('collapsed');
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+  }
+}
+
+function enableSidebarHover() {
+  const sidebar = document.getElementById('sidebar');
+  const arrow = document.getElementById('toggleArrow');
+  if (!sidebar) return;
+
+  // Apply initial state (respect saved pin)
+  applySidebarState();
+
+  // On non-touch devices we expand on hover when NOT pinned
+  if (!isTouchDevice()) {
+    sidebar.addEventListener('mouseenter', () => {
+      if (!sidebarPinned) {
+        sidebar.classList.add('expanded');
+        sidebar.classList.remove('collapsed');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+      }
+    });
+
+    sidebar.addEventListener('mouseleave', () => {
+      if (!sidebarPinned) {
+        sidebar.classList.remove('expanded');
+        sidebar.classList.add('collapsed');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    // Accessibility: keep open while focusing inside with keyboard
+    sidebar.addEventListener('focusin', () => {
+      if (!sidebarPinned) {
+        sidebar.classList.add('expanded');
+        sidebar.classList.remove('collapsed');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+      }
+    });
+    sidebar.addEventListener('focusout', (e) => {
+      // Collapse only if focus moved fully outside
+      if (!sidebarPinned && !sidebar.contains(document.activeElement)) {
+        sidebar.classList.remove('expanded');
+        sidebar.classList.add('collapsed');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+}
+
+// Rewire the existing toggle to act as a "pin/unpin"
+const _origToggleSidebar = toggleSidebar;
+toggleSidebar = function(){
+  // Invert pin state and persist
+  sidebarPinned = !sidebarPinned;
+  localStorage.setItem('sidebarPinned', JSON.stringify(sidebarPinned));
+  applySidebarState();
+};
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', enableSidebarHover);
+
   
 
 async function fetchJSON(input, { headers, ...opts } = {}) {

@@ -78,7 +78,7 @@ body.with-sidebar .wrap {
   background: var(--card);
   border-radius: var(--radius16);
   box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  padding: 16px 24px;
+  padding: 20px 104px;
   display: flex;
   flex-direction: column;
   gap: 14px;

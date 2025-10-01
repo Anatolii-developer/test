@@ -92,7 +92,7 @@ body.with-sidebar .wrap {
 }
 .action-bottom{
   display: flex;
-  align-items: center;        /* valid value */
+  align-items: left;        /* valid value */
   justify-content: center;    /* center the bottom row horizontally */
   gap: 12px;
 }

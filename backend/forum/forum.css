@@ -87,11 +87,13 @@ body.with-sidebar .wrap {
 .action-top{
   display: flex;
   align-items: center;
+  justify-content: center;   /* center the top row horizontally */
   gap: 16px;
 }
 .action-bottom{
   display: flex;
-  align-items: left;
+  align-items: center;        /* valid value */
+  justify-content: center;    /* center the bottom row horizontally */
   gap: 12px;
 }
 
@@ -153,8 +155,8 @@ body.with-sidebar .wrap {
   font-style: normal; 
   font-size: 16px; 
   color: #151515; 
-  text-align: left; 
-  width: 100%; 
+  text-align: left;          /* text left-aligned */
+  /* no forced width to keep the row centered */
 }
 
 .login-name{ 

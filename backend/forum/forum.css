@@ -739,3 +739,7 @@ body {
         align-items: flex-start;
     }
 }
+
+body.with-sidebar .wrap {
+  margin-left: 0 !important;   /* убираем сдвиг вправо */
+}

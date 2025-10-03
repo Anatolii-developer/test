@@ -23,6 +23,7 @@
 
     --radius16: 16px;
     --radius24: 24px;
+     --reply-chip-width: 1032px;
 }
 
 /* ========= Base ========= */
@@ -1139,17 +1140,22 @@ body {
 
 /* Чип "Відповідь на" над полем */
 .reply-context{
-  width: 1032px;               /* по ТЗ */
+  max-width: var(--reply-chip-width);
+  margin: 0 auto;               /* центр */
+  /* остальное без изменений: */
+  width: 100%;
   min-height: 72px;
   background: #ECF5EB;
-  border: 1px solid #275D2B;
-  border-radius: 10px;
-  padding: 16px 20px;
+  border: none;
+  border-bottom: 1px solid #275D2B;
+  border-radius: 10px 10px 0 0;
+  padding: 16px 24px;
   display: inline-flex;
   align-items: center;
   gap: 12px;
   position: relative;
 }
+
 .reply-context .label{
   font-family: 'Poppins', sans-serif;
   font-weight: 500;            /* Medium */

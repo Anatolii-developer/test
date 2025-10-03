@@ -53,21 +53,32 @@
 
       <div id="posts" style="margin-top: 16px"></div>
 
-     <div id="composer" class="composer">
-  <div id="replyCtx" class="reply-context" style="display:none">
-    <span class="label">Відповідь на:</span>
-    <span class="quote" id="replyToWho"></span>
-    <button id="replyCancel" class="close" title="Скасувати">×</button>
+    <div id="composer" class="composer">
+  <!-- ЕДИНАЯ КАРТОЧКА: верх — чип, низ — textarea -->
+  <div class="composer-card">
+    <div id="replyCtx" class="reply-context" style="display:none">
+      <span class="label">Відповідь на:</span>
+      <span class="quote" id="replyToWho"></span>
+      <button id="replyCancel" class="close" title="Скасувати">×</button>
+    </div>
+
+    <textarea id="replyText" placeholder="Напишіть Ваше повідомлення..."></textarea>
   </div>
 
-  <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
-
+  <!-- низ: файлы + отправка -->
   <div class="composer-actions">
-    <input id="replyFiles" type="file" multiple />
-    <button class="btn btn-primary" id="btnReply">Надіслати</button>
+    <!-- кнопка-лейбл открывает скрытый input -->
+    <input id="replyFiles" type="file" multiple hidden />
+    <label for="replyFiles" class="attach-btn">
+      <img src="/assets/forum/attach.svg" alt="" />
+      <span>Додати файл</span>
+    </label>
+
+    <button class="btn btn-send" id="btnReply">Надіслати</button>
     <span class="meta" id="lockHint" style="display:none">Тема закрита для нових відповідей</span>
   </div>
 
+  <!-- превью выбранных файлов -->
   <div id="preview" class="attachments-preview"></div>
 </div>
     </main>
@@ -127,15 +138,36 @@ function clearReplyCtx() {
         // Cancel button
         $replyCancel?.addEventListener("click", clearReplyCtx);
 
-        $files.addEventListener("change", () => {
+       $files.addEventListener("change", () => {
   $preview.innerHTML = "";
-  [...$files.files].forEach(f => {
+  const list = [...$files.files];
+
+  list.forEach((f, idx) => {
     if (f.type.startsWith("image/")) {
       const url = URL.createObjectURL(f);
+      const box = document.createElement("div");
+      box.className = "thumb";
+
       const img = document.createElement("img");
       img.src = url;
       img.onload = () => URL.revokeObjectURL(url);
-      $preview.appendChild(img);
+
+      const rm = document.createElement("button");
+      rm.className = "rm";
+      rm.textContent = "×";
+      rm.title = "Видалити";
+      rm.onclick = (e) => {
+        e.preventDefault();
+        // удалить из FileList нельзя напрямую — создаём новый список
+        const dt = new DataTransfer();
+        [...$files.files].forEach((file, i) => { if (i !== idx) dt.items.add(file); });
+        $files.files = dt.files;
+        box.remove();
+      };
+
+      box.appendChild(img);
+      box.appendChild(rm);
+      $preview.appendChild(box);
     } else {
       const div = document.createElement("div");
       div.className = "meta";

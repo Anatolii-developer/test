@@ -389,15 +389,32 @@ document.getElementById("btnReply").addEventListener("click", async () => {
         if (!id) return (location.href = "./index.html");
 
         const { thread, posts } = await Forum.api.getThread(id);
-        Forum.renderThreadHead(thread, "#tTitle", "#tMeta", "#tModActions");
-        Forum.renderPosts("#posts", posts, { thread });
 
-        // показать статус приватності поруч із метаданими
-        if (thread.isPrivate) {
-          const tMeta = document.getElementById("tMeta");
-          if (tMeta) tMeta.textContent += " • 🔐 Приватна";
-        }
+// ==== Fill title card (header) ====
+const $titleEl   = document.getElementById('tTitle');
+const $authorEl  = document.getElementById('tAuthor');
+const $metaEl    = document.getElementById('tMeta');
+const $answersEl = document.getElementById('tAnswers');
 
+if ($titleEl)  $titleEl.textContent  = thread.title || '';
+if ($authorEl) $authorEl.textContent = (thread.author?.fullName || thread.author?.username || thread.author?.email || '—');
+
+// Compose meta like: "Створив: NAME • DATE • (📌 Закріплено) (🔒 Закрито) (🔐 Приватна)"
+const createdBy  = (thread.author?.username || thread.author?.email || '—');
+const createdAt  = (()=>{ try { return new Date(thread.createdAt).toLocaleString('uk-UA'); } catch { return '';} })();
+let metaParts = [ `Створив: ${createdBy}`, createdAt ];
+if (thread.pinned) metaParts.push('📌 Закріплено');
+if (thread.locked) metaParts.push('🔒 Закрито');
+if (thread.isPrivate) metaParts.push('🔐 Приватна');
+if ($metaEl) $metaEl.textContent = metaParts.filter(Boolean).join(' • ');
+
+// Answers count (prefer posts.length, fallback to thread.postsCount)
+const answers = Array.isArray(posts) ? posts.length : (thread.postsCount || 0);
+if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
+
+// Render posts below
+Forum.renderPosts('#posts', posts, { thread });
+        
         // хто може бачити мод-кнопки: модератор або автор теми
         const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();
         const canModThis = Forum.can("moderate:threads") || (me && thread.author && String(me._id) === String(thread.author._id));
@@ -442,6 +459,33 @@ document.getElementById("btnReply").addEventListener("click", async () => {
         }
     
       });
+
+      // Update renderThreadHead to support new header placeholders while keeping backward compatibility
+      function renderThreadHead(thread, selTitle, selMeta, selActions) {
+        // Back-compat: still fill passed selectors
+        const $t = selTitle ? document.querySelector(selTitle) : null;
+        const $m = selMeta ? document.querySelector(selMeta) : null;
+        if ($t) $t.textContent = thread.title || '';
+        if ($m) {
+          const createdBy  = (thread.author?.username || thread.author?.email || '—');
+          const createdAt  = fmtDate(thread.createdAt);
+          const parts = [ `Створив: ${createdBy}`, createdAt ];
+          if (thread.pinned) parts.push('📌 Закріплено');
+          if (thread.locked) parts.push('🔒 Закрито');
+          if (thread.isPrivate) parts.push('🔐 Приватна');
+          $m.textContent = parts.filter(Boolean).join(' • ');
+        }
+        // New header placeholders (if present on page)
+        const $authorEl  = document.getElementById('tAuthor');
+        const $answersEl = document.getElementById('tAnswers');
+        if ($authorEl) $authorEl.textContent = (thread.author?.fullName || thread.author?.username || thread.author?.email || '—');
+        if ($answersEl && Number.isFinite(thread.postsCount)) $answersEl.textContent = `${thread.postsCount} відповідей`;
+
+        if (selActions && can('moderate:threads')) {
+          const $a = document.querySelector(selActions);
+          if ($a) $a.style.display = 'flex';
+        }
+      }
     </script>
   </body>
 </html>

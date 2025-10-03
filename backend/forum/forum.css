@@ -1140,15 +1140,12 @@ body {
 
 /* Чип "Відповідь на" над полем */
 .reply-context{
-  max-width: var(--reply-chip-width);
-  margin: 0 auto;               /* центр */
-  /* остальное без изменений: */
-  width: 100%;
-  min-height: 72px;
+  width: min(var(--reply-chip-width), 100%);
+  margin: 0 auto -1px;               /* сужаем и «вплавляем» в поле */
   background: #ECF5EB;
-  border: none;
-  border-bottom: 1px solid #275D2B;
-  border-radius: 10px 10px 0 0;
+  border: 1px solid #275D2B;
+  border-bottom: none;                /* нижней грани нет — шва не видно */
+  border-radius: 10px 10px 0 0;       /* только верхние углы скруглены */
   padding: 16px 24px;
   display: inline-flex;
   align-items: center;
@@ -1182,17 +1179,17 @@ body {
 
 /* Поле відповіді */
 #replyText{
-  width: 1110px;               /* по ТЗ */
+  width: 100%;
   height: 181px;               /* по ТЗ */
   background: #FFFFF9;
-  border-radius: 16px;
-  border: none;
-  padding: 16px 20px;
+  border: 1px solid #275D2B;   /* собственная рамка */
+  border-radius: 16px;         /* единый радиус карточки */
+  padding: 20px 24px;
   margin-top: 12px;
   font: 16px 'Poppins', var(--font-family);
   color: #414141;
   outline: none;
-  box-shadow: 0 0 0 1px #F1E1C0 inset; /* ніжна межа всередині (можна прибрати) */
+  resize: vertical;
 }
 #replyText::placeholder{ color:#8F8F8F; }
 
@@ -1202,28 +1199,26 @@ body {
 
 /* ЕДИНЫЙ БЛОК: верх (чип) + низ (textarea) без шва между ними */
 .composer-card{
-  width:100%;
-  /* чтобы чип и textarea визуально были одним объектом — дадим общий радиус и границу */
-  border:1px solid #275D2B;
-  border-radius:16px;
-  overflow:hidden;                 /* скрыть стык и разницу высот */
-  background:#FFFFF9;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  overflow: visible;          /* не обрезать чип, который уже поля */
+  background: transparent;
 }
 
 /* Чип «Відповідь на» — только верхние скругления, низ ровно к textarea */
 .reply-context{
-  width:100%;
-  min-height:72px;
-  background:#ECF5EB;
-  /* границу взяли у контейнера; внутри — убираем собственные */
-  border:none;
-  border-bottom:1px solid #275D2B; /* тонкая линия между чипом и полем */
-  border-radius:16px 16px 0 0;     /* верхние углы скруглены */
-  padding:16px 24px;
-  display:inline-flex;
-  align-items:center;
-  gap:12px;
-  position:relative;
+  width: min(var(--reply-chip-width), 100%);
+  margin: 0 auto -1px;
+  background: #ECF5EB;
+  border: 1px solid #275D2B;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  padding: 16px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
 }
 
 /* типографика по ТЗ */
@@ -1252,16 +1247,16 @@ body {
 
 /* Поле — нижняя часть единого блока: только нижние скругления */
 #replyText{
-  width:100%;
-  height:181px;                    /* по ТЗ */
-  resize:vertical;
-  background:#FFFFF9;
-  border:none;                      /* граница у .composer-card */
-  border-radius:0 0 16px 16px;      /* нижние углы скруглены */
-  padding:20px 24px;
-  font:16px 'Poppins', var(--font-family);
-  color:#414141;
-  outline:none;
+  width: 100%;
+  height: 181px;
+  resize: vertical;
+  background: #FFFFF9;
+  border: 1px solid #275D2B;
+  border-radius: 16px;
+  padding: 20px 24px;
+  font: 16px 'Poppins', var(--font-family);
+  color: #414141;
+  outline: none;
 }
 #replyText::placeholder{ color:#8F8F8F; }
 

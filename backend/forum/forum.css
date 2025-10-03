@@ -1079,3 +1079,51 @@ body {
   font-size: 16px;
   color: #97C194;
 }
+
+
+/* разделитель: одна верхняя линия, без двойных бордеров */
+.replies-separator{
+  border: 0;
+  border-top: 1px solid #000000;
+  height: 0;
+  margin: 16px 0 12px; /* после кнопки и перед ответами */
+}
+
+/* всё внутри первого поста — без дополнительных карточных бордеров */
+#posts .post:first-child .replies-block { padding: 0 0 8px; }
+
+#posts .post:first-child .replies-list .post{
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0;           /* чтобы не «вылазило» за контейнер */
+  padding: 12px 0;     /* вертикальный ритм */
+  width: auto;         /* на всякий случай */
+  max-width: 100%;
+}
+
+/* шапка ответа остаётся аккуратной */
+#posts .post:first-child .replies-list .post .post-head{
+  justify-content: space-between;
+}
+
+/* аватар/имя/время по ТЗ для ответов */
+#posts .post:first-child .replies-list .avatar{
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+#posts .post:first-child .replies-list .post-author-name{
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #275D2B;
+}
+#posts .post:first-child .replies-list .post-author-meta{
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #97C194;
+}

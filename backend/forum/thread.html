@@ -204,12 +204,14 @@ if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
 // Render posts below
 Forum.renderPosts('#posts', posts, { thread });
 
-// Сначала переносим все ответы (со 2-го поста) в скрытое хранилище
-(function hideRepliesInitially(){
+// единый блок управления показом ответов
+(function initRepliesToggle(){
   const root = document.querySelector('#posts');
   if (!root) return;
-  const rest = [...root.querySelectorAll('.post')].slice(1);
-  if (!rest.length) return;
+
+  // собрать ответы, начиная со 2-го поста, и спрятать
+  const replies = [...root.querySelectorAll('.post')].slice(1);
+  if (!replies.length) return;
 
   let store = root.querySelector('#hiddenReplies');
   if (!store){
@@ -218,15 +220,13 @@ Forum.renderPosts('#posts', posts, { thread });
     store.style.display = 'none';
     root.appendChild(store);
   }
-  rest.forEach(n => store.appendChild(n));
-})();
+  replies.forEach(n => store.appendChild(n));
 
-// Добавляем футер в первый пост: кнопка + счетчик
-(function addMainPostFooter(){
-  const firstPost = document.querySelector('#posts .post:first-child');
-  if (!firstPost) return;
+  // футер с кнопкой и счётчиком в первом посте
+  const first = root.querySelector('.post:first-child');
+  if (!first) return;
 
-  let footer = firstPost.querySelector('.post-footer');
+  let footer = first.querySelector('.post-footer');
   if (!footer){
     footer = document.createElement('div');
     footer.className = 'post-footer';
@@ -234,122 +234,50 @@ Forum.renderPosts('#posts', posts, { thread });
       <button class="show-more" type="button">Показати більше</button>
       <span class="answers-count" id="postAnswersCount"></span>
     `;
-    firstPost.appendChild(footer);
+    first.appendChild(footer);
   }
 
-  // количество ответов
-  const cnt = document.getElementById('postAnswersCount');
-  const total = (Array.isArray(posts) ? posts.length : (thread.postsCount || 0)) - 1;
-  if (cnt) cnt.textContent = `${Math.max(total,0)} відповідей`;
+  const total = Math.max((Array.isArray(posts) ? posts.length : (thread.postsCount || 0)) - 1, 0);
+  const cntEl = footer.querySelector('#postAnswersCount');
+  if (cntEl) cntEl.textContent = `${total} відповідей`;
 
-  // Контейнер раскрытия внутри первого поста
-  let repliesBlock = firstPost.querySelector('.replies-block');
+  // блок, в котором будет ОДНА линия и список ответов — внутри первого поста
+  let repliesBlock = first.querySelector('.replies-block');
   if (!repliesBlock){
     repliesBlock = document.createElement('div');
     repliesBlock.className = 'replies-block';
     repliesBlock.style.display = 'none';
-    firstPost.appendChild(repliesBlock);
+    first.appendChild(repliesBlock);
   }
 
   const btn = footer.querySelector('.show-more');
-  let expanded = false;
+  let open = false;
+
+  // заранее создаём разделитель и контейнер списка, чтобы не дублировать
+  const sep = document.createElement('div');
+  sep.className = 'replies-separator';
+  const list = document.createElement('div');
+  list.className = 'replies-list';
 
   btn?.addEventListener('click', () => {
-    const store = document.querySelector('#hiddenReplies');
-    if (!store) return;
+    open = !open;
+    if (open){
+      // порядок: кнопка → линия → ответы
+      repliesBlock.innerHTML = '';
+      repliesBlock.appendChild(sep);
+      repliesBlock.appendChild(list);
 
-    expanded = !expanded;
-
-    if (expanded) {
-      repliesBlock.style.display = 'block';
-      // создаем разделитель и список при каждом показе (или один раз — не критично)
-      repliesBlock.innerHTML = `
-        <hr class="replies-separator"/>
-        <div class="replies-list"></div>
-      `;
-      const list = repliesBlock.querySelector('.replies-list');
-
-      // Переносим все скрытые ответы внутрь первого поста
       while (store.firstChild) list.appendChild(store.firstChild);
 
-      btn.textContent = 'Приховати';
-    } else {
-      // Возвращаем ответы обратно в скрытое хранилище
-      const list = repliesBlock.querySelector('.replies-list');
-      const store = document.querySelector('#hiddenReplies');
-      if (list && store){
-        while (list.firstChild) store.appendChild(list.firstChild);
-      }
-      repliesBlock.style.display = 'none';
-      btn.textContent = 'Показати більше';
-    }
-  });
-})();
-
-(function setupShowMoreToggle(){
-  const firstPost = document.querySelector('#posts .post:first-child');
-  if (!firstPost) return;
-
-  const footer = firstPost.querySelector('.post-footer');
-  const btn = footer?.querySelector('.show-more');
-  const answersCount = footer?.querySelector('.answers-count');
-  const repliesBlock = document.createElement('div');
-  repliesBlock.className = 'replies-block';
-  repliesBlock.style.display = 'none';
-  firstPost.appendChild(repliesBlock);
-
-  let expanded = false;
-
-  btn?.addEventListener('click', () => {
-    expanded = !expanded;
-
-    if (expanded) {
-      // показать
       repliesBlock.style.display = 'block';
-      repliesBlock.innerHTML = `
-        <hr class="replies-separator"/>
-        <div class="replies-list"></div>
-      `;
       btn.textContent = 'Приховати';
-
-      // сюда вставляем все остальные посты (ответы)
-      const allPosts = [...document.querySelectorAll('#posts .post')].slice(1);
-      const list = repliesBlock.querySelector('.replies-list');
-      list.append(...allPosts);
     } else {
-      // скрыть
+      while (list.firstChild) store.appendChild(list.firstChild);
       repliesBlock.style.display = 'none';
       btn.textContent = 'Показати більше';
     }
   });
 })();
-(function addMainPostFooter(){
-    const firstPost = document.querySelector('#posts .post:first-child');
-    if (!firstPost) return;
-
-    // создаём контейнер футера, если его нет
-    let footer = firstPost.querySelector('.post-footer');
-    if (!footer){
-      footer = document.createElement('div');
-      footer.className = 'post-footer';
-      footer.innerHTML = `
-        <button class="show-more" type="button">Показати більше</button>
-        <span class="answers-count" id="postAnswersCount"></span>
-      `;
-      firstPost.appendChild(footer);
-    }
-
-    // выставляем количество ответов (вже пораховано вище як "answers")
-    const cnt = document.getElementById('postAnswersCount');
-    if (cnt) cnt.textContent = `${answers} відповідей`;
-
-    // клик по кнопке — триггер твоей логики раскрытия / подгрузки
-    footer.querySelector('.show-more')?.addEventListener('click', () => {
-      // TODO: вставь свою функцию раскрытия
-      // например: Forum.showAllReplies();
-      document.dispatchEvent(new CustomEvent('forum:show-more'));
-    });
-  })();
        document.querySelectorAll('#posts .js-reply').forEach(btn => { btn.textContent = 'Reply'; });
         // хто може бачити мод-кнопки: модератор або автор теми
         const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();

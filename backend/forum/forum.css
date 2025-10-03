@@ -42,21 +42,7 @@ body.with-sidebar:has(.sidebar.expanded) { --sbw: 256px; }
 body.with-sidebar .wrap {
   margin: 0 auto 40px;   /* только центр */
 }
-.sidebar nav a[href="/career-faq.html"]{
-  gap: 6px;                   /* было 10px — иконка ближе к тексту */
-}
 
-/* разрешаем перенос конкретно для ссылки на Планування Кар’єри */
-.sidebar nav a[href="/career-faq.html"] span{
-  white-space: normal;        /* разрешить перенос */
-  display: inline-block;
-    max-width: 160px;           /* ширина под две строки */
-  line-height: 1.15;
-  word-break: break-word;     /* подстраховка */
-  text-align: left;
-    margin-left: 0;    
-             /* Переопределяем глобальное правило, чтобы не было двойного отступа */
-}
 
 /* в свернутом состоянии спан всё равно скрыт — ничего менять не надо */
 html,

@@ -223,7 +223,7 @@ body {
 }
 
 /* Author row */
-.thread-author{ display:flex; align-items:center; gap:12px; }
+.thread-author .thread-avatar{ width:40px; height:40px; border-radius:50%; object-fit:cover; }
 .thread-avatar{
   width:40px; height:40px;          /* avatar 40x40 */
   border-radius:50%; object-fit:cover; flex:0 0 40px;
@@ -788,11 +788,8 @@ body {
   object-fit:cover;
   flex:0 0 40px;
 }
-.thread-card .thread-avatar{
-  width:80px;
-  height:80px;
-  flex:0 0 80px;
-}
+.thread-card .thread-avatar{ width:80px; height:80px; } /* только в шапке */
+
 .thread-author-col{ display:flex; flex-direction:column; }
 .thread-author-name{ font: 500 18px Poppins, Inter, sans-serif; color:#275D2B; }
 .thread-author-meta{ font: 400 12px Poppins, Inter, sans-serif; color:#97C194; }
@@ -811,13 +808,8 @@ body {
 
 /* Главный (первый) пост — обводка по ТЗ */
 #posts .post:first-child{
-  width: 1110px;
-  min-height: 308px;
-  background: #FFFFF9;
-  border: 2px solid #275D2B;        /* зелёная рамка */
-  border-radius: 16px;
-  padding: 24px 28px;
-  margin: 0 auto 16px;
+  width:1110px; min-height:308px; background:#FFFFF9;
+  border:2px solid #275D2B; border-radius:16px; padding:24px 28px; margin:0 auto 16px;
 }
 
 /* Типографика текста поста */
@@ -848,20 +840,12 @@ body {
 /* Удаляем кнопку удаления */
 .post .js-del{ display:none !important; }
 
-/* Кнопка Reply (иконка слева + текст) */
 .post .actions .js-reply{
-  width:196px !important;
-  height:48px !important;
-  padding:10px 53px !important;
-  border-radius:24px !important;
-  border:1px solid #275D2B !important;
-  background:#ECF5EB !important;
-  color:#275D2B !important;
-  font:600 16px Poppins, Inter, sans-serif !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:8px !important;
+  width:112px; height:48px; padding:10px;
+  border-radius:8px; border:1px solid #275D2B;
+  background:#ECF5EB; color:#275D2B;
+  font:600 16px Poppins, Inter, sans-serif;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
 }
 .post .actions .js-reply::before{
   content: "";
@@ -871,19 +855,18 @@ body {
   background: url("/assets/forum/reply.svg") center/contain no-repeat;
 }
 
-/* Кнопка лайка: квадрат + иконка + счётчик */
 .post .actions .js-like{
-  position:relative !important;
-  width:48px !important;
-  height:48px !important;
-  padding:0 !important;
-  border-radius:8px !important;
-  border:1px solid #275D2B !important;
-  background:#FFFFF9 !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  font-size:0 !important;
+  position:relative;
+  width:48px;
+  height:48px;
+  padding:0;
+  border-radius:8px;
+  border:1px solid #275D2B;
+  background:#ECF5EB;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0;
 }
 .post .actions .js-like::before{
   content: "";
@@ -902,6 +885,19 @@ body {
   color:#000000;
   display:inline-block;
 }
+
+
+.mod-actions{
+  display:flex; gap:24px; justify-content:center; margin:24px 0 12px;
+}
+.mod-actions .mod-btn{
+  width:196px; height:48px; padding:10px 53px;
+  border-radius:24px; border:1px solid #275D2B;
+  background:#ECF5EB; color:#275D2B; 
+  font:600 16px Poppins, Inter, sans-serif;
+  display:inline-flex; align-items:center; justify-content:center; gap:12px;
+}
+.mod-actions .mod-btn img.mod-icon{ width:20px; height:20px; }
 
 /* Показать більше */
 .show-more{
@@ -938,3 +934,13 @@ body {
   .thread-title{ font-size:28px; line-height:34px; }
 }
 
+
+
+/* Аватар автора внутри поста: по умолчанию 40x40 */
+.post .post-author .avatar{
+  width:40px; height:40px; border-radius:50%; object-fit:cover; flex:0 0 40px;
+}
+/* В первом посте — 80x80 */
+#posts .post:first-child .post-author .avatar{
+  width:80px; height:80px; flex:0 0 80px;
+}

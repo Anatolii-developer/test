@@ -354,6 +354,9 @@ function getDisplayRoles(){
     const canDel = Forum.can('moderate:posts') || (currentUser && String(currentUser._id) === String(p.author?._id));
     const liked = !!(p.liked ?? (Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === String(currentUser?._id))));
     const likes  = Number.isFinite(p.likes) ? p.likes : 0;
+    const authorName = escapeHtml(p.author?.fullName || p.author?.username || p.author?.email || '-');
+const avatarUrl  = p.author?.photoUrl || '/assets/profile-photo.png';
+const when       = fmtDate(p.createdAt);
 
     const el = document.createElement('div');
     el.className = 'post';
@@ -378,19 +381,24 @@ function getDisplayRoles(){
     }
 
     el.innerHTML = `
-      <div class="post-head">
-        <div class="meta"><strong>${escapeHtml(p.author?.username || p.author?.email || '-')}</strong> • ${fmtDate(p.createdAt)}</div>
-        <div class="actions">
-          <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1' : '0'}">
-            👍 <span class="js-like-count">${likes}</span>
-          </button>
-          <button class="btn btn-ghost js-reply" data-id="${p._id}">↩︎ Відповісти</button>
-          ${canDel ? `<button class="btn btn-danger js-del" data-id="${p._id}">Видалити</button>` : ''}
-        </div>
+  <div class="post-head">
+    <div class="post-author">
+      <img class="avatar" src="${avatarUrl}" alt="${authorName}" />
+      <div>
+        <div class="name">${authorName}</div>
+        <div class="meta">${when}</div>
       </div>
-      ${contentHTML}
-      ${attsHTML}
-    `;
+    </div>
+    <div class="actions">
+      <button class="btn btn-ghost js-reply" data-id="${p._id}">Reply</button>
+      <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1' : '0'}">
+        <span class="js-like-count">${likes}</span>
+      </button>
+    </div>
+  </div>
+  ${contentHTML}
+  ${attsHTML}
+`;
     $root.appendChild(el);
   });
 

@@ -11,7 +11,29 @@
     />
   </head>
   <body class="with-sidebar">
-    <aside class="sidebar" id="sidebar"></aside>
+    <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="/assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+    </div>
+    <img class="logo" src="/assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="/assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+    <img class="profile" src="/assets/profile-photo.png" alt="User" width="40" height="40" />
+    <nav>
+      <a href="/profile.html"><img src="/assets/sidebar/profile.svg" /><span>Про Мене</span></a>
+      <a href="/mycertificates.html"><img src="/assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a>
+      <a href="/career-faq.html"><img src="/assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a>
+      <a href="/library.html"><img src="/assets/sidebar/3.svg" /><span>Бібліотека</span></a>
+      <a href="/my-courses.html"><img src="/assets/sidebar/5.svg" /><span>Мої Курси</span></a>
+       <a href="/forum/index.html">
+  <img src="/assets/sidebar/forum.svg" alt="Форум"/>
+  <span>Форум</span>
+</a>
+    </nav>
+    <div class="logout">
+      <img src="/assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+      <span>Вийти з акаунту</span>
+    </div>
+  </aside>
 
     <main class="wrap">
       <div class="thread-card">

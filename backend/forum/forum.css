@@ -1139,6 +1139,7 @@ body {
 }
 
 /* Чип "Відповідь на" над полем */
+/* Чип "Відповідь на" над полем */
 .reply-context{
   width: min(var(--reply-chip-width), 100%);
   margin: 0 auto -1px;               /* сужаем и «вплавляем» в поле */
@@ -1151,6 +1152,7 @@ body {
   align-items: center;
   gap: 12px;
   position: relative;
+  justify-content: center;
 }
 
 .reply-context .label{
@@ -1185,11 +1187,13 @@ body {
   border: 1px solid #275D2B;   /* собственная рамка */
   border-radius: 16px;         /* единый радиус карточки */
   padding: 20px 24px;
-  margin-top: 12px;
+  margin-top: 0;
   font: 16px 'Poppins', var(--font-family);
   color: #414141;
   outline: none;
   resize: vertical;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 #replyText::placeholder{ color:#8F8F8F; }
 
@@ -1207,6 +1211,7 @@ body {
 }
 
 /* Чип «Відповідь на» — только верхние скругления, низ ровно к textarea */
+/* Чип «Відповідь на» — только верхние скругления, низ ровно к textarea */
 .reply-context{
   width: min(var(--reply-chip-width), 100%);
   margin: 0 auto -1px;
@@ -1219,6 +1224,7 @@ body {
   align-items: center;
   gap: 12px;
   position: relative;
+  justify-content: center;
 }
 
 /* типографика по ТЗ */
@@ -1257,6 +1263,9 @@ body {
   font: 16px 'Poppins', var(--font-family);
   color: #414141;
   outline: none;
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 #replyText::placeholder{ color:#8F8F8F; }
 

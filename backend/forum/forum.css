@@ -832,11 +832,12 @@ body {
 .post .actions{
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px; 
 }
 /* Order controls: Reply first, Like second */
 .post .actions .js-reply{ order: 0; }
-.post .actions .js-like{  order: 1; }
+.post .actions .js-like{  order: 1;
+position: relative;  }
 
 /* Удаляем кнопку удаления */
 .post .js-del{ display:none !important; }
@@ -993,15 +994,14 @@ body {
   background:#ECF5EB;            /* по ТЗ: бэк для лайка */
 }
 .post .actions .js-like .js-like-count{
-  position:absolute;
-  right:calc(100% + 24px);         /* слева от контейнера иконки */
-  top:50%; transform:translateY(-50%);
-  margin:0;
-  font:600 16px Poppins, Inter, sans-serif;
-  color:#000000;
-  display:inline-block;
+  position: absolute;
+  right: calc(100% + 20px); /* было +8px — отодвинули дальше от Reply */
+  top: 50%;
+  transform: translateY(-50%);
+  font: 600 16px Poppins, Inter, sans-serif;
+  color: #000;
+  z-index: 1;               /* на всякий случай поверх */
 }
-
 
 /* Footer первого поста: кнопка + счетчик справа снизу */
 #posts .post:first-child{ position: relative; padding-bottom: 64px; } /* запас под футер */

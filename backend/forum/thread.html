@@ -53,20 +53,21 @@
 
       <div id="posts" style="margin-top: 16px"></div>
 
-      <div id="composer" class="composer">
-  <div id="replyCtx" class="reply-context">
-    Відповідь на:&nbsp;<span id="replyToWho"></span>
+     <div id="composer" class="composer">
+  <div id="replyCtx" class="reply-context" style="display:none">
+    <span class="label">Відповідь на:</span>
+    <span class="quote" id="replyToWho"></span>
     <button id="replyCancel" class="close" title="Скасувати">×</button>
   </div>
+
   <textarea id="replyText" placeholder="Ваша відповідь..."></textarea>
 
-  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+  <div class="composer-actions">
     <input id="replyFiles" type="file" multiple />
     <button class="btn btn-primary" id="btnReply">Надіслати</button>
     <span class="meta" id="lockHint" style="display:none">Тема закрита для нових відповідей</span>
   </div>
 
-  <!-- превью выбранных файлов -->
   <div id="preview" class="attachments-preview"></div>
 </div>
     </main>
@@ -91,15 +92,22 @@
         const $replyToWho = document.getElementById("replyToWho");
         const $replyCancel = document.getElementById("replyCancel");
 
-        function showReplyCtx({ author = "", snippet = "" } = {}) {
-          $replyToWho.textContent = author ? `${author}: ${snippet}` : "";
-          $replyCtx.style.display = author ? "inline-flex" : "none";
-        }
-        function clearReplyCtx() {
-          currentParentId = null;
-          $replyCtx.style.display = "none";
-          $replyToWho.textContent = "";
-        }
+        function showReplyCtx({ snippet = "" } = {}) {
+  const $ctx = document.getElementById("replyCtx");
+  const $quote = document.getElementById("replyToWho");
+  if (!$ctx || !$quote) return;
+  const text = String(snippet || "").trim();
+  $quote.textContent = text ? `“${text}”` : "";
+  $ctx.style.display = text ? "inline-flex" : "none";
+}
+
+function clearReplyCtx() {
+  const $ctx = document.getElementById("replyCtx");
+  const $quote = document.getElementById("replyToWho");
+  if ($quote) $quote.textContent = "";
+  if ($ctx) $ctx.style.display = "none";
+  currentParentId = null;
+}
         // Allow Forum.renderPosts() to call this
         window.setReplyParent = function (postId, opts = {}) {
           currentParentId = postId;

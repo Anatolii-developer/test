@@ -380,7 +380,11 @@ const when       = fmtDate(p.createdAt);
       attsHTML = `<div class="post-attachments">${parts.join('')}</div>`;
     }
 
+    const rawText   = (p.content || "").toString();
+const snippet80 = rawText.replace(/\s+/g, " ").trim().slice(0, 120);
+
    // ...
+// ...
 el.innerHTML = `
   <div class="post-head">
     <div class="post-author">
@@ -391,7 +395,11 @@ el.innerHTML = `
       </div>
     </div>
     <div class="actions">
-      <button class="btn btn-ghost js-reply" data-id="${p._id}">Reply</button>
+      <button
+        class="btn btn-ghost js-reply"
+        data-id="${p._id}"
+        data-snippet="${escapeHtml(snippet80).replace(/"/g, '&quot;')}"
+      >Reply</button>
       <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1' : '0'}">
         <span class="js-like-count">${likes}</span>
       </button>
@@ -429,15 +437,29 @@ el.innerHTML = `
     });
   });
   // reply: delegate to global setter (thread.html defines setReplyParent), or fire a CustomEvent
-  $root.querySelectorAll('.js-reply').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (typeof window.setReplyParent === 'function') {
-        window.setReplyParent(btn.dataset.id);
-      } else {
-        document.dispatchEvent(new CustomEvent('forum:set-reply-parent', { detail: { postId: btn.dataset.id } }));
-      }
-    });
+$root.querySelectorAll('.js-reply').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.id;
+
+    // берем сниппет из data-атрибута, либо из текста поста на случай,
+    // если атрибут по какой-то причине пуст
+    const fallback =
+      btn.closest('.post')?.querySelector('.post-content')?.textContent?.trim().slice(0, 120) || '';
+    const snippet = btn.dataset.snippet || fallback;
+
+    if (typeof window.setReplyParent === 'function') {
+      window.setReplyParent(id, { snippet });
+    } else {
+      document.dispatchEvent(new CustomEvent('forum:set-reply-parent', {
+        detail: { postId: id, snippet }
+      }));
+    }
+
+    // плавный скролл к композеру и фокус на поле
+    document.getElementById('composer')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('replyText')?.focus();
   });
+});
 }
   function renderRoleHint(sel) {
     const el = document.querySelector(sel);

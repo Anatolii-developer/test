@@ -858,17 +858,18 @@ position: relative;  }
 }
 
 .post .actions .js-like{
-  position:relative;
-  width:48px;
-  height:48px;
-  padding:0;
-  border-radius:8px;
-  border:1px solid #275D2B;
-  background:#ECF5EB;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:0;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid #275D2B;
+  background: #ECF5EB;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  overflow: visible;            /* на всякий */
 }
 .post .actions .js-like::before{
   content: "";
@@ -995,12 +996,12 @@ position: relative;  }
 }
 .post .actions .js-like .js-like-count{
   position: absolute;
-  right: calc(100% + 20px); /* было +8px — отодвинули дальше от Reply */
+  left: calc(100% + 12px);      /* было right: calc(100% + 20px) — теперь справа */
   top: 50%;
   transform: translateY(-50%);
   font: 600 16px Poppins, Inter, sans-serif;
   color: #000;
-  z-index: 1;               /* на всякий случай поверх */
+  z-index: 1;
 }
 
 /* Footer первого поста: кнопка + счетчик справа снизу */

@@ -781,7 +781,18 @@ body {
 }
 
 .thread-author{ display:flex; align-items:center; gap:12px; }
-.thread-avatar{ width:80px; height:80px; border-radius:50%; object-fit:cover; flex:0 0 80px; }
+.thread-avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+  flex:0 0 40px;
+}
+.thread-card .thread-avatar{
+  width:80px;
+  height:80px;
+  flex:0 0 80px;
+}
 .thread-author-col{ display:flex; flex-direction:column; }
 .thread-author-name{ font: 500 18px Poppins, Inter, sans-serif; color:#275D2B; }
 .thread-author-meta{ font: 400 12px Poppins, Inter, sans-serif; color:#97C194; }
@@ -839,18 +850,18 @@ body {
 
 /* Кнопка Reply (иконка слева + текст) */
 .post .actions .js-reply{
-  width: 196px;
-  height: 48px;
-  padding: 10px 53px;
-  border-radius: 24px;
-  border: 1px solid #275D2B;
-  background: #ECF5EB;
-  color: #275D2B;
-  font: 600 16px Poppins, Inter, sans-serif;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  width:196px !important;
+  height:48px !important;
+  padding:10px 53px !important;
+  border-radius:24px !important;
+  border:1px solid #275D2B !important;
+  background:#ECF5EB !important;
+  color:#275D2B !important;
+  font:600 16px Poppins, Inter, sans-serif !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
 }
 .post .actions .js-reply::before{
   content: "";
@@ -862,17 +873,17 @@ body {
 
 /* Кнопка лайка: квадрат + иконка + счётчик */
 .post .actions .js-like{
-  position: relative;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border-radius: 8px;
-  border: 1px solid #275D2B;
-  background: #FFFFF9;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0; /* скрыть любые эмодзи/текст внутри */
+  position:relative !important;
+  width:48px !important;
+  height:48px !important;
+  padding:0 !important;
+  border-radius:8px !important;
+  border:1px solid #275D2B !important;
+  background:#FFFFF9 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
 }
 .post .actions .js-like::before{
   content: "";
@@ -882,14 +893,14 @@ body {
   display: inline-block;
 }
 .post .actions .js-like .js-like-count{
-  position: absolute;
-  left: calc(100% + 8px);
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0;
-  font: 600 16px Poppins, Inter, sans-serif;
-  color: #000000;
-  display: inline-block;
+  position:absolute;
+  right:calc(100% + 8px);
+  top:50%;
+  transform:translateY(-50%);
+  margin:0;
+  font:600 16px Poppins, Inter, sans-serif;
+  color:#000000;
+  display:inline-block;
 }
 
 /* Показать більше */
@@ -927,11 +938,3 @@ body {
   .thread-title{ font-size:28px; line-height:34px; }
 }
 
-
-.thread-avatar-big{
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex: 0 0 80px;
-}

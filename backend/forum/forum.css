@@ -40,14 +40,9 @@ body.with-sidebar:has(.sidebar.expanded) { --sbw: 256px; }
 /* Shift the centered container left by half of the visible sidebar width
    so its visual center aligns with the viewport center */
 body.with-sidebar .wrap {
-  transform: translateX(calc(-1 * var(--sbw) / 2));
-  transition: transform .3s ease;
+  margin: 0 auto 40px;   /* только центр */
 }
 
-/* On narrower screens, don't shift; keep standard centering */
-@media (max-width:1180px){
-  body.with-sidebar .wrap { transform: none; }
-}
 
 html,
 body {
@@ -721,9 +716,6 @@ body {
 
 /* ========= Responsive ========= */
 @media (max-width:1180px) {
-    body.with-sidebar .wrap {
-        margin-left: 0;
-    }
 
     .wrap {
         width: 90%;

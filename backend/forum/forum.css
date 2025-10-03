@@ -44,6 +44,17 @@ body.with-sidebar .wrap {
 }
 
 
+/* разрешаем перенос конкретно для ссылки на Планування Кар’єри */
+.sidebar nav a[href="/career-faq.html"] span{
+  white-space: normal;        /* разрешить перенос */
+  display: inline-block;
+  max-width: 150px;           /* ширина под две строки */
+  line-height: 1.15;
+  word-break: break-word;     /* подстраховка */
+  text-align: left;
+}
+
+/* в свернутом состоянии спан всё равно скрыт — ничего менять не надо */
 html,
 body {
     height: 100%

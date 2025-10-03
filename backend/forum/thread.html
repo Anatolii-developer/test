@@ -203,7 +203,7 @@ if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
 
 // Render posts below
 Forum.renderPosts('#posts', posts, { thread });
-        document.querySelectorAll('#posts .js-reply').forEach(btn => { btn.textContent = 'Reply'; });
+       document.querySelectorAll('#posts .js-reply').forEach(btn => { btn.textContent = 'Reply'; });
         // хто може бачити мод-кнопки: модератор або автор теми
         const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();
         const canModThis = Forum.can("moderate:threads") || (me && thread.author && String(me._id) === String(thread.author._id));

@@ -944,3 +944,66 @@ body {
 #posts .post:first-child .post-author .avatar{
   width:80px; height:80px; flex:0 0 80px;
 }
+
+
+/* ===== FIX: функциональные кнопки (мод-кнопки) — зелёные с белым текстом ===== */
+.mod-actions .mod-btn{
+  width:196px; height:48px; padding:10px 53px;
+  border-radius:24px;
+  background:#275D2B;            /* сплошной зелёный */
+  border:1px solid #275D2B;
+  color:#FFFFFF;                  /* белый текст */
+  font:600 16px Poppins, Inter, sans-serif;
+  display:inline-flex; align-items:center; justify-content:center; gap:12px;
+}
+.mod-actions .mod-btn:hover{ filter:brightness(.95); }
+
+/* ===== FIX: первый пост — автор справа от аватара, типографика ===== */
+#posts .post:first-child .post-author{
+  display:flex; align-items:center; gap:12px;
+}
+#posts .post:first-child .post-author .avatar{
+  width:80px; height:80px; border-radius:50%; object-fit:cover; flex:0 0 80px;
+}
+
+/* Имя автора (варианты селекторов на случай разной разметки) */
+#posts .post:first-child .author-name,
+#posts .post:first-child .post-author-name,
+#posts .post:first-child .thread-author-name{
+  color:#275D2B;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-weight:600;               /* Semi Bold */
+  font-size:24px;
+  line-height:1.2;
+}
+
+/* Статус «онлайн» (варианты селекторов) */
+#posts .post:first-child .author-status,
+#posts .post:first-child .post-author-status,
+#posts .post:first-child .thread-author-meta{
+  font-family:'Poppins', sans-serif;
+  font-weight:400;               /* Regular */
+  font-size:16px;
+  color:#97C194;
+}
+
+/* Колонка с именем/статусом вправо от аватара */
+#posts .post:first-child .author-col,
+#posts .post:first-child .post-author-col,
+#posts .post:first-child .thread-author-col{
+  display:flex; flex-direction:column; gap:4px;
+}
+
+/* ===== Напоминание: лайк — счётчик слева от иконки (оставляем как есть) ===== */
+.post .actions .js-like{
+  background:#ECF5EB;            /* по ТЗ: бэк для лайка */
+}
+.post .actions .js-like .js-like-count{
+  position:absolute;
+  right:calc(100% + 8px);         /* слева от контейнера иконки */
+  top:50%; transform:translateY(-50%);
+  margin:0;
+  font:600 16px Poppins, Inter, sans-serif;
+  color:#000000;
+  display:inline-block;
+}

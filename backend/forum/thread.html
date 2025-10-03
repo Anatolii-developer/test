@@ -232,6 +232,7 @@ document.getElementById("btnReply").addEventListener("click", async () => {
 
       const data = await Forum.api.getThread(id);
       Forum.renderPosts("#posts", data.posts, { thread: data.thread });
+      initRepliesToggle(data.posts, data.thread);
     } catch (e) {
       alert(e.message || e);
     }
@@ -265,9 +266,9 @@ if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
 
 // Render posts below
 Forum.renderPosts('#posts', posts, { thread });
-
+initRepliesToggle(posts, thread);
 // единый блок управления показом ответов
-(function initRepliesToggle(){
+function initRepliesToggle(posts, thread){
   const root = document.querySelector('#posts');
   if (!root) return;
 
@@ -299,7 +300,7 @@ Forum.renderPosts('#posts', posts, { thread });
     first.appendChild(footer);
   }
 
-  const total = Math.max((Array.isArray(posts) ? posts.length : (thread.postsCount || 0)) - 1, 0);
+  const total = Math.max((Array.isArray(posts) ? posts.length : (thread?.postsCount || 0)) - 1, 0);
   const cntEl = footer.querySelector('#postAnswersCount');
   if (cntEl) cntEl.textContent = `${total} відповідей`;
 
@@ -339,7 +340,7 @@ Forum.renderPosts('#posts', posts, { thread });
       btn.textContent = 'Показати більше';
     }
   });
-})();
+}
        document.querySelectorAll('#posts .js-reply').forEach(btn => { btn.textContent = 'Reply'; });
         // хто може бачити мод-кнопки: модератор або автор теми
         const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();

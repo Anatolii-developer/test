@@ -876,16 +876,7 @@ body {
   background: url("/assets/forum/like.svg") center/contain no-repeat;
   display: inline-block;
 }
-.post .actions .js-like .js-like-count{
-  position:absolute;
-  right:calc(100% + 8px);
-  top:50%;
-  transform:translateY(-50%);
-  margin:0;
-  font:600 16px Poppins, Inter, sans-serif;
-  color:#000000;
-  display:inline-block;
-}
+
 
 
 .mod-actions{
@@ -1003,7 +994,7 @@ body {
 }
 .post .actions .js-like .js-like-count{
   position:absolute;
-  right:calc(100% + 8px);         /* слева от контейнера иконки */
+  right:calc(100% + 24px);         /* слева от контейнера иконки */
   top:50%; transform:translateY(-50%);
   margin:0;
   font:600 16px Poppins, Inter, sans-serif;

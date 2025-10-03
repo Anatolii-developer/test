@@ -203,6 +203,33 @@ if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
 
 // Render posts below
 Forum.renderPosts('#posts', posts, { thread });
+(function addMainPostFooter(){
+    const firstPost = document.querySelector('#posts .post:first-child');
+    if (!firstPost) return;
+
+    // создаём контейнер футера, если его нет
+    let footer = firstPost.querySelector('.post-footer');
+    if (!footer){
+      footer = document.createElement('div');
+      footer.className = 'post-footer';
+      footer.innerHTML = `
+        <button class="show-more" type="button">Показати більше</button>
+        <span class="answers-count" id="postAnswersCount"></span>
+      `;
+      firstPost.appendChild(footer);
+    }
+
+    // выставляем количество ответов (вже пораховано вище як "answers")
+    const cnt = document.getElementById('postAnswersCount');
+    if (cnt) cnt.textContent = `${answers} відповідей`;
+
+    // клик по кнопке — триггер твоей логики раскрытия / подгрузки
+    footer.querySelector('.show-more')?.addEventListener('click', () => {
+      // TODO: вставь свою функцию раскрытия
+      // например: Forum.showAllReplies();
+      document.dispatchEvent(new CustomEvent('forum:show-more'));
+    });
+  })();
        document.querySelectorAll('#posts .js-reply').forEach(btn => { btn.textContent = 'Reply'; });
         // хто може бачити мод-кнопки: модератор або автор теми
         const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();

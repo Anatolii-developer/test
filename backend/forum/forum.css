@@ -1009,3 +1009,38 @@ body {
   color:#000000;
   display:inline-block;
 }
+
+
+/* Footer первого поста: кнопка + счетчик справа снизу */
+#posts .post:first-child{ position: relative; padding-bottom: 64px; } /* запас под футер */
+#posts .post:first-child .post-footer{
+  position: absolute;
+  right: 28px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Кнопка "Показати більше" по ТЗ */
+#posts .post:first-child .post-footer .show-more{
+  width:120px;
+  height:32px;
+  border-radius:24px;
+  padding:10px;             /* gap внутри по макету */
+  background:#275D2B;
+  color:#FFFFFF;
+  border:none;
+  font:500 14px Poppins, Inter, sans-serif;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+/* Количество ответов справа от кнопки */
+#posts .post:first-child .post-footer .answers-count{
+  font:400 16px Poppins, Inter, sans-serif;
+  color:#6B6B6B;            /* как на скрине */
+  opacity:.9;
+}

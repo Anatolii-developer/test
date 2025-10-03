@@ -203,6 +203,44 @@ if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
 
 // Render posts below
 Forum.renderPosts('#posts', posts, { thread });
+
+(function setupShowMoreToggle(){
+  const firstPost = document.querySelector('#posts .post:first-child');
+  if (!firstPost) return;
+
+  const footer = firstPost.querySelector('.post-footer');
+  const btn = footer?.querySelector('.show-more');
+  const answersCount = footer?.querySelector('.answers-count');
+  const repliesBlock = document.createElement('div');
+  repliesBlock.className = 'replies-block';
+  repliesBlock.style.display = 'none';
+  firstPost.appendChild(repliesBlock);
+
+  let expanded = false;
+
+  btn?.addEventListener('click', () => {
+    expanded = !expanded;
+
+    if (expanded) {
+      // показать
+      repliesBlock.style.display = 'block';
+      repliesBlock.innerHTML = `
+        <hr class="replies-separator"/>
+        <div class="replies-list"></div>
+      `;
+      btn.textContent = 'Приховати';
+
+      // сюда вставляем все остальные посты (ответы)
+      const allPosts = [...document.querySelectorAll('#posts .post')].slice(1);
+      const list = repliesBlock.querySelector('.replies-list');
+      list.append(...allPosts);
+    } else {
+      // скрыть
+      repliesBlock.style.display = 'none';
+      btn.textContent = 'Показати більше';
+    }
+  });
+})();
 (function addMainPostFooter(){
     const firstPost = document.querySelector('#posts .post:first-child');
     if (!firstPost) return;

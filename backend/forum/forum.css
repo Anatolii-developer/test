@@ -1044,3 +1044,38 @@ body {
   color:#6B6B6B;            /* как на скрине */
   opacity:.9;
 }
+
+.replies-separator {
+  border: 1px solid #000000;
+  margin: 20px 0;
+}
+
+.replies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* аватарка ответа */
+.replies-list .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* имя ответа */
+.replies-list .post-author-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* SemiBold */
+  font-size: 20px;
+  color: #275D2B;
+}
+
+/* онлайн/время */
+.replies-list .post-author-meta {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Regular */
+  font-size: 16px;
+  color: #97C194;
+}

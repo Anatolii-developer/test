@@ -380,13 +380,14 @@ const when       = fmtDate(p.createdAt);
       attsHTML = `<div class="post-attachments">${parts.join('')}</div>`;
     }
 
-    el.innerHTML = `
+   // ...
+el.innerHTML = `
   <div class="post-head">
     <div class="post-author">
       <img class="avatar" src="${avatarUrl}" alt="${authorName}" />
-      <div>
-        <div class="name">${authorName}</div>
-        <div class="meta">${when}</div>
+      <div class="post-author-col">
+        <div class="post-author-name">${authorName}</div>
+        <div class="post-author-meta">${when}</div>
       </div>
     </div>
     <div class="actions">

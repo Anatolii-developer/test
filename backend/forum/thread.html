@@ -204,6 +204,88 @@ if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
 // Render posts below
 Forum.renderPosts('#posts', posts, { thread });
 
+// Сначала переносим все ответы (со 2-го поста) в скрытое хранилище
+(function hideRepliesInitially(){
+  const root = document.querySelector('#posts');
+  if (!root) return;
+  const rest = [...root.querySelectorAll('.post')].slice(1);
+  if (!rest.length) return;
+
+  let store = root.querySelector('#hiddenReplies');
+  if (!store){
+    store = document.createElement('div');
+    store.id = 'hiddenReplies';
+    store.style.display = 'none';
+    root.appendChild(store);
+  }
+  rest.forEach(n => store.appendChild(n));
+})();
+
+// Добавляем футер в первый пост: кнопка + счетчик
+(function addMainPostFooter(){
+  const firstPost = document.querySelector('#posts .post:first-child');
+  if (!firstPost) return;
+
+  let footer = firstPost.querySelector('.post-footer');
+  if (!footer){
+    footer = document.createElement('div');
+    footer.className = 'post-footer';
+    footer.innerHTML = `
+      <button class="show-more" type="button">Показати більше</button>
+      <span class="answers-count" id="postAnswersCount"></span>
+    `;
+    firstPost.appendChild(footer);
+  }
+
+  // количество ответов
+  const cnt = document.getElementById('postAnswersCount');
+  const total = (Array.isArray(posts) ? posts.length : (thread.postsCount || 0)) - 1;
+  if (cnt) cnt.textContent = `${Math.max(total,0)} відповідей`;
+
+  // Контейнер раскрытия внутри первого поста
+  let repliesBlock = firstPost.querySelector('.replies-block');
+  if (!repliesBlock){
+    repliesBlock = document.createElement('div');
+    repliesBlock.className = 'replies-block';
+    repliesBlock.style.display = 'none';
+    firstPost.appendChild(repliesBlock);
+  }
+
+  const btn = footer.querySelector('.show-more');
+  let expanded = false;
+
+  btn?.addEventListener('click', () => {
+    const store = document.querySelector('#hiddenReplies');
+    if (!store) return;
+
+    expanded = !expanded;
+
+    if (expanded) {
+      repliesBlock.style.display = 'block';
+      // создаем разделитель и список при каждом показе (или один раз — не критично)
+      repliesBlock.innerHTML = `
+        <hr class="replies-separator"/>
+        <div class="replies-list"></div>
+      `;
+      const list = repliesBlock.querySelector('.replies-list');
+
+      // Переносим все скрытые ответы внутрь первого поста
+      while (store.firstChild) list.appendChild(store.firstChild);
+
+      btn.textContent = 'Приховати';
+    } else {
+      // Возвращаем ответы обратно в скрытое хранилище
+      const list = repliesBlock.querySelector('.replies-list');
+      const store = document.querySelector('#hiddenReplies');
+      if (list && store){
+        while (list.firstChild) store.appendChild(list.firstChild);
+      }
+      repliesBlock.style.display = 'none';
+      btn.textContent = 'Показати більше';
+    }
+  });
+})();
+
 (function setupShowMoreToggle(){
   const firstPost = document.querySelector('#posts .post:first-child');
   if (!firstPost) return;

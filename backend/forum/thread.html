@@ -67,6 +67,16 @@
         padding: 12px 14px;
         background: #fffdf7;
       }
+      /* ===== First (main) post card ===== */
+      .posts .post:first-child{
+        width: 1110px;                 /* fixed container width */
+        min-height: 308px;             /* target height */
+        background: #FFFFF9;           /* card bg */
+        border: 2px solid #275D2B;     /* green outline */
+        border-radius: 16px;           /* radius 16 */
+        padding: 24px 28px;            /* comfortable inner spacing */
+        margin: 0 auto 16px;           /* center in wrap and keep gap to next */
+      }
       .post + .post {
         margin-top: 10px;
       }
@@ -75,11 +85,105 @@
         justify-content: space-between;
         align-items: center;
       }
-      .post .actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
+      /* Post content typography */
+      .post .post-content{
+        font-family: Poppins, Inter, sans-serif;
+        font-weight: 500;              /* Medium */
+        font-size: 20px;
+        line-height: 1.5;
+        color: #414141;
       }
+      .post .meta{
+        font-family: Poppins, Inter, sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        color: #6B6B6B;
+      }
+      .post .actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+      }
+      /* ===== Reply button (with icon + text) ===== */
+      .post .actions .js-reply{
+        width: 112px;
+        height: 48px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #275D2B;
+        background: #ECF5EB;
+        color: #275D2B;
+        font: 500 16px Poppins, Inter, sans-serif;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      /* place your icon file at /assets/forum/reply.svg */
+      .post .actions .js-reply::before{
+        content: "";
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url("/assets/forum/reply.svg") center/contain no-repeat;
+      }
+      /* ===== Like button square + counter ===== */
+      .post .actions .js-like{
+        position: relative;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        border-radius: 8px;
+        border: 1px solid #275D2B;
+        background: #FFFFF9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0;                 /* hide emoji/text inside */
+      }
+      .post .actions .js-like::before{
+        content: "";
+        width: 32px;
+        height: 32px;
+        background: url("/assets/forum/like.svg") center/contain no-repeat;
+        display: inline-block;
+      }
+      .post .actions .js-like .js-like-count{
+        position: static;
+        margin-left: 10px;
+        font: 500 16px Poppins, Inter, sans-serif;
+        color: #275D2B;
+        display: inline-block;
+        transform: none;
+      }
+      /* ===== Show more (Показати більше) ===== */
+      .show-more{
+        width: 120px;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 24px;
+        background: #275D2B;
+        color: #fff;
+        border: none;
+        font: 500 14px Poppins, Inter, sans-serif;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      /* ===== Answers amount (right side of header) ===== */
+      #tAnswers{
+        width: 104px;
+        height: 24px;
+        font-family: Poppins, Inter, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        color: #363636B2;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      .posts{ gap: 16px; }
       .composer {
         margin-top: 16px;
         display: flex;

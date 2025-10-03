@@ -182,9 +182,9 @@
     /* ===== Moderator actions row ===== */
     .mod-actions{
       display:flex;
-      flex-wrap:wrap;
+      flex-wrap: nowrap;   /* prevent wrapping */
       justify-content:center;
-      gap:48px;
+      gap:24px;           /* adjust spacing between buttons */
       margin:24px 0 12px;
     }
     .mod-btn{
@@ -207,17 +207,12 @@
     .mod-btn:hover{ filter:brightness(.95); transform:translateY(-1px); }
     .mod-btn:active{ transform:translateY(0); }
 
-    /* Icon masks for mod buttons (replace URLs with your actual icons if needed) */
-    .mod-ico{
-      width:20px; height:20px; display:inline-block; background:#fff;
-      -webkit-mask-position:center; -webkit-mask-repeat:no-repeat; -webkit-mask-size:contain;
-              mask-position:center;         mask-repeat:no-repeat;         mask-size:contain;
+    .mod-icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      object-fit: contain;
     }
-    .i-pin     { -webkit-mask-image:url('/assets/icons/pin.svg');     mask-image:url('/assets/icons/pin.svg'); }
-    .i-private { -webkit-mask-image:url('/assets/icons/private.svg'); mask-image:url('/assets/icons/private.svg'); }
-    .i-trash   { -webkit-mask-image:url('/assets/icons/trash.svg');   mask-image:url('/assets/icons/trash.svg'); }
-    .i-lock    { -webkit-mask-image:url('/assets/icons/lock.svg');    mask-image:url('/assets/icons/lock.svg'); }
-    .i-plus    { -webkit-mask-image:url('/assets/icons/plus.svg');    mask-image:url('/assets/icons/plus.svg'); }
 
     @media (max-width:1180px){
       .wrap{ width:90%; padding:0 0 30px; }
@@ -246,23 +241,23 @@
 
   <div id="tModActions" class="mod-actions" style="display:none">
     <button class="mod-btn" id="btnPin">
-      <span class="mod-ico i-pin" aria-hidden="true"></span>
+      <img src="/assets/forum/attach.svg" alt="" class="mod-icon"/>
       <span>Закріпити</span>
     </button>
     <button class="mod-btn" id="btnPrivacy">
-      <span class="mod-ico i-private" aria-hidden="true"></span>
+      <img src="/assets/icons/private.svg" alt="" class="mod-icon"/>
       <span>Приватна</span>
     </button>
     <button class="mod-btn" id="btnDelThread">
-      <span class="mod-ico i-trash" aria-hidden="true"></span>
+      <img src="/assets/icons/trash.svg" alt="" class="mod-icon"/>
       <span>Видалити</span>
     </button>
     <button class="mod-btn" id="btnLock">
-      <span class="mod-ico i-lock" aria-hidden="true"></span>
+      <img src="/assets/icons/lock.svg" alt="" class="mod-icon"/>
       <span>Закрити</span>
     </button>
     <button class="mod-btn" id="btnInvite">
-      <span class="mod-ico i-plus" aria-hidden="true"></span>
+      <img src="/assets/icons/plus.svg" alt="" class="mod-icon"/>
       <span>Запросити</span>
     </button>
   </div>

@@ -132,9 +132,7 @@ async function registerUser(req, res) {
     await user.save();
     res.status(201).json({ message: 'User registered successfully.', user, emailEnqueued: true });
 
-    Promise.resolve()
-      .then(() => sendRegistrationEmail(user.email, user.firstName, user.lastName))
-      .catch(err => console.error('sendRegistrationEmail failed:', err?.message || err));
+   
   } catch (e) {
     console.error('Registration error:', e);
     res.status(500).json({ error: e.message });

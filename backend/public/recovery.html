@@ -55,8 +55,10 @@
     </div>
 </main>
 <script>
-  // ===== Password recovery flow (frontend) =====
-  const API_BASE = '/api/auth/recovery';
+  // Primary routes live under /api/auth/recovery, but some deployments expose only /api/auth/forgot-password.
+  // We'll try primary first, then fallback automatically.
+  const API_PRIMARY = '/api/auth/recovery';
+  const API_FALLBACK = '/api/auth';
   const state = { email: '', code: '', codeVerified: false };
   const RESEND_COOLDOWN = 60; // seconds
   let cooldownLeft = 0;
@@ -101,6 +103,24 @@
     }
   }
 
+  async function postJSON(url, body, fallbackUrl) {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {})
+    });
+    // If route not found and we have a fallback — try it once
+    if (res.status === 404 && fallbackUrl) {
+      const res2 = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {})
+      });
+      return { res: res2, data: await res2.json().catch(() => ({})) };
+    }
+    return { res, data: await res.json().catch(() => ({})) };
+  }
+
   // Sanitize code input to digits only and auto-verify on 6 chars
   document.addEventListener('input', (e) => {
     if (e.target && e.target.id === 'code') {
@@ -126,12 +146,11 @@
     if(!email){ toast('Вкажіть email.'); return; }
     setLoading(qs('btnSend'), true);
     try{
-      const res = await fetch(`${API_BASE}/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json().catch(()=>({}));
+      const { res, data } = await postJSON(
+        `${API_PRIMARY}/send`,
+        { email },
+        `${API_FALLBACK}/forgot-password` // fallback alias on some servers
+      );
       if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
       state.email = email;
       show(qs('codeBlock'), true);
@@ -150,12 +169,11 @@
     if(!email){ toast('Вкажіть email.'); return; }
     setLoading(qs('btnResend'), true);
     try{
-      const res = await fetch(`${API_BASE}/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json().catch(()=>({}));
+      const { res, data } = await postJSON(
+        `${API_PRIMARY}/send`,
+        { email },
+        `${API_FALLBACK}/forgot-password`
+      );
       if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
       toast('Код повторно відправлено.');
       startCooldown();
@@ -172,12 +190,10 @@
     if(!code){ toast('Введіть код з листа.'); return; }
     setLoading(qs('btnVerify'), true);
     try{
-      const res = await fetch(`${API_BASE}/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: state.email || (qs('email')?.value||'').trim(), code })
-      });
-      const data = await res.json().catch(()=>({}));
+      const { res, data } = await postJSON(
+        `${API_PRIMARY}/verify`,
+        { email: state.email || (qs('email')?.value||'').trim(), code }
+      );
       if(!res.ok) throw new Error(data.message || 'Невірний або прострочений код');
       state.code = code;
       state.codeVerified = true;
@@ -199,12 +215,10 @@
     if(p1 !== p2){ toast('Паролі не збігаються.'); return; }
     setLoading(qs('btnReset'), true);
     try{
-      const res = await fetch(`${API_BASE}/reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: state.email || (qs('email')?.value||'').trim(), code: state.code, newPassword: p1 })
-      });
-      const data = await res.json().catch(()=>({}));
+      const { res, data } = await postJSON(
+        `${API_PRIMARY}/reset`,
+        { email: state.email || (qs('email')?.value||'').trim(), code: state.code, newPassword: p1 }
+      );
       if(!res.ok) throw new Error(data.message || 'Не вдалося змінити пароль');
       alert('✅ Пароль успішно змінено! Тепер ви можете увійти.');
       setTimeout(() => location.href = '/login.html', 800);

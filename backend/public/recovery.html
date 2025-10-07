@@ -57,8 +57,8 @@
 <script>
   // Primary routes live under /api/auth/recovery, but some deployments expose only /api/auth/forgot-password.
   // We'll try primary first, then fallback automatically.
-  const API_PRIMARY = '/api/auth/recovery';
-  const API_FALLBACK = '/api/auth';
+  const API_PRIMARY = '/api/users/recovery';
+const API_FALLBACK = '/api/users';
   const state = { email: '', code: '', codeVerified: false };
   const RESEND_COOLDOWN = 60; // seconds
   let cooldownLeft = 0;

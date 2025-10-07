@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const sendRecoveryCodeEmail = require('../mailer/sendRecoveryCodeEmail');
-const sendRegistrationEmail = require('../mailer/sendRegistrationEmail');
 
 function genCode() {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6 цифр

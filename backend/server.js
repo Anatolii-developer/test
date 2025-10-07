@@ -58,7 +58,9 @@ app.use('/forum', express.static(path.join(__dirname, 'forum')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // API маршруты
-app.use('/api/users', require('./routes/userRoutes'));
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
 app.use('/api/courses', require('./routes/courseRoutes'));
 app.use('/api/roles', require('./routes/roleRoutes'));
 app.use('/api/library', require('./routes/library'));
@@ -84,4 +86,3 @@ app.use((err, req, res, next) => {
 app.listen(5050, '0.0.0.0', () => {
   console.log('🚀 Server listening on http://0.0.0.0:5050');
 });
-

@@ -1,4 +1,3 @@
-<!-- public/recovery.html (твой файл) -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -50,77 +49,99 @@
 
       <button style="background-color: #aaa; margin-top: 12px;" onclick="history.back()">Повернутись назад</button>
     </div>
-  </main>
+</main>
+<script>
+  // ===== Password recovery flow (frontend) =====
+  const API_BASE = '/api/auth/recovery';
+  const state = { email: '', code: '', codeVerified: false };
 
-  <script>
-    const API_BASE = window.API_BASE || ''; // если фронт и бэк на одном домене — оставь ''
-
-    async function sendRecoveryCode(){
-      const email = document.getElementById('email').value.trim();
-      if(!email) return alert('Вкажіть email');
-
-      try{
-        const r = await fetch(`${API_BASE}/api/users/recovery/send`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email })
-        });
-        // Всегда показываем следующий шаг
-        document.getElementById('codeBlock').style.display = 'block';
-        alert('Якщо аккаунт існує — код надіслано на e-mail');
-      }catch(e){
-        alert('Помилка відправки коду');
-        console.error(e);
-      }
+  function qs(id){ return document.getElementById(id); }
+  function show(el, yes){ if(!el) return; el.style.display = yes ? '' : 'none'; }
+  function toast(msg){ alert(msg); }
+  function setLoading(btn, is){
+    if(!btn) return;
+    if(is){
+      btn.disabled = true;
+      if(!btn.dataset._txt) btn.dataset._txt = btn.textContent;
+      btn.textContent = 'Зачекайте…';
+    } else {
+      btn.disabled = false;
+      if(btn.dataset._txt) btn.textContent = btn.dataset._txt;
     }
+  }
 
-    async function verifyCode(){
-      const email = document.getElementById('email').value.trim();
-      const code  = document.getElementById('code').value.trim();
-      if(!email || !code) return alert('Вкажіть email та код');
-
-      try{
-        const r = await fetch(`${API_BASE}/api/users/recovery/verify`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email, code })
-        });
-        if(!r.ok){
-          const e = await r.json().catch(()=>({}));
-          return alert(e.message || 'Невірний код');
-        }
-        document.getElementById('resetBlock').style.display = 'block';
-        alert('Код підтверджено, задайте новий пароль');
-      }catch(e){
-        alert('Помилка перевірки коду');
-      }
+  // Step 1: send code to email
+  async function sendRecoveryCode(){
+    const email = (qs('email')?.value || '').trim().toLowerCase();
+    if(!email){ toast('Вкажіть email.'); return; }
+    setLoading(qs('btnSend'), true);
+    try{
+      const res = await fetch(`${API_BASE}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
+      state.email = email;
+      show(qs('codeBlock'), true);
+      toast('Код відправлено на вашу електронну пошту.');
+    } catch (e){
+      toast(e.message || 'Помилка');
+    } finally {
+      setLoading(qs('btnSend'), false);
     }
+  }
 
-    async function resetPassword(){
-      const email = document.getElementById('email').value.trim();
-      const code  = document.getElementById('code').value.trim();
-      const p1    = document.getElementById('newPassword').value;
-      const p2    = document.getElementById('newPassword2').value;
-
-      if(!email || !code) return alert('Немає e-mail або коду');
-      if(!p1 || p1.length < 6) return alert('Мінімум 6 символів');
-      if(p1 !== p2) return alert('Паролі не співпадають');
-
-      try{
-        const r = await fetch(`${API_BASE}/api/users/recovery/reset`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email, code, newPassword: p1 })
-        });
-        const data = await r.json().catch(()=>({}));
-        if(!r.ok) return alert(data.message || 'Не вдалося змінити пароль');
-
-        alert('Пароль змінено! Тепер увійдіть з новим паролем.');
-        location.href = 'login.html';
-      }catch(e){
-        alert('Помилка зміни пароля');
-      }
+  // Step 2: verify code
+  async function verifyCode(){
+    const code = (qs('code')?.value || '').trim();
+    if(!code){ toast('Введіть код з листа.'); return; }
+    setLoading(qs('btnVerify'), true);
+    try{
+      const res = await fetch(`${API_BASE}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: state.email || (qs('email')?.value||'').trim(), code })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.message || 'Невірний або прострочений код');
+      state.code = code;
+      state.codeVerified = true;
+      show(qs('resetBlock'), true);
+      toast('Код підтверджено. Введіть новий пароль.');
+    } catch(e){
+      toast(e.message || 'Помилка');
+    } finally {
+      setLoading(qs('btnVerify'), false);
     }
-  </script>
+  }
+
+  // Step 3: set new password
+  async function resetPassword(){
+    if(!state.codeVerified){ toast('Спершу підтвердіть код.'); return; }
+    const p1 = qs('newPassword')?.value || '';
+    const p2 = qs('newPassword2')?.value || '';
+    if(p1.length < 8){ toast('Пароль має містити щонайменше 8 символів.'); return; }
+    if(p1 !== p2){ toast('Паролі не збігаються.'); return; }
+    setLoading(qs('btnReset'), true);
+    try{
+      const res = await fetch(`${API_BASE}/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: state.email || (qs('email')?.value||'').trim(), code: state.code, newPassword: p1 })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.message || 'Не вдалося змінити пароль');
+      alert('✅ Пароль успішно змінено! Тепер ви можете увійти.');
+setTimeout(() => location.href = '/index.html', 1000);
+    } catch(e){
+      toast(e.message || 'Помилка');
+    } finally {
+      setLoading(qs('btnReset'), false);
+    }
+  }
+</script>
+
 </body>
 </html>

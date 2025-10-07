@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const sendRecoveryCodeEmail = require('../mailer/sendRecoveryCodeEmail');
+const sendRegistrationEmail = require('../mailer/sendRegistrationEmail');
 
 function genCode() {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6 цифр
@@ -209,15 +210,6 @@ async function updateUserStatus(req, res) {
     res.status(500).json({ error: e.message });
   }
 }
-async function updateUser(req, res) {
-  try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-}
 
 // 1) отправить код
 async function sendRecoveryCode(req, res) {
@@ -268,7 +260,7 @@ async function verifyRecoveryCode(req, res) {
 }
 
 
-// 3) сброс пароля
+// controllers/userController.js
 async function resetPassword(req, res) {
   const { email, code, newPassword } = req.body;
   if (!email || !code || !newPassword) {
@@ -287,7 +279,8 @@ async function resetPassword(req, res) {
       return res.status(400).json({ message: 'Код прострочено' });
     }
 
-    user.password = await bcrypt.hash(String(newPassword), 10);
+    // КЛЮЧЕВОЕ: кладём сырой пароль — pre('save') его захеширует
+    user.password = String(newPassword);
     user.recoveryCode = null;
     user.recoveryCodeExpires = null;
     await user.save();

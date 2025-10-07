@@ -178,5 +178,4 @@ router.get("/", userCtrl.getAllUsers);
 router.get("/:id", userCtrl.getUserById);
 router.put("/:id/status", userCtrl.updateUserStatus);
 router.put("/:id", userCtrl.updateUser);
-router.post("/forgot-password", userCtrl.sendRecoveryCode);
 module.exports = router;

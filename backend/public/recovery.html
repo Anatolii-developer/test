@@ -24,12 +24,16 @@
       </div>
 
       <button id="btnSend" onclick="sendRecoveryCode()">Надіслати код</button>
+      <div id="resendWrap" style="display:none; margin-top:8px;">
+        <button id="btnResend" onclick="resendCode()" style="background:#6c757d;">Надіслати код ще раз</button>
+        <span id="resendTimer" class="s1" style="margin-left:8px; color:#6c757d;"></span>
+      </div>
 
       <!-- Шаг 2: код -->
       <div id="codeBlock" style="display:none; margin-top:16px;">
         <label for="code" class="s1">Код з листа</label>
         <div class="input-wrapper">
-          <input type="text" id="code" placeholder="6-значний код" />
+          <input type="text" id="code" placeholder="6-значний код" inputmode="numeric" maxlength="6" />
         </div>
         <button id="btnVerify" onclick="verifyCode()">Підтвердити код</button>
       </div>
@@ -54,6 +58,33 @@
   // ===== Password recovery flow (frontend) =====
   const API_BASE = '/api/auth/recovery';
   const state = { email: '', code: '', codeVerified: false };
+  const RESEND_COOLDOWN = 60; // seconds
+  let cooldownLeft = 0;
+  let cooldownTimer = null;
+
+  function startCooldown() {
+    const wrap = qs('resendWrap');
+    const btn = qs('btnResend');
+    const t = qs('resendTimer');
+    if (!wrap || !btn || !t) return;
+
+    wrap.style.display = '';
+    cooldownLeft = RESEND_COOLDOWN;
+    btn.disabled = true;
+    t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
+
+    clearInterval(cooldownTimer);
+    cooldownTimer = setInterval(() => {
+      cooldownLeft -= 1;
+      if (cooldownLeft <= 0) {
+        clearInterval(cooldownTimer);
+        t.textContent = 'Можна надіслати повторно';
+        btn.disabled = false;
+      } else {
+        t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
+      }
+    }, 1000);
+  }
 
   function qs(id){ return document.getElementById(id); }
   function show(el, yes){ if(!el) return; el.style.display = yes ? '' : 'none'; }
@@ -70,6 +101,25 @@
     }
   }
 
+  // Sanitize code input to digits only and auto-verify on 6 chars
+  document.addEventListener('input', (e) => {
+    if (e.target && e.target.id === 'code') {
+      const v = (e.target.value || '').replace(/\D+/g, '').slice(0, 6);
+      e.target.value = v;
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      if (qs('resetBlock') && qs('resetBlock').style.display !== 'none') {
+        resetPassword();
+      } else if (qs('codeBlock') && qs('codeBlock').style.display !== 'none') {
+        verifyCode();
+      } else {
+        sendRecoveryCode();
+      }
+    }
+  });
+
   // Step 1: send code to email
   async function sendRecoveryCode(){
     const email = (qs('email')?.value || '').trim().toLowerCase();
@@ -85,11 +135,34 @@
       if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
       state.email = email;
       show(qs('codeBlock'), true);
+      startCooldown();
       toast('Код відправлено на вашу електронну пошту.');
     } catch (e){
       toast(e.message || 'Помилка');
     } finally {
       setLoading(qs('btnSend'), false);
+    }
+  }
+
+  async function resendCode(){
+    if (cooldownLeft > 0) return;
+    const email = state.email || (qs('email')?.value || '').trim().toLowerCase();
+    if(!email){ toast('Вкажіть email.'); return; }
+    setLoading(qs('btnResend'), true);
+    try{
+      const res = await fetch(`${API_BASE}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
+      toast('Код повторно відправлено.');
+      startCooldown();
+    } catch(e){
+      toast(e.message || 'Помилка');
+    } finally {
+      setLoading(qs('btnResend'), false);
     }
   }
 
@@ -134,7 +207,7 @@
       const data = await res.json().catch(()=>({}));
       if(!res.ok) throw new Error(data.message || 'Не вдалося змінити пароль');
       alert('✅ Пароль успішно змінено! Тепер ви можете увійти.');
-setTimeout(() => location.href = '/index.html', 1000);
+      setTimeout(() => location.href = '/login.html', 800);
     } catch(e){
       toast(e.message || 'Помилка');
     } finally {

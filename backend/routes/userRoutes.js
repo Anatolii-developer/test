@@ -115,7 +115,7 @@ router.post("/recovery/send", userCtrl.sendRecoveryCode);
 router.post("/recovery/verify", userCtrl.verifyRecoveryCode); // можно не использовать, если проверяешь в reset
 router.post("/recovery/reset", userCtrl.resetPassword);
 router.post("/forgot-password", userCtrl.sendRecoveryCode);
-
+app.use('/api/auth', userRoutes);
 // ===== спец-роуты ДО /:id =====
 router.post(
   "/:id/photo",

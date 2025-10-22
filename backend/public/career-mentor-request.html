@@ -412,15 +412,17 @@
             headers: authHeaders(),
           });
           const body = await r.json().catch(() => ({}));
-          if (!r.ok || !body?.user) return null;
-          const roles = body.user.roles || [];
-          const ok =
-            Array.isArray(roles) &&
-            roles.some((s) => {
-              const v = String(s).toLowerCase();
-              return v.includes("ментор") || v.includes("mentor");
-            });
-          return ok ? body.user : null;
+          // Accept both shapes: { user: {...} } or just {...}
+          const current = body && (body.user || body);
+
+          if (!r.ok || !current) return null;
+
+          const roles = Array.isArray(current.roles) ? current.roles : [];
+          const ok = roles.some((s) => {
+            const v = String(s).toLowerCase();
+            return v.includes("ментор") || v.includes("mentor");
+          });
+          return ok ? current : null;
         } catch {
           return null;
         }
@@ -437,14 +439,18 @@
           headers: authHeaders(),
         });
         const body = await r.json().catch(() => ({}));
-        if (!r.ok || !body?.ok) {
+
+        // Accept shapes: { ok, application } or plain application object
+        const okFlag = r.ok && (body.ok === undefined ? true : !!body.ok);
+        if (!okFlag) {
           qs("#guard").style.display = "block";
           qs("#guard").textContent =
             body?.message || "Помилка завантаження заявки.";
           return;
         }
-        const a = body.application || {};
-        const u = a.user || {};
+
+        const a = body.application || body || {};
+        const u = a.user || a.owner || {};
 
         qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
         qs("#lastName").value = u.lastName || "";
@@ -471,6 +477,7 @@
       (async () => {
         const me = await ensureMentor();
         if (!me) {
+          qs("#page").style.display = "none";
           qs("#guard").style.display = "block";
           return;
         }

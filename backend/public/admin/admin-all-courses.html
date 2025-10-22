@@ -45,10 +45,12 @@
     </div>
   </main>
   <script>
-  window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
+  window.API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
 </script>
 <script src="admin-auth.js"></script>
   <script>
+  const API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
+
       document.addEventListener("DOMContentLoaded", () => {
         if (typeof renderAdminSidebar === "function") {
           renderAdminSidebar("admin-all-courses.html");
@@ -136,7 +138,7 @@
 
   async function fetchCourses(filterStatus = "WAITING_FOR_APPROVAL") {
     try {
-      const res = await fetch(`${API_BASE}/api/courses`);
+      const res = await fetch(`${API_BASE}/api/courses`, { credentials: "include" });
       const courses = await res.json();
 
       const tbody = document.getElementById("coursesTableBody");
@@ -182,6 +184,7 @@
     try {
       const res = await fetch(`${API_BASE}/api/courses/${courseId}/approve`, {
         method: "PUT",
+        credentials: "include",
       });
 
       if (res.ok) {
@@ -212,8 +215,7 @@
     }catch(_){}
 
     // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-    const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
-    fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+    fetch(`${API_BASE}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
 
     // редірект на логін з поверненням
     const back = encodeURIComponent(location.pathname + location.search);

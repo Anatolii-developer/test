@@ -142,9 +142,11 @@
   </div>
     <script src="admin-auth.js"></script>
  <script>
+  // Define API_BASE at the top of the main script block
+  const API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderAdminSidebar === "function") {
-      renderAdminSidebar("admin-career-requests.html");
+      renderAdminSidebar("admin-create-course.html");
     }
     if (typeof requireAdminPage === "function") {
       requireAdminPage();
@@ -172,7 +174,7 @@ function renderUserList(users) {
 
 async function openUserModal() {
   try {
-    const res = await fetch("http://157.230.121.24:5050/api/users");
+    const res = await fetch(`${API_BASE}/api/users`, { credentials: "include" });
     const users = await res.json();
     allUsers = users;
     renderUserList(users);
@@ -254,7 +256,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function loadParticipants() {
   try {
-    const res = await fetch("http://157.230.121.24:5050/api/users"); // 🟡 путь должен соответствовать твоему API
+    const res = await fetch(`${API_BASE}/api/users`, { credentials: "include" });
     const users = await res.json();
 
     const select = document.getElementById("participantsSelect");
@@ -320,10 +322,11 @@ document.getElementById("createCourseForm").addEventListener("submit", async fun
   };
 
   try {
-    const res = await fetch("http://157.230.121.24:5050/api/courses", {
+    const res = await fetch(`${API_BASE}/api/courses`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(formData),
+      credentials: "include"
     });
 
     const result = await res.json();
@@ -407,10 +410,11 @@ async function createNewUser() {
   }
 
   try {
-    const res = await fetch("http://157.230.121.24:5050/api/users", {
+    const res = await fetch(`${API_BASE}/api/users`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email })
+      body: JSON.stringify({ fullName, email }),
+      credentials: "include"
     });
 
     const newUser = await res.json();
@@ -436,8 +440,7 @@ async function createNewUser() {
     }catch(_){}
 
     // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-    const API = ""; // якщо бек і фронт на одному домені — залиш порожнім
-    fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+    fetch(`${API_BASE}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
 
     // редірект на логін з поверненням
     const back = encodeURIComponent(location.pathname + location.search);

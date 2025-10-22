@@ -315,7 +315,7 @@
     <script src="admin-auth.js"></script>
     <script>
 
-      const API = "http://157.230.121.24:5050";
+      const API = "https://cabinet.mamko-prof-supervision.com";
 
       
     function isApproved(user) {
@@ -348,7 +348,7 @@
   // --- Page bootstrap ---
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderAdminSidebar === "function") {
-      renderAdminSidebar("admin-career-requests.html");
+      renderAdminSidebar("admin-course-details.html");
     }
     if (typeof requireAdminPage === "function") {
       requireAdminPage();
@@ -424,11 +424,11 @@
 
     try {
       // 1) Пряма спроба отримати курс за id
-      let res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, { credentials: "include" });
+      let res = await fetch(`${API}/api/courses/${courseId}`, { credentials: "include" });
 
       if (res.status === 404) {
         // 2) Фолбек: шукаємо коректний _id у списку курсів
-        const listRes = await fetch(`http://157.230.121.24:5050/api/courses`, { credentials: "include" });
+        const listRes = await fetch(`${API}/api/courses`, { credentials: "include" });
         if (!listRes.ok) {
           const errJ = await listRes.json().catch(() => ({}));
           throw new Error(errJ.message || `HTTP ${listRes.status}`);
@@ -465,7 +465,7 @@
         }
 
         // Якщо знайдений id співпадає — пробуємо ще раз прямий GET
-        res = await fetch(`http://157.230.121.24:5050/api/courses/${found._id}`, { credentials: "include" });
+        res = await fetch(`${API}/api/courses/${found._id}`, { credentials: "include" });
       }
 
       if (!res.ok) {
@@ -515,7 +515,7 @@
       // Учасники
       selectedParticipantIds = (course.participants || []).map(p => typeof p === "string" ? p : (p && p._id ? p._id : p));
       try {
-        const usersRes = await fetch("http://157.230.121.24:5050/api/users", { credentials: "include" });
+        const usersRes = await fetch(`${API}/api/users`, { credentials: "include" });
         if (usersRes.ok) {
           allUsers = await usersRes.json();
           updateParticipantsUI();
@@ -556,7 +556,7 @@
     };
 
     try {
-      const res = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+      const res = await fetch(`${API}/api/courses/${courseId}`, {
         method: "PUT",
         credentials: "include",
         headers: getAuthHeaders(),
@@ -580,7 +580,7 @@
     if (!courseId) { alert("Не вказано ID курсу"); return; }
     if (!confirm("Точно видалити цей курс? Дію неможливо скасувати.")) return;
     try {
-      const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}`, {
+      const r = await fetch(`${API}/api/courses/${courseId}`, {
         method: "DELETE",
         credentials: "include",
         headers: getAuthHeaders(),
@@ -601,7 +601,7 @@
   async function approveCourse() {
     if (!courseId) return;
     try {
-      const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/approve`, { method: "PUT", credentials: "include" });
+      const r = await fetch(`${API}/api/courses/${courseId}/approve`, { method: "PUT", credentials: "include" });
       if (!r.ok) {
         const d = await r.json().catch(() => ({}));
         throw new Error(d.message || `HTTP ${r.status}`);
@@ -618,7 +618,7 @@
     if (!courseId) return;
     const reason = prompt("Причина відхилення (необовʼязково):", "");
     try {
-      const r = await fetch(`http://157.230.121.24:5050/api/courses/${courseId}/reject`, {
+      const r = await fetch(`${API}/api/courses/${courseId}/reject`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

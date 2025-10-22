@@ -65,7 +65,7 @@ function adminOnly(req, res, next) {
 // ===== Auth =====
 router.post("/register", userCtrl.registerUser); // письмо уходит внутри контроллера
 router.post("/login", userCtrl.loginUser);
-router.post("/admin/login", userCtrl.adminLogin);
+router.post("/admin/login", userCtrl.adminLogin || userCtrl.loginUser);
 router.get("/profile", auth, userCtrl.profile);
 router.get("/admin/profile", auth, adminOnly, userCtrl.profile);
 

@@ -1,8 +1,8 @@
-const User = require('../models/User');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 const nodemailer = require("nodemailer");
+const path = require("path");
+const User = require("../models/User"); 
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
@@ -165,9 +165,6 @@ exports.updateUserStatus = async (req, res) => {
 };
 
 
-// controllers/userController.js
-const bcrypt = require("bcryptjs");
-
 exports.loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -196,8 +193,6 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -228,22 +223,12 @@ exports.sendRecoveryCode = async (req, res) => {
     user.recoveryCode = code;
     await user.save();
 
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: process.env.EMAIL_FROM,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-
-    const mailOptions = {
+    await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to: email,
       subject: "Код для відновлення паролю",
       text: `Ваш код для відновлення паролю: ${code}`
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
     res.json({ message: "Код надіслано на пошту" });
   } catch (error) {
     console.error("sendRecoveryCode error:", error);
@@ -251,8 +236,6 @@ exports.sendRecoveryCode = async (req, res) => {
   }
 };
 
-
-const path = require("path");
 
 const uploadUserPhoto = async (req, res) => {
   try {
@@ -277,7 +260,7 @@ module.exports = {
   loginUser: exports.loginUser,
   updateUser: exports.updateUser,
   sendRecoveryCode: exports.sendRecoveryCode,
-  uploadUserPhoto: exports.uploadUserPhoto,
+  uploadUserPhoto,
 
   // новые:
   adminLogin,

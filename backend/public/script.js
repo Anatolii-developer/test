@@ -1,7 +1,6 @@
 
 
-const API_BASE = "";
-window.API_BASE = API_BASE;
+window.API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
 
 // --- Global fetch wrapper: add Bearer token and credentials by default ---
 (function(){

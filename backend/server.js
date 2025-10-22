@@ -19,11 +19,10 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // ===== CORS =====
 const ALLOWED_ORIGINS = [
-  'https://cabinet.mamko-prof-supervision.com',
   'https://mamko-prof-supervision.com',
   'https://www.mamko-prof-supervision.com',
+  'https://cabinet.mamko-prof-supervision.com',
   'http://localhost:3000',
-  'http://127.0.0.1:3000',
 ];
 app.use(cors({
   origin(origin, cb) {

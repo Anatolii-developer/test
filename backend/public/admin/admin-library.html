@@ -313,7 +313,7 @@ body{
     <script src="admin-auth.js"></script>
 
     <script>
-      const API_BASE = "http://157.230.121.24:5050";
+    const API_BASE = (window.API_BASE || "");
       let selectAllClicked = false;
       let allUsers = [];
       const usersById = new Map(); // cache for quick name lookup
@@ -352,7 +352,7 @@ body{
       }
 
       async function loadRoles() {
-        const res = await fetch(`${API_BASE}/api/roles`);
+       const res = await fetch(`${API_BASE}/api/roles`, { credentials: "include" });
         if (!res.ok) throw new Error("Не вдалося отримати ролі");
         const roles = await res.json(); // [{ _id, name }]
 
@@ -378,7 +378,7 @@ body{
       // Завантаження поточних курсів у селект
       async function loadCurrentCourses() {
         try {
-          const res = await fetch(`${API_BASE}/api/courses`);
+         const res = await fetch(`${API_BASE}/api/courses`, { credentials: "include" });
           if (!res.ok) return;
           const allCourses = await res.json();
           const sel = document.getElementById("courseSelect");
@@ -497,7 +497,7 @@ body{
       document.addEventListener("DOMContentLoaded", async () => {
         refreshSectionSelect();
         if (typeof renderAdminSidebar === "function") {
-          renderAdminSidebar("admin-career-requests.html");
+          renderAdminSidebar("admin-library.html");
         }
         if (typeof requireAdminPage === "function") {
           requireAdminPage();
@@ -518,7 +518,7 @@ body{
 
         // 3) Користувачі
         try {
-          const response = await fetch(`${API_BASE}/api/users/approved`);
+          const response = await fetch(`${API_BASE}/api/users/approved`, { credentials: "include" });
           allUsers = await response.json();
           usersById.clear(); allUsers.forEach(u => usersById.set(String(u._id), (`${u.firstName || ""} ${u.lastName || ""}`.trim() || u.email || String(u._id))));
           renderTable(allUsers);
@@ -540,7 +540,8 @@ body{
             if (!courseId) return;
             try {
               const res = await fetch(
-                `${API_BASE}/api/courses/${courseId}/participants`
+                `${API_BASE}/api/courses/${courseId}/participants`,
+                { credentials: "include" }
               );
               const users = await res.json();
               allUsers = users;
@@ -548,7 +549,8 @@ body{
               // load folders for the selected course to allow choosing existing sections
               try {
                 const fr = await fetch(
-                  `${API_BASE}/api/library/folders?destination=courses&courseId=${courseId}`
+                  `${API_BASE}/api/library/folders?destination=courses&courseId=${courseId}`,
+                  { credentials: "include" }
                 );
                 if (fr.ok) {
                   const folders = await fr.json();
@@ -776,12 +778,13 @@ body{
 
         // отправка одного FormData
         const sendOnce = async (fd) => {
-          const res = await fetch("http://157.230.121.24:5050/api/library", {
-            method: "POST",
-            body: fd,
-          });
-          return res;
-        };
+  const res = await fetch(`${API_BASE}/api/library`, {
+    method: "POST",
+    body: fd,
+    credentials: "include",
+  });
+  return res;
+};
 
         try {
           let fd = buildBaseForm();
@@ -925,7 +928,8 @@ body{
           params.set("courseId", courseId);
         try {
           const r = await fetch(
-            `${API_BASE}/api/library/folders?${params.toString()}`
+            `${API_BASE}/api/library/folders?${params.toString()}`,
+            { credentials: "include" }
           );
           if (r.ok) {
             const folders = await r.json();
@@ -959,7 +963,7 @@ body{
         if (folder) params.set("folder", folder);
 
         try {
-          const r = await fetch(`${API_BASE}/api/library?${params.toString()}`);
+          const r = await fetch(`${API_BASE}/api/library?${params.toString()}`, { credentials: "include" });
           const items = r.ok ? await r.json() : [];
           items.sort((a,b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
           renderMaterialsList(items);
@@ -1138,7 +1142,7 @@ body{
         ids.forEach(uid => fd.append('users[]', uid));
 
         try{
-          const r = await fetch(`${API_BASE}/api/library/${id}`, { method:'PUT', body: fd });
+          const r = await fetch(`${API_BASE}/api/library/${id}`, { method:'PUT', body: fd, credentials: "include" });
           if(!r.ok){
             let msg = 'Не вдалося зберегти призначення';
             try{ const j = await r.clone().json(); msg = j?.message || msg; }catch{}
@@ -1175,6 +1179,7 @@ body{
         try {
           const r = await fetch(`${API_BASE}/api/library/${id}`, {
             method: "DELETE",
+            credentials: "include",
           });
           if (!r.ok) throw new Error("Не вдалося видалити");
           await loadExistingMaterials();
@@ -1274,6 +1279,7 @@ body{
           const r = await fetch(`${API_BASE}/api/library/${editId}`, {
             method: "PUT",
             body: fd,
+            credentials: "include",
           });
           if (!r.ok) throw new Error("Не вдалося зберегти зміни");
           // зачистка режиму редагування

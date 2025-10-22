@@ -127,10 +127,11 @@
 
       </section>
   </main>
-
+  <script>
+  window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
+</script>
   <script src="script.js"></script>
  <script>
-const API_BASE = "http://157.230.121.24:5050";
 
 function getYouTubeEmbedUrl(link){
   const m = String(link||"").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);

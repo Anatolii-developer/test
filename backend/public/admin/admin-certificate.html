@@ -59,43 +59,52 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderAdminSidebar === "function") {
-      renderAdminSidebar("admin-career-requests.html");
+      renderAdminSidebar("admin-certificate.html");
     }
     if (typeof requireAdminPage === "function") {
       requireAdminPage();
     }
-    load();
+    // init happens below in the main DOMContentLoaded
   });
-
-
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const arrow = document.getElementById('toggleArrow');
-    sidebar.classList.toggle('expanded');
-    sidebar.classList.toggle('collapsed');
-    if (arrow) arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
-  }
-
-  function logoutUser() {
-    window.location.href = "login.html";
-  }
-
-  // ====== Helpers ======
-  function fmtDate(d) {
-    if (!d) return '-';
-    const dt = new Date(d);
-    if (isNaN(dt)) return '-';
-    return dt.toLocaleDateString('uk-UA');
-  }
-  function fullName(u) {
-    return [u.firstName, u.lastName].filter(Boolean).join(' ') || u.fullName || '';
-  }
-  function getCert(obj, lang) {
-    // поддерживаем оба варианта ключа: eng/en
-    return (obj && (obj[lang] || (lang === 'eng' ? obj['en'] : null))) || null;
-  }
-
+</script>
+<script>
   document.addEventListener("DOMContentLoaded", () => {
+    const API = (window.API_BASE || "");
+
+    if (typeof renderAdminSidebar === "function") {
+      renderAdminSidebar("admin-certificate.html");
+    }
+    if (typeof requireAdminPage === "function") {
+      requireAdminPage();
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const arrow = document.getElementById('toggleArrow');
+      sidebar.classList.toggle('expanded');
+      sidebar.classList.toggle('collapsed');
+      if (arrow) arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    function logoutUser() {
+      window.location.href = "login.html";
+    }
+
+    // ====== Helpers ======
+    function fmtDate(d) {
+      if (!d) return '-';
+      const dt = new Date(d);
+      if (isNaN(dt)) return '-';
+      return dt.toLocaleDateString('uk-UA');
+    }
+    function fullName(u) {
+      return [u.firstName, u.lastName].filter(Boolean).join(' ') || u.fullName || '';
+    }
+    function getCert(obj, lang) {
+      // поддерживаем оба варианта ключа: eng/en
+      return (obj && (obj[lang] || (lang === 'eng' ? obj['en'] : null))) || null;
+    }
+
     const tableBody = document.getElementById("participantsTable");
     const searchInput = document.getElementById("searchName");
     const modal = document.getElementById("certificateModal");
@@ -149,7 +158,8 @@
       try {
         const res = await fetch(`${API}/api/users/${selectedUserId}/certificate?lang=${selectedLang}&courseId=${courseSelect.value}`, {
           method: "POST",
-          body: formData
+          body: formData,
+          credentials: "include"
         });
 
         if (res.ok) {
@@ -177,14 +187,14 @@
       if (!courseId) return;
 
       try {
-        const res = await fetch(`${API}/api/courses/${courseId}/participants`);
+        const res = await fetch(`${API}/api/courses/${courseId}/participants`, { credentials: "include" });
         let users = await res.json();
 
         // Дотягиваем полноценные данные по каждому участнику (для доступа к certificates)
         const enriched = await Promise.all(
           users.map(async (u) => {
             try {
-              const ru = await fetch(`${API}/api/users/${u._id}`);
+              const ru = await fetch(`${API}/api/users/${u._id}`, { credentials: "include" });
               const full = await ru.json();
               return { ...u, ...full }; // мерджим, чтобы были и базовые поля, и certificates
             } catch {
@@ -246,7 +256,7 @@
     // --- Загружаем только «Пройдений» курсы для выпадашки ---
     async function loadCompletedCourses() {
       try {
-        const res = await fetch(`${API}/api/courses?status=Пройдений`);
+        const res = await fetch(`${API}/api/courses?status=Пройдений`, { credentials: "include" });
         const courses = await res.json();
         courseSelect.innerHTML = `<option value="">Оберіть курс</option>`;
         courses.forEach(course => {
@@ -269,7 +279,7 @@
       localStorage.removeItem('user');
       ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
     }catch(_){}
-    const API = "";
+    const API = (window.API_BASE || "");
     fetch(`${API}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
     const back = encodeURIComponent(location.pathname + location.search);
     location.href = `admin-login.html?returnUrl=${back}`;

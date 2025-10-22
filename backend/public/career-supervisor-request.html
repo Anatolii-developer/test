@@ -373,8 +373,13 @@
             headers: authHeaders(),
           });
           const body = await r.json().catch(() => ({}));
-          if (!r.ok || !body?.user) return null;
-          const roles = body.user.roles || [];
+          if (!r.ok) return null;
+
+          // Accept both shapes: { user: {...} } or the user object directly
+          const current = body && (body.user || body);
+          if (!current) return null;
+
+          const roles = current.roles || [];
           const ok =
             Array.isArray(roles) &&
             roles.some((s) => {
@@ -385,7 +390,7 @@
                 v.includes("supervisor")
               );
             });
-          return ok ? body.user : null;
+          return ok ? current : null;
         } catch {
           return null;
         }
@@ -402,31 +407,41 @@
           headers: authHeaders(),
         });
         const body = await r.json().catch(() => ({}));
-        if (!r.ok || !body?.ok) {
+
+        if (!r.ok) {
           qs("#guard").style.display = "block";
           qs("#guard").textContent =
-            body?.message || "Помилка завантаження заявки.";
+            (body && body.message) || "Помилка завантаження заявки.";
           return;
         }
-        const a = body.application || {};
-        const u = a.user || {};
+
+        // Accept both shapes: { ok, application } or a flat application object
+        const a = (body && (body.application || body)) || {};
+        if (!a || (!a._id && !a.id)) {
+          qs("#guard").style.display = "block";
+          qs("#guard").textContent = "Заявку не знайдено.";
+          return;
+        }
+
+        // user can be nested under 'user' or 'owner'
+        const u = a.user || a.owner || {};
+
         qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
         qs("#lastName").value = u.lastName || "";
         qs("#firstName").value = u.firstName || "";
         qs("#middleName").value = u.middleName || "";
-        qs("#submittedAt").value = fmtDate(a.createdAt);
+        qs("#submittedAt").value = fmtDate(a.createdAt || a.created_at || "");
         qs("#experience").value = a.experience || a.exp || "";
         qs("#age").value = a.ageGroup || a.age || "";
         qs("#requestText").value = a.requestText || a.request || "";
         qs("#aboutText").value = a.aboutText || a.about || "";
         qs("#education").value = a.education || "";
-        const topics = Array.isArray(a.topics)
-          ? a.topics.filter(Boolean)
-          : a.topics || "";
-        qs("#topics").value = Array.isArray(topics)
-          ? topics.join(", ")
-          : topics;
+
+        const topics = Array.isArray(a.topics) ? a.topics.filter(Boolean) : a.topics || "";
+        qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
+
         qs("#page").style.display = "flex";
+        qs("#guard").style.display = "none";
       }
 
       (async () => {

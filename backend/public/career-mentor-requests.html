@@ -404,17 +404,22 @@
           try {
             body = await res.clone().json();
           } catch (_) {}
+
           debugLog("Profile →", res, body);
-          if (!res.ok || !body || !body.user) return null;
-          const roles = body.user.roles || [];
-          const hasMentor =
-            Array.isArray(roles) &&
-            roles.some(
-              (s) =>
-                String(s).toLowerCase().includes("ментор") ||
-                String(s).toLowerCase().includes("mentor")
-            );
-          return hasMentor ? body.user : null;
+
+          // Server may return either { user: {...} } or the user object directly
+          const userObj = body && (body.user || body);
+
+          if (!res.ok || !userObj) return null;
+
+          const roles = Array.isArray(userObj.roles) ? userObj.roles : [];
+          const hasMentor = roles.some((s) => /ментор|mentor/i.test(String(s)));
+
+          if (!hasMentor) {
+            console.warn("Access denied. Roles:", roles);
+            return null;
+          }
+          return userObj;
         } catch (e) {
           console.warn("ensureMentor failed:", e);
           return null;

@@ -252,17 +252,9 @@ const uploadUserPhoto = async (req, res) => {
   }
 };
 
-module.exports = {
-  registerUser,
-  getAllUsers,
-  getUserById,
-  updateUserStatus,
-  loginUser,
-  updateUser,
-  sendRecoveryCode,
-  uploadUserPhoto,
-  adminLogin,
-  profile,
-  verifyRecoveryCode,
-  resetPassword,
-};
+// Explicit exports for functions declared via function/const syntax
+exports.adminLogin = adminLogin;
+exports.profile = profile;
+exports.verifyRecoveryCode = verifyRecoveryCode;
+exports.resetPassword = resetPassword;
+exports.uploadUserPhoto = uploadUserPhoto;

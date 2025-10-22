@@ -253,16 +253,14 @@ const uploadUserPhoto = async (req, res) => {
 };
 
 module.exports = {
-  registerUser: exports.registerUser,
-  getAllUsers: exports.getAllUsers,
-  getUserById: exports.getUserById,
-  updateUserStatus: exports.updateUserStatus,
-  loginUser: exports.loginUser,
-  updateUser: exports.updateUser,
-  sendRecoveryCode: exports.sendRecoveryCode,
+  registerUser,
+  getAllUsers,
+  getUserById,
+  updateUserStatus,
+  loginUser,
+  updateUser,
+  sendRecoveryCode,
   uploadUserPhoto,
-
-  // новые:
   adminLogin,
   profile,
   verifyRecoveryCode,

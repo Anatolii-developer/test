@@ -314,8 +314,9 @@
       </div>
     </div>
 
-
-<script src="script.js"></script>
+<script>
+  window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
+</script>
     <script>
       // ===== Helpers =====
       function debugLog(prefix, res, body) {
@@ -395,7 +396,7 @@
 
       async function ensureMentor() {
         try {
-          const res = await fetch("/api/users/profile", {
+          const res = await fetch(`${window.API_BASE}/api/users/profile`, {
             method: "GET",
             credentials: "include",
           });
@@ -473,7 +474,7 @@
           token ? { 'Authorization': `Bearer ${token}` } : {}
         );
         try {
-          const res = await fetch('/api/career-applications?assigned=1&target=mentor', {
+          const res = await fetch(`${window.API_BASE}/api/career-applications?assigned=1&target=mentor`, {
             method: 'GET',
             credentials: 'include',
             headers

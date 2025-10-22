@@ -1,4 +1,10 @@
 const User = require('../models/User');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const nodemailer = require("nodemailer");
+
+const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
 exports.registerUser = async (req, res) => {
   try {
@@ -30,6 +36,75 @@ exports.registerUser = async (req, res) => {
 };
 
 
+async function adminLogin(req, res) {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.status !== "APPROVED") return res.status(403).json({ message: "Account not approved" });
+
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+
+    const roles = Array.isArray(user.roles) ? user.roles.map(String) : [];
+    if (!roles.map(r => r.toLowerCase()).includes("admin")) {
+      return res.status(403).json({ message: "Forbidden: admin only" });
+    }
+
+    const token = jwt.sign({ id: user._id, roles }, JWT_SECRET, { expiresIn: "7d" });
+    // если используешь cookie-сессию — можно положить в httpOnly-cookie:
+    // res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: true });
+    return res.json({ message: "Admin login successful", token, user });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+}
+
+// /api/users/profile и /api/users/admin/profile
+async function profile(req, res) {
+  try {
+    const user = await User.findById(req.user?.id || req.user?._id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+}
+
+// /api/users/recovery/verify
+async function verifyRecoveryCode(req, res) {
+  const { email, code } = req.body;
+  if (!email || !code) return res.status(400).json({ message: "Email and code are required" });
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.recoveryCode !== String(code)) {
+      return res.status(400).json({ message: "Invalid code" });
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+}
+
+// /api/users/recovery/reset
+async function resetPassword(req, res) {
+  const { email, code, newPassword } = req.body;
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({ message: "Email, code and newPassword are required" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.recoveryCode !== String(code)) {
+      return res.status(400).json({ message: "Invalid code" });
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.recoveryCode = undefined;
+    await user.save();
+    res.json({ message: "Password updated" });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+}
 
 
 
@@ -194,8 +269,19 @@ const uploadUserPhoto = async (req, res) => {
   }
 };
 
-// Экспортируй
 module.exports = {
-  ...exports,
-  uploadUserPhoto,
+  registerUser: exports.registerUser,
+  getAllUsers: exports.getAllUsers,
+  getUserById: exports.getUserById,
+  updateUserStatus: exports.updateUserStatus,
+  loginUser: exports.loginUser,
+  updateUser: exports.updateUser,
+  sendRecoveryCode: exports.sendRecoveryCode,
+  uploadUserPhoto: exports.uploadUserPhoto,
+
+  // новые:
+  adminLogin,
+  profile,
+  verifyRecoveryCode,
+  resetPassword,
 };

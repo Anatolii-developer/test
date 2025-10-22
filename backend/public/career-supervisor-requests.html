@@ -339,24 +339,23 @@
             method: "GET",
             credentials: "include",
           });
-          const body = await res
-            .clone()
-            .json()
-            .catch(() => null);
-          if (!res.ok || !body || !body.user) return null;
-          const roles = body.user.roles || [];
-          const has =
-            Array.isArray(roles) &&
-            roles.some((s) => {
-              const v = String(s).toLowerCase();
-              return (
-                v.includes("супервізор") ||
-                v.includes("супервизор") ||
-                v.includes("supervisor")
-              );
-            });
-          return has ? body.user : null;
+          let body = null;
+          try {
+            body = await res.clone().json();
+          } catch (_) {}
+
+          // handle both shapes: { user: {...} } or direct user object
+          if (!res.ok || !body) return null;
+          const userObj = body.user || body;
+
+          const roles = Array.isArray(userObj.roles) ? userObj.roles : [];
+          // debug log to see current roles
+          try { console.log("[supervisor] roles:", roles); } catch (_) {}
+
+          const has = roles.some((r) => /супервізор|супервизор|supervisor/i.test(String(r)));
+          return has ? userObj : null;
         } catch (e) {
+          console.warn("ensureSupervisor failed:", e);
           return null;
         }
       }

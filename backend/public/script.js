@@ -1,6 +1,7 @@
 
 
-API_BASE = "http://157.230.121.24:5050";
+const API_BASE = "";
+window.API_BASE = API_BASE;
 
 // --- Global fetch wrapper: add Bearer token and credentials by default ---
 (function(){
@@ -101,9 +102,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     // 1) Проверяем реальную авторизацию на сервере
     const pr = await fetch(`${API_BASE}/api/users/profile`, { credentials: "include" });
-    const prData = await pr.json().catch(() => ({}));
 
-    if (!pr.ok || !prData?.ok || !prData?.user?._id) {
+    if (!pr.ok) {
       // Нет валидной сессии — чистим локальные следы и уходим на логин
       try {
         localStorage.removeItem("user");
@@ -119,7 +119,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     // 2) Доверяемся серверу, обновляем локальный слепок
-    const sessionUser = prData.user;
+    const sessionUser = await pr.json();
     try { localStorage.setItem("user", JSON.stringify(sessionUser)); } catch(_) {}
 
     // 3) Грузим свежие данные пользователя по id
@@ -772,7 +772,7 @@ window.addEventListener("DOMContentLoaded", () => {
     let creatorRole = "";
 
     try {
-      const resUser = await fetch(`http://157.230.121.24:5050/api/users/${creatorId}`);
+      const resUser = await fetch(`${API_BASE}/api/users/${creatorId}`);
       const user = await resUser.json();
       creatorName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
       creatorRole = user.role || "";
@@ -805,7 +805,7 @@ window.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const res = await fetch("http://157.230.121.24:5050/api/courses", {
+      const res = await fetch(`${API_BASE}/api/courses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

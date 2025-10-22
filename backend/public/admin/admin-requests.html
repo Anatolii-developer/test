@@ -42,7 +42,9 @@
   </div>
 </main>
 
-
+  <script>
+  window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
+</script>
 <script src="admin-auth.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -54,7 +56,6 @@
     }
     load();
   });
-const API_URL = "http://157.230.121.24:5050";
 let currentUserId = null;
 let currentStatus = "WAIT FOR REVIEW";
 

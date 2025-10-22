@@ -44,7 +44,9 @@
       </table>
     </div>
   </main>
-
+  <script>
+  window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
+</script>
 <script src="admin-auth.js"></script>
   <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -76,7 +78,6 @@
           });
         });
       });
-  const API_BASE = "http://157.230.121.24:5050";
 
   function creatorDisplayName(course) {
     // 1) prefer saved flat string

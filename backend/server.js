@@ -13,7 +13,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
   maxAge: '7d',
   setHeaders: (res) => res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
 }));
-app.use(express.static(path.join(__dirname, 'public')));   // /assets/...
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/forum', express.static(path.join(__dirname, 'forum')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
@@ -38,7 +38,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-// ===== API =====
+// ===== ROUTES =====
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/auth', require('./routes/userRoutes'));
 app.use('/api/courses', require('./routes/courseRoutes'));
@@ -46,8 +46,6 @@ app.use('/api/roles', require('./routes/roleRoutes'));
 app.use('/api/library', require('./routes/library'));
 app.use('/api/career-applications', require('./routes/careerRoutes'));
 app.use('/api/career-faq', require('./routes/careerFaqRoutes'));
-
-// Форум
 app.use('/api/forum', require('./forum/forum.routes'));
 
 app.get('/health', (_, res) => res.json({ ok: true }));
@@ -57,6 +55,31 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
-app.listen(5050, '0.0.0.0', () => {
-  console.log('🚀 Server listening on http://0.0.0.0:5050');
-});
+// ===== DATABASE CONNECTION =====
+mongoose.set('strictQuery', false);
+mongoose.set('bufferCommands', false);
+
+const PORT = process.env.PORT || 5050;
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI not set in .env');
+  process.exit(1);
+}
+
+async function start() {
+  try {
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 });
+    console.log('✅ MongoDB connected');
+
+    app.listen(PORT, '0.0.0.0', () =>
+      console.log(`🚀 Server running on http://0.0.0.0:${PORT}`)
+    );
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1);
+  }
+}
+
+start();

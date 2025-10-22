@@ -52,6 +52,7 @@ async function adminLogin(req, res) {
     }
 
     const token = jwt.sign({ id: user._id, roles }, JWT_SECRET, { expiresIn: "7d" });
+    setAuthCookie(res, token);
     // если используешь cookie-сессию — можно положить в httpOnly-cookie:
     // res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: true });
     return res.json({ message: "Admin login successful", token, user });
@@ -176,7 +177,13 @@ async function loginUser(req, res) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    res.status(200).json({ message: "Login successful", user });
+    const roles = Array.isArray(user.roles) ? user.roles.map(String) : [];
+    const token = jwt.sign({ id: user._id, roles }, JWT_SECRET, { expiresIn: "7d" });
+
+    // set httpOnly auth cookie
+    setAuthCookie(res, token);
+
+    return res.status(200).json({ message: "Login successful", user, token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -251,6 +258,18 @@ const uploadUserPhoto = async (req, res) => {
     res.status(500).json({ message: "Помилка сервера." });
   }
 };
+
+function setAuthCookie(res, token) {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: isProd ? 'none' : 'lax',      // 'none' если фронт на другом домене/субдомене
+    secure:  isProd ? true : false,         // для 'none' нужен HTTPS!
+    domain:  isProd ? '.mamko-prof-supervision.com' : undefined, // общий для поддоменов
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
 
 module.exports = {
   registerUser,

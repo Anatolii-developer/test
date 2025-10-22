@@ -6,7 +6,7 @@ const User = require("../models/User");
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
-exports.registerUser = async (req, res) => {
+async function registerUser(req, res) {
   try {
     const user = new User(req.body);
     await user.save();
@@ -33,7 +33,7 @@ exports.registerUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
 
 
 async function adminLogin(req, res) {
@@ -108,7 +108,7 @@ async function resetPassword(req, res) {
 
 
 
-exports.getAllUsers = async (req, res) => {
+async function getAllUsers(req, res) {
   try {
     const { status } = req.query;
     const filter = status ? { status } : {};
@@ -119,9 +119,9 @@ exports.getAllUsers = async (req, res) => {
     console.error("Ошибка при получении пользователей:", error);
     res.status(500).json({ message: 'Server error' });
   }
-};
+}
 
-exports.getUserById = async (req, res) => {
+async function getUserById(req, res) {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -129,9 +129,9 @@ exports.getUserById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
 
-exports.updateUserStatus = async (req, res) => {
+async function updateUserStatus(req, res) {
   try {
     const { status, role } = req.body;
     const update = { status };
@@ -162,10 +162,10 @@ exports.updateUserStatus = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
 
 
-exports.loginUser = async (req, res) => {
+async function loginUser(req, res) {
   const { username, password } = req.body;
 
   try {
@@ -180,11 +180,11 @@ exports.loginUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
+}
 
 
 
-exports.updateUser = async (req, res) => {
+async function updateUser(req, res) {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -192,7 +192,7 @@ exports.updateUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -210,7 +210,7 @@ async function sendMail(to, subject, html) {
     html,
   });
 }
-exports.sendRecoveryCode = async (req, res) => {
+async function sendRecoveryCode(req, res) {
   const { email } = req.body;
 
   if (!email) return res.status(400).json({ message: "Email is required" });
@@ -234,7 +234,7 @@ exports.sendRecoveryCode = async (req, res) => {
     console.error("sendRecoveryCode error:", error);
     res.status(500).json({ message: "Не вдалося надіслати лист" });
   }
-};
+}
 
 
 const uploadUserPhoto = async (req, res) => {
@@ -252,9 +252,17 @@ const uploadUserPhoto = async (req, res) => {
   }
 };
 
-// Explicit exports for functions declared via function/const syntax
-exports.adminLogin = adminLogin;
-exports.profile = profile;
-exports.verifyRecoveryCode = verifyRecoveryCode;
-exports.resetPassword = resetPassword;
-exports.uploadUserPhoto = uploadUserPhoto;
+module.exports = {
+  registerUser,
+  getAllUsers,
+  getUserById,
+  updateUserStatus,
+  loginUser,
+  updateUser,
+  sendRecoveryCode,
+  uploadUserPhoto,
+  adminLogin,
+  profile,
+  verifyRecoveryCode,
+  resetPassword,
+};

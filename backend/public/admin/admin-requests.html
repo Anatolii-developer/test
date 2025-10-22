@@ -54,7 +54,7 @@
     if (typeof requireAdminPage === "function") {
       requireAdminPage();
     }
-    load();
+    loadUsers();
   });
 let currentUserId = null;
 let currentStatus = "WAIT FOR REVIEW";
@@ -76,6 +76,11 @@ function logoutUser() {
 document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.querySelector(".requests-table tbody");
   const tableHead = document.getElementById("table-header");
+  const searchEmail = document.getElementById("searchEmail");
+  const searchName = document.getElementById("searchName");
+  const decisionSelect = document.getElementById("decisionSelect");
+  const roleSelect = document.getElementById("roleSelect");
+  const submitDecision = document.getElementById("submitDecision");
 
 const tabs = document.querySelectorAll(".top-btn");
   tabs.forEach(tab => {
@@ -98,23 +103,25 @@ const tabs = document.querySelectorAll(".top-btn");
     });
   });
 
-  submitDecision.onclick = async () => {
-    const status = decisionSelect.value;
-    const role = roleSelect.value;
-    if (!status || !currentUserId) return;
+  if (submitDecision && decisionSelect) {
+    submitDecision.onclick = async () => {
+      const status = decisionSelect.value;
+      const role = roleSelect ? roleSelect.value : undefined;
+      if (!status || !currentUserId) return;
 
-    await fetch(`${API_URL}/api/users/${currentUserId}/status`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, role }),
-    });
+      await fetch(`${window.API_BASE}/api/users/${currentUserId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, role }),
+      });
 
-    loadUsers();
-  };
+      loadUsers();
+    };
+  }
 
   async function loadUsers() {
     try {
-      const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
+      const res = await fetch(`${window.API_BASE}/api/users?status=${currentStatus}`);
       const users = await res.json();
 
      if (currentStatus === "APPROVED") {

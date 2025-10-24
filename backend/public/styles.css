@@ -152,7 +152,7 @@ main {
 .login-card {
   background-color: #FFFFF9;
   width: 656px;
-  height: 516px;
+  height: 724px;
   border-radius: 24px;
   padding: 100px;
   box-shadow:
@@ -276,8 +276,7 @@ main {
 .registration-card {
   background-color: #FFFFF9;
   width: 1140px;
-  min-height: auto;
-  height: 568px;
+  min-height: 1000px;
   border-radius: 24px;
   padding: 60px 100px;
   margin-top: 140px;
@@ -3114,9 +3113,6 @@ body:has(.login-card) {
     padding-left: 16px;
     margin-top: 24px;
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
-  }
-  .recover-page .login-card {
-    height: 612px;
   }
 
   .credentials-page .h1 {

@@ -2948,7 +2948,7 @@ body:has(.login-card) {
     width: 100%;
     max-width: 540px;
     height: auto;
-    padding: 48px 48px 56px;
+    padding: 30px 30px 56px;
     margin-top: 48px;
     border-radius: 20px;
   }
@@ -2988,9 +2988,9 @@ body:has(.login-card) {
     height: auto;
     border-radius: 16px;
     padding-top: 80px;
-    padding-right: 60px;
+    padding-right: 16px;
     padding-bottom: 80px;
-    padding-left: 60px;
+    padding-left: 16px;
     margin-top: 32px;
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
   }
@@ -3016,6 +3016,7 @@ body:has(.login-card) {
     margin-top: 6px;
   }
   .input-wrapper input {
+    width: 312px;
     height: 44px;
     padding: 10px 40px 10px 44px;
     font-size: 16px;

@@ -31,7 +31,7 @@ async function login() {
    const usernameEl = document.getElementById("username");
   const passwordEl = document.getElementById("password");
   const username = usernameEl.value.trim();
-  const password = passwordEl.value.trim();
+const password = passwordEl.value;
 
   if (!username || !password) {
     alert("Введіть username і пароль.");

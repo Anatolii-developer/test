@@ -199,7 +199,7 @@ async function loginUser(req, res) {
   const { username, password } = req.body;
 
   const uname = String(username || "").trim();
-  const pwd = String(password || "");
+ const pwd = String(password || "");
 
   try {
     const user = await User.findOne({ username: uname });

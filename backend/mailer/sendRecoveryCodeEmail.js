@@ -17,13 +17,14 @@ function makeTransport(port) {
   });
 }
 
-module.exports = async function sendRecoveryCodeEmail(to, code) {
+module.exports = async function sendRecoveryCodeEmail(to, code, username) {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     throw new Error('SMTP configuration missing');
   }
 
   const html = `
     <div style="font-family:Poppins,Arial,sans-serif;font-size:16px;color:#333">
+     ${username ? `<p>Ім’я користувача: <b>${username}</b></p>` : ''}
       <p>Ваш код для відновлення паролю:</p>
       <div style="display:flex;align-items:center;gap:12px;margin:12px 0">
         <span style="font:bold 28px/1.2 Poppins,Arial;color:#275D2B;letter-spacing:2px">${code}</span>
@@ -33,7 +34,9 @@ module.exports = async function sendRecoveryCodeEmail(to, code) {
     </div>
   `;
 
-  const mail = { to, subject: 'Відновлення паролю', text: `Ваш код: ${code} (дійсний 15 хвилин)`, html };
+  const subject = 'Відновлення паролю';
+  const text = `Ім’я користувача: ${username || '-'}\nВаш код: ${code} (дійсний 15 хвилин)`;
+  const mail = { to, subject, text, html };
 
   const ports = [Number(process.env.SMTP_PORT) || 587, 2525, 465];
   let lastErr;

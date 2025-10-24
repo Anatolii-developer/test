@@ -125,7 +125,7 @@ async function resetPassword(req, res) {
     if (!user || user.recoveryCode !== String(code)) {
       return res.status(400).json({ message: "Invalid code" });
     }
-    user.password = await bcrypt.hash(newPassword, 10);
+   user.password = String(newPassword);
     user.recoveryCode = undefined;
     await user.save();
     res.json({ message: "Password updated" });
@@ -251,7 +251,7 @@ async function sendRecoveryCode(req, res) {
     user.recoveryCode = code;
     await user.save();
 
-    await sendRecoveryCodeEmail(email, code);
+    await sendRecoveryCodeEmail(email, code, user.username);
     res.json({ message: "Код надіслано на пошту" });
   } catch (error) {
     console.error("sendRecoveryCode error:", error);

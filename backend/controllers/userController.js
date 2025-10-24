@@ -200,15 +200,6 @@ async function updateUser(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
-
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.EMAIL_FROM,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
 async function sendMail(to, subject, html) {
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,

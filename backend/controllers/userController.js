@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const path = require("path");
 const User = require("../models/User"); 
+const sendRecoveryCodeEmail = require('../mailer/sendRecoveryCodeEmail');
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
@@ -221,12 +223,7 @@ async function sendRecoveryCode(req, res) {
     user.recoveryCode = code;
     await user.save();
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: "Код для відновлення паролю",
-      text: `Ваш код для відновлення паролю: ${code}`
-    });
+    await sendRecoveryCodeEmail(email, code);
     res.json({ message: "Код надіслано на пошту" });
   } catch (error) {
     console.error("sendRecoveryCode error:", error);

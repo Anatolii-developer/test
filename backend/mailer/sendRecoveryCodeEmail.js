@@ -1,25 +1,24 @@
 // backend/mailer/sendRecoveryCodeEmail.js
 const nodemailer = require('nodemailer');
 
-async function buildTransport(port) {
-  const isSecure = String(port) === '465'; // 587/2525 -> STARTTLS, 465 -> SSL
-  const transporter = nodemailer.createTransport({
+function makeTransport(port) {
+  const secure = String(port) === '465';
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(port),
-    secure: isSecure,
+    secure,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    connectionTimeout: 8000,   // 8s
+    greetingTimeout: 8000,
+    socketTimeout: 10000,
+    tls: { rejectUnauthorized: false } // на shared IP бывает полезно
   }, {
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
   });
-
-  // проверим соединение заранее — удобнее дебажить
-  await transporter.verify();
-  return transporter;
 }
 
 module.exports = async function sendRecoveryCodeEmail(to, code) {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.error('[Mailer] ❌ SMTP env missing');
     throw new Error('SMTP configuration missing');
   }
 
@@ -34,26 +33,19 @@ module.exports = async function sendRecoveryCodeEmail(to, code) {
     </div>
   `;
 
-  const mail = {
-    to,
-    subject: 'Відновлення паролю',
-    text: `Ваш код: ${code} (дійсний 15 хвилин)`,
-    html,
-    replyTo: process.env.SMTP_FROM, // чтобы ответы шли на твой Gmail
-  };
+  const mail = { to, subject: 'Відновлення паролю', text: `Ваш код: ${code} (дійсний 15 хвилин)`, html };
 
-  // 1-я попытка: 587 → 2-я: 2525
-  const ports = [process.env.SMTP_PORT || 587, 2525].map(Number);
+  const ports = [Number(process.env.SMTP_PORT) || 587, 2525, 465];
   let lastErr;
   for (const port of ports) {
     try {
-      const transporter = await buildTransport(port);
-      const info = await transporter.sendMail(mail);
-      console.log(`[Mailer] ✅ sent via port ${port}: ${info.messageId || ''}`);
+      const t = makeTransport(port);
+      const info = await t.sendMail(mail);
+      console.log(`[Mailer] ✅ sent via ${port}: ${info.messageId || ''}`);
       return;
     } catch (e) {
       lastErr = e;
-      console.warn(`[Mailer] ⚠️ failed on port ${port}:`, e.message);
+      console.warn(`[Mailer] ⚠️ port ${port} failed: ${e.message}`);
     }
   }
   console.error('[Mailer] ❌ all ports failed:', lastErr?.message);

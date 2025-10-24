@@ -3087,6 +3087,88 @@ body:has(.login-card) {
     color: #E37009;
     text-decoration: none;
   }
+
+  /* ===============================
+     Credentials page (create-credentials.html)
+     Mobile adaptation
+     =============================== */
+  .credentials-page header {
+    height: 64px;
+    padding: 8px 16px;
+  }
+
+  .credentials-page main {
+    padding: 0 16px 60px;
+    align-items: center;
+  }
+
+  .credentials-page .login-card {
+    width: 344px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    padding-top: 32px;   /* more compact than login */
+    padding-right: 16px;
+    padding-bottom: 32px;
+    padding-left: 16px;
+    margin-top: 24px;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  }
+
+  .credentials-page .h1 {
+    font-size: 28px;
+    line-height: 34px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .credentials-page .s1 {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  .credentials-page .text-regular {
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+  }
+
+  .credentials-page .hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .credentials-page .input-wrapper {
+    margin-top: 6px;
+  }
+
+  .credentials-page .input-wrapper input {
+    width: 100%;
+    height: 44px;
+    padding: 10px 40px 10px 44px;
+    font-size: 16px;
+  }
+
+  .credentials-page .input-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .credentials-page .toggle-password {
+    width: 20px;
+    height: 20px;
+  }
+
+  .credentials-page .login-card button {
+    width: 100%;
+    font-size: 18px;
+    padding: 12px;
+    margin-top: 14px;
+    border-radius: 12px;
+  }
 }
 
 /* If a desktop background bleeds through from other sections, keep auth pages on top */

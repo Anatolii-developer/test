@@ -7,55 +7,23 @@
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Make page stretch full height and center card */
+    /* Page stretch + centered card */
     html, body { height: 100%; }
     body { min-height: 100vh; display: flex; flex-direction: column; }
     main { flex: 1 0 auto; display: grid; place-items: center; padding: 16px; }
     header { flex: 0 0 auto; }
 
-    /* Password peek button */
     .input-wrapper { position: relative; }
-    .peek {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      padding: 4px;
-    }
 
     /* Cooldown progress bar */
     #resendWrap { display: none; }
-    .cooldown {
-      height: 4px;
-      background: #e9ecef;
-      border-radius: 3px;
-      overflow: hidden;
-      margin-left: 8px;
-      flex: 1 1 auto;
-      align-self: center;
-    }
-    .cooldown .fill {
-      height: 100%;
-      width: 0%;
-      background: #6c757d;
-      transition: width 1s linear;
-    }
+    .cooldown { height: 4px; background: #e9ecef; border-radius: 3px; overflow: hidden; margin-left: 8px; flex: 1 1 auto; align-self: center; }
+    .cooldown .fill { height: 100%; width: 0%; background: #6c757d; transition: width 1s linear; }
 
-    /* Make resend row tidy */
-    .resend-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-top: 8px;
-    }
+    .resend-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
   </style>
 </head>
-<body>
+<body class="auth-bg">
   <header>
     <img class="logo" src="assets/logo.png" alt="Institute Logo" />
     <div class="language-select">UA ▼</div>
@@ -80,240 +48,242 @@
         </div>
       </div>
 
-      <!-- Шаг 2: код -->
+      <!-- Крок 2: введення коду -->
       <div id="codeBlock" style="display:none; margin-top:16px;">
         <label for="code" class="s1">Код з листа</label>
-       <div class="input-wrapper">
-  <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
-  <input type="password" id="newPassword" placeholder="Введіть новий пароль" />
-  <img src="assets/icon-eye-close.svg"
-       class="toggle-password"
-       data-target="newPassword"
-       alt="toggle visibility" />
-</div>
+        <div class="input-wrapper">
+          <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
+          <input type="text" id="code" placeholder="6-значний код" inputmode="numeric" maxlength="6" />
+        </div>
+        <button id="btnVerify" onclick="verifyCode()">Підтвердити код</button>
+      </div>
 
-<div class="input-wrapper">
-  <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
-  <input type="password" id="newPassword2" placeholder="Повторіть пароль" />
-  <img src="assets/icon-eye-close.svg"
-       class="toggle-password"
-       data-target="newPassword2"
-       alt="toggle visibility" />
-</div>
+      <!-- Крок 3: зміна пароля (показується після верифікації) -->
+      <div id="resetBlock" style="display:none; margin-top:16px;">
+        <label for="newPassword" class="s1">Новий пароль</label>
+        <div class="input-wrapper">
+          <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
+          <input type="password" id="newPassword" placeholder="Введіть новий пароль" />
+          <img src="assets/icon-eye-close.svg"
+               class="toggle-password"
+               data-target="newPassword"
+               alt="toggle visibility" />
+        </div>
+
         <label for="newPassword2" class="s1" style="margin-top:8px;">Підтвердження</label>
         <div class="input-wrapper">
+          <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
           <input type="password" id="newPassword2" placeholder="Повторіть пароль" />
-          <button type="button" class="peek" data-target="newPassword2" aria-label="Показати пароль">👁</button>
+          <img src="assets/icon-eye-close.svg"
+               class="toggle-password"
+               data-target="newPassword2"
+               alt="toggle visibility" />
         </div>
         <button id="btnReset" onclick="resetPassword()">Змінити пароль</button>
       </div>
 
       <button style="background-color: #aaa; margin-top: 12px;" onclick="history.back()">Повернутись назад</button>
     </div>
-</main>
-<script>
-  // Primary routes live under /api/auth/recovery, but some deployments expose only /api/auth/forgot-password.
-  // We'll try primary first, then fallback automatically.
-  const API_PRIMARY = '/api/users/recovery';
-const API_FALLBACK = '/api/users';
+  </main>
 
-  const state = { email: '', code: '', codeVerified: false };
-  const RESEND_COOLDOWN = 60; // seconds
-  let cooldownLeft = 0;
-  let cooldownTimer = null;
+  <script>
+    const API_PRIMARY = '/api/users/recovery';
+    const API_FALLBACK = '/api/users';
 
-  function startCooldown() {
-    const wrap = qs('resendWrap');
-    const btn = qs('btnResend');
-    const t = qs('resendTimer');
-    if (!wrap || !btn || !t) return;
+    const state = { email: '', code: '', codeVerified: false };
+    const RESEND_COOLDOWN = 60;
+    let cooldownLeft = 0;
+    let cooldownTimer = null;
 
-    wrap.style.display = '';
-    const barFill = document.querySelector('#resendBar .fill');
-    if (barFill) barFill.style.width = '100%';
-    cooldownLeft = RESEND_COOLDOWN;
-    btn.disabled = true;
-    t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
-
-    clearInterval(cooldownTimer);
-    cooldownTimer = setInterval(() => {
-      cooldownLeft -= 1;
-      if (cooldownLeft <= 0) {
-        clearInterval(cooldownTimer);
-        t.textContent = 'Можна надіслати повторно';
-        btn.disabled = false;
-        if (barFill) barFill.style.width = '0%';
+    function qs(id){ return document.getElementById(id); }
+    function show(el, yes){ if(!el) return; el.style.display = yes ? '' : 'none'; }
+    function toast(msg){ alert(msg); }
+    function setLoading(btn, is){
+      if(!btn) return;
+      if(is){
+        btn.disabled = true;
+        if(!btn.dataset._txt) btn.dataset._txt = btn.textContent;
+        btn.textContent = 'Зачекайте…';
       } else {
-        t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
-        if (barFill) {
-          const pct = Math.max(0, Math.round((cooldownLeft / RESEND_COOLDOWN) * 100));
-          barFill.style.width = pct + '%';
-        }
+        btn.disabled = false;
+        if(btn.dataset._txt) btn.textContent = btn.dataset._txt;
       }
-    }, 1000);
-  }
-
-  function qs(id){ return document.getElementById(id); }
-  function show(el, yes){ if(!el) return; el.style.display = yes ? '' : 'none'; }
-  function toast(msg){ alert(msg); }
-  function setLoading(btn, is){
-    if(!btn) return;
-    if(is){
-      btn.disabled = true;
-      if(!btn.dataset._txt) btn.dataset._txt = btn.textContent;
-      btn.textContent = 'Зачекайте…';
-    } else {
-      btn.disabled = false;
-      if(btn.dataset._txt) btn.textContent = btn.dataset._txt;
     }
-  }
 
-  async function postJSON(url, body, fallbackUrl) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12000); // 12s timeout
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body || {}),
-        signal: controller.signal,
-      });
-      if (res.status === 404 && fallbackUrl) {
-        const res2 = await fetch(fallbackUrl, {
+    function startCooldown() {
+      const wrap = qs('resendWrap');
+      const btn = qs('btnResend');
+      const t = qs('resendTimer');
+      if (!wrap || !btn || !t) return;
+
+      wrap.style.display = '';
+      const barFill = document.querySelector('#resendBar .fill');
+      if (barFill) barFill.style.width = '100%';
+      cooldownLeft = RESEND_COOLDOWN;
+      btn.disabled = true;
+      t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
+
+      clearInterval(cooldownTimer);
+      cooldownTimer = setInterval(() => {
+        cooldownLeft -= 1;
+        if (cooldownLeft <= 0) {
+          clearInterval(cooldownTimer);
+          t.textContent = 'Можна надіслати повторно';
+          btn.disabled = false;
+          if (barFill) barFill.style.width = '0%';
+        } else {
+          t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
+          if (barFill) {
+            const pct = Math.max(0, Math.round((cooldownLeft / RESEND_COOLDOWN) * 100));
+            barFill.style.width = pct + '%';
+          }
+        }
+      }, 1000);
+    }
+
+    async function postJSON(url, body, fallbackUrl) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+      try {
+        const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body || {}),
           signal: controller.signal,
         });
-        return { res: res2, data: await res2.json().catch(() => ({})) };
-      }
-      return { res, data: await res.json().catch(() => ({})) };
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  // Sanitize code input to digits only and auto-verify on 6 chars
-  document.addEventListener('input', (e) => {
-    if (e.target && e.target.id === 'code') {
-      const v = (e.target.value || '').replace(/\D+/g, '').slice(0, 6);
-      e.target.value = v;
-    }
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      if (qs('resetBlock') && qs('resetBlock').style.display !== 'none') {
-        resetPassword();
-      } else if (qs('codeBlock') && qs('codeBlock').style.display !== 'none') {
-        verifyCode();
-      } else {
-        sendRecoveryCode();
+        if (res.status === 404 && fallbackUrl) {
+          const res2 = await fetch(fallbackUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {}),
+            signal: controller.signal,
+          });
+          return { res: res2, data: await res2.json().catch(() => ({})) };
+        }
+        return { res, data: await res.json().catch(() => ({})) };
+      } finally {
+        clearTimeout(timer);
       }
     }
-  });
 
-  // Step 1: send code to email
-  async function sendRecoveryCode(){
-    const email = (qs('email')?.value || '').trim().toLowerCase();
-    if(!email){ toast('Вкажіть email.'); return; }
-    setLoading(qs('btnSend'), true);
-    try{
-      const { res, data } = await postJSON(
-        `${API_PRIMARY}/send`,
-        { email },
-        `${API_FALLBACK}/forgot-password` // fallback alias on some servers
-      );
-      if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
-      state.email = email;
-      show(qs('codeBlock'), true);
-      startCooldown();
-      toast('Код відправлено на вашу електронну пошту.');
-    } catch (e){
-      toast(e.message || 'Помилка');
-    } finally {
-      setLoading(qs('btnSend'), false);
+    // Input sanitation for code field
+    document.addEventListener('input', (e) => {
+      if (e.target && e.target.id === 'code') {
+        const v = (e.target.value || '').replace(/\D+/g, '').slice(0, 6);
+        e.target.value = v;
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (qs('resetBlock') && qs('resetBlock').style.display !== 'none') {
+          resetPassword();
+        } else if (qs('codeBlock') && qs('codeBlock').style.display !== 'none') {
+          verifyCode();
+        } else {
+          sendRecoveryCode();
+        }
+      }
+    });
+
+    async function sendRecoveryCode(){
+      const email = (qs('email')?.value || '').trim().toLowerCase();
+      if(!email){ toast('Вкажіть email.'); return; }
+      setLoading(qs('btnSend'), true);
+      try{
+        const { res, data } = await postJSON(
+          `${API_PRIMARY}/send`,
+          { email },
+          `${API_FALLBACK}/forgot-password`
+        );
+        if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
+        state.email = email;
+        show(qs('codeBlock'), true);
+        startCooldown();
+        toast('Код відправлено на вашу електронну пошту.');
+      } catch (e){
+        toast(e.message || 'Помилка');
+      } finally {
+        setLoading(qs('btnSend'), false);
+      }
     }
-  }
 
-  async function resendCode(){
-    if (cooldownLeft > 0) return;
-    const email = state.email || (qs('email')?.value || '').trim().toLowerCase();
-    if(!email){ toast('Вкажіть email.'); return; }
-    setLoading(qs('btnResend'), true);
-    try{
-      const { res, data } = await postJSON(
-        `${API_PRIMARY}/send`,
-        { email },
-        `${API_FALLBACK}/forgot-password`
-      );
-      if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
-      toast('Код повторно відправлено.');
-      startCooldown();
-    } catch(e){
-      toast(e.message || 'Помилка');
-    } finally {
-      setLoading(qs('btnResend'), false);
+    async function resendCode(){
+      if (cooldownLeft > 0) return;
+      const email = state.email || (qs('email')?.value || '').trim().toLowerCase();
+      if(!email){ toast('Вкажіть email.'); return; }
+      setLoading(qs('btnResend'), true);
+      try{
+        const { res, data } = await postJSON(
+          `${API_PRIMARY}/send`,
+          { email },
+          `${API_FALLBACK}/forgot-password`
+        );
+        if(!res.ok) throw new Error(data.message || 'Помилка надсилання коду');
+        toast('Код повторно відправлено.');
+        startCooldown();
+      } catch(e){
+        toast(e.message || 'Помилка');
+      } finally {
+        setLoading(qs('btnResend'), false);
+      }
     }
-  }
 
-  // Step 2: verify code
-  async function verifyCode(){
-    const code = (qs('code')?.value || '').trim();
-    if(!code){ toast('Введіть код з листа.'); return; }
-    setLoading(qs('btnVerify'), true);
-    try{
-      const { res, data } = await postJSON(
-        `${API_PRIMARY}/verify`,
-        { email: state.email || (qs('email')?.value||'').trim(), code }
-      );
-      if(!res.ok) throw new Error(data.message || 'Невірний або прострочений код');
-      state.code = code;
-      state.codeVerified = true;
-      show(qs('resetBlock'), true);
-      toast('Код підтверджено. Введіть новий пароль.');
-    } catch(e){
-      toast(e.message || 'Помилка');
-    } finally {
-      setLoading(qs('btnVerify'), false);
+    async function verifyCode(){
+      const code = (qs('code')?.value || '').trim();
+      if(!code){ toast('Введіть код з листа.'); return; }
+      setLoading(qs('btnVerify'), true);
+      try{
+        const { res, data } = await postJSON(
+          `${API_PRIMARY}/verify`,
+          { email: state.email || (qs('email')?.value||'').trim(), code }
+        );
+        if(!res.ok) throw new Error(data.message || 'Невірний або прострочений код');
+        state.code = code;
+        state.codeVerified = true;
+        show(qs('resetBlock'), true);
+        toast('Код підтверджено. Введіть новий пароль.');
+      } catch(e){
+        toast(e.message || 'Помилка');
+      } finally {
+        setLoading(qs('btnVerify'), false);
+      }
     }
-  }
 
-  // Step 3: set new password (client-side)
-  async function resetPassword(){
-    if(!state.codeVerified){ toast('Спершу підтвердіть код.'); return; }
-    const p1 = qs('newPassword')?.value || '';
-    const p2 = qs('newPassword2')?.value || '';
-    if(p1.length < 8){ toast('Пароль має містити щонайменше 8 символів.'); return; }
-    if(p1 !== p2){ toast('Паролі не збігаються.'); return; }
-    setLoading(qs('btnReset'), true);
-    try{
-      const { res, data } = await postJSON(
-        `${API_PRIMARY}/reset`,
-        { email: state.email || (qs('email')?.value||'').trim(), code: state.code, newPassword: p1 }
-      );
-      if(!res.ok) throw new Error(data.message || 'Не вдалося змінити пароль');
-      alert('✅ Пароль успішно змінено! Тепер ви можете увійти.');
-      setTimeout(() => location.href = '/index.html', 800);
-    } catch(e){
-      toast(e.message || 'Помилка');
-    } finally {
-      setLoading(qs('btnReset'), false);
+    async function resetPassword(){
+      if(!state.codeVerified){ toast('Спершу підтвердіть код.'); return; }
+      const p1 = qs('newPassword')?.value || '';
+      const p2 = qs('newPassword2')?.value || '';
+      if(p1.length < 8){ toast('Пароль має містити щонайменше 8 символів.'); return; }
+      if(p1 !== p2){ toast('Паролі не збігаються.'); return; }
+      setLoading(qs('btnReset'), true);
+      try{
+        const { res, data } = await postJSON(
+          `${API_PRIMARY}/reset`,
+          { email: state.email || (qs('email')?.value||'').trim(), code: state.code, newPassword: p1 }
+        );
+        if(!res.ok) throw new Error(data.message || 'Не вдалося змінити пароль');
+        alert('✅ Пароль успішно змінено! Тепер ви можете увійти.');
+        setTimeout(() => location.href = '/index.html', 800);
+      } catch(e){
+        toast(e.message || 'Помилка');
+      } finally {
+        setLoading(qs('btnReset'), false);
+      }
     }
-  }
 
- // Переключатель видимости пароля по иконке-глазику
-document.addEventListener('click', (e) => {
-  const img = e.target.closest('.toggle-password');
-  if (!img) return;
-  const id = img.getAttribute('data-target');
-  const input = document.getElementById(id);
-  if (!input) return;
+    // Toggle visibility for password fields
+    document.addEventListener('click', (e) => {
+      const img = e.target.closest('.toggle-password');
+      if (!img) return;
+      const id = img.getAttribute('data-target');
+      const input = document.getElementById(id);
+      if (!input) return;
 
-  const isHidden = input.type === 'password';
-  input.type = isHidden ? 'text' : 'password';
-  img.src = isHidden ? 'assets/icon-eye-open.svg' : 'assets/icon-eye-close.svg';
-});
-</script>
-
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      img.src = isHidden ? 'assets/icon-eye-open.svg' : 'assets/icon-eye-close.svg';
+    });
+  </script>
 </body>
 </html>

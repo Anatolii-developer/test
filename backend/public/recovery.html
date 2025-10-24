@@ -6,6 +6,54 @@
   <title>Відновлення - Psychologist Platform</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Make page stretch full height and center card */
+    html, body { height: 100%; }
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+    main { flex: 1 0 auto; display: grid; place-items: center; padding: 16px; }
+    header { flex: 0 0 auto; }
+
+    /* Password peek button */
+    .input-wrapper { position: relative; }
+    .peek {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    /* Cooldown progress bar */
+    #resendWrap { display: none; }
+    .cooldown {
+      height: 4px;
+      background: #e9ecef;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-left: 8px;
+      flex: 1 1 auto;
+      align-self: center;
+    }
+    .cooldown .fill {
+      height: 100%;
+      width: 0%;
+      background: #6c757d;
+      transition: width 1s linear;
+    }
+
+    /* Make resend row tidy */
+    .resend-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -24,9 +72,12 @@
       </div>
 
       <button id="btnSend" onclick="sendRecoveryCode()">Надіслати код</button>
-      <div id="resendWrap" style="display:none; margin-top:8px;">
-        <button id="btnResend" onclick="resendCode()" style="background:#6c757d;">Надіслати код ще раз</button>
-        <span id="resendTimer" class="s1" style="margin-left:8px; color:#6c757d;"></span>
+      <div id="resendWrap">
+        <div class="resend-row">
+          <button id="btnResend" onclick="resendCode()" style="background:#6c757d;">Надіслати код ще раз</button>
+          <span id="resendTimer" class="s1" style="color:#6c757d;" aria-live="polite"></span>
+          <div id="resendBar" class="cooldown"><div class="fill"></div></div>
+        </div>
       </div>
 
       <!-- Шаг 2: код -->
@@ -43,10 +94,12 @@
         <label for="newPassword" class="s1">Новий пароль</label>
         <div class="input-wrapper">
           <input type="password" id="newPassword" placeholder="Введіть новий пароль" />
+          <button type="button" class="peek" data-target="newPassword" aria-label="Показати пароль">👁</button>
         </div>
         <label for="newPassword2" class="s1" style="margin-top:8px;">Підтвердження</label>
         <div class="input-wrapper">
           <input type="password" id="newPassword2" placeholder="Повторіть пароль" />
+          <button type="button" class="peek" data-target="newPassword2" aria-label="Показати пароль">👁</button>
         </div>
         <button id="btnReset" onclick="resetPassword()">Змінити пароль</button>
       </div>
@@ -59,6 +112,7 @@
   // We'll try primary first, then fallback automatically.
   const API_PRIMARY = '/api/users/recovery';
 const API_FALLBACK = '/api/users';
+
   const state = { email: '', code: '', codeVerified: false };
   const RESEND_COOLDOWN = 60; // seconds
   let cooldownLeft = 0;
@@ -71,6 +125,8 @@ const API_FALLBACK = '/api/users';
     if (!wrap || !btn || !t) return;
 
     wrap.style.display = '';
+    const barFill = document.querySelector('#resendBar .fill');
+    if (barFill) barFill.style.width = '100%';
     cooldownLeft = RESEND_COOLDOWN;
     btn.disabled = true;
     t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
@@ -82,8 +138,13 @@ const API_FALLBACK = '/api/users';
         clearInterval(cooldownTimer);
         t.textContent = 'Можна надіслати повторно';
         btn.disabled = false;
+        if (barFill) barFill.style.width = '0%';
       } else {
         t.textContent = `Можна надіслати повторно через ${cooldownLeft}s`;
+        if (barFill) {
+          const pct = Math.max(0, Math.round((cooldownLeft / RESEND_COOLDOWN) * 100));
+          barFill.style.width = pct + '%';
+        }
       }
     }, 1000);
   }
@@ -104,21 +165,28 @@ const API_FALLBACK = '/api/users';
   }
 
   async function postJSON(url, body, fallbackUrl) {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body || {})
-    });
-    // If route not found and we have a fallback — try it once
-    if (res.status === 404 && fallbackUrl) {
-      const res2 = await fetch(fallbackUrl, {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000); // 12s timeout
+    try {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body || {})
+        body: JSON.stringify(body || {}),
+        signal: controller.signal,
       });
-      return { res: res2, data: await res2.json().catch(() => ({})) };
+      if (res.status === 404 && fallbackUrl) {
+        const res2 = await fetch(fallbackUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body || {}),
+          signal: controller.signal,
+        });
+        return { res: res2, data: await res2.json().catch(() => ({})) };
+      }
+      return { res, data: await res.json().catch(() => ({})) };
+    } finally {
+      clearTimeout(timer);
     }
-    return { res, data: await res.json().catch(() => ({})) };
   }
 
   // Sanitize code input to digits only and auto-verify on 6 chars
@@ -206,7 +274,7 @@ const API_FALLBACK = '/api/users';
     }
   }
 
-  // Step 3: set new password
+  // Step 3: set new password (client-side)
   async function resetPassword(){
     if(!state.codeVerified){ toast('Спершу підтвердіть код.'); return; }
     const p1 = qs('newPassword')?.value || '';
@@ -228,6 +296,18 @@ const API_FALLBACK = '/api/users';
       setLoading(qs('btnReset'), false);
     }
   }
+
+  // Toggle password visibility
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.peek');
+    if (!btn) return;
+    const id = btn.getAttribute('data-target');
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    btn.setAttribute('aria-label', input.type === 'password' ? 'Показати пароль' : 'Сховати пароль');
+  });
 </script>
 
 </body>

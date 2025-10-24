@@ -2917,3 +2917,149 @@ input:checked+.slider:before {
   opacity: 1
 }
 
+
+
+/* =========================================
+   AUTH PAGES (Login / Recovery / Credentials)
+   Mobile adaptations + page-only background
+   ========================================= */
+
+/* Show the special background ONLY on pages that contain the .login-card
+   (login.html, recovery.html, create-credentials.html).
+   You can also force it by adding class="auth-bg" on &lt;body&gt; in those pages. */
+body.auth-bg,
+body:has(.login-card) {
+  background: #F6F6F6 url('assets/background.png') no-repeat center top / cover;
+}
+
+/* Tablet tweaks (optional, keeps big cards but trims spacing) */
+@media (max-width: 768px) {
+  header {
+    height: 72px;
+    padding: 12px 20px;
+  }
+  .logo {
+    margin-left: 0;
+  }
+  main {
+    padding: 0 16px 60px;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 540px;
+    height: auto;
+    padding: 48px 48px 56px;
+    margin-top: 48px;
+    border-radius: 20px;
+  }
+}
+
+/* Phone layout — matches the provided mobile spec:
+   nav: 376x64
+   container: 344 width, radius 16, padding 80/60/80/60
+*/
+@media (max-width: 480px) {
+  /* NAV / HEADER */
+  header {
+    height: 64px;
+    padding: 8px 16px;
+  }
+  .logo {
+    width: 156px;
+    height: 40px;
+    object-fit: contain;
+    margin-left: 0;
+  }
+  .language-select {
+    font-size: 14px;
+    margin-right: 0;
+  }
+
+  /* PAGE WRAPPER */
+  main {
+    padding: 0 16px 60px;
+    align-items: center;
+  }
+
+  /* CARD */
+  .login-card {
+    width: 344px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    padding-top: 80px;
+    padding-right: 60px;
+    padding-bottom: 80px;
+    padding-left: 60px;
+    margin-top: 32px;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  }
+
+  /* TYPOGRAPHY */
+  .h1 {
+    font-size: 28px;
+    line-height: 34px;
+    text-align: center;
+  }
+  .s1 {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .text-regular,
+  .text-medium {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  /* INPUTS */
+  .input-wrapper {
+    margin-top: 6px;
+  }
+  .input-wrapper input {
+    height: 44px;
+    padding: 10px 40px 10px 44px;
+    font-size: 16px;
+  }
+  .input-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .toggle-password {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* LINKS + ACTIONS */
+  .actions {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .actions a {
+    font-size: 14px;
+  }
+
+  /* BUTTONS */
+  .login-card button,
+  .registration-card button {
+    width: 100%;
+    height: 48px;
+    font-size: 18px;
+    padding: 12px;
+    margin-top: 18px;
+    border-radius: 12px;
+  }
+
+  .register {
+    font-size: 16px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .register a { font-size: 16px; }
+}
+
+/* If a desktop background bleeds through from other sections, keep auth pages on top */
+body.auth-bg main,
+body:has(.login-card) main {
+  position: relative;
+  z-index: 1;
+}

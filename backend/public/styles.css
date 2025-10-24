@@ -168,7 +168,7 @@ main {
 }
 
 /* vertical divider between left icon and input text */
-.input-wrapper::after {
+.input-wrapper:has(.input-icon)::after {
   content: "";
   position: absolute;
   left: 40px;               /* aligns with left icon padding */

@@ -221,7 +221,7 @@ const API_FALLBACK = '/api/users';
       );
       if(!res.ok) throw new Error(data.message || 'Не вдалося змінити пароль');
       alert('✅ Пароль успішно змінено! Тепер ви можете увійти.');
-      setTimeout(() => location.href = '/login.html', 800);
+      setTimeout(() => location.href = '/index.html', 800);
     } catch(e){
       toast(e.message || 'Помилка');
     } finally {

@@ -62,7 +62,7 @@
   </header>
 
   <main>
-    <div class="login-card">
+    <div class="recovery-card">
       <h1 class="h1" style="color: #D97A1C; text-align: center;">Відновлення</h1>
 
       <label for="email" class="s1">Email</label>
@@ -83,19 +83,23 @@
       <!-- Шаг 2: код -->
       <div id="codeBlock" style="display:none; margin-top:16px;">
         <label for="code" class="s1">Код з листа</label>
-        <div class="input-wrapper">
-          <input type="text" id="code" placeholder="6-значний код" inputmode="numeric" maxlength="6" />
-        </div>
-        <button id="btnVerify" onclick="verifyCode()">Підтвердити код</button>
-      </div>
+       <div class="input-wrapper">
+  <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
+  <input type="password" id="newPassword" placeholder="Введіть новий пароль" />
+  <img src="assets/icon-eye-close.svg"
+       class="toggle-password"
+       data-target="newPassword"
+       alt="toggle visibility" />
+</div>
 
-      <!-- Шаг 3: новый пароль -->
-      <div id="resetBlock" style="display:none; margin-top:16px;">
-        <label for="newPassword" class="s1">Новий пароль</label>
-        <div class="input-wrapper">
-          <input type="password" id="newPassword" placeholder="Введіть новий пароль" />
-          <button type="button" class="peek" data-target="newPassword" aria-label="Показати пароль">👁</button>
-        </div>
+<div class="input-wrapper">
+  <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
+  <input type="password" id="newPassword2" placeholder="Повторіть пароль" />
+  <img src="assets/icon-eye-close.svg"
+       class="toggle-password"
+       data-target="newPassword2"
+       alt="toggle visibility" />
+</div>
         <label for="newPassword2" class="s1" style="margin-top:8px;">Підтвердження</label>
         <div class="input-wrapper">
           <input type="password" id="newPassword2" placeholder="Повторіть пароль" />
@@ -297,17 +301,18 @@ const API_FALLBACK = '/api/users';
     }
   }
 
-  // Toggle password visibility
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.peek');
-    if (!btn) return;
-    const id = btn.getAttribute('data-target');
-    const input = document.getElementById(id);
-    if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
-    btn.textContent = input.type === 'password' ? '👁' : '🙈';
-    btn.setAttribute('aria-label', input.type === 'password' ? 'Показати пароль' : 'Сховати пароль');
-  });
+ // Переключатель видимости пароля по иконке-глазику
+document.addEventListener('click', (e) => {
+  const img = e.target.closest('.toggle-password');
+  if (!img) return;
+  const id = img.getAttribute('data-target');
+  const input = document.getElementById(id);
+  if (!input) return;
+
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  img.src = isHidden ? 'assets/icon-eye-open.svg' : 'assets/icon-eye-close.svg';
+});
 </script>
 
 </body>

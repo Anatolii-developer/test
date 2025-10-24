@@ -161,6 +161,18 @@ main {
   margin-top: 100px;
 }
 
+/* Восстановление: та же карточка, но тянется по содержимому */
+.recovery-card {
+  background-color: #FFFFF9;
+  width: 656px;
+  min-height: 480px;  /* базовый размер, дальше растёт сама */
+  height: auto;       /* ключевое отличие от .login-card */
+  border-radius: 24px;
+  padding: 100px;
+  box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  margin-top: 100px;
+}
+
 /* Inputs with icons */
 .input-wrapper {
   position: relative;
@@ -224,6 +236,7 @@ main {
 }
 
 .login-card button,
+.recovery-card button,
 .registration-card button {
   width: 100%;
   background-color: #E37009;
@@ -2943,7 +2956,9 @@ input:checked+.slider:before {
    (login.html, recovery.html, create-credentials.html).
    You can also force it by adding class="auth-bg" on &lt;body&gt; in those pages. */
 body.auth-bg,
-body:has(.login-card) {
+body:has(.login-card)б
+body:has(.recovery-card)  {
+  
   background: #F6F6F6 url('assets/background.png') no-repeat center top / cover;
 }
 
@@ -2959,6 +2974,7 @@ body:has(.login-card) {
   main {
     padding: 0 16px 60px;
   }
+  .recovery-card,
   .login-card {
     width: 100%;
     max-width: 540px;

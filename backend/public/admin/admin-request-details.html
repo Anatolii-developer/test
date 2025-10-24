@@ -342,14 +342,18 @@
 </div>
 <script src="admin-auth.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", async () => {
         if (typeof renderAdminSidebar === "function") {
           renderAdminSidebar("admin-career-requests.html");
         }
         if (typeof requireAdminPage === "function") {
-          requireAdminPage();
+          try {
+            await requireAdminPage();
+          } catch (e) {
+            console.warn("requireAdminPage failed:", e);
+          }
         }
-        load();
+        // NOTE: loadApplication() is called in the later DOMContentLoaded handler below.
       });
       // --- small helpers ---
       const qs = (s) => document.querySelector(s);

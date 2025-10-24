@@ -36,8 +36,11 @@ async function safeSendMail({ to, subject, html, text }) {
 }
 
 async function registerUser(req, res) {
+  const payload = { ...req.body };
+  if (payload.username) payload.username = String(payload.username).trim();
+
   try {
-    const user = new User(req.body);
+    const user = new User(payload);
     await user.save();
 
     await safeSendMail({
@@ -138,7 +141,7 @@ async function getAllUsers(req, res) {
     const { status } = req.query;
     const filter = status ? { status } : {};
 
-    const users = await User.find(filter).sort({ createdAt: -1 });
+    const users = await User.find(filter).select("-password").sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
     console.error("Ошибка при получении пользователей:", error);
@@ -148,7 +151,7 @@ async function getAllUsers(req, res) {
 
 async function getUserById(req, res) {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (error) {
@@ -195,12 +198,15 @@ async function updateUserStatus(req, res) {
 async function loginUser(req, res) {
   const { username, password } = req.body;
 
+  const uname = String(username || "").trim();
+  const pwd = String(password || "");
+
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username: uname });
     if (!user) return res.status(404).json({ message: "User not found" });
     if (user.status !== "APPROVED") return res.status(403).json({ message: "Account not approved" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(pwd, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     const roles = Array.isArray(user.roles) ? user.roles.map(String) : [];
@@ -219,7 +225,12 @@ async function loginUser(req, res) {
 
 async function updateUser(req, res) {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const body = { ...req.body };
+    if (Object.prototype.hasOwnProperty.call(body, "password") && body.password) {
+      body.password = await bcrypt.hash(String(body.password), 10);
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, body, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (error) {

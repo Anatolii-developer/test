@@ -8,28 +8,50 @@ const sendRecoveryCodeEmail = require('../mailer/sendRecoveryCodeEmail');
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
+function buildSmtpTransportFromEnv() {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('[Mailer] SMTP_* env vars are missing; emails will be skipped.');
+    return null;
+  }
+  const isSecure = String(process.env.SMTP_PORT || '') === '465';
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: isSecure,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+  });
+}
+
+async function safeSendMail({ to, subject, html, text }) {
+  const transporter = buildSmtpTransportFromEnv();
+  if (!transporter) return; // do not throw if env is absent
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  try {
+    await transporter.sendMail({ from, to, subject, html, text });
+    console.log('[Mailer] Email sent to', to, '→', subject);
+  } catch (e) {
+    console.error('[Mailer] sendMail failed:', e.message);
+    // do not rethrow to avoid 500 on business routes
+  }
+}
+
 async function registerUser(req, res) {
   try {
     const user = new User(req.body);
     await user.save();
 
-    try {
-      await sendMail(
-        user.email,
-        "Підтвердження отримання заявки на реєстрацію",
-        `
+    await safeSendMail({
+      to: user.email,
+      subject: "Підтвердження отримання заявки на реєстрацію",
+      html: `
         <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
         <p>Дякуємо за вашу заявку на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії.</p>
         <p>Наразі ваша заявка перебуває на розгляді. Найближчим часом вона буде підтверджена та Ви отримаєте лист з усіма необхідними даними для входу та користування кабінетом.</p>
         <p>Якщо у вас виникнуть запитання, ви можете звертатися на нашу електронну пошту: profsupervision@gmail.com.</p>
         <p>З повагою,<br>Команда IPS</p>
         <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
-        `
-      );
-    } catch (emailErr) {
-      console.error("❌ Send email failed:", emailErr.message);
-      // Можно даже записать это в логи или в базу данных, но пользователю не показывать
-    }
+      `,
+    });
 
     res.status(201).json({ message: "User registered successfully." });
   } catch (error) {
@@ -136,34 +158,36 @@ async function getUserById(req, res) {
 
 async function updateUserStatus(req, res) {
   try {
-    const { status, role } = req.body;
-    const update = { status };
-    if (role) update.role = role;
+    const { status, roles, role } = req.body; // roles (array) preferred
+
+    const update = {};
+    if (status) update.status = status;
+    if (Array.isArray(roles)) update.roles = roles;
+    if (role) update.role = role; // legacy single role if provided
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     if (status === "APPROVED") {
-      await sendMail(
-        user.email,
-        "Ваш доступ до особистого кабінету IPS активовано",
-        `
-        <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
-        <p>Ваша заявка на реєстрацію до особистого кабінету на нашому сайті Інституту Професійної Супервізії була успішно підтверджена.</p>
-        <p>Відтепер ви маєте доступ до вашого персонального кабінету.</p>
-        <p>🔐 <strong>Дані для входу:</strong><br>
-        Посилання: <a href="http://mamko-prof-supervision.com/login">Вхід</a><br>
-        Ім’я користувача: ${user.username}<br>
-        Ваш пароль: [********]</p>
-        <p>📌 Якщо ви маєте запитання — звертайтесь на profsupervision@gmail.com.</p>
-        <p>З повагою,<br>Команда IPS</p>
-        <p><a href="https://mamko-prof-supervision.com/">mamko-prof-supervision.com</a></p>
-        `
-      );
+      await safeSendMail({
+        to: user.email,
+        subject: "Ваш доступ до особистого кабінету IPS активовано",
+        html: `
+          <p>Шановна/ий ${user.firstName || ""} ${user.lastName || ""},</p>
+          <p>Ваша заявка на реєстрацію була успішно підтверджена.</p>
+          <p>Ви можете увійти за посиланням:
+            <a href="https://cabinet.mamko-prof-supervision.com/">Кабінет IPS</a>
+          </p>
+          <p>Ім’я користувача: <b>${user.username}</b></p>
+          <p>З повагою,<br>Команда IPS</p>
+        `,
+      });
     }
 
-    res.json(user);
+    return res.json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('updateUserStatus error:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 }
 
@@ -202,14 +226,7 @@ async function updateUser(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
-async function sendMail(to, subject, html) {
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
-    to,
-    subject,
-    html,
-  });
-}
+
 async function sendRecoveryCode(req, res) {
   const { email } = req.body;
 

@@ -3265,12 +3265,27 @@ body:has(.recovery-card) {
     min-height: 100px; /* keep proportions */
   }
 
-  /* Phone row: ensure total 296px */
-  .registration-card .phone-input-wrapper {
-    width: 296px;
-    margin: 0;
-    gap: 8px;
-  }
+ .registration-card .phone-input-wrapper {
+  width: 296px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.registration-card .phone-input-wrapper .country-code-select {
+  width: 84px;
+  height: 32px;          /* все поля по 32px */
+  padding: 0 8px;
+  font-size: 14px;
+}
+
+/* переопределяем width:296px !important для tel */
+.registration-card .phone-input-wrapper #phone {
+  width: calc(296px - 84px - 8px) !important; /* 204px */
+  height: 32px;
+  flex: 0 0 auto;
+}
 
   .registration-card .country-code-select {
     width: 84px;

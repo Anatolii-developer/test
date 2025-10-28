@@ -545,19 +545,59 @@ main {
 }
 
 
-/*Registration Success*/
-
+/* Registration Success (desktop defaults) */
+body.success-page header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #275D2B;
+}
+body.success-page {
+  padding-top: 80px; /* reserve space for fixed header */
+}
 .success-container {
   display: flex;
   justify-content: center;
   align-items: center;
- height: calc(100vh - 80px);
+  min-height: calc(100vh - 80px);
+  padding: 24px 16px;
   background-color: #96C194;
 }
-
 .success-image {
-  max-width: 100%;
+  display: block;
+  width: 100%;
+  max-width: 820px;
   height: auto;
+  object-fit: contain;
+}
+
+/* Success page navbar tweaks */
+body.success-page .nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+}
+body.success-page .nav-btn {
+  border-radius: 24px;
+  padding: 10px 20px;
+  background-color: #ECF5EB;
+  color: #275D2B;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  min-width: clamp(140px, 28vw, 196px);
+  text-align: center;
+}
+body.success-page .nav-btn:hover {
+  background-color: #d9ebd7;
+  color: #275D2B;
 }
 
 
@@ -2987,6 +3027,12 @@ body:has(.recovery-card) {
     margin-top: 48px;
     border-radius: 20px;
   }
+  /* Success page @768 */
+  body.success-page .nav-btn {
+    font-size: 14px;
+    padding: 10px 16px;
+    min-width: 140px;
+  }
 }
 
 /* Phone layout — matches the provided mobile spec:
@@ -3370,6 +3416,12 @@ body:has(.recovery-card) {
     align-items: center;
     border: none;
   }
+  /* hide textual label on tiny icon buttons while keeping accessible name */
+  .nav-btn {
+    text-indent: -9999px;
+    overflow: hidden;
+    line-height: 0;
+  }
 
   /* ✅ Подставить свои SVG-иконки */
   .nav-btn:nth-child(1) {
@@ -3383,10 +3435,10 @@ body:has(.recovery-card) {
     background-color: rgba(255,255,255,0.15);
   }
 
-  /* Success image */
+  /* Success image (mobile) */
   .success-container {
-    height: auto;
-    padding: 24px 12px;
+    min-height: auto;
+    padding: 16px 12px 24px;
   }
 
   .success-image {

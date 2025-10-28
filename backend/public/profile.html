@@ -453,17 +453,21 @@ function populateFormat(freshUser) {
       const freshUser = await fetchFreshUser();
       if (!freshUser) return;
 
-      // Photo (if exists)
-     const photoEl = document.getElementById("profilePhoto");
-if (photoEl) {
-  if (user.photoUrl) {
-    const finalUrl = resolvePhotoUrl(user.photoUrl) + `?v=${Date.now()}`; // кеш-бастинг
-    photoEl.src = finalUrl;
-    photoEl.onerror = () => { photoEl.src = 'assets/profile-photo.png'; };
-  } else {
-    photoEl.src = 'assets/profile-photo.png';
-  }
-}
+      // Photo (if exists) — fixed ReferenceError (use freshUser)
+      try {
+        const photoEl = document.getElementById("profilePhoto");
+        if (photoEl) {
+          if (freshUser && freshUser.photoUrl) {
+            const finalUrl = resolvePhotoUrl(freshUser.photoUrl) + `?v=${Date.now()}`; // cache-busting
+            photoEl.src = finalUrl;
+            photoEl.onerror = () => { photoEl.src = 'assets/profile-photo.png'; };
+          } else {
+            photoEl.src = 'assets/profile-photo.png';
+          }
+        }
+      } catch (e) {
+        console.error('Photo render error:', e);
+      }
 
       // Step 2 textareas
       setIfExists(document.getElementById('profileAboutTextarea'), freshUser.about);

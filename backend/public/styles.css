@@ -301,6 +301,7 @@ main {
   display: flex;
   justify-content: space-between;
   gap: 60px;
+  align-items: flex-start;
 }
 
 .form-left {
@@ -310,6 +311,10 @@ main {
 .form-right img {
   width: 300px;
   height: auto;
+  object-fit: contain;
+  align-self: flex-start;   /* align image with the top of name fields */
+  display: block;
+  margin-top: 0;
 }
 
 /* Form Groups */
@@ -345,7 +350,7 @@ main {
 .registration-card input[type="tel"],
 .registration-card textarea {
   width: 456px;
-  height: 48px;
+  height: 32px;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
@@ -3199,52 +3204,71 @@ body:has(.recovery-card) {
     width: 344px;
     max-width: 100%;
     border-radius: 16px;
-    padding: 24px 0 32px; /* no side padding to allow 172+172 layout */
+    padding-top: 24px;
+    padding-right: 24px;
+    padding-bottom: 32px;
+    padding-left: 24px;
     margin-top: 32px;
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
   }
 
-  /* Stack columns on mobile */
+  /* Stack columns on mobile, but keep image opposite the name fields */
   .registration-card .form-section {
     display: block;
+    position: relative;     /* allow absolute positioning of the image */
+    min-height: 203px;      /* reserve height so content below doesn't overlap image */
+  }
+  .registration-card .form-left {
+    padding-right: 130px; /* reduced because image is narrower */
   }
 
   /* Illustration */
   .registration-card .form-right img {
-    width: 126px;
-    height: 203px;
+    position: absolute;
+    top: 20px;
+    right: 8px; /* moved farther right so it doesn’t overlap name inputs */
+    width: 110px; /* slightly reduced size */
+    height: auto;
     object-fit: contain;
-    display: block;
-    margin: 0 auto 12px;
+    margin: 0;
+  }
+  /* Push the next block after the three name fields below the image */
+  .registration-card .form-left .form-group:nth-of-type(4) {
+    margin-top: 0 !important; /* no artificial gap before date of birth */
+  }
+  .registration-card .form-group {
+    margin-bottom: 12px;
   }
 
-  /* Default inputs on registration (others) — 312px wide, keep height as desktop (48px) */
+  /* Default inputs on registration (others) — 296px wide, keep height as desktop (32px) */
   .registration-card input[type="text"],
   .registration-card input[type="email"],
   .registration-card input[type="tel"],
   .registration-card input[type="date"],
   .registration-card textarea,
   .registration-card select {
-    width: 312px !important;      /* per spec */
-    margin-left: 16px;            /* center inside 344 with 16px gutters */
-    margin-right: 16px;
+    width: 296px !important;      /* per spec */
+    margin-left: 0;
+    margin-right: 0;
   }
 
   /* Keep existing height proportion for non-name inputs */
   .registration-card input[type="email"],
   .registration-card input[type="tel"],
   .registration-card input[type="date"] {
-    height: 48px;
+    height: 32px;
   }
+
+  .registration-card input[type="text"] { height: 32px; }
 
   .registration-card textarea {
     min-height: 100px; /* keep proportions */
   }
 
-  /* Phone row: ensure total 312px */
+  /* Phone row: ensure total 296px */
   .registration-card .phone-input-wrapper {
-    width: 312px;
-    margin: 0 16px;
+    width: 296px;
+    margin: 0;
     gap: 8px;
   }
 
@@ -3287,12 +3311,12 @@ body:has(.recovery-card) {
 
   /* After the 172+172 row, the third (middleName) will wrap naturally to next line */
 
-  /* Radio group width align with others (312) */
+  /* Radio group width align with others (296) */
   .registration-card .radio-group,
   .registration-card .radio-group label {
-    width: 312px;
-    margin-left: 16px;
-    margin-right: 16px;
+    width: 296px;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 

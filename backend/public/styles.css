@@ -3333,6 +3333,66 @@ body:has(.recovery-card) {
     margin-left: 0;
     margin-right: 0;
   }
+
+  body.success-page {
+    background: #96C194; /* так как фон используется на 3 страницах */
+    padding-top: 64px; /* меньше отступ под мобильный header */
+  }
+
+  /* Header */
+  header {
+    height: 64px;
+    padding: 8px 12px;
+  }
+
+  /* Logo меньше */
+  .logo {
+    width: 120px;
+    height: auto;
+    margin-left: 0;
+  }
+
+  /* Меняем кнопки на круглые иконки */
+  .nav-buttons {
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .nav-btn {
+    min-width: auto;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: transparent;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+  }
+
+  /* ✅ Подставить свои SVG-иконки */
+  .nav-btn:nth-child(1) {
+    background: url("assets/arrow-back.svg") center/24px no-repeat;
+  }
+  .nav-btn:nth-child(2) {
+    background: url("assets/home.svg") center/24px no-repeat;
+  }
+
+  .nav-btn:hover {
+    background-color: rgba(255,255,255,0.15);
+  }
+
+  /* Success image */
+  .success-container {
+    height: auto;
+    padding: 24px 12px;
+  }
+
+  .success-image {
+    max-width: 80%;
+  }
+
 }
 
 /* If a desktop background bleeds through from other sections, keep auth pages on top */

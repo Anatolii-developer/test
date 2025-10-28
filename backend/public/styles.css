@@ -2956,9 +2956,8 @@ input:checked+.slider:before {
    (login.html, recovery.html, create-credentials.html).
    You can also force it by adding class="auth-bg" on &lt;body&gt; in those pages. */
 body.auth-bg,
-body:has(.login-card)б
-body:has(.recovery-card)  {
-  
+body:has(.login-card),
+body:has(.recovery-card) {
   background: #F6F6F6 url('assets/background.png') no-repeat center top / cover;
 }
 
@@ -3013,6 +3012,7 @@ body:has(.recovery-card)  {
   }
 
   /* CARD */
+  .recovery-card,
   .login-card {
     width: 344px;
     max-width: 100%;
@@ -3184,6 +3184,115 @@ body:has(.recovery-card)  {
     padding: 12px;
     margin-top: 14px;
     border-radius: 12px;
+  }
+  
+  /* ===============================
+     REGISTRATION (mobile spec)
+     container: 344px
+     names: 172x62
+     others: 312px (height as before)
+     image: 126x203
+     =============================== */
+
+  /* Card container */
+  .registration-card {
+    width: 344px;
+    max-width: 100%;
+    border-radius: 16px;
+    padding: 24px 0 32px; /* no side padding to allow 172+172 layout */
+    margin-top: 32px;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  }
+
+  /* Stack columns on mobile */
+  .registration-card .form-section {
+    display: block;
+  }
+
+  /* Illustration */
+  .registration-card .form-right img {
+    width: 126px;
+    height: 203px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 12px;
+  }
+
+  /* Default inputs on registration (others) — 312px wide, keep height as desktop (48px) */
+  .registration-card input[type="text"],
+  .registration-card input[type="email"],
+  .registration-card input[type="tel"],
+  .registration-card input[type="date"],
+  .registration-card textarea,
+  .registration-card select {
+    width: 312px !important;      /* per spec */
+    margin-left: 16px;            /* center inside 344 with 16px gutters */
+    margin-right: 16px;
+  }
+
+  /* Keep existing height proportion for non-name inputs */
+  .registration-card input[type="email"],
+  .registration-card input[type="tel"],
+  .registration-card input[type="date"] {
+    height: 48px;
+  }
+
+  .registration-card textarea {
+    min-height: 100px; /* keep proportions */
+  }
+
+  /* Phone row: ensure total 312px */
+  .registration-card .phone-input-wrapper {
+    width: 312px;
+    margin: 0 16px;
+    gap: 8px;
+  }
+
+  .registration-card .country-code-select {
+    width: 84px;
+    height: 48px;
+    padding: 0 8px;
+    font-size: 14px;
+  }
+
+  .registration-card #phone {
+    flex: 1;
+    height: 48px;
+  }
+
+  /* --- Names row: first/last/middle — 172 x 62 each --- */
+  /* Make the containing .form-group for each name act as inline blocks */
+  .registration-card .form-group:has(#firstName),
+  .registration-card .form-group:has(#lastName),
+  .registration-card .form-group:has(#middleName) {
+    display: inline-block;
+    vertical-align: top;
+    width: 172px;         /* per spec */
+    margin: 0 0 12px 0;   /* compact spacing */
+    padding-left: 0;      /* align to edges */
+    padding-right: 0;
+  }
+
+  /* Labels inside inline groups inherit the narrow width automatically */
+
+  /* Inputs themselves: exact 172x62 */
+  .registration-card #firstName,
+  .registration-card #lastName,
+  .registration-card #middleName {
+    width: 172px !important;
+    height: 62px;
+    margin-left: 0;   /* flush to card edge */
+    margin-right: 0;
+  }
+
+  /* After the 172+172 row, the third (middleName) will wrap naturally to next line */
+
+  /* Radio group width align with others (312) */
+  .registration-card .radio-group,
+  .registration-card .radio-group label {
+    width: 312px;
+    margin-left: 16px;
+    margin-right: 16px;
   }
 }
 

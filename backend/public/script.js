@@ -1311,3 +1311,49 @@ document.addEventListener('DOMContentLoaded', () => {
   syncOtherDir();
   otherDirCheckbox.addEventListener('change', syncOtherDir);
 });
+
+
+window.resolvePhotoUrl = window.resolvePhotoUrl || function(url) {
+  if (!url) return '';
+  try {
+    if (/^https?:\/\//i.test(url)) return url;
+    if (/^\/\//.test(url)) return window.location.protocol + url;
+    const base = (typeof API_BASE !== 'undefined' ? API_BASE : '').replace(/\/+$/, '');
+    const path = url.startsWith('/') ? url : '/' + url;
+    return base + path;
+  } catch { return url; }
+};
+
+async function getFreshUserSafe() {
+  const raw = localStorage.getItem('user');
+  if (!raw) return null;
+  let me;
+  try { me = JSON.parse(raw); } catch { return null; }
+  if (!me || !me._id) return me;
+
+  try {
+    const r = await fetch(`${typeof API_BASE !== 'undefined' ? API_BASE : ''}/api/users/${me._id}`, { credentials: 'include' });
+    if (r.ok) {
+      const fresh = await r.json();
+      localStorage.setItem('user', JSON.stringify(fresh));
+      return fresh;
+    }
+  } catch {}
+  return me; // fallback к локальному снимку
+}
+
+async function applySidebarAvatar(selector = '.sidebar .profile') {
+  const img = document.querySelector(selector);
+  if (!img) return;
+
+  const me = await getFreshUserSafe();
+  const src = me?.photoUrl ? resolvePhotoUrl(me.photoUrl) + `?v=${Date.now()}` : 'assets/profile-photo.png';
+
+  img.src = src;
+  img.onerror = () => { img.src = 'assets/profile-photo.png'; };
+}
+
+// Автоматически ставим аватар при загрузке на ВСЕХ страницах, где есть сайдбар
+document.addEventListener('DOMContentLoaded', () => {
+  applySidebarAvatar();
+});

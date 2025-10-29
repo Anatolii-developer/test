@@ -522,6 +522,59 @@ $root.querySelectorAll('.js-reply').forEach(btn => {
   }
 
 
+  // --- Forum avatar helpers ---
+
+async function forumGetFreshUserSafe() {
+  const raw = localStorage.getItem('user');
+  if (!raw) return null;
+  let me;
+  try { me = JSON.parse(raw); } catch { return null; }
+  if (!me || !me._id) return me;
+
+  try {
+    const r = await fetch(`${typeof API_BASE !== 'undefined' ? API_BASE : ''}/api/users/${me._id}`, { credentials: 'include' });
+    if (r.ok) {
+      const fresh = await r.json();
+      localStorage.setItem('user', JSON.stringify(fresh));
+      return fresh;
+    }
+  } catch {}
+  return me;
+}
+
+function forumResolvePhotoUrl(url) {
+  if (typeof resolvePhotoUrl === 'function') return resolvePhotoUrl(url); // использовать общий, если есть
+  if (!url) return '';
+  try {
+    if (/^https?:\/\//i.test(url)) return url;
+    if (/^\/\//.test(url)) return window.location.protocol + url;
+    const base = (typeof API_BASE !== 'undefined' ? API_BASE : '').replace(/\/+$/, '');
+    const path = url.startsWith('/') ? url : '/' + url;
+    return base + path;
+  } catch { return url; }
+}
+
+async function forumApplyAvatars() {
+  const me = await forumGetFreshUserSafe();
+  const finalSrc = me?.photoUrl
+    ? forumResolvePhotoUrl(me.photoUrl) + `?v=${Date.now()}`
+    : '/assets/profile-photo.png';
+
+  // 1) Аватар в сайдбаре форума
+  const sidebarImg = document.querySelector('.sidebar .profile');
+  if (sidebarImg) {
+    sidebarImg.src = finalSrc;
+    sidebarImg.onerror = () => { sidebarImg.src = '/assets/profile-photo.png'; };
+  }
+
+  // 2) Аватар рядом с полем ввода новой темы/поиска
+  const actionAvatar = document.querySelector('.action-bar .avatar');
+  if (actionAvatar) {
+    actionAvatar.src = finalSrc;
+    actionAvatar.onerror = () => { actionAvatar.src = '/assets/profile-photo.png'; };
+  }
+}
+
 
   return { init, api, can, renderRoleHint, renderThreadList, renderThreadHead, renderPosts, getUser, getDisplayName, getDisplayRoles };
 })();

@@ -126,12 +126,14 @@
     <script src="./forum.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        if (typeof renderAdminSidebar === "function")
-          renderAdminSidebar("forum/index.html");
+        document.addEventListener("DOMContentLoaded", async () => {
+  if (typeof Forum === "undefined") {
+    console.error("Forum is still not defined!");
+    return;
+  }
 
-        await Forum.init();
-
-        await Forum.applyAvatars();
+  await Forum.init();
+  await Forum.applyAvatars();
 
         // take consistent name + roles from Forum helpers
         const me   = Forum.getUser() || {};

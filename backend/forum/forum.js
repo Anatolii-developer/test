@@ -575,14 +575,19 @@ async function forumApplyAvatars() {
   }
 }
 
-document.getElementById("btnContactAdmin").addEventListener("click", () => {
-  document.getElementById("adminMsgModal").style.display = "flex";
-});
+const contactBtn = document.getElementById("btnContactAdmin");
+if (contactBtn) {
+  contactBtn.addEventListener("click", () => {
+    document.getElementById("adminMsgModal").style.display = "flex";
+  });
+}
 
-document.getElementById("closeAdminMsg").addEventListener("click", () => {
-  document.getElementById("adminMsgModal").style.display = "none";
+const modal = document.getElementById("adminMsgModal");
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
 });
-
 document.getElementById("sendAdminMsg").addEventListener("click", async () => {
   const text = document.getElementById("adminMsgText").value.trim();
   if (!text) return alert("Введіть текст повідомлення");

@@ -714,6 +714,14 @@ body.success-page .nav-btn:hover {
   margin-bottom: 20px;
 }
 
+.sidebar .profile {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FFFFFF20;
+}
+
 .sidebar .logo {
   width: 160px;
   /* Fix width so it doesn’t overflow */

@@ -46,6 +46,29 @@
         }
       }
 
+      .contact-floating-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background: #275D2B;
+        color: #fff;
+        font-size: 22px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        transition: opacity .2s ease, transform .2s ease;
+      }
+      .contact-floating-btn:hover {
+        opacity: 0.85;
+        transform: scale(1.05);
+      }
     </style>
   </head>
   <body class="with-sidebar">
@@ -83,9 +106,6 @@
       <div class="action-bar">
   <!-- верхній рядок: аватар + поле + кнопка -->
   <div class="action-top">
-    <button class="contact-admin-btn" id="btnContactAdmin">
-  📩 Зв’язатися з адміністратором
-</button>
     <img class="avatar" src="/assets/profile-photo.png" alt="User" />
     <input
       id="q"
@@ -123,82 +143,106 @@
       <div id="list" class="thread-list"></div>
     </main>
 
-    <script src="./forum.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", async () => {
-        if (typeof renderAdminSidebar === "function")
-          renderAdminSidebar("forum/index.html");
+   <script src="./forum.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
 
-        await Forum.init();
+  if (typeof Forum === "undefined") {
+    console.error("Forum is not defined!");
+    return;
+  }
 
-        await Forum.applyAvatars();
+  await Forum.init();
+  await Forum.applyAvatars();
 
-        // take consistent name + roles from Forum helpers
-        const me   = Forum.getUser() || {};
-        const name = Forum.getDisplayName();
-        const roles = Forum.getDisplayRoles();
+  // User Info
+  const me   = Forum.getUser() || {};
+  const name = Forum.getDisplayName();
+  const roles = Forum.getDisplayRoles();
 
-        // fill the "Ви увійшли як …" line
-        document.getElementById('loginName').textContent = name || (me.email || 'Користувач');
-        document.getElementById('loginRole').textContent = (roles && roles.length) ? roles.join(', ') : '—';
+  document.getElementById('loginName').textContent = name || me.email || 'Користувач';
+  document.getElementById('loginRole').textContent = (roles.length ? roles.join(', ') : '—');
 
-        Forum.renderRoleHint("#roleHint");
+  Forum.renderRoleHint("#roleHint");
 
-        const btnNew = document.getElementById("btnNewThread");
+  // Hide "Publish" if no permission
+  const btnNew = document.getElementById("btnNewThread");
+  if (!Forum.can("post:create")) {
+    btnNew.style.display = "none";
+  }
 
-        // 1) Скрыть кнопку "Нова тема", якщо немає прав (не авторизован)
-        // На фронте считаем, что достаточно быть залогиненым, чтобы мочь створювати тему.
-        // Если на бэке логика строже — все равно поймаем 403 ниже.
-        if (!Forum.can("post:create")) {
-          btnNew.style.display = "none";
-        }
+  // Load list
+  async function load() {
+    try {
+      const q = document.getElementById("q").value.trim();
+      const data = await Forum.api.listThreads({ q });
+      Forum.renderThreadList("#list", data, "#empty");
+    } catch (e) {
+      console.warn(e);
+      alert("Не вдалося завантажити список тем.");
+    }
+  }
 
-        // 2) Загрузка списка
-        const load = async () => {
-          try {
-            const q = document.getElementById("q").value.trim();
-            const data = await Forum.api.listThreads({ q });
-            Forum.renderThreadList("#list", data, "#empty");
-          } catch (e) {
-            console.warn(e);
-            alert("Не вдалося завантажити список тем.");
-          }
-        };
-        document.getElementById("btnSearch")?.addEventListener("click", load);
-        document.getElementById("q").addEventListener("keydown", (e) => {
-          if (e.key === "Enter") load();
-        });
+  document.getElementById("q").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") load();
+  });
 
-        // 3) Создать тему с внятной обработкой 401/403
-        btnNew.addEventListener("click", async () => {
-          const title = prompt("Заголовок теми:");
-          if (!title) return;
-          const content = prompt("Перший пост:") || "";
-
-          try {
-            const t = await Forum.api.createThread({ title, content });
-            if (t && t._id) location.href = `./thread.html?id=${t._id}`;
-          } catch (err) {
-            const msg = String(err.message || err);
-            if (/unauthorized/i.test(msg) || /401/.test(msg)) {
-              alert("Потрібно увійти в акаунт, щоб створити тему.");
-            } else if (/forbidden/i.test(msg) || /403/.test(msg)) {
-              alert("У вас немає прав створювати теми (403). Зверніться до адміністратора.");
-            } else {
-              alert("Не вдалося створити тему: " + msg);
-            }
-          }
-        });
-
-        await load();
-      });
-
+  // Debounce on input
   let t;
   document.getElementById("q").addEventListener("input", () => {
     clearTimeout(t);
     t = setTimeout(load, 350);
   });
-    </script>
+
+  // Create thread
+  btnNew.addEventListener("click", async () => {
+    const title = prompt("Заголовок теми:");
+    if (!title) return;
+    const content = prompt("Перший пост:") || "";
+
+    try {
+      const t = await Forum.api.createThread({ title, content });
+      location.href = `./thread.html?id=${t._id}`;
+    } catch (err) {
+      const msg = err.message || err;
+      if (/401/.test(msg)) return alert("Потрібно увійти в акаунт.");
+      if (/403/.test(msg)) return alert("Недостатньо прав.");
+      alert("Помилка створення теми: " + msg);
+    }
+  });
+
+  // Initial load
+  await load();
+
+  // Contact Admin modal
+  const modal = document.getElementById("adminMsgModal");
+  document.getElementById("btnContactAdmin").addEventListener("click", () => {
+    modal.style.display = "flex";
+  });
+  document.getElementById("closeAdminMsg").addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+  document.getElementById("sendAdminMsg").addEventListener("click", async () => {
+    const text = document.getElementById("adminMsgText").value.trim();
+    if (!text) return alert("Введіть текст повідомлення");
+
+    try {
+      await fetch(`/api/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      });
+      alert("Повідомлення надіслано!");
+      modal.style.display = "none";
+      document.getElementById("adminMsgText").value = "";
+    } catch (e) {
+      alert("Не вдалося відправити повідомлення");
+    }
+  });
+
+});
+</script>
     
 
     <div id="adminMsgModal" class="modal">
@@ -209,5 +253,6 @@
     <button id="closeAdminMsg">Закрити</button>
   </div>
 </div>
+    <button id="btnContactAdmin" class="contact-floating-btn">📩</button>
   </body>
 </html>

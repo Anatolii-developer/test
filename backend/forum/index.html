@@ -128,7 +128,7 @@
 
         await Forum.init();
 
-         await forumApplyAvatars();
+        await Forum.applyAvatars();
 
         // take consistent name + roles from Forum helpers
         const me   = Forum.getUser() || {};

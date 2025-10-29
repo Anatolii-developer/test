@@ -576,5 +576,17 @@ async function forumApplyAvatars() {
 }
 
 
-  return { init, api, can, renderRoleHint, renderThreadList, renderThreadHead, renderPosts, getUser, getDisplayName, getDisplayRoles };
+  return {
+    init,
+    api,
+    can,
+    renderRoleHint,
+    renderThreadList,
+    renderThreadHead,
+    renderPosts,
+    getUser,
+    getDisplayName,
+    getDisplayRoles,
+    applyAvatars: forumApplyAvatars
+  };
 })();

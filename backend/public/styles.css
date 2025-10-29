@@ -3453,3 +3453,41 @@ body:has(.login-card) main {
   position: relative;
   z-index: 1;
 }
+
+
+/* ===== Scrollable text fields ===== */
+.scrollable,
+.profile-value,
+#step2 span,
+#step3 span,
+.edit-input,
+.edit-textarea,
+textarea {
+  max-height: 220px;        /* десктопный лимит */
+  overflow: auto;           /* включаем прокрутку */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* чтобы длинные слова/ссылки не ломали макет */
+.profile-value,
+#step2 span,
+#step3 span,
+.edit-input,
+.edit-textarea,
+textarea {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* на телефонах высота меньше */
+@media (max-width: 480px) {
+  .scrollable,
+  .profile-value,
+  #step2 span,
+  #step3 span,
+  .edit-input,
+  .edit-textarea,
+  textarea {
+    max-height: 160px;
+  }
+}

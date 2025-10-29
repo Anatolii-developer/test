@@ -111,6 +111,10 @@
         if (typeof renderAdminSidebar === "function")
           renderAdminSidebar("forum/index.html");
         await Forum.init();
+        // Ensure avatars (sidebar, action bar) reflect current user
+        if (Forum.applyAvatars) {
+          await Forum.applyAvatars();
+        }
 
         const id = new URLSearchParams(location.search).get("id");
         const $files = document.getElementById("replyFiles");
@@ -241,6 +245,19 @@ document.getElementById("btnReply").addEventListener("click", async () => {
         if (!id) return (location.href = "./index.html");
 
         const { thread, posts } = await Forum.api.getThread(id);
+        // Set thread header avatar to the author's photo
+        (function () {
+          try {
+            const $headerAvatar = document.querySelector('.thread-card .thread-avatar');
+            if ($headerAvatar) {
+              const authorName = (thread.author?.fullName || thread.author?.username || thread.author?.email || '—');
+              const src = thread.author?.photoUrl || '/assets/profile-photo.png';
+              $headerAvatar.src = src;
+              $headerAvatar.alt = authorName;
+              $headerAvatar.onerror = () => { $headerAvatar.src = '/assets/profile-photo.png'; };
+            }
+          } catch (_) {}
+        })();
 
 // ==== Fill title card (header) ====
 const $titleEl   = document.getElementById('tTitle');

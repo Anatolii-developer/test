@@ -302,7 +302,7 @@ r.get('/threads', optionalAuth, async (req, res) => {
       topics = await ForumTopic.find(filter)
         .sort({ pinned: -1, lastPostAt: -1, createdAt: -1 })
         .limit(200)
-        .populate('authorId', 'username email firstName lastName')
+        .populate('authorId', 'username email firstName lastName photoUrl')
         .lean();
     } catch (e) {
       console.error('Threads query failed:', e, 'filter=', filter);
@@ -335,6 +335,7 @@ r.get('/threads', optionalAuth, async (req, res) => {
         email: t.authorId.email,
         firstName: t.authorId.firstName,
         lastName: t.authorId.lastName,
+        photoUrl: t.authorId.photoUrl,
       } : null,
       preview: t.preview || '',
     })));
@@ -348,7 +349,7 @@ r.get('/threads', optionalAuth, async (req, res) => {
 r.get('/threads/:id', optionalAuth, async (req, res) => {
   try {
     const t = await ForumTopic.findById(req.params.id)
-      .populate('authorId', 'username email firstName lastName')
+      .populate('authorId', 'username email firstName lastName photoUrl')
       .lean();
     if (!t) return res.status(404).json({ message: 'Thread not found' });
 
@@ -360,7 +361,7 @@ r.get('/threads/:id', optionalAuth, async (req, res) => {
 
     const rawPosts = await ForumPost.find(filter)
       .sort({ createdAt: 1 })
-      .populate('authorId', 'username email firstName lastName')
+      .populate('authorId', 'username email firstName lastName photoUrl')
       .select('content authorId createdAt likes likedBy attachments parentId hidden hiddenReason')
       .lean();
 
@@ -389,6 +390,7 @@ r.get('/threads/:id', optionalAuth, async (req, res) => {
             email: p.authorId.email,
             firstName: p.authorId.firstName,
             lastName: p.authorId.lastName,
+            photoUrl: p.authorId.photoUrl,
           } : null,
           liked: Array.isArray(p.likedBy) && p.likedBy.some(id => String(id) === uid),
         });
@@ -404,6 +406,7 @@ r.get('/threads/:id', optionalAuth, async (req, res) => {
         email: t.authorId.email,
         firstName: t.authorId.firstName,
         lastName: t.authorId.lastName,
+        photoUrl: t.authorId.photoUrl,
       }
     } : t;
 

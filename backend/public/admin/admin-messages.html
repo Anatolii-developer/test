@@ -1,0 +1,41 @@
+<h2>Повідомлення користувачів</h2>
+<div id="msgList"></div>
+
+<script>
+async function loadMessages() {
+  const res = await fetch(`/api/messages`, { credentials: "include" });
+  if (!res.ok) return alert("Помилка завантаження");
+  const list = await res.json();
+
+  const root = document.getElementById("msgList");
+  root.innerHTML = "";
+
+  list.forEach(m => {
+    const item = document.createElement("div");
+    item.className = "msg-item";
+    item.innerHTML = `
+      <div><b>${m.userName || '—'}</b></div>
+      <div>${m.text}</div>
+      <textarea data-id="${m._id}" placeholder="Відповідь">${m.reply || ''}</textarea>
+      <button class="replyBtn" data-id="${m._id}">Відповісти</button>
+    `;
+    root.appendChild(item);
+  });
+
+  document.querySelectorAll(".replyBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const reply = root.querySelector(`textarea[data-id="${id}"]`).value.trim();
+      const res = await fetch(`/api/messages/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reply }),
+      });
+      if (!res.ok) return alert("Помилка збереження");
+      alert("Відповідь збережено");
+    });
+  });
+}
+loadMessages();
+</script>

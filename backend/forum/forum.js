@@ -575,6 +575,36 @@ async function forumApplyAvatars() {
   }
 }
 
+document.getElementById("btnContactAdmin").addEventListener("click", () => {
+  document.getElementById("adminMsgModal").style.display = "flex";
+});
+
+document.getElementById("closeAdminMsg").addEventListener("click", () => {
+  document.getElementById("adminMsgModal").style.display = "none";
+});
+
+document.getElementById("sendAdminMsg").addEventListener("click", async () => {
+  const text = document.getElementById("adminMsgText").value.trim();
+  if (!text) return alert("Введіть текст повідомлення");
+
+  try {
+    const res = await fetch(`${API_BASE}/api/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) throw new Error("Помилка");
+
+    alert("Повідомлення надіслано!");
+    document.getElementById("adminMsgText").value = "";
+    document.getElementById("adminMsgModal").style.display = "none";
+  } catch (e) {
+    alert("Не вдалося відправити повідомлення");
+  }
+});
+
 
   return {
     init,

@@ -83,6 +83,9 @@
       <div class="action-bar">
   <!-- верхній рядок: аватар + поле + кнопка -->
   <div class="action-top">
+    <button class="contact-admin-btn" id="btnContactAdmin">
+  📩 Зв’язатися з адміністратором
+</button>
     <img class="avatar" src="/assets/profile-photo.png" alt="User" />
     <input
       id="q"
@@ -197,5 +200,14 @@
   });
     </script>
     
+
+    <div id="adminMsgModal" class="modal">
+  <div class="modal-content">
+    <h3>Написати адміністратору</h3>
+    <textarea id="adminMsgText" placeholder="Ваше повідомлення..."></textarea>
+    <button id="sendAdminMsg">Надіслати</button>
+    <button id="closeAdminMsg">Закрити</button>
+  </div>
+</div>
   </body>
 </html>

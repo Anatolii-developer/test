@@ -562,10 +562,19 @@ function normalizeWithOther(arr, options, otherLabel='Інше'){
     .map(v => v); // можно дополнительно триммить
 }
 
-const dirSpan = document.getElementById('profileDirections');
-if (dirSpan && Array.isArray(user.directions)) {
-  dirSpan.textContent = normalizeWithOther(user.directions, directionsOptions).join(', ');
-}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dirSpan = document.getElementById('profileDirections');
+  if (!dirSpan) return;
+
+  // Prefer the fresh user object you set earlier (window.currentUser), fall back to localStorage snapshot
+  const me = window.currentUser || (function() {
+    try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
+  })();
+
+  const dirs = normalizeWithOther((me && Array.isArray(me.directions) ? me.directions : []), directionsOptions);
+  dirSpan.textContent = dirs.join(', ');
+});
 
 let users = [];
 let selectedParticipants = [];

@@ -789,7 +789,28 @@ body {
   object-fit:cover;
   flex:0 0 40px;
 }
-.thread-card .thread-avatar{ width:80px; height:80px; } /* только в шапке */
+/* FIX: аватар в заголовке темы не сжимается */
+.thread-card .thread-avatar{
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;      /* переопределяем 40px → 80px */
+  aspect-ratio: 1 / 1; /* подстраховка на будущее */
+  object-fit: cover;
+  display: block;
+}
+
+/* Заодно выровняем аватар в первом посте и в ответах */
+#posts .post:first-child .post-author .avatar{
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px; 
+}
+
+.replies-list .avatar{
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
+}
 
 .thread-author-col{ display:flex; flex-direction:column; }
 .thread-author-name{ font: 500 18px Poppins, Inter, sans-serif; color:#275D2B; }

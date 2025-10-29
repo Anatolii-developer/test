@@ -472,47 +472,7 @@ function populateFormat(freshUser) {
       // Step 2 textareas
       setIfExists(document.getElementById('profileAboutTextarea'), freshUser.about);
       // Courses textarea is filled by populateCompletedCoursesTextarea(), skip direct set
-      // Role(s) — mirror forum logic with robust fallbacks
-      (function(){
-        const roleEl = document.getElementById('profileRoleTextarea');
-        if (!roleEl) return;
-
-        // Primary: API user payload
-        let rolesText = '';
-        if (Array.isArray(freshUser.roles) && freshUser.roles.length) {
-          rolesText = freshUser.roles.join(', ');
-        } else if (freshUser.role) {
-          rolesText = String(freshUser.role);
-        } else if (Array.isArray(freshUser?.permissions?.roles) && freshUser.permissions.roles.length) {
-          rolesText = freshUser.permissions.roles.join(', ');
-        } else if (freshUser.companyRole) {
-          rolesText = String(freshUser.companyRole);
-        }
-
-        // Secondary: local snapshot (same source Forum uses)
-        if (!rolesText) {
-          try {
-            const raw = localStorage.getItem('user');
-            if (raw) {
-              const u = JSON.parse(raw);
-              if (Array.isArray(u.roles) && u.roles.length) rolesText = u.roles.join(', ');
-              else if (u.role) rolesText = String(u.role);
-              else if (Array.isArray(u?.permissions?.roles) && u.permissions.roles.length) rolesText = u.permissions.roles.join(', ');
-              else if (u.companyRole) rolesText = String(u.companyRole);
-            }
-          } catch(_) {}
-        }
-
-        // Tertiary: if Forum helper exists, prefer its computed display
-        if (!rolesText && window.Forum && typeof Forum.getDisplayRoles === 'function') {
-          const r = Forum.getDisplayRoles();
-          if (Array.isArray(r) && r.length) rolesText = r.join(', ');
-        }
-
-        // Finally, set the textarea value if anything found
-        roleEl.value = rolesText || '';
-        autoResize(roleEl);
-      })();
+      setIfExists(document.getElementById('profileRoleTextarea'), (freshUser.roles && freshUser.roles.length ? freshUser.roles.join(', ') : freshUser.role));
       setIfExists(document.getElementById('profileCostTextarea'), freshUser.cost);
       setIfExists(document.getElementById('profileVideoTextarea'), freshUser.videoLink);
       setIfExists(document.getElementById('profileQualificationsTextarea'), freshUser.qualifications);

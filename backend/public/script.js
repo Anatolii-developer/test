@@ -139,7 +139,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("profileTopics").textContent = (user.topics || []).join(", ");
     document.getElementById("profileAboutTextarea").value = user.about || "";
     document.getElementById("profileCoursesTextarea").value = user.courses || "";
-    document.getElementById("profileRoleTextarea").value = user.role || "";
+    {
+  const roleEl = document.getElementById("profileRoleTextarea");
+  if (roleEl) {
+    const roleText = Array.isArray(user.roles) && user.roles.length
+      ? user.roles.join(", ")
+      : (user.role || "");
+    roleEl.value = roleText;
+    // щоб textarea гарно підтягнулась по висоті
+    if (typeof autoResize === "function") autoResize(roleEl);
+  }
+}
     document.getElementById("profileCostTextarea").value = user.cost || "";
 
     const videoTextarea = document.getElementById("profileVideoTextarea");

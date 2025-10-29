@@ -408,75 +408,116 @@ const topicsOptions = [
   "ПТСР",
   "Кризи та травми"
 ];
-
-function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
+function enableCheckboxEdit(fieldId, mongoKey, optionsArray, otherLabel = 'Інше') {
   const container = document.getElementById(fieldId).parentNode;
-  const selectedValues = (window.currentUser?.[mongoKey] || []);
+  const selectedValues = Array.isArray(window.currentUser?.[mongoKey]) ? window.currentUser[mongoKey] : [];
 
-  // 1) Прибрати старий span
+  // 1) Удаляем старый span
   const oldSpan = document.getElementById(fieldId);
   if (oldSpan) oldSpan.remove();
 
-  // 2) Контейнер з плитками
+  // 2) Контейнер с плитками
   const checkboxContainer = document.createElement("div");
   checkboxContainer.className = "checkbox-group";
 
-  // Показати “Інше”, якщо воно є в уже збережених значеннях
-  const customOthers = selectedValues.filter(v => !optionsArray.includes(v));
-  if (customOthers.length) {
-    const otherBadge = document.createElement('div');
-    otherBadge.style.margin = '8px 0';
-    otherBadge.style.fontSize = '14px';
-    otherBadge.style.opacity = '0.8';
-    otherBadge.textContent = 'Інше: ' + customOthers[0];
-    checkboxContainer.appendChild(otherBadge);
-  }
+  // Найдем уже сохраненный кастомный вариант (не из списка)
+  const normalizedOptions = new Set(optionsArray.map(String));
+  const preSavedCustom = (selectedValues.find(v => v && !normalizedOptions.has(String(v))) || '').toString().trim();
 
-  const checkboxes = [];
-  optionsArray.forEach(option => {
-    const tile = document.createElement("div");
-    tile.className = "checkbox-tile";
+  const tiles = [];
 
-    const square = document.createElement("div");
-    square.className = "checkbox-square";
-    if (selectedValues.includes(option)) {
-      square.classList.add("checked");
-    }
+  // 2.1) Рисуем обычные опции, исключая сам ярлык «Інше» (его сделаем отдельно)
+  optionsArray
+    .filter(opt => String(opt) !== otherLabel)
+    .forEach(option => {
+      const tile = document.createElement("div");
+      tile.className = "checkbox-tile";
 
-    const label = document.createElement("span");
-    label.textContent = option;
+      const square = document.createElement("div");
+      square.className = "checkbox-square";
+      if (selectedValues.includes(option)) square.classList.add("checked");
 
-    tile.appendChild(square);
-    tile.appendChild(label);
-    checkboxContainer.appendChild(tile);
+      const label = document.createElement("span");
+      label.textContent = option;
 
-    square.addEventListener("click", () => {
-      square.classList.toggle("checked");
+      tile.appendChild(square);
+      tile.appendChild(label);
+      checkboxContainer.appendChild(tile);
+
+      square.addEventListener("click", () => {
+        square.classList.toggle("checked");
+      });
+
+      tiles.push({ type: 'regular', square, value: option });
     });
 
-    checkboxes.push({ square, value: option });
+  // 2.2) Плитка «Інше» с input
+  const otherTile = document.createElement("div");
+  otherTile.className = "checkbox-tile";
+
+  const otherSquare = document.createElement("div");
+  otherSquare.className = "checkbox-square";
+
+  const otherText = document.createElement("span");
+  otherText.textContent = otherLabel;
+
+  const otherInput = document.createElement("input");
+  otherInput.type = "text";
+  otherInput.placeholder = "Вкажіть інше…";
+  otherInput.style.display = "none";
+  otherInput.style.marginTop = "8px";
+  otherInput.style.width = "100%";
+  otherInput.value = preSavedCustom;
+
+  // Если был сохранен кастом — активируем «Інше» и показываем поле
+  if (preSavedCustom) {
+    otherSquare.classList.add("checked");
+    otherInput.style.display = "block";
+  }
+
+  // Клик по квадрату включает/выключает и показывает/скрывает поле
+  otherSquare.addEventListener("click", () => {
+    const checked = otherSquare.classList.toggle("checked");
+    otherInput.style.display = checked ? "block" : "none";
+    if (!checked) otherInput.value = otherInput.value.trim(); // не чистим — пусть остается
   });
 
-  // Кнопка зберегти
+  otherTile.appendChild(otherSquare);
+  otherTile.appendChild(otherText);
+  checkboxContainer.appendChild(otherTile);
+  // Поле под плиткой «Інше»
+  checkboxContainer.appendChild(otherInput);
+
+  container.appendChild(checkboxContainer);
+
+  // 3) Кнопка сохранить
   const checkIcon = document.createElement("img");
   checkIcon.src = "assets/check-icon.svg";
   checkIcon.className = "check-icon";
   checkIcon.style.cursor = "pointer";
   checkIcon.style.width = "20px";
   checkIcon.style.marginLeft = "8px";
-
-  container.appendChild(checkboxContainer);
   container.appendChild(checkIcon);
 
   checkIcon.addEventListener("click", async () => {
-    const selected = checkboxes
+    // Собираем выбранные обычные
+    const selected = tiles
       .filter(({ square }) => square.classList.contains("checked"))
       .map(({ value }) => value);
 
-    updatedProfileData[mongoKey] = selected;
+    // Обрабатываем «Інше»
+    const otherVal = otherInput.value.trim();
+    const otherChecked = otherSquare.classList.contains("checked");
+    if (otherChecked && otherVal) {
+      selected.push(otherVal); // кладём реальный текст, НЕ ярлык «Інше»
+    }
+    // Если otherChecked, но текста нет — просто ничего не добавляем
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser?._id) return;
+    if (!storedUser?._id) {
+      alert("Please log in first.");
+      return;
+    }
 
     try {
       const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
@@ -485,13 +526,18 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
         credentials: "include",
         body: JSON.stringify({ [mongoKey]: selected }),
       });
-
       const result = await res.json();
 
       if (res.ok) {
+        // Обновим локальный снимок
+        try { localStorage.setItem("user", JSON.stringify(result)); } catch(_) {}
+        window.currentUser = result;
+
+        // Отрисуем обратно в текстовом виде
         const newSpan = document.createElement("span");
         newSpan.id = fieldId;
         newSpan.textContent = selected.join(", ");
+
         checkboxContainer.remove();
         checkIcon.remove();
         container.appendChild(newSpan);
@@ -504,6 +550,21 @@ function enableCheckboxEdit(fieldId, mongoKey, optionsArray) {
       alert("Серверна помилка.");
     }
   });
+}
+
+function normalizeWithOther(arr, options, otherLabel='Інше'){
+  if (!Array.isArray(arr)) return [];
+  const set = new Set(options.map(String));
+  return arr
+    .map(v => String(v).trim())
+    .filter(v => v && v !== otherLabel) // выкинем буквальный ярлык «Інше»
+    .filter((v, idx, self) => self.indexOf(v) === idx) // уникальные
+    .map(v => v); // можно дополнительно триммить
+}
+
+const dirSpan = document.getElementById('profileDirections');
+if (dirSpan && Array.isArray(user.directions)) {
+  dirSpan.textContent = normalizeWithOther(user.directions, directionsOptions).join(', ');
 }
 
 let users = [];

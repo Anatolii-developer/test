@@ -46,29 +46,6 @@
         }
       }
 
-      .contact-floating-btn {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        border: none;
-        background: #275D2B;
-        color: #fff;
-        font-size: 22px;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        transition: opacity .2s ease, transform .2s ease;
-      }
-      .contact-floating-btn:hover {
-        opacity: 0.85;
-        transform: scale(1.05);
-      }
     </style>
   </head>
   <body class="with-sidebar">
@@ -106,6 +83,9 @@
       <div class="action-bar">
   <!-- верхній рядок: аватар + поле + кнопка -->
   <div class="action-top">
+    <button class="contact-admin-btn" id="btnContactAdmin">
+  📩 Зв’язатися з адміністратором
+</button>
     <img class="avatar" src="/assets/profile-photo.png" alt="User" />
     <input
       id="q"
@@ -146,14 +126,12 @@
     <script src="./forum.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        document.addEventListener("DOMContentLoaded", async () => {
-  if (typeof Forum === "undefined") {
-    console.error("Forum is still not defined!");
-    return;
-  }
+        if (typeof renderAdminSidebar === "function")
+          renderAdminSidebar("forum/index.html");
 
-  await Forum.init();
-  await Forum.applyAvatars();
+        await Forum.init();
+
+        await Forum.applyAvatars();
 
         // take consistent name + roles from Forum helpers
         const me   = Forum.getUser() || {};
@@ -231,6 +209,5 @@
     <button id="closeAdminMsg">Закрити</button>
   </div>
 </div>
-    <button id="btnContactAdmin" class="contact-floating-btn">📩</button>
   </body>
 </html>

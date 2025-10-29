@@ -371,15 +371,35 @@ function toggleCityField() {
   document.getElementById('offlineCity').style.display = offline ? 'block' : 'none';
 }
 
-// при заполнении профиля
 function populateFormat(freshUser) {
-  document.getElementById('formatOnline').checked =
-    freshUser.format?.includes('Онлайн');
-  const isOffline = freshUser.format?.includes('Офлайн');
-  document.getElementById('formatOffline').checked = isOffline;
-  if (isOffline) {
-    document.getElementById('offlineCity').style.display = 'block';
-    document.getElementById('offlineCity').value = freshUser.city || '';
+  // витягуємо формат у вигляді масиву
+  const raw = freshUser?.format;
+  const arr = Array.isArray(raw)
+    ? raw
+    : (typeof raw === 'string' ? raw.split(',') : []);
+
+  // нормалізуємо: обрізати пробіли, до нижнього регістру
+  const norm = arr.map(s => String(s).trim().toLowerCase());
+
+  // підтримуємо UA/EN варіанти
+  const isOnline  = norm.includes('онлайн') || norm.includes('online');
+  const isOffline = norm.includes('офлайн') || norm.includes('offline') || norm.includes('in-person');
+
+  const onlineEl  = document.getElementById('formatOnline');
+  const offlineEl = document.getElementById('formatOffline');
+  const cityEl    = document.getElementById('offlineCity');
+
+  if (onlineEl)  onlineEl.checked  = !!isOnline;
+  if (offlineEl) offlineEl.checked = !!isOffline;
+
+  if (cityEl) {
+    if (isOffline) {
+      cityEl.style.display = 'block';
+      cityEl.value = freshUser.city || '';
+    } else {
+      cityEl.style.display = 'none';
+      // cityEl.value = ''; // якщо треба ховати й чистити
+    }
   }
 }
     // Make autoResize available globally
@@ -604,6 +624,7 @@ function populateFormat(freshUser) {
         const updated = await res.json();
         // Update localStorage snapshot to keep UI consistent
         localStorage.setItem('user', JSON.stringify(updated));
+        populateFormat(updated);
         alert('Збережено');
       } catch(e) {
         console.error(e);

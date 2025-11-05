@@ -3645,3 +3645,9 @@ textarea {
   #sidebar .logo,
   #sidebar .logo-collapsed{ display:block !important; }
 }
+
+@media (min-width: 769px) {
+  .site-header {
+    display: none !important;
+  }
+}

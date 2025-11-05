@@ -133,6 +133,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <header class="mobile-nav" aria-label="Mobile Navigation">
+  <button id="burgerBtn" class="burger-btn" aria-label="Open menu">
+    <img src="assets/ui/burger.svg" alt="" width="24" height="24"/>
+  </button>
+  <a href="profile.html" aria-label="Home">
+    <img class="mobile-logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" height="24"/>
+  </a>
+  <div class="language-select">UA ▼</div>
+</header>
   <div class="background-top"></div>
   <header class="site-header">
     <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
@@ -172,7 +181,7 @@
     </div>
   </aside>
 
-
+<div id="backdrop" role="presentation" aria-hidden="true"></div>
 
   <main class="profile-background" id="mainContent">
     <section class="profile-hero">

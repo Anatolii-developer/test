@@ -1218,7 +1218,7 @@ function enableSidebarHover() {
   applySidebarState();
 
   // On non-touch devices we expand on hover when NOT pinned
-  if (!isTouchDevice()) {
+if (!isTouchDevice() && !isMobile()) {
     sidebar.addEventListener('mouseenter', () => {
       if (!sidebarPinned) {
         sidebar.classList.add('expanded');
@@ -1254,18 +1254,70 @@ function enableSidebarHover() {
   }
 }
 
-// Rewire the existing toggle to act as a "pin/unpin"
-const _origToggleSidebar = toggleSidebar;
 toggleSidebar = function(){
-  // Invert pin state and persist
+  // Мобильный: открываем/закрываем оверлей вместо pin/unpin
+  if (isMobile()) {
+    const sidebar = document.getElementById('sidebar');
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) closeMobileSidebar(); else openMobileSidebar();
+    return;
+  }
+
+  // Десктоп: pin/unpin как раньше
   sidebarPinned = !sidebarPinned;
   localStorage.setItem('sidebarPinned', JSON.stringify(sidebarPinned));
   applySidebarState();
 };
 
+// ===== Mobile helpers & overlay open/close =====
+function isMobile() {
+  return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+}
+
+function openMobileSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('backdrop');
+  if (!sidebar) return;
+  sidebar.classList.add('open');
+  if (backdrop) backdrop.classList.add('show');
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('backdrop');
+  if (!sidebar) return;
+  sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('show');
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+}
+
+// Wire mobile events
+document.addEventListener('DOMContentLoaded', () => {
+  const burger = document.getElementById('burgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('backdrop');
+
+  if (burger) burger.addEventListener('click', openMobileSidebar);
+  if (backdrop) backdrop.addEventListener('click', closeMobileSidebar);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isMobile()) closeMobileSidebar();
+  });
+
+  if (sidebar) {
+    sidebar.querySelectorAll('nav a').forEach(a => {
+      a.addEventListener('click', () => { if (isMobile()) closeMobileSidebar(); });
+    });
+  }
+});
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', enableSidebarHover);
-
+window.addEventListener('resize', () => {
+  applySidebarState();
+});
 
 document.addEventListener("DOMContentLoaded", async () => {
   const participantsSelect = document.getElementById("participantsSelect");

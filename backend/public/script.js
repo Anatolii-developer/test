@@ -1295,24 +1295,7 @@ function closeMobileSidebar() {
 }
 
 // Wire mobile events
-document.addEventListener('DOMContentLoaded', () => {
-  const burger = document.getElementById('burgerBtn');
-  const sidebar = document.getElementById('sidebar');
-  const backdrop = document.getElementById('backdrop');
 
-  if (burger) burger.addEventListener('click', openMobileSidebar);
-  if (backdrop) backdrop.addEventListener('click', closeMobileSidebar);
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isMobile()) closeMobileSidebar();
-  });
-
-  if (sidebar) {
-    sidebar.querySelectorAll('nav a').forEach(a => {
-      a.addEventListener('click', () => { if (isMobile()) closeMobileSidebar(); });
-    });
-  }
-});
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', enableSidebarHover);
 window.addEventListener('resize', () => {

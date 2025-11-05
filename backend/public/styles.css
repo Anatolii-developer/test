@@ -2998,6 +2998,7 @@ input:checked+.slider:before {
   opacity: 1
 }
 
+.site-header { display: none; }
 
 
 /* =========================================
@@ -3643,4 +3644,9 @@ textarea {
   /* на мобильных не даем "collapsed" визуально прятать логотипы */
   #sidebar .logo,
   #sidebar .logo-collapsed{ display:block !important; }
+}
+
+@media (max-width: 768px) {
+  .site-header { display: grid; }
+  body { padding-top: 64px; } /* отступ под фиксированный зелёный хедер */
 }

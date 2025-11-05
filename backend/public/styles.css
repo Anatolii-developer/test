@@ -3557,6 +3557,7 @@ textarea {
       height: 300px;
       background-position: center top;
       background-size: cover;
+      top: 64px; 
     }
 
     /* Rows and labels stack nicely on small screens */

@@ -32,11 +32,122 @@
     #profileCoursesTextarea{
       min-height:120px;
     }
+    /* ===== Header (общий) ===== */
+    .site-header {
+      background-color: #275D2B;
+      height: 80px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 48px 1fr 64px; /* левый бургер / центр логотип / правый язык */
+      align-items: center;
+      column-gap: 12px;
+    }
+    .site-header .header-logo img {
+      height: 40px;
+      display: block;
+      margin: 0 auto; /* центрируем логотип */
+    }
+    .burger,
+    .lang-switch {
+      background: transparent;
+      border: 0;
+      color: #fff;
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+    .burger img { width: 24px; height: 24px; }
+    .language-select { display: none !important; }
+
+    /* ===== Базовое поведение сайдбара на десктопе (без изменений) ===== */
+    @media (min-width: 481px) {
+      .drawer-backdrop { display: none !important; }
+    }
+
+    /* ===== Мобайл: 376×812 спецификация ===== */
+    @media (max-width: 480px) {
+      /* высота навбара 64px */
+      .site-header { height: 64px; padding: 8px 12px; }
+
+      /* основной контент не сдвигаем влево на мобиле */
+      #mainContent { padding-left: 0 !important; }
+
+      /* off-canvas для существующего .sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 376px;           /* по ТЗ */
+        max-width: 100vw;       /* подстраховка */
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform .3s ease;
+        z-index: 1001;          /* над всем */
+        padding-top: 64px;      /* чтобы не попасть под header */
+        background: #fff;       /* гарантируем фон */
+      }
+
+      /* убираем десктопные кнопки сайдбара */
+      .sidebar .toggle-button { display: none !important; }
+
+      /* когда меню открыто */
+      .sidebar.open { transform: translateX(0); }
+
+      /* затемнение фона */
+      .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease;
+        z-index: 1000; /* ниже сайдбара, но выше контента */
+      }
+      .drawer-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Внутренние элементы сайдбара на мобиле на всю ширину */
+      .sidebar nav a {
+        padding: 12px 8px;
+        gap: 12px;
+        border-radius: 12px;
+      }
+      .sidebar.expanded,
+      .sidebar.collapsed {
+        width: 376px; /* на мобиле не коллапсим, всегда фулл */
+        align-items: flex-start;
+      }
+      .sidebar.collapsed nav a span { display: inline-block; opacity: 1; max-width: none; }
+
+      /* фиксируем лого сайдбара нормально */
+      .sidebar .logo { margin-left: 8px; width: 160px; }
+      .sidebar .logo-collapsed { display: none !important; }
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="background-top"></div>
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/ui/burger.svg" alt="" />
+    </button>
+
+    <a href="/" class="header-logo" aria-label="Homepage">
+      <img src="assets/emblem.svg" alt="Company" />
+    </a>
+
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -709,6 +820,46 @@ function populateFormat(freshUser) {
         alert(e.message || 'Серверна помилка.');
       }
     };
-  </script>
+</script>
+<script>
+(function () {
+  const sidebar = document.getElementById('sidebar');
+  const burger  = document.getElementById('burgerBtn');
+  const backdrop = document.getElementById('drawerBackdrop');
+
+  if (!sidebar || !burger || !backdrop) return;
+
+  const openMenu = () => {
+    sidebar.classList.add('open');
+    backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    burger.setAttribute('aria-expanded', 'true');
+  };
+
+  const closeMenu = () => {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+    burger.setAttribute('aria-expanded', 'false');
+  };
+
+  burger.addEventListener('click', () => {
+    const isOpen = sidebar.classList.contains('open');
+    isOpen ? closeMenu() : openMenu();
+  });
+
+  backdrop.addEventListener('click', closeMenu);
+
+  // Закрывать по ESC
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  // Закрывать, когда кликаем по ссылке в меню (навигация)
+  sidebar.querySelectorAll('nav a').forEach(a => {
+    a.addEventListener('click', closeMenu);
+  });
+})();
+</script>
 </body>
 </html>

@@ -629,9 +629,12 @@ body.success-page .nav-btn:hover {
   align-items: flex-start;
 }
 
-.sidebar.collapsed {
-  width: 92px;
-  align-items: center;
+.sidebar.collapsed{
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
 }
 
 .sidebar .toggle-button {

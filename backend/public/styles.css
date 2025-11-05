@@ -611,7 +611,7 @@ body.success-page .nav-btn:hover {
   z-index: 100;
   /* make sure it's above content */
   height: 100vh;
-  background-color: #ECF5EB;
+  background-color: #97C194;
   padding: 24px;
   gap: 24px;
   transition: all 0.3s ease;
@@ -3557,6 +3557,7 @@ textarea {
       height: 300px;
       background-position: center top;
       background-size: cover;
+      top: 64px; /* push background image below mobile header so navbar doesn't cover it */
     }
 
     /* Rows and labels stack nicely on small screens */

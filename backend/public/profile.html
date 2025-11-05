@@ -6,6 +6,72 @@
   <title>Профіль</title>
   <link rel="stylesheet" href="styles.css"/>
   <style>
+
+    /* ===== Photo Cropper (FB-like) ===== */
+.cropper-modal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.cropper-modal.show{ display:flex; }
+
+.cropper-dialog{
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.cropper-dialog h3{
+  margin: 0 0 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #222;
+  text-align: center;
+}
+
+#cropperCanvas{
+  width: 100%;
+  height: auto;
+  display:block;
+  background:#111;
+  border-radius:12px;
+}
+.cropper-zoom{
+  margin-top: 12px;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
+.cropper-zoom input[type="range"]{
+  width: 100%;
+}
+.cropper-actions{
+  margin-top: 14px;
+  display:flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.cropper-actions .btn{
+  border:1px solid #D9D9D9;
+  background:#fff;
+  padding:8px 14px;
+  border-radius:10px;
+  font-family: 'Poppins', sans-serif;
+  font-size:14px;
+  cursor:pointer;
+}
+.cropper-actions .btn.primary{
+  border-color:#275D2B;
+  background:#275D2B;
+  color:#fff;
+}
     /* Make all profile textareas comfortably tall and readable by default */
     .textarea-wrapper { width: 100%; }
     .edit-textarea{
@@ -765,61 +831,11 @@ function populateFormat(freshUser) {
       setupTextareaSave('profileLanguageTextarea', 'language', 'languageCheckIcon');
     });
     // Override previewPhoto to guarantee preview + upload + final URL from backend
-    window.previewPhoto = async function (event) {
-      const file = event?.target?.files?.[0];
-      const img = document.getElementById('profilePhoto');
-      if (!file || !img) return;
-
-      // 1) Instant preview
-      const reader = new FileReader();
-      reader.onload = function () {
-        img.src = reader.result; // show immediately
-      };
-      reader.readAsDataURL(file);
-
-      // 2) Upload to backend
-      try {
-        const rawUser = localStorage.getItem('user');
-        if (!rawUser) return alert('Будь ласка, увійдіть у систему.');
-        const user = JSON.parse(rawUser);
-
-        const formData = new FormData();
-        formData.append('photo', file);
-
-        const res = await fetch(`${API_BASE}/api/users/${user._id}/photo`, {
-          method: 'POST',
-          credentials: 'include',
-          body: formData
-        });
-
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          throw new Error(data?.message || 'Помилка завантаження фото');
-        }
-
-        // 3) Use backend URL (handles CDN/static hosting)
-        if (data?.photoUrl) {
-          const finalUrl = resolvePhotoUrl(data.photoUrl);
-          img.src = finalUrl;
-
-          // keep local user snapshot in sync
-          try {
-            const fresh = await (await fetch(`${API_BASE}/api/users/${user._id}`, { credentials: 'include' })).json();
-            localStorage.setItem('user', JSON.stringify(fresh));
-          } catch (_) {
-            // fallback: minimally store photoUrl
-            const u = JSON.parse(localStorage.getItem('user') || '{}');
-            u.photoUrl = data.photoUrl;
-            localStorage.setItem('user', JSON.stringify(u));
-          }
-        }
-
-        alert('Фото оновлено!');
-      } catch (e) {
-        console.error('Upload error:', e);
-        alert(e.message || 'Серверна помилка.');
-      }
-    };
+window.previewPhoto = function (event) {
+  const file = event?.target?.files?.[0];
+  if (!file) return;
+  openPhotoCropper(file);
+};
 </script>
 <script>
 (function () {
@@ -859,6 +875,227 @@ function populateFormat(freshUser) {
   sidebar.querySelectorAll('nav a').forEach(a => {
     a.addEventListener('click', closeMenu);
   });
+})();
+</script>
+
+</div>
+<script>
+(function(){
+  const modal = document.getElementById('photoCropperModal');
+  const canvas = document.getElementById('cropperCanvas');
+  const ctx = canvas.getContext('2d');
+  const zoom = document.getElementById('cropperZoom');
+  const btnSave = document.getElementById('cropperSave');
+  const btnCancel = document.getElementById('cropperCancel');
+
+  const PREVIEW_W = canvas.width;
+  const PREVIEW_H = canvas.height;
+  const CIRCLE_R = Math.floor(Math.min(PREVIEW_W, PREVIEW_H) * 0.45);
+  const CIRCLE_CX = Math.floor(PREVIEW_W / 2);
+  const CIRCLE_CY = Math.floor(PREVIEW_H / 2);
+
+  let img = null;
+  let imgW = 0, imgH = 0;
+  let scale = 1;
+  let offsetX = 0, offsetY = 0;
+  let dragging = false;
+  let dragStartX = 0, dragStartY = 0;
+  let originalFile = null;
+
+  function showModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); }
+  function hideModal(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+
+  function draw(){
+    ctx.clearRect(0,0,PREVIEW_W,PREVIEW_H);
+    ctx.fillStyle = '#111';
+    ctx.fillRect(0,0,PREVIEW_W,PREVIEW_H);
+
+    if (img) {
+      ctx.save();
+      ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+    }
+
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillRect(0,0,PREVIEW_W,PREVIEW_H);
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(CIRCLE_CX, CIRCLE_CY, CIRCLE_R, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  function fitImageInitially(){
+    const scaleX = (CIRCLE_R*2) / imgW;
+    const scaleY = (CIRCLE_R*2) / imgH;
+    scale = Math.max(scaleX, scaleY);
+    zoom.value = String(scale.toFixed(2));
+    const imgCanvasW = imgW * scale;
+    const imgCanvasH = imgH * scale;
+    offsetX = CIRCLE_CX - imgCanvasW / 2;
+    offsetY = CIRCLE_CY - imgCanvasH / 2;
+  }
+
+  function clampOffset(){
+    const minX = CIRCLE_CX - (imgW*scale - (CIRCLE_R));
+    const maxX = CIRCLE_CX - (CIRCLE_R);
+    const minY = CIRCLE_CY - (imgH*scale - (CIRCLE_R));
+    const maxY = CIRCLE_CY - (CIRCLE_R);
+
+    if (imgW*scale <= CIRCLE_R*2){
+      offsetX = CIRCLE_CX - (imgW*scale)/2;
+    } else {
+      if (offsetX < minX) offsetX = minX;
+      if (offsetX > maxX) offsetX = maxX;
+    }
+    if (imgH*scale <= CIRCLE_R*2){
+      offsetY = CIRCLE_CY - (imgH*scale)/2;
+    } else {
+      if (offsetY < minY) offsetY = minY;
+      if (offsetY > maxY) offsetY = maxY;
+    }
+  }
+
+  function onPointerDown(e){
+    dragging = true;
+    const rect = canvas.getBoundingClientRect();
+    const pt = e.touches ? e.touches[0] : e;
+    dragStartX = pt.clientX - rect.left;
+    dragStartY = pt.clientY - rect.top;
+  }
+  function onPointerMove(e){
+    if (!dragging) return;
+    const rect = canvas.getBoundingClientRect();
+    const pt = e.touches ? e.touches[0] : e;
+    const x = pt.clientX - rect.left;
+    const y = pt.clientY - rect.top;
+    const dx = x - dragStartX;
+    const dy = y - dragStartY;
+    dragStartX = x;
+    dragStartY = y;
+    offsetX += dx;
+    offsetY += dy;
+    clampOffset();
+    draw();
+  }
+  function onPointerUp(){ dragging = false; }
+
+  function onWheel(e){
+    e.preventDefault();
+    const delta = -e.deltaY;
+    const factor = delta > 0 ? 1.05 : 0.95;
+
+    const imgXBefore = (CIRCLE_CX - offsetX)/scale;
+    const imgYBefore = (CIRCLE_CY - offsetY)/scale;
+
+    scale = Math.min(3, Math.max(0.5, scale * factor));
+    zoom.value = String(scale.toFixed(2));
+
+    const imgXAfter = (CIRCLE_CX - offsetX)/scale;
+    const imgYAfter = (CIRCLE_CY - offsetY)/scale;
+    offsetX += (imgXAfter - imgXBefore)*scale;
+    offsetY += (imgYAfter - imgYBefore)*scale;
+
+    clampOffset();
+    draw();
+  }
+
+  zoom.addEventListener('input', () => {
+    const newScale = parseFloat(zoom.value);
+    if (!isFinite(newScale)) return;
+    const imgXBefore = (CIRCLE_CX - offsetX)/scale;
+    const imgYBefore = (CIRCLE_CY - offsetY)/scale;
+    scale = Math.min(3, Math.max(0.5, newScale));
+    const imgXAfter = (CIRCLE_CX - offsetX)/scale;
+    const imgYAfter = (CIRCLE_CY - offsetY)/scale;
+    offsetX += (imgXAfter - imgXBefore)*scale;
+    offsetY += (imgYAfter - imgYBefore)*scale;
+    clampOffset();
+    draw();
+  });
+
+  canvas.addEventListener('mousedown', onPointerDown);
+  canvas.addEventListener('mousemove', onPointerMove);
+  window.addEventListener('mouseup', onPointerUp);
+  canvas.addEventListener('touchstart', onPointerDown, {passive:false});
+  canvas.addEventListener('touchmove', onPointerMove, {passive:false});
+  window.addEventListener('touchend', onPointerUp);
+  canvas.addEventListener('wheel', onWheel, { passive:false });
+
+  async function exportCroppedAndUpload(){
+    if (!img) return;
+    const OUT = 512;
+    const out = document.createElement('canvas');
+    out.width = OUT; out.height = OUT;
+    const octx = out.getContext('2d');
+
+    const Rp = CIRCLE_R;
+    const Ro = OUT/2;
+
+    const imgCx = (CIRCLE_CX - offsetX)/scale;
+    const imgCy = (CIRCLE_CY - offsetY)/scale;
+
+    const scaleOut = scale * (Ro / Rp);
+
+    octx.clearRect(0,0,OUT,OUT);
+    octx.save();
+    octx.beginPath();
+    octx.arc(Ro, Ro, Ro, 0, Math.PI*2);
+    octx.closePath();
+    octx.clip();
+
+    octx.setTransform(scaleOut, 0, 0, scaleOut, Ro - imgCx*scaleOut, Ro - imgCy*scaleOut);
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(img, 0, 0);
+    octx.restore();
+
+    const blob = await new Promise(res => out.toBlob(res, 'image/png', 0.92));
+    const file = new File([blob], (originalFile?.name || 'avatar') + '.png', { type: 'image/png' });
+
+    try{
+      const url = URL.createObjectURL(blob);
+      const imgEl = document.getElementById('profilePhoto');
+      if (imgEl) imgEl.src = url;
+      if (typeof uploadProfilePhoto === 'function'){
+        await uploadProfilePhoto(file);
+      }
+    } finally {
+      hideModal();
+    }
+  }
+
+  // Public entry
+  window.openPhotoCropper = function(file){
+    originalFile = file;
+    const reader = new FileReader();
+    reader.onload = function(){
+      img = new Image();
+      img.onload = function(){
+        imgW = img.width; imgH = img.height;
+        fitImageInitially();
+        clampOffset();
+        draw();
+        showModal();
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  btnCancel.addEventListener('click', hideModal);
+  btnSave.addEventListener('click', exportCroppedAndUpload);
 })();
 </script>
 </body>

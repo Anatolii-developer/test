@@ -213,6 +213,22 @@
       UA ▼
     </button>
   </header>
+  <!-- Photo Cropper Modal -->
+  <div id="photoCropperModal" class="cropper-modal" aria-hidden="true" role="dialog" aria-label="Редактор фото">
+    <div class="cropper-dialog">
+      <h3>Пересуньте та масштабуйте</h3>
+      <canvas id="cropperCanvas" width="360" height="360"></canvas>
+      <div class="cropper-zoom">
+        <span>−</span>
+        <input id="cropperZoom" type="range" min="0.5" max="3" step="0.01" value="1" />
+        <span>+</span>
+      </div>
+      <div class="cropper-actions">
+        <button class="btn" id="cropperCancel">Скасувати</button>
+        <button class="btn primary" id="cropperSave">Зберегти</button>
+      </div>
+    </div>
+  </div>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
@@ -883,10 +899,14 @@ window.previewPhoto = function (event) {
 (function(){
   const modal = document.getElementById('photoCropperModal');
   const canvas = document.getElementById('cropperCanvas');
-  const ctx = canvas.getContext('2d');
   const zoom = document.getElementById('cropperZoom');
   const btnSave = document.getElementById('cropperSave');
   const btnCancel = document.getElementById('cropperCancel');
+  if (!modal || !canvas || !zoom || !btnSave || !btnCancel) {
+    console.warn('[cropper] Required DOM elements not found. Modal markup missing?');
+    return;
+  }
+  const ctx = canvas.getContext('2d');
 
   const PREVIEW_W = canvas.width;
   const PREVIEW_H = canvas.height;

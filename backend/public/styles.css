@@ -3645,6 +3645,10 @@ textarea {
   /* на мобильных не даем "collapsed" визуально прятать логотипы */
   #sidebar .logo,
   #sidebar .logo-collapsed{ display:block !important; }
+
+  .sidebar .logo { display: none; }
+  .sidebar .logo-collapsed { display: none !important; }
+  .sidebar.open .logo { display: block; }
 }
 
 @media (min-width: 769px) {

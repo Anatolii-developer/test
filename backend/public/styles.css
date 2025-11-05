@@ -629,12 +629,9 @@ body.success-page .nav-btn:hover {
   align-items: flex-start;
 }
 
-.sidebar.collapsed{
-  width: 0 !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  overflow: hidden !important;
+.sidebar.collapsed {
+  width: 92px;
+  align-items: center;
 }
 
 .sidebar .toggle-button {
@@ -3647,9 +3644,4 @@ textarea {
   /* на мобильных не даем "collapsed" визуально прятать логотипы */
   #sidebar .logo,
   #sidebar .logo-collapsed{ display:block !important; }
-}
-
-@media (max-width: 768px) {
-  .site-header { display: grid; }
-  body { padding-top: 64px; } /* отступ под фиксированный зелёный хедер */
 }

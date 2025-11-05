@@ -3499,3 +3499,87 @@ textarea {
     max-height: 160px;
   }
 }
+
+  /* ===============================
+     PROFILE (mobile adaptation)
+     =============================== */
+
+  /* Title spec */
+  .about-me-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 56px;     /* readable and centers vertically within line */
+    text-align: center;
+    vertical-align: middle;
+    padding-bottom: 24px;  /* tighter on mobile */
+  }
+
+  /* Progress indicator / number pages */
+  .progress-indicator {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .step {
+    width: 58px;           /* number pages width */
+    height: 58px;          /* number pages height */
+    font-size: 24px;
+    border-width: 2px;
+  }
+  .step-line {
+    width: 40px;
+  }
+
+  /* Main container for profile steps */
+  .profile-card-wrapper {
+    margin-top: 16px;
+    padding-bottom: 60px;
+  }
+  #step1 .profile-card,
+  #step2 .profile-card,
+  #step3 .profile-card {
+    width: 344px;          /* main container width */
+    max-width: 100%;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  }
+
+  /* Reduce hero top padding so content starts higher on phones */
+  .profile-hero {
+    padding-top: 240px;
+  }
+
+  /* Rows and labels stack nicely on small screens */
+  .profile-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .profile-label {
+    min-width: 0;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+  .profile-value-wrapper {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Textareas/inputs full width inside 344px card */
+  .textarea-wrapper,
+  .edit-textarea,
+  .editable-field input,
+  .editable-field .edit-input,
+  .editable-field textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .edit-textarea {
+    min-height: 56px;
+  }
+
+  /* Photo size trim so it fits visually */
+  .profile-photo-wrapper {
+    width: 160px;
+    height: 180px;
+  }

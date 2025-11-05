@@ -3615,8 +3615,9 @@ textarea {
   }
   .mobile-nav .language-select{ font-family:'Poppins',sans-serif; font-size:14px; }
 
-  /* отступ под фиксированный navbar */
-  body{ padding-top:56px; }
+  /* отступ только если реально используется .mobile-nav; иначе без отступа */
+  body{ padding-top:0 !important; }
+  body:has(.mobile-nav){ padding-top:56px !important; }
 
   /* сайдбар как оверлей на всю ширину */
   #sidebar{

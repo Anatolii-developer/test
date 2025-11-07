@@ -3820,4 +3820,43 @@ textarea {
   }
   .video-thumb { width: 100%; height: 200px; }
   .book-item { padding: 20px; }
+
+  /* ==== Addons page: phone tweaks for main container & media lists ==== */
+  /* Ensure the main content card uses the compact phone layout */
+  .library-content {
+    width: 344px;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  /* Lay out video/book lists as a single-column grid with consistent gaps */
+  .video-list,
+  .book-list {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Make video iframes fully responsive with 16:9 ratio */
+  .video-item .video-thumb {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .video-item .video-thumb iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: 0;
+    display: block;
+  }
+
+  /* Book items: tighter padding on mobile */
+  .book-item {
+    padding: 20px;
+  }
 }

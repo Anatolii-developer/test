@@ -1281,17 +1281,12 @@ body.success-page .nav-btn:hover {
 
 
 
-/* ====== LIBRARY HERO DESKTOP (background as image, title overlaps) ====== */
-/* ====== LIBRARY HERO DESKTOP (background as image, title overlaps) ====== */
 .library-hero {
-  position: relative;
   width: 100%;
-  height: 812px; /* matches hero image height */
-  margin: 0; /* remove any top margin */
-  padding: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  max-width: 1110px;
+  margin: 80px auto 60px;
+  text-align: center;
+  position: relative;
 }
 
 .library-background {
@@ -1308,43 +1303,13 @@ body.success-page .nav-btn:hover {
   /* optional spacing */
 }
 
+
 .hero-title {
-  position: absolute;
-  bottom: -40px; /* overlap below the image */
   font-size: 64px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
-  text-shadow: 0 4px 8px rgba(0,0,0,0.4);
-  z-index: 10;
-}
-
-@media (max-width: 480px) {
-  .library-hero {
-    position: relative;
-    width: 100%;
-    height: 812px;
-    margin: 0;
-    padding: 0;
-    background: url("assets/library/library-hero.png") no-repeat center top / cover;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .library-hero picture,
-  .library-hero .hero-img {
-    display: none;
-  }
-
-  .hero-title {
-    position: absolute;
-    bottom: -40px;
-    font-size: 40px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    z-index: 10;
-  }
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  padding: 20px;
 }
 
 
@@ -3695,15 +3660,6 @@ textarea {
 
   /* ===== LIBRARY (mobile spec) ===== */
   @media (max-width: 480px) {
-    /* ===== LIBRARY HERO MOBILE override ===== */
-    .library-hero {
-      height: 812px;
-      background: url("assets/library-hero-mobile.svg") no-repeat center top / cover;
-    }
-    .hero-title {
-      font-size: 40px;
-      bottom: -24px;
-    }
     /* Hero illustration width exactly 376px on phone */
     .library-hero .hero-img {
       width: 376px !important;
@@ -3760,24 +3716,4 @@ textarea {
     }
   }
 
-  @media (max-width: 480px) {
-  .library-hero picture,
-  .library-hero .hero-img {
-    display: block;
-    margin: 0 auto 16px;
-  }
-
-  /* Жёстко выставляем мобильные габариты под макет 376×812 */
-  .library-hero .hero-img {
-    width: 376px;   /* ровно как просил */
-    height: 812px;
-    object-fit: cover;   /* чтобы не тянуться, если пропорции отличаются */
-    border-radius: 0;    /* без скругления, если надо — можешь убрать */
-  }
-
-  /* Чуть компактнее отступы */
-  .library-hero {
-    margin: 40px auto 20px;
-    text-align: center;
-  }
-}
+  

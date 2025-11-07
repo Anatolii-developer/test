@@ -3659,53 +3659,59 @@ textarea {
 }
 
   /* ===== LIBRARY (mobile spec) ===== */
-  /* Hero illustration width exactly 376px on phone */
-  .library-hero .hero-img {
-    width: 376px !important;
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto 16px;
-  }
+  @media (max-width: 480px) {
+    /* Hero illustration width exactly 376px on phone */
+    .library-hero .hero-img {
+      width: 376px !important;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto 16px;
+    }
 
-  /* Cards behave like tappable buttons with 344px width */
-  .library-section {
-    align-items: center;
-    gap: 16px;
-  }
-  .library-card {
-    width: 344px !important;
-    max-width: 100%;
-    height: auto;
-    padding: 24px;
-    border-radius: 16px;
-    gap: 12px;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .library-card .info {
-    width: 100%;
-    height: auto;
-  }
-  .library-card .image {
-    width: 100%;
-    max-width: 280px;
-    height: auto;
-    align-self: center;
-  }
-  .library-card .arrow {
-    width: 40px;
-    height: 40px;
-    align-self: flex-end;
-  }
+    /* Cards behave like tappable buttons with 344px width */
+    .library-section {
+      align-items: center;
+      gap: 16px;
+    }
+    .library-card {
+      width: 344px !important;
+      max-width: 100%;
+      height: auto;
+      padding: 24px;
+      border-radius: 16px;
+      gap: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      position: relative;
+    }
+    .library-card .info {
+      width: 100%;
+      height: auto;
+      padding-right: 56px;
+    }
+    .library-card .image {
+      width: 100%;
+      max-width: 280px;
+      height: auto;
+      align-self: center;
+    }
+    .library-card .arrow {
+      position: absolute;
+      right: 16px;
+      top: 24px;
+      width: 32px;
+      height: 32px;
+    }
 
-  /* Main header and title spacing on small screens */
-  .library-hero {
-    width: 100%;
-    margin: 40px auto 20px;
-  }
-  .hero-title {
-    font-size: 32px;
-    line-height: 40px;
-    margin-top: 8px;
+    /* Main header and title spacing on small screens */
+    .library-hero {
+      width: 100%;
+      margin: 40px auto 20px;
+    }
+    .hero-title {
+      font-size: 32px;
+      line-height: 40px;
+      margin-top: 8px;
+    }
   }

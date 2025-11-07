@@ -3715,3 +3715,25 @@ textarea {
       margin-top: 8px;
     }
   }
+
+  @media (max-width: 480px) {
+  .library-hero picture,
+  .library-hero .hero-img {
+    display: block;
+    margin: 0 auto 16px;
+  }
+
+  /* Жёстко выставляем мобильные габариты под макет 376×812 */
+  .library-hero .hero-img {
+    width: 376px;   /* ровно как просил */
+    height: 812px;
+    object-fit: cover;   /* чтобы не тянуться, если пропорции отличаются */
+    border-radius: 0;    /* без скругления, если надо — можешь убрать */
+  }
+
+  /* Чуть компактнее отступы */
+  .library-hero {
+    margin: 40px auto 20px;
+    text-align: center;
+  }
+}

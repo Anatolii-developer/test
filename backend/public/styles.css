@@ -1,5 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap');
+:root {
+  --font-family: 'Poppins', sans-serif;
 
+  --h1-size: 56px;
+  --h2-size: 40px;
+  --h3-size: 32px;
+  --h4-size: 28px;
+  --s1-size: 24px;
+  --s2-size: 20px;
+  --text-size: 20px;
+  --caption-1: 12px;
+  --caption-2: 12px;
+  --caption-3: 10px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap');
 :root {
   --font-family: 'Poppins', sans-serif;
 
@@ -3806,167 +3820,99 @@ textarea {
   }
   .video-thumb { width: 100%; height: 200px; }
   .book-item { padding: 20px; }
+}
 
-  /* ==== Addons page: phone tweaks for main container & media lists ==== */
-  /* Ensure the main content card uses the compact phone layout */
-  .library-content {
+/* ===== MY COURSES MATERIALS (phone): main container adaptation ===== */
+@media (max-width: 480px) {
+
+  /* Main content container for "Матеріали моїх курсів" */
+  .materials-library-content {
     width: 344px;
     max-width: 100%;
-    margin: 20px auto;
+    margin: 16px auto 24px;
     padding: 16px;
     border-radius: 16px;
+    background-color: #FFFDF6;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
   }
 
-  /* Lay out video/book lists as a single-column grid with consistent gaps */
-  .video-list,
-  .book-list {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    gap: 16px;
+  /* Date filter compact layout */
+  .materials-library-content .date-section {
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .materials-library-content .date-inputs {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .materials-library-content .date-input {
+    width: 100%;
+    height: 40px;
+  }
+  .materials-library-content .filter-btn-wrapper {
+    justify-content: stretch;
+    margin-top: 8px;
+  }
+  .materials-library-content .filter-btn {
+    width: 100%;
+    height: 32px;
   }
 
-  /* Make video iframes fully responsive with 16:9 ratio */
-  .video-item .video-thumb {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 9;
-    background: #000;
+  /* Buckets and headings */
+  .bucket { margin: 16px 0; }
+  .bucket-title {
+    font-size: 18px;
+    margin: 6px 0 10px;
+    text-align: left;
+  }
+
+  /* Folder sections inside each course */
+  .section {
+    margin: 8px 0 12px;
     border-radius: 12px;
-    overflow: hidden;
   }
-  .video-item .video-thumb iframe {
-    width: 100% !important;
-    height: 100% !important;
-    border: 0;
-    display: block;
+  .section summary {
+    padding: 12px;
+    font-size: 16px;
+    gap: 8px;
   }
-
-  /* Book items: tighter padding on mobile */
-  .book-item {
-    padding: 20px;
-  }
-}
-/* ===============================
-   PHONE HARD OVERRIDES (force on ≤480px)
-   =============================== */
-@media only screen and (max-width: 480px) {
-
-  /* Ensure the page scales correctly and nothing enforces desktop widths */
-  html, body {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
+  .materials {
+    padding: 10px 12px;
+    gap: 10px;
   }
 
-  /* Header card on phone */
-  .main-header {
-    width: 344px !important;
-    max-width: 100% !important;
-    margin: 16px auto 20px !important;
-    padding: 16px !important;
-    border-radius: 16px !important;
-    background: #FFFFF9 !important;
-    display: flex !important;
-    flex-direction: column !important;  /* title above image */
-    align-items: center !important;
-    gap: 12px !important;
+  /* Material rows */
+  .material-row {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  .row-head {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .row-head .view-btn {
+    width: 100%;
+    order: 2;            /* moves button below the title/desc on small screens */
+  }
+  .material-title { font-size: 16px; }
+  .material-desc  { font-size: 13px; line-height: 1.45; }
+
+  /* Preview frame size on phones */
+  .preview { margin-top: 8px; }
+  .preview iframe,
+  .preview embed {
+    height: 200px;       /* was 420px on desktop */
+    border-radius: 8px;
   }
 
-  /* Title: Inter, Semi Bold, 24px */
-  .main-header h2 {
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 24px !important;
-    line-height: 30px !important;
-    color: #333 !important;
-    text-align: center !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  /* Course header text sizing */
+  .course-item { padding-bottom: 20px; }
+  .course-title {
+    font-size: 18px;
+    text-align: center;
   }
-
-  /* Image under title: 284×148 box, keep inside without cropping */
-  .main-header img {
-    display: block !important;
-    width: 100% !important;
-    max-width: 284px !important;
-    height: auto !important;
-    aspect-ratio: 284 / 148 !important;
-    object-fit: contain !important;
-    object-position: center !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border-radius: 12px !important;
-  }
-
-  /* Buttons: first link full row (Головна), then two 152×32 pills below */
-  .nav-buttons {
-    width: 344px !important;
-    max-width: 100% !important;
-    margin: 0 auto 20px !important;
-    display: grid !important;
-    grid-template-columns: repeat(2, 152px) !important;
-    grid-column-gap: 12px !important;
-    grid-row-gap: 12px !important;
-    justify-content: center !important;
-    align-items: center !important;
-  }
-  .nav-buttons a:nth-child(1) {
-    grid-column: 1 / -1 !important;
-    justify-self: center !important;
-  }
-  .nav-buttons .nav-button {
-    width: 152px !important;
-    height: 32px !important;
-    border-radius: 24px !important;
-    padding: 0 12px !important;
-    font-size: 14px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-  }
-
-  /* Main content card */
-  .library-content {
-    width: 344px !important;
-    max-width: 100% !important;
-    margin: 20px auto !important;
-    padding: 16px !important;
-    border-radius: 16px !important;
-  }
-
-  /* Video/book lists into a single column */
-  .video-list,
-  .book-list {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-    text-align: left !important;
-  }
-
-  /* Fully responsive 16:9 video */
-  .video-item .video-thumb {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 9 !important;
-    background: #000 !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-  }
-  .video-item .video-thumb iframe {
-    width: 100% !important;
-    height: 100% !important;
-    border: 0 !important;
-    display: block !important;
-  }
-
-  .book-item { padding: 20px !important; }
-
-  /* Make sure mobile title font applies anywhere else too */
-  .h2,
-  .library-hero .hero-title,
-  .main-header h2 {
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 24px !important;
+  .course-description {
+    font-size: 14px;
+    text-align: left;
   }
 }

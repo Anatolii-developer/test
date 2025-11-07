@@ -1678,7 +1678,7 @@ body.success-page .nav-btn:hover {
 
 .materials-library-content {
   width: 1110px;
-  height: 1533px;
+  height: auto;
   background-color: #FFFDF6;
   border-radius: 24px;
   padding: 60px 100px;
@@ -3840,14 +3840,21 @@ textarea {
   .materials-library-content .date-section {
     gap: 8px;
     margin-top: 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .materials-library-content .date-inputs {
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
     gap: 8px;
+    justify-content: space-between;
+    width: 100%;
   }
   .materials-library-content .date-input {
-    width: 100%;
+    width: calc(50% - 6px);
     height: 40px;
+    box-sizing: border-box;
   }
   .materials-library-content .filter-btn-wrapper {
     justify-content: stretch;

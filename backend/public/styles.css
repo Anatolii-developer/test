@@ -3766,12 +3766,14 @@ textarea {
     padding: 0;
   }
 
-  /* Picture directly under the title with strict 284x148 size */
+  /* Picture directly under the title: scalable, fits screen, preserves aspect ratio, not cropped */
   .main-header img {
     display: block !important;
-    width: 284px;
-    height: 148px;
-    object-fit: cover;
+    width: 100%;
+    max-width: 284px;
+    height: auto;
+    aspect-ratio: 284 / 148;
+    object-fit: contain;
     object-position: center;
     margin: 0;
     padding: 0;

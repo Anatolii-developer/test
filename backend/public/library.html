@@ -6,21 +6,103 @@
   <title>Library</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Header (shared like profile) ===== */
+    .site-header {
+      background-color: #275D2B;
+      height: 80px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 48px 1fr 64px;
+      align-items: center;
+      column-gap: 12px;
+    }
+    .site-header .header-logo img {
+      height: 40px;
+      display: block;
+      margin: 0 auto;
+    }
+    .burger,
+    .lang-switch {
+      background: transparent;
+      border: 0;
+      color: #fff;
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+    .burger img { width: 24px; height: 24px; }
+
+    /* ===== Mobile off-canvas like profile (376×812) ===== */
+    @media (max-width: 480px) {
+      .site-header { height: 64px; padding: 8px 12px; }
+      #mainContent { padding-left: 0 !important; }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 376px;
+        max-width: 100vw;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform .3s ease;
+        z-index: 1001;
+        padding-top: 64px;
+        background: #fff;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar .toggle-button { display: none !important; }
+
+      .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease;
+        z-index: 1000;
+      }
+      .drawer-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .sidebar nav a {
+        padding: 12px 8px;
+        gap: 12px;
+        border-radius: 12px;
+      }
+      .sidebar.expanded,
+      .sidebar.collapsed {
+        width: 376px;
+        align-items: flex-start;
+      }
+      .sidebar.collapsed nav a span { display: inline-block; opacity: 1; max-width: none; }
+
+      .sidebar .logo { margin-left: 8px; width: 160px; }
+      .sidebar .logo-collapsed { display: none !important; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Mobile top navbar -->
-  <div class="mobile-nav" role="navigation" aria-label="Mobile">
-    <button class="burger-btn" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
-      <!-- inline burger icon -->
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="3" y="6" width="18" height="2" rx="1" fill="#1F1F1F"/>
-        <rect x="3" y="11" width="18" height="2" rx="1" fill="#1F1F1F"/>
-        <rect x="3" y="16" width="18" height="2" rx="1" fill="#1F1F1F"/>
-      </svg>
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/sidebar/burger.svg" alt="" />
     </button>
-    <img class="logo" src="assets/sidebar/IPS Logo (1).svg" alt="IPS" />
-    <div class="language-select">UA ▼</div>
-  </div>
+
+    <a href="/" class="header-logo" aria-label="Homepage">
+      <img src="assets/emblem.svg" alt="Company" />
+    </a>
+
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
   <div class="library-background-top"></div>
   <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
@@ -46,7 +128,7 @@
     </div>
   </aside>
   <!-- Backdrop for mobile sidebar -->
-  <div id="backdrop"></div>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
   <main class="library-background" id="mainContent">
         <section class="library-hero">
@@ -99,51 +181,44 @@
 
   <script src="script.js"></script>
   <script>
-    (function(){
-      const sidebar = document.getElementById('sidebar');
-      const burger  = document.getElementById('burgerBtn');
-      const backdrop = document.getElementById('backdrop');
+  (function () {
+    const sidebar = document.getElementById('sidebar');
+    const burger  = document.getElementById('burgerBtn');
+    const backdrop = document.getElementById('drawerBackdrop');
 
-      function openSidebarMobile(){
-        if(!sidebar) return;
-        sidebar.classList.add('open');
-        if(backdrop) backdrop.classList.add('show');
-        if(burger) burger.setAttribute('aria-expanded','true');
-        // lock body scroll on mobile when drawer is open
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
-      }
-      function closeSidebarMobile(){
-        if(!sidebar) return;
-        sidebar.classList.remove('open');
-        if(backdrop) backdrop.classList.remove('show');
-        if(burger) burger.setAttribute('aria-expanded','false');
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-      }
+    if (!sidebar || !burger || !backdrop) return;
 
-      if(burger){
-        burger.addEventListener('click', function(){
-          if(sidebar.classList.contains('open')) closeSidebarMobile();
-          else openSidebarMobile();
-        });
-      }
-      if(backdrop){
-        backdrop.addEventListener('click', closeSidebarMobile);
-      }
-      // Close on nav click (better UX for one-page links)
-      if(sidebar){
-        sidebar.querySelectorAll('nav a, .logout').forEach(el => {
-          el.addEventListener('click', closeSidebarMobile);
-        });
-      }
-      // Auto-close if resizing to desktop
-      window.addEventListener('resize', function(){
-        if(window.innerWidth > 768){
-          closeSidebarMobile();
-        }
-      });
-    })();
+    const openMenu = () => {
+      sidebar.classList.add('open');
+      backdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      burger.setAttribute('aria-expanded', 'true');
+    };
+
+    const closeMenu = () => {
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+      burger.setAttribute('aria-expanded', 'false');
+    };
+
+    burger.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('open');
+      isOpen ? closeMenu() : openMenu();
+    });
+
+    backdrop.addEventListener('click', closeMenu);
+
+    // Close on ESC
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    // Close when navigating via sidebar links
+    sidebar.querySelectorAll('nav a, .logout').forEach(el => {
+      el.addEventListener('click', closeMenu);
+    });
+  })();
   </script>
 </body>
 </html>

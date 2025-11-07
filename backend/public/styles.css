@@ -1,4 +1,19 @@
-/* ========== Typography System ========== */
+:root {
+  --font-family: 'Poppins', sans-serif;
+
+  --h1-size: 56px;
+  --h2-size: 40px;
+  --h3-size: 32px;
+  --h4-size: 28px;
+  --s1-size: 24px;
+  --s2-size: 20px;
+  --text-size: 20px;
+  --caption-1: 12px;
+  --caption-2: 12px;
+  --caption-3: 10px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap');
 :root {
   --font-family: 'Poppins', sans-serif;
 
@@ -3725,13 +3740,13 @@ textarea {
     width: 344px;
     max-width: 100%;
     margin: 16px auto 20px;
-    padding: 16px;                 /* simple inner padding */
+    padding: 16px;
     border-radius: 16px;
     background: #FFFFF9;
     position: relative;
     overflow: hidden;
     display: flex;
-    flex-direction: column;        /* stack title over image */
+    flex-direction: column;        /* title above image */
     align-items: center;
     gap: 12px;
   }
@@ -3739,11 +3754,12 @@ textarea {
   /* Make sure any previous ::before hero is not shown */
   .main-header::before { display: none !important; }
 
-  /* Title on top */
+  /* Title on top (Inter font, semi bold, 24px) */
   .main-header h2 {
-    font-size: 28px;
-    line-height: 34px;
-    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;              /* Semi Bold */
+    font-size: 24px;
+    line-height: 30px;
     color: #333;
     text-align: center;
     margin: 0;
@@ -3752,7 +3768,7 @@ textarea {
 
   /* Picture directly under the title with strict 284x148 size */
   .main-header img {
-    display: block !important;     /* override earlier "display:none" */
+    display: block !important;
     width: 284px;
     height: 148px;
     object-fit: cover;
@@ -3768,33 +3784,38 @@ textarea {
     max-width: 100%;
     margin: 0 auto 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 152px);
     grid-column-gap: 12px;
     grid-row-gap: 12px;
-    justify-items: stretch;
+    justify-content: center;     /* centers the 152px columns in 344px */
     align-items: center;
   }
-
-  /* First link takes the whole first row */
+  /* First link spans the first row alone */
   .nav-buttons a:nth-child(1) {
     grid-column: 1 / -1;
-    justify-self: center;         /* centers the single pill */
-    width: 100%;
+    justify-self: center;
   }
-
-  /* Buttons look like pills and fill their grid cells */
+  /* All pill buttons identical size */
   .nav-buttons .nav-button {
-    width: 100%;
-    height: 48px;
+    width: 152px;
+    height: 32px;
     border-radius: 24px;
-    padding: 0 16px;
+    padding: 0 12px;
+    font-size: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
   }
 
-  /* Keep secondary variant intact on phone */
-  .nav-buttons .nav-button.secondary { /* no overrides needed */ }
-
+  /* Main content card sizing on phone */
+  .library-content {
+    width: 344px;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .video-thumb { width: 100%; height: 200px; }
+  .book-item { padding: 20px; }
 }

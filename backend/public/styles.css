@@ -1282,21 +1282,16 @@ body.success-page .nav-btn:hover {
 
 
 /* ====== LIBRARY HERO DESKTOP (background as image, title overlaps) ====== */
+/* ====== LIBRARY HERO DESKTOP (background as image, title overlaps) ====== */
 .library-hero {
   position: relative;
   width: 100%;
   height: 812px; /* matches hero image height */
   margin: 0; /* remove any top margin */
   padding: 0;
-  background: url("assets/library/library-hero.png") no-repeat center top / cover;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-}
-
-.library-hero picture,
-.library-hero .hero-img {
-  display: none; /* hide inline image, use background instead */
 }
 
 .library-background {
@@ -1313,7 +1308,6 @@ body.success-page .nav-btn:hover {
   /* optional spacing */
 }
 
-
 .hero-title {
   position: absolute;
   bottom: -40px; /* overlap below the image */
@@ -1322,6 +1316,35 @@ body.success-page .nav-btn:hover {
   color: #fff;
   text-shadow: 0 4px 8px rgba(0,0,0,0.4);
   z-index: 10;
+}
+
+@media (max-width: 480px) {
+  .library-hero {
+    position: relative;
+    width: 100%;
+    height: 812px;
+    margin: 0;
+    padding: 0;
+    background: url("assets/library/library-hero.png") no-repeat center top / cover;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .library-hero picture,
+  .library-hero .hero-img {
+    display: none;
+  }
+
+  .hero-title {
+    position: absolute;
+    bottom: -40px;
+    font-size: 40px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
 }
 
 

@@ -4061,10 +4061,12 @@ textarea {
 }
 
 
+
+
 /* ===== COMPLETED COURSES (phone): header 344px, buttons grid, certificate card 344px ===== */
 @media (max-width: 480px) {
 
-  /* Шапка страницы "Пройдені курси" */
+  /* Use page class on body to scope styles to Пройдені курси */
   body.completed-courses-page .main-header {
     width: 344px;
     max-width: 100%;
@@ -4075,7 +4077,7 @@ textarea {
     position: relative;
     overflow: hidden;
     display: flex;
-    flex-direction: column;        /* тайтл над картинкой */
+    flex-direction: column;        /* title above image */
     align-items: center;
     gap: 12px;
   }
@@ -4104,7 +4106,7 @@ textarea {
     border-radius: 12px;
   }
 
-  /* Кнопки навигации под шапкой */
+  /* Навигационные кнопки на странице Пройдені курси */
   body.completed-courses-page .completed-nav-buttons {
     width: 344px;
     max-width: 100%;
@@ -4153,9 +4155,10 @@ textarea {
     border-radius: 16px;
     background-color: #FFFDF6;
     box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+    gap: 20px;
   }
 
-  /* Фильтр дат */
+  /* Фильтр дат: компактная раскладка */
   body.completed-courses-page .completed-courses-content .date-section {
     gap: 8px;
     margin-top: 4px;
@@ -4186,6 +4189,7 @@ textarea {
     padding: 16px;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 16px;
   }
 
   body.completed-courses-page .date-line span {
@@ -4220,5 +4224,12 @@ textarea {
   body.completed-courses-page .view-site-button {
     width: 100%;
     text-align: center;
+  }
+
+  /* Линия дат над сертификатом */
+  body.completed-courses-page .certificate-dates {
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px;
   }
 }

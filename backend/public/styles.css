@@ -4066,8 +4066,9 @@ textarea {
 /* ===== COMPLETED COURSES (phone): header 344px, buttons grid, certificate card 344px ===== */
 @media (max-width: 480px) {
 
-  /* Use page class on body to scope styles to Пройдені курси */
-  body.completed-courses-page .main-header {
+  body.completed-courses-page .main-header,
+  body.current-courses-page .main-header,
+  body.planned-courses-page .main-header {
     width: 344px;
     max-width: 100%;
     margin: 16px auto 20px;
@@ -4082,7 +4083,9 @@ textarea {
     gap: 12px;
   }
 
-  body.completed-courses-page .main-header h2 {
+  body.completed-courses-page .main-header h2,
+  body.current-courses-page .main-header h2,
+  body.planned-courses-page .main-header h2 {
     font-family: 'Inter', sans-serif;
     font-weight: 600;              /* Semi Bold */
     font-size: 24px;
@@ -4093,7 +4096,9 @@ textarea {
     padding: 0;
   }
 
-  body.completed-courses-page .main-header img {
+  body.completed-courses-page .main-header img,
+  body.current-courses-page .main-header img,
+  body.planned-courses-page .main-header img {
     display: block !important;
     width: 100%;
     max-width: 284px;
@@ -4106,8 +4111,10 @@ textarea {
     border-radius: 12px;
   }
 
-  /* Навигационные кнопки на странице Пройдені курси */
-  body.completed-courses-page .completed-nav-buttons {
+  /* Навигационные кнопки на странице Пройдені курси и Поточні курси */
+  body.completed-courses-page .completed-nav-buttons,
+  body.current-courses-page .completed-nav-buttons,
+  body.planned-courses-page .completed-nav-buttons {
     width: 344px;
     max-width: 100%;
     margin: 0 auto 20px;
@@ -4120,12 +4127,16 @@ textarea {
   }
 
   /* Первая ("Головна") — на всю строку */
-  body.completed-courses-page .completed-nav-buttons a:nth-child(1) {
+  body.completed-courses-page .completed-nav-buttons a:nth-child(1),
+  body.current-courses-page .completed-nav-buttons a:nth-child(1),
+  body.planned-courses-page .completed-nav-buttons a:nth-child(1) {
     grid-column: 1 / -1;
     justify-self: center;
   }
 
-  body.completed-courses-page .completed-nav-button {
+  body.completed-courses-page .completed-nav-button,
+  body.current-courses-page .completed-nav-button,
+  body.planned-courses-page .completed-nav-button {
     width: 152px;
     height: 32px;
     border-radius: 24px;
@@ -4139,15 +4150,19 @@ textarea {
   }
 
   /* Иконка стрелки у "Головна" */
-  body.completed-courses-page .completed-nav-button img {
+  body.completed-courses-page .completed-nav-button img,
+  body.current-courses-page .completed-nav-button img,
+  body.planned-courses-page .completed-nav-button img {
     width: 16px;
     height: 16px;
     object-fit: contain;
     margin-right: 6px;
   }
 
-  /* Контейнер с сертификатами */
-  body.completed-courses-page .completed-courses-content {
+  /* Контейнер с сертификатами / текущими курсами */
+  body.completed-courses-page .completed-courses-content,
+  body.current-courses-page .completed-courses-content,
+  body.planned-courses-page .completed-courses-content {
     width: 344px;
     max-width: 100%;
     margin: 20px auto;
@@ -4159,26 +4174,36 @@ textarea {
   }
 
   /* Фильтр дат: компактная раскладка */
-  body.completed-courses-page .completed-courses-content .date-section {
+  body.completed-courses-page .completed-courses-content .date-section,
+  body.current-courses-page .completed-courses-content .date-section,
+  body.planned-courses-page .completed-courses-content .date-section {
     gap: 8px;
     margin-top: 4px;
   }
 
-  body.completed-courses-page .completed-courses-content .date-inputs {
+  body.completed-courses-page .completed-courses-content .date-inputs,
+  body.current-courses-page .completed-courses-content .date-inputs,
+  body.planned-courses-page .completed-courses-content .date-inputs {
     flex-direction: row;
     gap: 8px;
   }
 
-  body.completed-courses-page .completed-courses-content .date-input {
+  body.completed-courses-page .completed-courses-content .date-input,
+  body.current-courses-page .completed-courses-content .date-input,
+  body.planned-courses-page .completed-courses-content .date-input {
     width: calc(50% - 4px);
     height: 40px;
   }
 
-  body.completed-courses-page .completed-courses-content .filter-btn-wrapper {
+  body.completed-courses-page .completed-courses-content .filter-btn-wrapper,
+  body.current-courses-page .completed-courses-content .filter-btn-wrapper,
+  body.planned-courses-page .completed-courses-content .filter-btn-wrapper {
     margin-top: 8px;
   }
 
-  body.completed-courses-page .completed-courses-content .filter-btn {
+  body.completed-courses-page .completed-courses-content .filter-btn,
+  body.current-courses-page .completed-courses-content .filter-btn,
+  body.planned-courses-page .completed-courses-content .filter-btn {
     width: 100%;
     height: 32px;
   }

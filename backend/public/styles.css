@@ -4059,3 +4059,166 @@ textarea {
     padding: 0 16px;
   }
 }
+
+
+/* ===== COMPLETED COURSES (phone): header 344px, buttons grid, certificate card 344px ===== */
+@media (max-width: 480px) {
+
+  /* Шапка страницы "Пройдені курси" */
+  body.completed-courses-page .main-header {
+    width: 344px;
+    max-width: 100%;
+    margin: 16px auto 20px;
+    padding: 16px;
+    border-radius: 16px;
+    background: #FFFFF9;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;        /* тайтл над картинкой */
+    align-items: center;
+    gap: 12px;
+  }
+
+  body.completed-courses-page .main-header h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;              /* Semi Bold */
+    font-size: 24px;
+    line-height: 30px;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  body.completed-courses-page .main-header img {
+    display: block !important;
+    width: 100%;
+    max-width: 284px;
+    height: auto;
+    aspect-ratio: 284 / 148;
+    object-fit: contain;
+    object-position: center;
+    margin: 0;
+    padding: 0;
+    border-radius: 12px;
+  }
+
+  /* Кнопки навигации под шапкой */
+  body.completed-courses-page .completed-nav-buttons {
+    width: 344px;
+    max-width: 100%;
+    margin: 0 auto 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 152px);
+    grid-column-gap: 12px;
+    grid-row-gap: 12px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Первая ("Головна") — на всю строку */
+  body.completed-courses-page .completed-nav-buttons a:nth-child(1) {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  body.completed-courses-page .completed-nav-button {
+    width: 152px;
+    height: 32px;
+    border-radius: 24px;
+    padding: 0 12px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  /* Иконка стрелки у "Головна" */
+  body.completed-courses-page .completed-nav-button img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    margin-right: 6px;
+  }
+
+  /* Контейнер с сертификатами */
+  body.completed-courses-page .completed-courses-content {
+    width: 344px;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 16px;
+    border-radius: 16px;
+    background-color: #FFFDF6;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+  }
+
+  /* Фильтр дат */
+  body.completed-courses-page .completed-courses-content .date-section {
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  body.completed-courses-page .completed-courses-content .date-inputs {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  body.completed-courses-page .completed-courses-content .date-input {
+    width: calc(50% - 4px);
+    height: 40px;
+  }
+
+  body.completed-courses-page .completed-courses-content .filter-btn-wrapper {
+    margin-top: 8px;
+  }
+
+  body.completed-courses-page .completed-courses-content .filter-btn {
+    width: 100%;
+    height: 32px;
+  }
+
+  /* Карточка сертификата */
+  body.completed-courses-page .certificate-card {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  body.completed-courses-page .date-line span {
+    font-size: 16px;
+  }
+
+  body.completed-courses-page .certificate-title {
+    font-size: 18px;
+  }
+
+  body.completed-courses-page .certificate-description {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  body.completed-courses-page .certificate-embed {
+    height: 220px;
+    border-radius: 12px;
+  }
+
+  body.completed-courses-page .card-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  body.completed-courses-page .lang-toggle-wrapper {
+    justify-content: flex-start;
+  }
+
+  body.completed-courses-page .view-button,
+  body.completed-courses-page .view-site-button {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -3980,12 +3980,82 @@ textarea {
     align-self: center;
   }
 
-  .arrow-btn {
-    align-self: flex-end;
-  }
 
   .arrow {
     width: 32px;
     height: 32px;
+  }
+}
+
+/* ===== MOBILE: My Courses ===== */
+@media (max-width: 480px) {
+
+  /* Карточка курса */
+  .course-card {
+    width: 344px;
+    margin: 0 auto 20px;
+    padding: 20px;
+    border-radius: 24px;
+    background: #FFFFFF;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Заголовок (Inter, 24px, Semi Bold) */
+  .course-info h3 {
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: #000;
+    margin: 0;
+    padding-right: 48px; /* место под стрелку справа */
+    line-height: 1.2;
+  }
+
+  /* Стрелка справа, на одной линии */
+  .arrow-btn {
+    position: absolute;
+    top: 18px;       /* идеально выравнивает по линии текста */
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .arrow-btn img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  /* Картинка под текстом */
+  .course-illustration {
+    width: 100%;
+    height: auto;
+    margin-top: 16px;
+    border-radius: 16px;
+    object-fit: contain;
+  }
+
+  /* Герой изображение */
+  .my-courses-hero-img {
+    width: 100%;
+    height: auto;
+  }
+
+  .my-courses-title {
+    font-family: Inter, sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  /* Контейнер секции */
+  .my-courses-section {
+    padding: 0 16px;
   }
 }

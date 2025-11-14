@@ -3923,3 +3923,69 @@ textarea {
     text-align: left;
   }
 }
+/* ===== MY COURSES (phone): hero 376px, cards 344px like library ===== */
+@media (max-width: 480px) {
+
+  /* Section spacing */
+  .my-courses-section {
+    padding-top: 40px;
+    gap: 16px;
+    align-items: center;
+  }
+
+  /* Hero: image 376px, title below */
+  .my-courses-hero {
+    margin-bottom: 20px;
+  }
+
+  .my-courses-hero-img {
+    width: 376px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 12px;
+  }
+
+  .my-courses-title {
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 600;
+    color: #FFFFFF;
+    padding: 0 16px 8px;
+    text-align: center;
+  }
+
+  /* Course cards behave like 344px tappable tiles */
+  .course-card {
+    width: 344px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .course-info h3 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .course-illustration {
+    width: 100%;
+    max-width: 284px;
+    height: auto;
+    align-self: center;
+  }
+
+  .arrow-btn {
+    align-self: flex-end;
+  }
+
+  .arrow {
+    width: 32px;
+    height: 32px;
+  }
+}

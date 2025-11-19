@@ -2695,6 +2695,7 @@ input:checked+.slider:before {
   flex-wrap: wrap;
   gap: 20px;
   padding-top: 8px;
+  align-items: flex-start;
 }
 
 .radio-group label {
@@ -2702,6 +2703,7 @@ input:checked+.slider:before {
   align-items: center;
   gap: 8px;
   font-size: 16px;
+  min-width: 0;
 }
 
 .radio-group.access-type-group {
@@ -4410,6 +4412,7 @@ textarea {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    width: 100%;
   }
 
   body.create-course-page .weekdays-checkboxes {

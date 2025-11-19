@@ -46,6 +46,63 @@ body {
   position: relative;
 }
 
+.site-header {
+  background-color: #275D2B;
+  height: 80px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 48px 1fr 64px;
+  align-items: center;
+  column-gap: 12px;
+}
+
+.site-header .header-logo img {
+  height: 40px;
+  display: block;
+  margin: 0 auto;
+}
+
+.burger,
+.lang-switch {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.burger img {
+  width: 24px;
+  height: 24px;
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.drawer-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    height: 64px;
+    padding: 8px 12px;
+  }
+}
+
 
 /* Headings */
 .h1 {
@@ -3610,65 +3667,68 @@ textarea {
     }
   }
 
-  .mobile-nav { display: none; } /* скрыт на десктопе */
-
 @media (max-width: 768px) {
-  /* мобильный топ-навигационный бар */
-  .mobile-nav {
-    display: flex;
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 56px;
-    align-items: center; justify-content: space-between;
-    padding: 0 16px;
-    background: #fff;
-    z-index: 1001; /* над backdrop, под сайдбаром */
-    box-shadow: 0 1px 0 rgba(0,0,0,.06);
+  #mainContent {
+    padding-left: 0 !important;
   }
-  .mobile-nav .burger-btn{
-    border: 0; background: transparent;
-    width: 32px; height: 32px; display: grid; place-items: center;
-  }
-  .mobile-nav .language-select{ font-family:'Poppins',sans-serif; font-size:14px; }
 
-  /* отступ только если реально используется .mobile-nav; иначе без отступа */
-  body{ padding-top:0 !important; }
-  body:has(.mobile-nav){ padding-top:56px !important; }
-
-  /* сайдбар как оверлей на всю ширину */
-  #sidebar{
+  .sidebar {
     position: fixed;
-    top:56px; left:0;
-    height: calc(100vh - 56px);
-    width:100vw; max-width:100vw;
+    top: 0;
+    left: 0;
+    width: min(376px, 100vw);
+    max-width: 100vw;
+    height: 100vh;
     transform: translateX(-100%);
-    transition: transform .25s ease;
-    z-index:1002;
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    background: #FFFFFF;
+    padding-top: 64px;
   }
-  #sidebar.open{ transform: translateX(0); }
 
-  /* стрелку/тоггл прячем в мобиле */
-  #sidebar .toggle-button{ display:none; }
-
-  /* backdrop под сайдбар */
-  #backdrop{
-    display:none; position:fixed; inset:0;
-    background: rgba(0,0,0,.4);
-    z-index:1000;
+  .sidebar.open {
+    transform: translateX(0);
   }
-  #backdrop.show{ display:block; }
 
-  /* на мобильных не даем "collapsed" визуально прятать логотипы */
-  #sidebar .logo,
-  #sidebar .logo-collapsed{ display:block !important; }
+  .sidebar .toggle-button {
+    display: none !important;
+  }
 
-  .sidebar .logo { display: none; }
-  .sidebar .logo-collapsed { display: none !important; }
-  .sidebar.open .logo { display: block; }
+  .sidebar.expanded,
+  .sidebar.collapsed {
+    width: min(376px, 100vw);
+    align-items: flex-start;
+  }
+
+  .sidebar nav a {
+    padding: 12px 8px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .sidebar.collapsed nav a span {
+    display: inline-block;
+    opacity: 1;
+    max-width: none;
+    margin-left: 10px;
+  }
+
+  .sidebar .logo {
+    display: block;
+    margin-left: 8px;
+    width: 160px;
+  }
+
+  .sidebar .logo-collapsed {
+    display: none !important;
+  }
 }
 
 @media (min-width: 769px) {
   .site-header {
+    display: none !important;
+  }
+  .drawer-backdrop {
     display: none !important;
   }
 }
@@ -4068,7 +4128,8 @@ textarea {
 
   body.completed-courses-page .main-header,
   body.current-courses-page .main-header,
-  body.planned-courses-page .main-header {
+  body.planned-courses-page .main-header,
+  body.create-course-page .main-header {
     width: 344px;
     max-width: 100%;
     margin: 16px auto 20px;
@@ -4085,7 +4146,8 @@ textarea {
 
   body.completed-courses-page .main-header h2,
   body.current-courses-page .main-header h2,
-  body.planned-courses-page .main-header h2 {
+  body.planned-courses-page .main-header h2,
+  body.create-course-page .main-header h2 {
     font-family: 'Inter', sans-serif;
     font-weight: 600;              /* Semi Bold */
     font-size: 24px;
@@ -4098,7 +4160,8 @@ textarea {
 
   body.completed-courses-page .main-header img,
   body.current-courses-page .main-header img,
-  body.planned-courses-page .main-header img {
+  body.planned-courses-page .main-header img,
+  body.create-course-page .main-header img {
     display: block !important;
     width: 100%;
     max-width: 284px;
@@ -4114,7 +4177,8 @@ textarea {
   /* Навигационные кнопки на странице Пройдені курси и Поточні курси */
   body.completed-courses-page .completed-nav-buttons,
   body.current-courses-page .completed-nav-buttons,
-  body.planned-courses-page .completed-nav-buttons {
+  body.planned-courses-page .completed-nav-buttons,
+  body.create-course-page .completed-nav-buttons {
     width: 344px;
     max-width: 100%;
     margin: 0 auto 20px;
@@ -4129,14 +4193,16 @@ textarea {
   /* Первая ("Головна") — на всю строку */
   body.completed-courses-page .completed-nav-buttons a:nth-child(1),
   body.current-courses-page .completed-nav-buttons a:nth-child(1),
-  body.planned-courses-page .completed-nav-buttons a:nth-child(1) {
+  body.planned-courses-page .completed-nav-buttons a:nth-child(1),
+  body.create-course-page .completed-nav-buttons a:nth-child(1) {
     grid-column: 1 / -1;
     justify-self: center;
   }
 
   body.completed-courses-page .completed-nav-button,
   body.current-courses-page .completed-nav-button,
-  body.planned-courses-page .completed-nav-button {
+  body.planned-courses-page .completed-nav-button,
+  body.create-course-page .completed-nav-button {
     width: 152px;
     height: 32px;
     border-radius: 24px;
@@ -4152,7 +4218,8 @@ textarea {
   /* Иконка стрелки у "Головна" */
   body.completed-courses-page .completed-nav-button img,
   body.current-courses-page .completed-nav-button img,
-  body.planned-courses-page .completed-nav-button img {
+  body.planned-courses-page .completed-nav-button img,
+  body.create-course-page .completed-nav-button img {
     width: 16px;
     height: 16px;
     object-fit: contain;
@@ -4249,6 +4316,84 @@ textarea {
   body.completed-courses-page .view-site-button {
     width: 100%;
     text-align: center;
+  }
+
+  body.create-course-page main {
+    width: 100%;
+    padding: 0 16px 60px;
+  }
+
+  body.create-course-page .create-course-content {
+    width: 344px;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 16px;
+    background-color: #FFFDF6;
+    box-shadow: -5px 0 5px #2F832F, 5px 0 5px #2F832F;
+    gap: 16px;
+  }
+
+  body.create-course-page .create-course-content .form-group {
+    gap: 8px;
+  }
+
+  body.create-course-page .create-course-content label {
+    font-size: 14px;
+  }
+
+  body.create-course-page .create-course-content input,
+  body.create-course-page .create-course-content select,
+  body.create-course-page .create-course-content textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  body.create-course-page .date-range,
+  body.create-course-page .time-range {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  body.create-course-page .date-range input,
+  body.create-course-page .time-range input {
+    width: 100%;
+  }
+
+  body.create-course-page .time-range span {
+    display: none;
+  }
+
+  body.create-course-page .radio-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  body.create-course-page .weekdays-checkboxes {
+    gap: 6px;
+  }
+
+  body.create-course-page .small-button {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body.create-course-page .save-btn-wrapper {
+    justify-content: center;
+  }
+
+  body.create-course-page .save-btn {
+    width: 100%;
+  }
+
+  body.create-course-page #userModal .modal-content {
+    width: 90%;
+    max-width: 360px;
   }
 
   /* Линия дат над сертификатом */

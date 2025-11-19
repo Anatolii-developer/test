@@ -243,46 +243,6 @@
   <script>
   window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
 </script>
-  <script>
-  (function () {
-    const sidebar  = document.getElementById('sidebar');
-    const burger   = document.getElementById('burgerBtn');
-    const backdrop = document.getElementById('drawerBackdrop');
-
-    if (!sidebar || !burger || !backdrop) return;
-
-    const openMenu = () => {
-      sidebar.classList.add('open');
-      backdrop.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      burger.setAttribute('aria-expanded', 'true');
-    };
-
-    const closeMenu = () => {
-      sidebar.classList.remove('open');
-      backdrop.classList.remove('active');
-      document.body.style.overflow = '';
-      burger.setAttribute('aria-expanded', 'false');
-    };
-
-    burger.addEventListener('click', () => {
-      const isOpen = sidebar.classList.contains('open');
-      isOpen ? closeMenu() : openMenu();
-    });
-
-    backdrop.addEventListener('click', closeMenu);
-
-    // Close on ESC
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
-
-    // Close when navigating via a sidebar link
-    sidebar.querySelectorAll('nav a').forEach(a => {
-      a.addEventListener('click', closeMenu);
-    });
-  })();
-  </script>
   <script src="script.js"></script>
  <script>
 

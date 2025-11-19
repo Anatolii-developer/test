@@ -180,45 +180,5 @@
   </main>
 
   <script src="script.js"></script>
-  <script>
-  (function () {
-    const sidebar = document.getElementById('sidebar');
-    const burger  = document.getElementById('burgerBtn');
-    const backdrop = document.getElementById('drawerBackdrop');
-
-    if (!sidebar || !burger || !backdrop) return;
-
-    const openMenu = () => {
-      sidebar.classList.add('open');
-      backdrop.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      burger.setAttribute('aria-expanded', 'true');
-    };
-
-    const closeMenu = () => {
-      sidebar.classList.remove('open');
-      backdrop.classList.remove('active');
-      document.body.style.overflow = '';
-      burger.setAttribute('aria-expanded', 'false');
-    };
-
-    burger.addEventListener('click', () => {
-      const isOpen = sidebar.classList.contains('open');
-      isOpen ? closeMenu() : openMenu();
-    });
-
-    backdrop.addEventListener('click', closeMenu);
-
-    // Close on ESC
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
-
-    // Close when navigating via sidebar links
-    sidebar.querySelectorAll('nav a, .logout').forEach(el => {
-      el.addEventListener('click', closeMenu);
-    });
-  })();
-  </script>
 </body>
 </html>

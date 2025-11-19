@@ -10,7 +10,20 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
 </head>
-<body>
+<body class="create-course-page">
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/sidebar/burger.svg" alt="" />
+    </button>
+
+    <a href="/" class="header-logo" aria-label="Головна">
+      <img src="assets/emblem.svg" alt="IPS" />
+    </a>
+
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
  <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -34,6 +47,7 @@
       <span>Вийти з акаунту</span>
     </div>
   </aside>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
   <main id="mainContent">
     <div class="main-header">

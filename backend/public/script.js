@@ -1181,6 +1181,7 @@ function toggleSidebar() {
 
 // === Sidebar hover-to-open + pin state ===
 let sidebarPinned = false;
+let drawerMenuBound = false;
 
 // Try to restore pin state
 try {
@@ -1274,24 +1275,45 @@ function isMobile() {
   return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
 }
 
+function getDrawerBackdrop() {
+  return document.getElementById('drawerBackdrop') || document.getElementById('backdrop');
+}
+
+function setBurgerExpanded(isOpen) {
+  const burger = document.getElementById('burgerBtn');
+  if (burger) {
+    burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+}
+
 function openMobileSidebar() {
   const sidebar = document.getElementById('sidebar');
-  const backdrop = document.getElementById('backdrop');
   if (!sidebar) return;
   sidebar.classList.add('open');
-  if (backdrop) backdrop.classList.add('show');
+  const backdrop = getDrawerBackdrop();
+  if (backdrop) {
+    backdrop.classList.add('active');
+    backdrop.classList.add('show');
+  }
   document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
+  document.body.classList.add('drawer-open');
+  setBurgerExpanded(true);
 }
 
 function closeMobileSidebar() {
   const sidebar = document.getElementById('sidebar');
-  const backdrop = document.getElementById('backdrop');
   if (!sidebar) return;
   sidebar.classList.remove('open');
-  if (backdrop) backdrop.classList.remove('show');
+  const backdrop = getDrawerBackdrop();
+  if (backdrop) {
+    backdrop.classList.remove('active');
+    backdrop.classList.remove('show');
+  }
   document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
+  document.body.classList.remove('drawer-open');
+  setBurgerExpanded(false);
 }
 
 // Wire mobile events
@@ -1300,6 +1322,34 @@ function closeMobileSidebar() {
 document.addEventListener('DOMContentLoaded', enableSidebarHover);
 window.addEventListener('resize', () => {
   applySidebarState();
+});
+document.addEventListener('DOMContentLoaded', () => {
+  if (drawerMenuBound) return;
+  const sidebar = document.getElementById('sidebar');
+  const burger = document.getElementById('burgerBtn');
+  const backdrop = getDrawerBackdrop();
+  if (!sidebar || !burger || !backdrop) return;
+
+  drawerMenuBound = true;
+
+  burger.addEventListener('click', () => {
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+      closeMobileSidebar();
+    } else {
+      openMobileSidebar();
+    }
+  });
+
+  backdrop.addEventListener('click', closeMobileSidebar);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileSidebar();
+  });
+
+  sidebar.querySelectorAll('nav a, .logout').forEach((el) => {
+    el.addEventListener('click', closeMobileSidebar);
+  });
 });
 
 document.addEventListener("DOMContentLoaded", async () => {

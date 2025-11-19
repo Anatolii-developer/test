@@ -8,19 +8,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="site-header">
-      <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
-        <img src="assets/sidebar/burger.svg" alt="" />
-      </button>
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/sidebar/burger.svg" alt="" />
+    </button>
 
-      <a href="/" class="header-logo" aria-label="Homepage">
-        <img src="assets/emblem.svg" alt="Company" />
-      </a>
+    <a href="/" class="header-logo" aria-label="Головна">
+      <img src="assets/emblem.svg" alt="IPS" />
+    </a>
 
-      <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
-        UA ▼
-      </button>
-    </header>
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
   <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -44,8 +44,7 @@
       <span>Вийти з акаунту</span>
     </div>
   </aside>
-    <!-- Backdrop for mobile sidebar -->
-    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
   <main id="mainContent">
     <section class="my-courses-section">
@@ -98,45 +97,5 @@
   </main>
 
   <script src="script.js"></script>
-  <script>
-    (function () {
-      const sidebar = document.getElementById('sidebar');
-      const burger  = document.getElementById('burgerBtn');
-      const backdrop = document.getElementById('drawerBackdrop');
-
-      if (!sidebar || !burger || !backdrop) return;
-
-      const openMenu = () => {
-        sidebar.classList.add('open');
-        backdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        burger.setAttribute('aria-expanded', 'true');
-      };
-
-      const closeMenu = () => {
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('active');
-        document.body.style.overflow = '';
-        burger.setAttribute('aria-expanded', 'false');
-      };
-
-      burger.addEventListener('click', () => {
-        const isOpen = sidebar.classList.contains('open');
-        isOpen ? closeMenu() : openMenu();
-      });
-
-      backdrop.addEventListener('click', closeMenu);
-
-      // Close on ESC
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMenu();
-      });
-
-      // Close when navigating via sidebar links
-      sidebar.querySelectorAll('nav a, .logout').forEach(el => {
-        el.addEventListener('click', closeMenu);
-      });
-    })();
-  </script>
 </body>
 </html>

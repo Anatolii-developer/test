@@ -2659,9 +2659,22 @@ input:checked+.slider:before {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  align-items: flex-start;
 }
 
-.create-course-content input,
+.create-course-content .form-group label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #8F8F8F;
+}
+
+.create-course-content .form-group:first-of-type > label {
+  font-size: 16px;
+  color: #414141;
+}
+
+.create-course-content input:not([type="checkbox"]),
 .create-course-content select,
 .create-course-content textarea {
   padding: 12px;
@@ -2698,7 +2711,7 @@ input:checked+.slider:before {
 }
 
 .radio-group.access-type-group label {
-  width: 100%;
+  width: auto;
   justify-content: flex-start;
   white-space: nowrap;
 }
@@ -2729,6 +2742,10 @@ input:checked+.slider:before {
   align-items: center;
 }
 
+.time-range {
+  flex-wrap: nowrap;
+}
+
 .date-range input[type="date"],
 .time-range input[type="time"] {
   padding: 12px;
@@ -2741,6 +2758,21 @@ input:checked+.slider:before {
   color: #333;
 }
 
+.time-range input[type="time"] {
+  width: 136px;
+  height: 40px;
+  padding: 0 12px;
+  line-height: 40px;
+  border: 1px solid #E37009;
+  border-radius: 8px;
+}
+
+.time-range span {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  color: #8F8F8F;
+}
+
 .weekdays-checkboxes {
   display: flex;
   flex-direction: column;
@@ -2751,21 +2783,26 @@ input:checked+.slider:before {
 .weekdays-checkboxes label {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 16px;
+  gap: 10px;
+  font-size: 14px;
   font-weight: 500;
-  color: #2D2D2D;
+  color: #414141;
 }
 
 .weekdays-checkboxes input[type="checkbox"] {
   appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid #E37009;
-  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #E37009;
+  border-radius: 6px;
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
+  background-color: #fffef9;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .weekdays-checkboxes input[type="checkbox"]:checked {
@@ -2775,10 +2812,10 @@ input:checked+.slider:before {
 .weekdays-checkboxes input[type="checkbox"]:checked::after {
   content: "✔";
   color: white;
-  font-size: 11px;
+  font-size: 12px;
   position: absolute;
-  left: 3px;
-  top: -2px;
+  left: 4px;
+  top: -1px;
 }
 
 
@@ -4351,7 +4388,7 @@ textarea {
     font-size: 14px;
   }
 
-  body.create-course-page .create-course-content input,
+  body.create-course-page .create-course-content input:not([type="checkbox"]),
   body.create-course-page .create-course-content select,
   body.create-course-page .create-course-content textarea {
     width: 100%;
@@ -4359,20 +4396,14 @@ textarea {
     font-size: 14px;
   }
 
-  body.create-course-page .date-range,
-  body.create-course-page .time-range {
+  body.create-course-page .date-range {
     flex-direction: column;
     gap: 8px;
     align-items: stretch;
   }
 
-  body.create-course-page .date-range input,
-  body.create-course-page .time-range input {
+  body.create-course-page .date-range input {
     width: 100%;
-  }
-
-  body.create-course-page .time-range span {
-    display: none;
   }
 
   body.create-course-page .radio-group {

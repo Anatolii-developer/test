@@ -2876,10 +2876,12 @@ input:checked+.slider:before {
 }
 
 .cert-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
   gap: 16px;
   margin-bottom: 40px;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 980px;
 }
 
 .cert-btn {
@@ -2890,6 +2892,10 @@ input:checked+.slider:before {
   font-weight: 500;
   text-decoration: none;
   transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .cert-btn:hover {
@@ -3046,6 +3052,7 @@ input:checked+.slider:before {
 
   .cert-nav {
     gap: 12px;
+    max-width: 760px;
   }
 
   .cert-btn {
@@ -3120,7 +3127,8 @@ input:checked+.slider:before {
     width: 344px;
     max-width: 100%;
     margin: 0 auto 16px;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 

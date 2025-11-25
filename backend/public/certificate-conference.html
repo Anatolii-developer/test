@@ -11,6 +11,19 @@
     />
   </head>
   <body>
+    <header class="site-header">
+      <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+        <img src="assets/sidebar/burger.svg" alt="" />
+      </button>
+
+      <a href="/" class="header-logo" aria-label="Головна">
+        <img src="assets/emblem.svg" alt="IPS" />
+      </a>
+
+      <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+        UA ▼
+      </button>
+    </header>
     <aside class="sidebar collapsed" id="sidebar">
       <div class="toggle-button" onclick="toggleSidebar()">
         <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -65,6 +78,7 @@
         <span>Вийти з акаунту</span>
       </div>
     </aside>
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
     <main class="cert-page">
       <div class="main-header">

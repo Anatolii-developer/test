@@ -2264,7 +2264,8 @@ input:checked+.slider:before {
 
 /* Completed Courses Content */
 .completed-courses-content {
-  width: 1110px;
+  width: 100%;
+  max-width: 1110px;
   height: auto;
   margin: 60px auto;
   padding: 60px 100px;
@@ -2279,11 +2280,12 @@ input:checked+.slider:before {
 /* Navigation Button Container */
 .completed-nav-buttons {
   display: flex;
-  gap: 50px;
-  margin-top: 30px;
-  margin-bottom: 28px;
-  justify-content: flex-start;
-
+  flex-wrap: wrap;
+  gap: 24px;
+  width: 100%;
+  max-width: 1110px;
+  margin: 30px auto 28px;
+  justify-content: center;
 }
 
 .completed-nav-button.create {
@@ -2511,7 +2513,8 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 910px;
+  width: 100%;
+  max-width: 910px;
   margin: 0 auto 32px;
   color: #275D2B;
   font-family: 'Poppins', sans-serif;
@@ -4168,6 +4171,117 @@ textarea {
   }
 }
 
+
+
+
+/* ===== COMPLETED COURSES (tablet): fluid width, wrapping buttons, softer padding ===== */
+@media (max-width: 900px) {
+
+  body.completed-courses-page .main-header,
+  body.current-courses-page .main-header,
+  body.planned-courses-page .main-header,
+  body.create-course-page .main-header {
+    width: 100%;
+    max-width: 760px;
+    margin: 80px auto 24px;
+    padding: 20px 24px;
+    gap: 16px;
+  }
+
+  body.completed-courses-page .main-header h2,
+  body.current-courses-page .main-header h2,
+  body.planned-courses-page .main-header h2,
+  body.create-course-page .main-header h2 {
+    padding-left: 0;
+    font-size: 30px;
+    line-height: 36px;
+    text-align: left;
+  }
+
+  body.completed-courses-page .main-header img,
+  body.current-courses-page .main-header img,
+  body.planned-courses-page .main-header img,
+  body.create-course-page .main-header img {
+    padding-right: 0;
+    max-width: 240px;
+    width: 100%;
+    height: auto;
+  }
+
+  body.completed-courses-page .completed-nav-buttons,
+  body.current-courses-page .completed-nav-buttons,
+  body.planned-courses-page .completed-nav-buttons,
+  body.create-course-page .completed-nav-buttons {
+    max-width: 760px;
+    gap: 16px;
+  }
+
+  body.completed-courses-page .completed-nav-button,
+  body.current-courses-page .completed-nav-button,
+  body.planned-courses-page .completed-nav-button,
+  body.create-course-page .completed-nav-button {
+    flex: 1 1 45%;
+    min-width: 180px;
+    width: auto;
+    height: 42px;
+    padding: 0 14px;
+    font-size: 16px;
+  }
+
+  body.completed-courses-page .completed-courses-content,
+  body.current-courses-page .completed-courses-content,
+  body.planned-courses-page .completed-courses-content {
+    max-width: 760px;
+    padding: 24px 20px;
+    margin: 16px auto;
+  }
+
+  body.completed-courses-page .completed-courses-content .date-inputs,
+  body.current-courses-page .completed-courses-content .date-inputs,
+  body.planned-courses-page .completed-courses-content .date-inputs {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  body.completed-courses-page .completed-courses-content .date-input,
+  body.current-courses-page .completed-courses-content .date-input,
+  body.planned-courses-page .completed-courses-content .date-input {
+    flex: 1 1 200px;
+    min-width: 0;
+    width: auto;
+  }
+
+  body.completed-courses-page .completed-courses-content .filter-btn-wrapper,
+  body.current-courses-page .completed-courses-content .filter-btn-wrapper,
+  body.planned-courses-page .completed-courses-content .filter-btn-wrapper {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  body.completed-courses-page .completed-courses-content .filter-btn,
+  body.current-courses-page .completed-courses-content .filter-btn,
+  body.planned-courses-page .completed-courses-content .filter-btn {
+    width: 100%;
+  }
+
+  body.completed-courses-page .certificate-card {
+    padding: 18px;
+  }
+
+  body.completed-courses-page .certificate-embed {
+    height: 320px;
+  }
+
+  body.completed-courses-page .card-bottom {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  body.completed-courses-page .view-button,
+  body.completed-courses-page .view-site-button {
+    width: 100%;
+  }
+}
 
 
 

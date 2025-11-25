@@ -3134,7 +3134,7 @@ input:checked+.slider:before {
   }
 
   .cert-btn {
-    width: 100%;
+    width: 50%;
     min-height: 32px;
     justify-content: center;
     display: inline-flex;

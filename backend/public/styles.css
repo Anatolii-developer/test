@@ -3016,6 +3016,166 @@ input:checked+.slider:before {
   background: #cf5d00;
 }
 
+
+/* ===== CERT PAGES: tablet adjustments ===== */
+@media (max-width: 900px) {
+  .cert-page {
+    padding: 32px 20px;
+  }
+
+  .cert-page .main-header {
+    width: 100%;
+    max-width: 760px;
+    margin: 80px auto 24px;
+    padding: 20px 24px;
+    gap: 16px;
+  }
+
+  .cert-page .main-header h2 {
+    padding-left: 0;
+    font-size: 30px;
+    line-height: 36px;
+  }
+
+  .cert-page .main-header img {
+    padding-right: 0;
+    max-width: 240px;
+    width: 100%;
+    height: auto;
+  }
+
+  .cert-nav {
+    gap: 12px;
+  }
+
+  .cert-btn {
+    flex: 1 1 48%;
+    min-width: 220px;
+    text-align: center;
+  }
+
+  .cert-grid {
+    gap: 20px;
+  }
+
+  .cert-card {
+    width: 100%;
+    max-width: 760px;
+  }
+
+  .cert-embed {
+    height: 280px;
+  }
+
+  .cert-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .view-btn {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* ===== CERT PAGES: phone layout ===== */
+@media (max-width: 480px) {
+  .cert-page {
+    padding: 0 16px 40px;
+  }
+
+  .cert-page .main-header {
+    width: 344px;
+    max-width: 100%;
+    margin: 16px auto 20px;
+    padding: 16px;
+    border-radius: 16px;
+    background: #FFFFF9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cert-page .main-header h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 28px;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+  }
+
+  .cert-page .main-header img {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    border-radius: 12px;
+    padding: 0;
+  }
+
+  .cert-nav {
+    width: 344px;
+    max-width: 100%;
+    margin: 0 auto 16px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cert-btn {
+    width: 100%;
+    justify-content: center;
+    display: inline-flex;
+    height: 40px;
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  .cert-grid {
+    width: 344px;
+    max-width: 100%;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cert-card {
+    width: 100%;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .cert-title {
+    font-size: 16px;
+  }
+
+  .cert-dates {
+    font-size: 13px;
+  }
+
+  .cert-embed {
+    height: 220px;
+  }
+
+  .cert-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .lang-switch {
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .view-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .sidebar.expanded nav a:nth-child(3) span {
   white-space: normal;
   /* allow wrapping */
@@ -4478,6 +4638,46 @@ textarea {
   body.completed-courses-page .view-site-button {
     width: 100%;
     text-align: center;
+  }
+
+  /* ===== CURRENT COURSES: компактные карточки ===== */
+  body.current-courses-page .current-course-item {
+    padding: 12px 0 24px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  body.current-courses-page .course-date-line {
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  body.current-courses-page .course-date-line span {
+    font-size: 14px;
+  }
+
+  body.current-courses-page .current-course-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  body.current-courses-page .current-course-title {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  body.current-courses-page .current-course-subtitle {
+    font-size: 14px;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  body.current-courses-page .current-show-more-btn,
+  body.current-courses-page .join-meeting-btn {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 14px;
   }
 
   body.create-course-page main {

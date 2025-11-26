@@ -4080,7 +4080,7 @@ textarea {
   }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
   .site-header {
     display: none !important;
   }

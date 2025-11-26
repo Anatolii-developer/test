@@ -1494,6 +1494,35 @@ body.success-page .nav-btn:hover {
   }
 }
 
+/* Landscape phones / small tablets: keep image on the right to use space */
+@media (max-width: 900px) and (min-width: 569px) {
+  .library-card {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    padding: 20px 16px;
+    gap: 12px;
+  }
+
+  .library-card .info {
+    width: 100%;
+  }
+
+  .library-card .image {
+    width: 200px;
+    max-width: 220px;
+    height: auto;
+    justify-self: end;
+  }
+
+  .library-card .arrow {
+    width: 44px;
+    height: 44px;
+    justify-self: end;
+    margin-left: 0;
+  }
+}
+
 
 /* ========== Main Library Layout ========== */
 

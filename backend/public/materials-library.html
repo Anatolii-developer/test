@@ -80,10 +80,29 @@
       .preview iframe,
       .preview embed {
         width: 100%;
-        height: 420px;
+        height: clamp(380px, 70vh, 820px);
         border: 0;
         border-radius: 10px;
         background: #fff;
+      }
+      .pdf-preview {
+        display: grid;
+        gap: 8px;
+      }
+      .pdf-open-full {
+        justify-self: end;
+        color: #d97a1c;
+        font-size: 14px;
+        text-decoration: none;
+      }
+      .pdf-open-full:hover { text-decoration: underline; }
+      .mobile-pdf-note {
+        font-size: 14px;
+        line-height: 1.5;
+        background: #fff7ea;
+        border: 1px solid #f4d9b5;
+        padding: 10px 12px;
+        border-radius: 10px;
       }
       .empty-note {
         opacity: 0.7;
@@ -307,6 +326,9 @@ function getYouTubeEmbedUrl(link){
 const esc = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const cssSafe = s => String(s||"").replace(/[^a-z0-9_-]+/gi,"-");
 const parseISO = v => { const d = v?new Date(v):null; return isNaN(d?.getTime?.())?null:d; };
+const isMobileViewport = () => {
+  return window.matchMedia("(max-width: 640px)").matches || /Mobi|Android/i.test(navigator.userAgent);
+};
 
 function getMe(){
   // очікуємо з localStorage (як у адмінці)
@@ -512,7 +534,17 @@ function renderPreview(container, mat){
   const url = raw.startsWith("http") ? raw : `${API_BASE}/${raw.replace(/^\/+/, "")}`;
   const ext = (raw.split(".").pop()||"").toLowerCase();
   if (ext==="pdf"){
-    container.innerHTML = `<embed src="${url}" type="application/pdf" />`;
+    if (isMobileViewport()){
+      // На телефонах відкриваємо у новій вкладці, щоб працював повноекранний перегляд
+      try { window.open(url, "_blank", "noopener"); } catch (_err) {}
+      container.innerHTML = `<div class="mobile-pdf-note">PDF відкрито у новій вкладці для перегляду на весь екран. Якщо вкладка не відкрилася, <a href="${url}" target="_blank" rel="noopener">натисніть тут</a>.</div>`;
+    } else {
+      container.innerHTML = `
+        <div class="pdf-preview">
+          <embed src="${url}" type="application/pdf" />
+          <a class="pdf-open-full" href="${url}" target="_blank" rel="noopener">Відкрити на весь екран</a>
+        </div>`;
+    }
   } else if (["doc","docx","ppt","pptx"].includes(ext)){
     container.innerHTML = `<div class="material-desc">Попередній перегляд недоступний без HTTPS. <a href="${url}" target="_blank" rel="noopener">Відкрити / Завантажити</a></div>`;
   } else {

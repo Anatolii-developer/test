@@ -145,13 +145,13 @@
       .language-select { display: none !important; }
 
       /* Desktop: keep backdrop hidden */
-      @media (min-width: 481px) {
+      @media (min-width: 1025px) {
         .drawer-backdrop { display: none !important; }
       }
 
-      /* ===== Mobile 376×812 behavior ===== */
-      @media (max-width: 480px) {
-        .site-header { height: 64px; padding: 8px 12px; }
+      /* ===== Tablet / landscape phones ===== */
+      @media (max-width: 1024px) {
+        .site-header { display: grid !important; }
         /* content should not be shifted left on mobile */
         #mainContent { padding-left: 0 !important; }
 
@@ -160,13 +160,13 @@
           position: fixed;
           top: 0;
           left: 0;
-          width: 376px;
+          width: min(420px, 100vw);
           max-width: 100vw;
           height: 100vh;
           transform: translateX(-100%);
           transition: transform .3s ease;
           z-index: 1001;
-          padding-top: 64px; /* keep clear under header */
+          padding-top: 80px; /* keep clear under header */
           background: #fff;
         }
         /* hide desktop toggle button in sidebar */
@@ -183,6 +183,7 @@
           pointer-events: none;
           transition: opacity .2s ease;
           z-index: 1000;
+          display: block !important;
         }
         .drawer-backdrop.active {
           opacity: 1;
@@ -197,12 +198,20 @@
         }
         .sidebar.expanded,
         .sidebar.collapsed {
-          width: 376px; /* always full on mobile */
+          width: min(420px, 100vw); /* always full on mobile */
           align-items: flex-start;
         }
         .sidebar.collapsed nav a span { display: inline-block; opacity: 1; max-width: none; }
         .sidebar .logo { margin-left: 8px; width: 160px; }
         .sidebar .logo-collapsed { display: none !important; }
+      }
+
+      /* ===== Mobile 376×812 behavior ===== */
+      @media (max-width: 480px) {
+        .site-header { height: 64px; padding: 8px 12px; }
+        .sidebar { padding-top: 64px; width: min(376px, 100vw); }
+        .sidebar.expanded,
+        .sidebar.collapsed { width: min(376px, 100vw); }
       }
     </style>
   </head>

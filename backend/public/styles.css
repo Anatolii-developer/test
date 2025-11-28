@@ -3004,22 +3004,31 @@ input:checked+.slider:before {
 
 
 .cert-page {
+  --cert-section-width: 920px;
   padding: 60px 40px;
+}
+
+.cert-page .main-header {
+  width: 100%;
+  max-width: var(--cert-section-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cert-nav {
   display: grid;
-  grid-template-columns: repeat(2, minmax(220px, 1fr));
-  gap: 16px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0 auto 32px;
   width: 100%;
-  max-width: 980px;
+  max-width: var(--cert-section-width);
+  align-items: stretch;
 }
 
 .cert-btn {
   background: #3C6E44;
   color: #fff;
-  padding: 12px 24px;
+  padding: 12px 18px;
   border-radius: 32px;
   font-weight: 500;
   text-decoration: none;
@@ -3028,6 +3037,8 @@ input:checked+.slider:before {
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-width: 0;
+  line-height: 1.4;
 }
 
 .cert-btn:hover {
@@ -3158,12 +3169,13 @@ input:checked+.slider:before {
 /* ===== CERT PAGES: tablet adjustments ===== */
 @media (max-width: 900px) {
   .cert-page {
+    --cert-section-width: 760px;
     padding: 32px 20px;
   }
 
   .cert-page .main-header {
     width: 100%;
-    max-width: 760px;
+    max-width: var(--cert-section-width);
     margin: 80px auto 24px;
     padding: 20px 24px;
     gap: 16px;
@@ -3184,12 +3196,13 @@ input:checked+.slider:before {
 
   .cert-nav {
     gap: 12px;
-    max-width: 760px;
+    max-width: var(--cert-section-width);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
 
   .cert-btn {
     flex: 1 1 48%;
-    min-width: 220px;
+    min-width: 0;
     text-align: center;
   }
 
@@ -3221,12 +3234,13 @@ input:checked+.slider:before {
 /* ===== CERT PAGES: phone layout ===== */
 @media (max-width: 480px) {
   .cert-page {
+    --cert-section-width: 344px;
     padding: 0 16px 40px;
   }
 
   .cert-page .main-header {
-    width: 344px;
-    max-width: 100%;
+    width: 100%;
+    max-width: var(--cert-section-width);
     margin: 16px auto 20px;
     padding: 16px;
     border-radius: 16px;
@@ -3256,12 +3270,12 @@ input:checked+.slider:before {
   }
 
   .cert-nav {
-    width: 344px;
-    max-width: 100%;
+    width: 100%;
+    max-width: var(--cert-section-width);
     margin: 0 auto 16px;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
     justify-items: stretch;
   }
 
@@ -3272,7 +3286,7 @@ input:checked+.slider:before {
     display: inline-flex;
     font-size: 13px;
     border-radius: 24px;
-    padding: 8px 12px;
+    padding: 8px 10px;
     line-height: 18px;
     white-space: normal;
     text-align: center;

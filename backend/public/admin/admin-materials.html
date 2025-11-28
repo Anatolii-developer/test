@@ -64,12 +64,11 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof renderAdminSidebar === "function") {
-      renderAdminSidebar("admin-career-requests.html");
+      renderAdminSidebar("admin-materials.html");
     }
     if (typeof requireAdminPage === "function") {
       requireAdminPage();
     }
-    load();
   });
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
@@ -86,7 +85,7 @@ function logoutUser() {
   window.location.href = "login.html";
 }
 
-  const API_URL = "http://157.230.121.24:5050";
+  const API_BASE = "";
   let currentUserId = null;
   let currentStatus = "WAIT FOR REVIEW";
 
@@ -118,9 +117,10 @@ function logoutUser() {
       const role = roleSelect.value;
       if (!status || !currentUserId) return;
 
-      await fetch(`${API_URL}/api/users/${currentUserId}/status`, {
+      await fetch(`${API_BASE}/api/users/${currentUserId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ status, role }),
       });
       modal.style.display = "none";
@@ -129,7 +129,7 @@ function logoutUser() {
 
     async function loadUsers() {
       try {
-        const res = await fetch(`${API_URL}/api/users?status=${currentStatus}`);
+        const res = await fetch(`${API_BASE}/api/users?status=${currentStatus}`, { credentials: "include" });
         const users = await res.json();
 
         if (currentStatus === "APPROVED") {
@@ -159,7 +159,7 @@ function logoutUser() {
         document.querySelectorAll(".more-btn").forEach(btn => {
           btn.addEventListener("click", async () => {
             const id = btn.dataset.id;
-            const res = await fetch(`${API_URL}/api/users/${id}`);
+            const res = await fetch(`${API_BASE}/api/users/${id}`, { credentials: "include" });
             const user = await res.json();
             currentUserId = id;
 

@@ -34,18 +34,19 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof renderAdminSidebar === "function") {
-        renderAdminSidebar("admin-career-requests.html");
+        renderAdminSidebar("admin-roles.html");
       }
       if (typeof requireAdminPage === "function") {
         requireAdminPage();
       }
-      load();
+      loadRoles();
     });
     let roles = [];
+const API_BASE = "";
 
 async function loadRoles() {
   try {
-    const res = await fetch("http://157.230.121.24:5050/api/roles");
+    const res = await fetch(`${API_BASE}/api/roles`, { credentials: "include" });
     roles = await res.json();
     await renderRoles(); // теперь тоже async
   } catch (err) {
@@ -60,7 +61,7 @@ async function loadRoles() {
 
   let usersByRole = {};
   try {
-    const res = await fetch("http://157.230.121.24:5050/api/users/roles-with-users");
+    const res = await fetch(`${API_BASE}/api/users/roles-with-users`, { credentials: "include" });
     usersByRole = await res.json();
   } catch (err) {
     console.error("❌ Не вдалося завантажити користувачів по ролях:", err);
@@ -112,9 +113,10 @@ async function loadRoles() {
       if (!name) return;
 
       try {
-        const res = await fetch("http://157.230.121.24:5050/api/roles", {
+        const res = await fetch(`${API_BASE}/api/roles`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ name })
         });
 
@@ -133,8 +135,9 @@ async function loadRoles() {
       if (!confirm("Видалити роль?")) return;
 
       try {
-        const res = await fetch(`http://157.230.121.24:5050/api/roles/${id}`, {
-          method: "DELETE"
+        const res = await fetch(`${API_BASE}/api/roles/${id}`, {
+          method: "DELETE",
+          credentials: "include"
         });
 
         if (res.ok) {
@@ -151,9 +154,10 @@ async function loadRoles() {
       const newName = prompt("Нова назва ролі:", oldName);
       if (!newName || newName === oldName) return;
 
-      fetch(`http://157.230.121.24:5050/api/roles/${id}`, {
+      fetch(`${API_BASE}/api/roles/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name: newName })
       }).then(res => {
         if (res.ok) loadRoles();
@@ -161,7 +165,6 @@ async function loadRoles() {
       });
     }
 
-    window.addEventListener("DOMContentLoaded", loadRoles);
      function logoutUser(){
     try{
       // чистимо локальне

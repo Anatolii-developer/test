@@ -379,9 +379,6 @@
         <div class="field" style="grid-column: 1/-1">
           <label>Напрямок роботи</label><textarea id="directions" readonly></textarea>
         </div>
-        <div class="field" style="grid-column: 1/-1">
-          <label>Тематики/теми</label><textarea id="topics" readonly></textarea>
-        </div>
       </div>
       </div>
     </main>
@@ -398,6 +395,20 @@
       };
       const params = new URLSearchParams(location.search);
       const ID = params.get("id");
+
+      async function fetchUserDetails(userId) {
+        if (!userId) return null;
+        try {
+          const r = await fetch(`/api/users/${userId}`, {
+            credentials: "include",
+            headers: authHeaders(),
+          });
+          if (!r.ok) return null;
+          return await r.json().catch(() => null);
+        } catch {
+          return null;
+        }
+      }
 
       function getToken() {
         try {
@@ -475,7 +486,9 @@
         }
 
         // user can be nested under 'user' or 'owner'
-        const u = a.user || a.owner || {};
+        const baseUser = a.user || a.owner || {};
+        const freshUser = await fetchUserDetails(baseUser._id || baseUser.id);
+        const u = freshUser || baseUser || {};
 
         qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
         qs("#lastName").value = u.lastName || "";

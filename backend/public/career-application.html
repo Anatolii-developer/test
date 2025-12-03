@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Подати заявку</title>
-    <link
+  <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
@@ -15,34 +15,47 @@
         font-family: "Poppins", sans-serif;
         background-color: #97c194;
         color: #414141;
+        padding: 0;
+      }
+
+      main.apply-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 32px 16px 72px;
+        box-sizing: border-box;
       }
 
       .apply-header {
-        width: 1110px;
-        height: 212px;
+        width: 100%;
+        max-width: 1110px;
         background-color: #fff;
         border-radius: 24px;
-        margin: 40px auto 20px;
-        padding: 40px 100px;
+        padding: clamp(24px, 4vw, 40px) clamp(24px, 8vw, 100px);
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
       }
 
       .apply-title {
-        font-size: 40px;
+        font-size: clamp(28px, 4vw, 40px);
         font-weight: 600;
         color: #414141;
       }
 
       .apply-image {
-        width: 284px;
-        height: 164px;
+        width: clamp(200px, 28vw, 284px);
+        height: auto;
       }
 
       .apply-arrow {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
       }
 
       .back-button {
@@ -61,15 +74,18 @@
       }
 
       .apply-form {
-        width: 1110px;
+        width: 100%;
+        max-width: 1110px;
         background-color: #fff;
         border-radius: 24px;
-        padding: 60px 100px;
+        padding: clamp(28px, 5vw, 60px) clamp(24px, 7vw, 100px);
         margin: 0 auto;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+        box-sizing: border-box;
       }
 
       .form-group {
-        margin-bottom: 30px;
+        margin-bottom: 28px;
       }
 
       .form-group p {
@@ -118,10 +134,11 @@
       .input-wrapper {
         position: relative;
         margin-top: 12px;
+        width: 100%;
       }
 
       input[type="text"] {
-        width: 910px;
+        width: 100%;
         height: 28px;
         border-radius: 8px;
         padding: 0 12px;
@@ -161,7 +178,7 @@
         font-size: 16px;
         font-weight: 500;
         padding: 10px 20px;
-        margin: 0 auto 40px;
+        margin: 0 auto 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -174,9 +191,72 @@
       .view-requests-button:hover {
         background-color: #d9ebd7;
       }
+
+      .secondary-actions {
+        width: 100%;
+        max-width: 1110px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+      }
+
+      @media (max-width: 900px) {
+        main.apply-page {
+          padding: 20px 12px 60px;
+        }
+
+        .apply-header {
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+        }
+
+        .apply-arrow {
+          align-self: flex-end;
+        }
+
+        .back-button {
+          margin-top: 0;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .custom-radio {
+          align-items: flex-start;
+          line-height: 1.4;
+        }
+
+        .custom-radio .radio-icon {
+          margin-top: 2px;
+        }
+
+        input[type="text"] {
+          height: 40px;
+        }
+      }
     </style>
   </head>
   <body>
+    <header class="site-header">
+      <button
+        class="burger"
+        id="burgerBtn"
+        aria-label="Відкрити меню"
+        aria-expanded="false"
+        aria-controls="sidebar"
+      >
+        <img src="assets/sidebar/burger.svg" alt="" />
+      </button>
+
+      <a href="/" class="header-logo" aria-label="Головна">
+        <img src="assets/emblem.svg" alt="IPS" />
+      </a>
+
+      <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+        UA ▼
+      </button>
+    </header>
     <aside class="sidebar collapsed" id="sidebar">
       <div class="toggle-button" onclick="toggleSidebar()">
         <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -204,10 +284,10 @@
         <a href="profile.html"
           ><img src="assets/sidebar/profile.svg" /><span>Про Мене</span></a
         >
-        <a href="#"
+        <a href="mycertificates.html"
           ><img src="assets/sidebar/news.svg" /><span>Мої Сертифікати</span></a
         >
-        <a href="#"
+        <a href="career-faq.html"
           ><img src="assets/sidebar/10.svg" /><span>Планування Кар'єри</span></a
         >
         <a href="library.html"
@@ -220,10 +300,6 @@
   <img src="assets/sidebar/forum.svg" alt="Форум"/>
   <span>Форум</span>
 </a>
-        <a href="forum/index.html">
-          <img src="assets/sidebar/forum.svg" alt="Форум" />
-          <span>Форум</span>
-        </a>
       </nav>
       <div class="logout">
         <img
@@ -235,134 +311,124 @@
         <span>Вийти з акаунту</span>
       </div>
     </aside>
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-    <div class="apply-header">
-      <div class="apply-title">Подати заявку</div>
-      <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
-      <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
-    </div>
-
-    <a href="career-faq.html" class="back-button">
-      <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
-    </a>
-    <a
-      id="applyBtn"
-      href="career-mentor-requests.html"
-      class="view-requests-button"
-      style="display: none; margin-top: -20px"
-    >
-      Менторство
-    </a>
-
-    <a href="career-requests.html" class="view-requests-button">
-      Переглянути подані заявки
-    </a>
-
-    <div class="apply-form">
-      <div class="form-group">
-        <p>До кого Ви звертаєтесь?</p>
-        <label class="custom-radio">
-          <input type="radio" name="target" value="supervisor" />
-          <span class="radio-icon"></span>
-          Супервізора
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="target" value="mentor" />
-          <span class="radio-icon"></span>
-          Ментора
-        </label>
-      </div>
-      <div class="form-group">
-        <p>Скільки років у вас практики:</p>
-        <label class="custom-radio">
-          <input type="radio" name="experience" value="<7" />
-          <span class="radio-icon"></span>
-          зовсім початківець/студент або практикуючий до 7 років
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="experience" value="7-15" />
-          <span class="radio-icon"></span>
-          практикуючий від 7 до 15 років
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="experience" value=">15" />
-          <span class="radio-icon"></span>
-          від 15 і більше років практики
-        </label>
+    <main class="apply-page" id="mainContent">
+      <div class="apply-header">
+        <div class="apply-title">Подати заявку</div>
+        <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
+        <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
       </div>
 
-      <div class="form-group">
-        <p>До якої категорії людей за віком Ви відноситесь:</p>
-        <label class="custom-radio">
-          <input type="radio" name="age" value="до 32" />
-          <span class="radio-icon"></span>
-          до 32 років
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="age" value="32-42" />
-          <span class="radio-icon"></span>
-          від 32 до 42 років
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="age" value="42-52" />
-          <span class="radio-icon"></span>
-          від 42 до 52 років
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="age" value="52-65" />
-          <span class="radio-icon"></span>
-          від 52 до 65 років
-        </label>
-        <label class="custom-radio">
-          <input type="radio" name="age" value=">65" />
-          <span class="radio-icon"></span>
-          за 65 років
-        </label>
-      </div>
+      <a href="career-faq.html" class="back-button">
+        <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
+      </a>
+      <a
+        id="applyBtn"
+        href="career-mentor-requests.html"
+        class="view-requests-button"
+        style="display: none;"
+      >
+        Менторство
+      </a>
 
-      <div class="form-group">
-        <p>
-          Напишіть, будь ласка, Ваш запит, з яким Ви звертаєтесь до ментора:
-        </p>
-        <div class="input-wrapper">
-          <input id="requestText" type="text" placeholder="Ваш запит..." />
-          <img class="edit-icon" src="./assets/edit-icon.svg" alt="Edit" />
+      <div class="apply-form">
+        <div class="form-group">
+          <p>До кого Ви звертаєтесь?</p>
+          <label class="custom-radio">
+            <input type="radio" name="target" value="supervisor" />
+            <span class="radio-icon"></span>
+            Супервізора
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="target" value="mentor" />
+            <span class="radio-icon"></span>
+            Ментора
+          </label>
         </div>
-      </div>
-
-      <div class="form-group">
-        <p>
-          Напишіть про себе те, що вважаєте за потрібним знати ментору про себе
-          та ситуацію:
-        </p>
-        <div class="input-wrapper">
-          <input
-            id="aboutText"
-            type="text"
-            placeholder="Інформація про себе..."
-          />
-          <img class="edit-icon" src="./assets/edit-icon.svg" alt="Edit" />
+        <div class="form-group">
+          <p>Скільки років у вас практики:</p>
+          <label class="custom-radio">
+            <input type="radio" name="experience" value="<7" />
+            <span class="radio-icon"></span>
+            зовсім початківець/студент або практикуючий до 7 років
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="experience" value="7-15" />
+            <span class="radio-icon"></span>
+            практикуючий від 7 до 15 років
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="experience" value=">15" />
+            <span class="radio-icon"></span>
+            від 15 і більше років практики
+          </label>
         </div>
-      </div>
 
-      <button id="submitBtn" type="button" class="submit-button">
-        Подати заявку
-      </button>
-    </div>
-    <a
-      href="career-requests.html"
-      class="submit-button"
-      style="
-        display: inline-block;
-        text-decoration: none;
-        text-align: center;
-        margin-left: 100px;
-        background-color: #ecf5eb;
-        color: #275d2b;
-        font-weight: 500;
-      "
-      >Переглянути подані заявки</a
-    >
+        <div class="form-group">
+          <p>До якої категорії людей за віком Ви відноситесь:</p>
+          <label class="custom-radio">
+            <input type="radio" name="age" value="до 32" />
+            <span class="radio-icon"></span>
+            до 32 років
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="age" value="32-42" />
+            <span class="radio-icon"></span>
+            від 32 до 42 років
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="age" value="42-52" />
+            <span class="radio-icon"></span>
+            від 42 до 52 років
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="age" value="52-65" />
+            <span class="radio-icon"></span>
+            від 52 до 65 років
+          </label>
+          <label class="custom-radio">
+            <input type="radio" name="age" value=">65" />
+            <span class="radio-icon"></span>
+            за 65 років
+          </label>
+        </div>
+
+        <div class="form-group">
+          <p>
+            Напишіть, будь ласка, Ваш запит, з яким Ви звертаєтесь до ментора:
+          </p>
+          <div class="input-wrapper">
+            <input id="requestText" type="text" placeholder="Ваш запит..." />
+            <img class="edit-icon" src="./assets/edit-icon.svg" alt="Edit" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <p>
+            Напишіть про себе те, що вважаєте за потрібним знати ментору про себе
+            та ситуацію:
+          </p>
+          <div class="input-wrapper">
+            <input
+              id="aboutText"
+              type="text"
+              placeholder="Інформація про себе..."
+            />
+            <img class="edit-icon" src="./assets/edit-icon.svg" alt="Edit" />
+          </div>
+        </div>
+
+        <button id="submitBtn" type="button" class="submit-button">
+          Подати заявку
+        </button>
+      </div>
+      <div class="secondary-actions">
+        <a href="career-requests.html" class="view-requests-button">
+          Переглянути подані заявки
+        </a>
+      </div>
+    </main>
     <script>
       const API = "http://157.230.121.24:5050/api/career-applications";
 

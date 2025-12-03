@@ -149,22 +149,24 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 32px;
-        padding: 0 16px;
-        border-radius: 24px;
+        height: 40px;
+        width: 48px;
+        padding: 0;
+        border-radius: 14px;
         border: none;
         cursor: pointer;
-        background: #275d2b;
-        color: #fff;
+        background: transparent;
+        color: #275d2b;
         font-weight: 600;
         font-size: 14px;
         white-space: nowrap;
         flex: 0 0 auto;
         text-decoration: none;
         gap: 8px;
+        margin-left: auto;
       }
-      .btn-more .btn-label { display: inline; }
-      .btn-more .btn-arrow { display: none; width: 20px; height: 20px; }
+      .btn-more .btn-label { display: none; }
+      .btn-more .btn-arrow { display: block; width: 22px; height: 22px; }
       .empty {
         text-align: center;
         color: #6b6b6b;
@@ -401,7 +403,7 @@
         more.setAttribute("aria-label", "Відкрити заявку детально");
         more.innerHTML = `
           <span class="btn-label">Дізнатись більше</span>
-          <img src="./assets/library/arrow-main.svg" alt="Arrow" class="btn-arrow" />
+          <img src="./assets/library/arrow.png" alt="Arrow" class="btn-arrow" />
         `;
         row.append(left, more);
         return row;

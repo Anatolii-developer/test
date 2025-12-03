@@ -109,9 +109,9 @@
 }
 
 .contact-btn {
-  height: 36px;
-  padding: 0 53px;           /* горизонтальные отступы, без вертикальных */
-  line-height: 36px;         /* выравниваем текст по вертикали */
+  height: 40px;
+  padding: 0 48px;           /* горизонтальные отступы, без вертикальных */
+  line-height: 40px;         /* выравниваем текст по вертикали */
   border-radius: 24px;
   background: #275D2B;
   color: #fff;
@@ -312,6 +312,13 @@
           flex-direction: column;
           align-items: flex-start;
           gap: 8px;
+        }
+        .contact-btn {
+          width: 100%;
+          max-width: 360px;
+          padding: 12px 16px;
+          height: auto;
+          line-height: 1.4;
         }
       }
       @media (max-width: 600px) {

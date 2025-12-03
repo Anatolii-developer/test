@@ -393,6 +393,10 @@
           d.getMonth() + 1
         )}.${d.getFullYear()}`;
       };
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val || "";
+      };
       const params = new URLSearchParams(location.search);
       const ID = params.get("id");
 
@@ -490,28 +494,31 @@
         const freshUser = await fetchUserDetails(baseUser._id || baseUser.id);
         const u = freshUser || baseUser || {};
 
-        qs("#photo").src = u.photoUrl || "/assets/profile-photo.png";
-        qs("#lastName").value = u.lastName || "";
-        qs("#firstName").value = u.firstName || "";
-        qs("#middleName").value = u.middleName || "";
-        qs("#submittedAt").value = fmtDate(a.createdAt || a.created_at || "");
-        qs("#experience").value = a.experience || a.exp || "";
-        qs("#age").value = a.ageGroup || a.age || "";
-        qs("#requestText").value = a.requestText || a.request || "";
-        qs("#aboutText").value = a.aboutText || a.about || "";
-        qs("#education").value = u.education || a.education || "";
+        const photoEl = document.getElementById("photo");
+        if (photoEl) photoEl.src = u.photoUrl || "/assets/profile-photo.png";
+        setVal("lastName", u.lastName);
+        setVal("firstName", u.firstName);
+        setVal("middleName", u.middleName);
+        setVal("submittedAt", fmtDate(a.createdAt || a.created_at || ""));
+        setVal("experience", a.experience || a.exp || "");
+        setVal("age", a.ageGroup || a.age || "");
+        setVal("requestText", a.requestText || a.request || "");
+        setVal("aboutText", a.aboutText || a.about || "");
+        setVal("education", u.education || a.education || "");
 
         const directions = Array.isArray(u.directions)
           ? u.directions
           : Array.isArray(a.directions)
           ? a.directions
           : [];
-        qs("#directions").value = Array.isArray(directions) && directions.length
-          ? directions.filter(Boolean).join(", ")
-          : (u.direction || a.direction || "");
+        setVal("directions",
+          Array.isArray(directions) && directions.length
+            ? directions.filter(Boolean).join(", ")
+            : (u.direction || a.direction || "")
+        );
 
         const topics = Array.isArray(a.topics) ? a.topics.filter(Boolean) : a.topics || "";
-        qs("#topics").value = Array.isArray(topics) ? topics.join(", ") : topics;
+        setVal("topics", Array.isArray(topics) ? topics.join(", ") : topics);
 
         qs("#page").style.display = "flex";
         qs("#guard").style.display = "none";

@@ -414,6 +414,11 @@
         </div>
 
         <div class="field" style="grid-column: 1/-1">
+          <label>Напрямок роботи</label>
+          <textarea id="directions" readonly></textarea>
+        </div>
+
+        <div class="field" style="grid-column: 1/-1">
           <label>Тематики/теми</label>
           <textarea id="topics" readonly></textarea>
         </div>
@@ -509,7 +514,16 @@
         qs("#age").value = a.ageGroup || a.age || "";
         qs("#requestText").value = a.requestText || a.request || "";
         qs("#aboutText").value = a.aboutText || a.about || "";
-        qs("#education").value = a.education || "";
+        qs("#education").value = u.education || a.education || "";
+
+        const directions = Array.isArray(u.directions)
+          ? u.directions
+          : Array.isArray(a.directions)
+          ? a.directions
+          : [];
+        qs("#directions").value = Array.isArray(directions) && directions.length
+          ? directions.filter(Boolean).join(", ")
+          : (u.direction || a.direction || "");
 
         const topics = Array.isArray(a.topics)
           ? a.topics.filter(Boolean)

@@ -11,57 +11,106 @@
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background-color: #97C194;
+      color: #414141;
+    }
+
+    main.career-faq-page {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      padding: 32px 16px 80px;
+      box-sizing: border-box;
     }
 
     .hero {
       width: 100%;
-      height: 700px;
+      max-width: 1200px;
+      min-height: clamp(320px, 55vh, 640px);
       background: url('./assets/library/career-img.png') no-repeat center center/cover;
       position: relative;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
+      padding: 32px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(26, 70, 32, 0) 30%, rgba(26, 70, 32, 0.55) 100%);
     }
 
     .hero-title {
+      position: relative;
       color: #FFFFFF;
-      font-family: 'Poppins', sans-serif;
       font-weight: 600;
-      font-size: 64px;
+      font-size: clamp(36px, 6vw, 64px);
       text-transform: uppercase;
-      position: absolute;
-      bottom: 40px;
+      letter-spacing: 2px;
       text-align: center;
     }
 
     .faq-section {
-      width: 1110px;
+      width: 100%;
+      max-width: 1110px;
       margin: 0 auto;
       background: white;
       border-radius: 24px;
-      padding: 60px 100px;
+      padding: clamp(28px, 4vw, 60px) clamp(20px, 6vw, 72px);
       box-sizing: border-box;
       color: #414141;
+      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.08);
     }
 
     .faq-section h2 {
-      font-size: 40px;
+      font-size: clamp(32px, 4vw, 40px);
       font-weight: 600;
-      margin-bottom: 40px;
+      margin: 0 0 28px;
       color: #414141;
       text-align: center;
     }
 
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .faq-item {
+      position: relative;
       background-color: #FFEED9CC;
       border-radius: 16px;
-      margin-bottom: 16px;
-      padding: 20px 24px;
+      padding: 20px 48px 20px 24px;
       cursor: pointer;
       font-weight: 700;
       font-size: 20px;
       color: #414141;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .faq-item::after {
+      content: '+';
+      position: absolute;
+      right: 18px;
+      top: 22px;
+      font-size: 20px;
+      color: #414141;
+      transition: transform 0.2s ease;
+    }
+
+    .faq-item:hover {
+      background-color: #FFE4C5;
+      transform: translateY(-1px);
+    }
+
+    .faq-item.open::after {
+      transform: rotate(45deg);
     }
 
     .faq-answer {
@@ -69,55 +118,119 @@
       font-size: 16px;
       margin-top: 12px;
       color: #414141;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .faq-empty {
+      background: #f8f8f8;
+      border-radius: 16px;
+      padding: 16px 20px;
+      text-align: center;
+      color: #6a6a6a;
+      font-weight: 500;
+    }
+
+    .cta-stack {
+      width: 100%;
+      max-width: 1110px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .apply-button {
-  width: 1110px;
-  height: 212px;
-  margin: 40px auto;
-  background-color: white;
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  padding: 60px 100px;
-}
+      width: 100%;
+      background-color: white;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(24px, 4vw, 48px) clamp(20px, 5vw, 56px);
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+    }
 
-.apply-button:hover {
-  background-color: #f0f0f0;
-}
+    .apply-button:hover {
+      background-color: #f5f5f5;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.08);
+    }
 
-.apply-text {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 40px;
-  color: #414141;
-}
+    .apply-text {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: clamp(26px, 4vw, 40px);
+      color: #414141;
+    }
 
-.apply-img {
-  width: 284px;
-  height: 164px;
-  object-fit: contain;
-}
+    .apply-img {
+      width: 284px;
+      max-width: 42vw;
+      height: auto;
+      object-fit: contain;
+    }
 
-.apply-arrow {
-  width: 64px;
-  height: 64px;
-}
+    .apply-arrow {
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+    }
 
+    @media (max-width: 1100px) {
+      .hero {
+        max-width: 100%;
+      }
+    }
 
-.faq-answer { display: none; }
-.faq-item.open .faq-answer { display: block; }
+    @media (max-width: 768px) {
+      main.career-faq-page {
+        gap: 20px;
+        padding: 20px 12px 60px;
+      }
 
+      .hero {
+        min-height: 320px;
+        padding: 24px;
+        border-radius: 20px;
+      }
 
-    @media (max-width: 1200px) {
-      .faq-section, .apply-button {
-        width: 90%;
-        padding: 40px 30px;
+      .hero-title {
+        font-size: clamp(28px, 8vw, 40px);
+      }
+
+      .faq-section {
+        padding: 24px 18px;
+      }
+
+      .faq-item {
+        padding: 16px 44px 16px 16px;
+        font-size: 18px;
+      }
+
+      .faq-answer {
+        font-size: 15px;
+      }
+
+      .apply-button {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .apply-img {
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .apply-arrow {
+        align-self: flex-end;
       }
     }
 
@@ -125,7 +238,20 @@
   </style>
 </head>
 <body>
-    <aside class="sidebar collapsed" id="sidebar">
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/sidebar/burger.svg" alt="" />
+    </button>
+
+    <a href="/" class="header-logo" aria-label="Головна">
+      <img src="assets/emblem.svg" alt="IPS" />
+    </a>
+
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
+  <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
     </div>
@@ -142,128 +268,131 @@
   <img src="assets/sidebar/forum.svg" alt="Форум"/>
   <span>Форум</span>
 </a>
-      <a href="forum/index.html">
-  <img src="assets/sidebar/forum.svg" alt="Форум"/>
-  <span>Форум</span>
-</a>
     </nav>
     <div class="logout">
       <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
       <span>Вийти з акаунту</span>
     </div>
   </aside>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-  <div class="hero">
-    <div class="hero-title">CAREER PLANNING</div>
-  </div>
+  <main class="career-faq-page" id="mainContent">
+    <section class="hero">
+      <div class="hero-title">CAREER PLANNING</div>
+    </section>
 
-  <div class="faq-section">
-    <h2>FAQ</h2>
+    <section class="faq-section">
+      <h2>FAQ</h2>
 
-    <div class="faq-item">
-      Що таке менторство у психотерапевтичному середовищі?
-      <div class="faq-answer">
-       Менторство — це форма професійної підтримки, 
-       коли досвідчений спеціаліст (ментор) супроводжує колегу на певному етапі його професійного становлення. 
-       Це може стосуватися як етичних і професійних питань, так і особистісного розвитку в ролі психотерапевта.
-      </div>
-    </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          Що таке менторство у психотерапевтичному середовищі?
+          <div class="faq-answer">
+           Менторство — це форма професійної підтримки, 
+           коли досвідчений спеціаліст (ментор) супроводжує колегу на певному етапі його професійного становлення. 
+           Це може стосуватися як етичних і професійних питань, так і особистісного розвитку в ролі психотерапевта.
+          </div>
+        </div>
 
-    <div class="faq-item">
-      Чим менторство відрізняється від супервізії?
-      <div class="faq-answer">
-        Супервізія зосереджена на роботі з клієнтськими випадками й етичними межами терапії. 
-        Менторство — це більш широка взаємодія: розвиток професійної ідентичності, підтримка у виборі подальшого навчання, професійного шляху, балансі між особистим і професійним.
-      </div>
-    </div>
+        <div class="faq-item">
+          Чим менторство відрізняється від супервізії?
+          <div class="faq-answer">
+            Супервізія зосереджена на роботі з клієнтськими випадками й етичними межами терапії. 
+            Менторство — це більш широка взаємодія: розвиток професійної ідентичності, підтримка у виборі подальшого навчання, професійного шляху, балансі між особистим і професійним.
+          </div>
+        </div>
 
-   <div class="faq-item">
-    Чи буде в мене план дій із професійного розвитку під час роботи з ментором?
-    <div class="faq-answer">
-     Так, ментор допоможе структурувати запити та розробити реалістичний план: як у навчанні, так і в кар’єрному русі. 
-     План може включати рекомендації щодо програм, публікацій, супервізій чи участі в професійних спільнотах.
-    </div>
-  </div>
-    
-  <div class="faq-item">
-    Як виглядає робота з ментором?
-    <div class="faq-answer" >
-      Це регулярні зустрічі (онлайн або офлайн), у яких ви обговорюєте запити, виклики, сумніви, цілі. 
-      Формат може бути як структурованим (за попереднім планом), так і відкритим — за потребою. Ментор не «вчить», а радше підтримує, спрямовує й ділиться досвідом.
-    </div>
-  </div>
+        <div class="faq-item">
+          Чи буде в мене план дій із професійного розвитку під час роботи з ментором?
+          <div class="faq-answer">
+            Так, ментор допоможе структурувати запити та розробити реалістичний план: як у навчанні, так і в кар’єрному русі. 
+            План може включати рекомендації щодо програм, публікацій, супервізій чи участі в професійних спільнотах.
+          </div>
+        </div>
+          
+        <div class="faq-item">
+          Як виглядає робота з ментором?
+          <div class="faq-answer">
+            Це регулярні зустрічі (онлайн або офлайн), у яких ви обговорюєте запити, виклики, сумніви, цілі. 
+            Формат може бути як структурованим (за попереднім планом), так і відкритим — за потребою. Ментор не «вчить», а радше підтримує, спрямовує й ділиться досвідом.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Хто може бути ментором?
-    <div class="faq-answer" >Ментором зазвичай стає досвідчений фахівець, 
-      який має не лише глибоку експертизу, а й етичну чутливість та бажання підтримувати розвиток інших. 
-      У нашій спільноті ментори проходять спеціальну підготовку й відбираються з урахуванням запиту ментората.
-    </div>
-  </div>
+        <div class="faq-item">
+          Хто може бути ментором?
+          <div class="faq-answer">Ментором зазвичай стає досвідчений фахівець, 
+            який має не лише глибоку експертизу, а й етичну чутливість та бажання підтримувати розвиток інших. 
+            У нашій спільноті ментори проходять спеціальну підготовку й відбираються з урахуванням запиту ментората.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Скільки триває менторство?
-    <div class="faq-answer" >Тривалість менторства визначається індивідуально — залежно від запиту, рівня підготовки та професійних цілей. Найчастіше процес триває від 3 до 6 місяців, проте можливі й довготривалі формати співпраці — до року і більше. Для досягнення відчутних змін у карʼєрі зазвичай потрібен час, тому менторство розглядається як процес, а не одноразова зустріч.
-</div>
-  </div>
+        <div class="faq-item">
+          Скільки триває менторство?
+          <div class="faq-answer">Тривалість менторства визначається індивідуально — залежно від запиту, рівня підготовки та професійних цілей. Найчастіше процес триває від 3 до 6 місяців, проте можливі й довготривалі формати співпраці — до року і більше. Для досягнення відчутних змін у карʼєрі зазвичай потрібен час, тому менторство розглядається як процес, а не одноразова зустріч.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Чи є теми, які не входять у менторство?
-    <div class="faq-answer" > Так. Менторство не замінює особисту терапію, супервізію або консультування з юридичних питань. У разі потреби ментор може порекомендувати відповідного спеціаліста.
-</div>
-  </div>
+        <div class="faq-item">
+          Чи є теми, які не входять у менторство?
+          <div class="faq-answer"> Так. Менторство не замінює особисту терапію, супервізію або консультування з юридичних питань. У разі потреби ментор може порекомендувати відповідного спеціаліста.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Чи є різниця між менторством і наставництвом?
-    <div class="faq-answer" > У нашому контексті ці терміни часто вживаються як синоніми. Проте «наставництво» іноді акцентує на передаванні досвіду, тоді як «менторство» більше про партнерство і рефлексивну підтримку.
-</div>
-  </div>
+        <div class="faq-item">
+          Чи є різниця між менторством і наставництвом?
+          <div class="faq-answer"> У нашому контексті ці терміни часто вживаються як синоніми. Проте «наставництво» іноді акцентує на передаванні досвіду, тоді як «менторство» більше про партнерство і рефлексивну підтримку.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Як відбувається добір ментора?
-    <div class="faq-answer" ">Менторат заповнює анкету із запитами, після чого координатор проєкту пропонує кандидата, який відповідає тематиці запиту, стилю роботи та етапу розвитку ментората.
-</div>
-  </div>
+        <div class="faq-item">
+          Як відбувається добір ментора?
+          <div class="faq-answer">Менторат заповнює анкету із запитами, після чого координатор проєкту пропонує кандидата, який відповідає тематиці запиту, стилю роботи та етапу розвитку ментората.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Що мені дасть менторство?
-    <div class="faq-answer" ">Підтримку, зменшення почуття ізольованості, можливість ставити «незручні» питання, переосмислювати професійну ідентичність і отримувати зворотний зв’язок від колеги, який вже пройшов подібний шлях. Це безпека та розвиток одночасно.
-</div>
-  </div>
+        <div class="faq-item">
+          Що мені дасть менторство?
+          <div class="faq-answer">Підтримку, зменшення почуття ізольованості, можливість ставити «незручні» питання, переосмислювати професійну ідентичність і отримувати зворотний зв’язок від колеги, який вже пройшов подібний шлях. Це безпека та розвиток одночасно.
+          </div>
+        </div>
 
-  <div class="faq-item" ">
-    Як враховується робота з ментором в загальному обліку проходження супервізії?
-    <div class="faq-answer" >Години роботи з ментором зараховуються до супервізійної практики та будуть відображатися в особистому кабінеті в “Обліку практики”.
-</div>
-  </div>
+        <div class="faq-item">
+          Як враховується робота з ментором в загальному обліку проходження супервізії?
+          <div class="faq-answer">Години роботи з ментором зараховуються до супервізійної практики та будуть відображатися в особистому кабінеті в “Обліку практики”.
+          </div>
+        </div>
 
-  <div class="faq-item" >
-    Який смисл та значення має менторство для формування високопрофесійного спеціаліста в області ментального здоров’я та психологічної підтримки?
-    <div class="faq-answer">Справжній професіонал з психологічного консультування в ідеалі мав би володіти наступними вміннями та поєднувати їх в своїй особистості:
+        <div class="faq-item">
+          Який смисл та значення має менторство для формування високопрофесійного спеціаліста в області ментального здоров’я та психологічної підтримки?
+          <div class="faq-answer">Справжній професіонал з психологічного консультування в ідеалі мав би володіти наступними вміннями та поєднувати їх в своїй особистості:
 вміння і навички працювати в консультативній роботі (психотерапевтична, психоаналітична, кризова і т.д.);
 отримувати та надавати супервізію;
 оволодіти мистецтвом менторства, тобто бути спроможним здійснювати управління власною карʼєрою і визначати свою професійну долю і навчати цьому учнів, початківців і колег. 
-</div>
-  </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  </div>
-<div class="apply-button" onclick="location.href='career-application.html'">
-  <div class="apply-text">Подати заявку</div>
-  <img src="./assets/career-apply.png" alt="Apply Image" class="apply-img" />
-  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
-</div>
+    <div class="cta-stack">
+      <div class="apply-button" onclick="location.href='career-application.html'">
+        <div class="apply-text">Подати заявку</div>
+        <img src="./assets/career-apply.png" alt="Apply Image" class="apply-img" />
+        <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+      </div>
 
-<div class="apply-button" id="mentorButton" style="display: none;" onclick="location.href='career-mentor-requests.html'">
-  <div class="apply-text">Менторство</div>
-  <img src="./assets/career-mentor.png" alt="Mentor Image" class="apply-img" />
-  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
-</div>
+      <div class="apply-button" id="mentorButton" style="display: none;" onclick="location.href='career-mentor-requests.html'">
+        <div class="apply-text">Менторство</div>
+        <img src="./assets/career-mentor.png" alt="Mentor Image" class="apply-img" />
+        <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+      </div>
 
-<div class="apply-button" id="supervisorButton" style="display: none;" onclick="location.href='career-supervisor-requests.html'">
-  <div class="apply-text">Супервізори</div>
-  <img src="./assets/supervision.png" alt="Supervisor Image" class="apply-img" />
-  <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
-</div>
+      <div class="apply-button" id="supervisorButton" style="display: none;" onclick="location.href='career-supervisor-requests.html'">
+        <div class="apply-text">Супервізори</div>
+        <img src="./assets/supervision.png" alt="Supervisor Image" class="apply-img" />
+        <img src="./assets/library/arrow.png" alt="Arrow Icon" class="apply-arrow" />
+      </div>
+    </div>
+  </main>
 
 
 <script>
@@ -271,13 +400,31 @@
 (function () {
   const FAQ_API = '/api/career-faq'; // публичный список (isActive=true)
   let didRender = false;
+  let toggleBound = false;
 
   // Экранирование и переносы
   const escapeHtml = (s='') =>
     s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const nl2br = (s='') => s.replace(/\n/g, '<br/>');
 
+  const getFaqContainer = () => {
+    const section = document.querySelector('.faq-section');
+    if (!section) return null;
+    return section.querySelector('.faq-list') || section;
+  };
+
+  function bindFaqToggle(container) {
+    if (toggleBound || !container) return;
+    toggleBound = true;
+    container.addEventListener('click', (e) => {
+      const item = e.target.closest('.faq-item');
+      if (item && container.contains(item)) item.classList.toggle('open');
+    });
+  }
+
   async function loadFaq() {
+    bindFaqToggle(getFaqContainer());
+
     try {
       const res = await fetch(FAQ_API, { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to load FAQ');
@@ -292,26 +439,32 @@
     if (didRender) return; // защита от двойного рендера
     didRender = true;
 
-    const section = document.querySelector('.faq-section');
-    if (!section) return;
+    const container = getFaqContainer();
+    if (!container) return;
+
+    bindFaqToggle(container);
 
     // Удалим старые .faq-item (если были размечены статически)
-    section.querySelectorAll('.faq-item').forEach(n => n.remove());
+    container.querySelectorAll('.faq-item').forEach(n => n.remove());
+    container.querySelectorAll('.faq-empty').forEach(n => n.remove());
 
-    items.forEach(it => {
+    const list = Array.isArray(items) ? items : [];
+    if (!list.length) {
+      const empty = document.createElement('div');
+      empty.className = 'faq-empty';
+      empty.textContent = 'Запитання наразі відсутні.';
+      container.appendChild(empty);
+      return;
+    }
+
+    list.forEach(it => {
       const wrap = document.createElement('div');
       wrap.className = 'faq-item';
       wrap.innerHTML = `
         ${escapeHtml(it.question || '')}
         <div class="faq-answer">${nl2br(escapeHtml(it.answer || ''))}</div>
       `;
-      section.appendChild(wrap);
-    });
-
-    // Делегирование кликов: открытие/закрытие ответа
-    section.addEventListener('click', (e) => {
-      const item = e.target.closest('.faq-item');
-      if (item && section.contains(item)) item.classList.toggle('open');
+      container.appendChild(wrap);
     });
   }
 

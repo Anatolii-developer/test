@@ -39,6 +39,7 @@
         justify-content: space-between;
         gap: 20px;
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+        text-align: center;
       }
       .apply-title {
         font-size: clamp(28px, 4vw, 40px);
@@ -175,6 +176,9 @@
         text-decoration: none;
         gap: 8px;
         margin-left: auto;
+        background: transparent !important;
+        border: none;
+        box-shadow: none;
       }
       .btn-more .btn-arrow {
         width: 22px;
@@ -279,8 +283,8 @@
         }
         .apply-header {
           flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
+          align-items: center;
+          text-align: center;
         }
         .apply-arrow {
           align-self: flex-end;
@@ -320,7 +324,9 @@
           padding: 10px;
           border-radius: 14px;
           align-self: flex-end;
-          background: transparent;
+          background: transparent !important;
+          box-shadow: none;
+          border: none;
         }
         .btn-more .btn-label {
           display: none;

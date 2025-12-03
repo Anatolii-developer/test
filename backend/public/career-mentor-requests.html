@@ -49,11 +49,6 @@
         width: clamp(200px, 28vw, 284px);
         height: auto;
       }
-      .apply-arrow {
-        width: 56px;
-        height: 56px;
-        flex-shrink: 0;
-      }
       .back-button {
         width: 196px;
         height: 48px;
@@ -167,23 +162,24 @@
         align-items: center;
         justify-content: center;
         height: 32px;
-        padding: 0 14px;
-        border-radius: 999px;
+        padding: 0;
+        border-radius: 12px;
         border: none;
         cursor: pointer;
-        background: #275d2b;
-        color: #fff;
+        background: transparent;
+        color: #275d2b;
         font-weight: 600;
         font-size: 14px;
         white-space: nowrap;
         flex: 0 0 auto;
         text-decoration: none;
         gap: 8px;
+        margin-left: auto;
       }
       .btn-more .btn-arrow {
-        width: 20px;
-        height: 20px;
-        display: none;
+        width: 22px;
+        height: 22px;
+        display: block;
       }
       .btn-more .btn-label {
         display: inline;
@@ -319,11 +315,12 @@
           order: 2;
         }
         .btn-more {
-          width: 52px;
-          height: 52px;
-          padding: 12px;
-          border-radius: 16px;
+          width: 48px;
+          height: 48px;
+          padding: 10px;
+          border-radius: 14px;
           align-self: flex-end;
+          background: transparent;
         }
         .btn-more .btn-label {
           display: none;
@@ -391,7 +388,6 @@
       <div class="apply-header">
         <div class="apply-title">Менторство</div>
         <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
-        <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
       </div>
 
       <div class="toolbar">
@@ -557,7 +553,7 @@
         more.setAttribute("aria-label", "Відкрити заявку детально");
         more.innerHTML = `
           <span class="btn-label">Дізнатись більше</span>
-          <img src="./assets/library/arrow.png" alt="Arrow" class="btn-arrow" />
+          <img src="./assets/library/arrow-main.svg" alt="Arrow" class="btn-arrow" />
         `;
         row.append(left, more);
         return row;

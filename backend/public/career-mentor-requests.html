@@ -15,30 +15,44 @@
         font-family: "Poppins", sans-serif;
         background: #97c194;
         color: #414141;
+        padding: 0;
+      }
+
+      main.mentor-requests-page {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 32px 16px 72px;
+        box-sizing: border-box;
       }
       .apply-header {
-        width: 1110px;
-        height: 212px;
+        width: 100%;
+        max-width: 1110px;
         background: #fff;
         border-radius: 24px;
-        margin: 40px auto 20px;
-        padding: 40px 100px;
+        margin: 0 auto 10px;
+        padding: clamp(24px, 4vw, 40px) clamp(24px, 8vw, 100px);
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
       }
       .apply-title {
-        font-size: 40px;
+        font-size: clamp(28px, 4vw, 40px);
         font-weight: 600;
         color: #414141;
       }
       .apply-image {
-        width: 284px;
-        height: 164px;
+        width: clamp(200px, 28vw, 284px);
+        height: auto;
       }
       .apply-arrow {
-        width: 64px;
-        height: 64px;
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
       }
       .back-button {
         width: 196px;
@@ -46,8 +60,7 @@
         background: #275d2b;
         border-radius: 24px;
         color: #fff;
-        padding: 10px 53px;
-        margin: 0 auto 20px;
+        padding: 10px 32px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -56,12 +69,14 @@
         text-decoration: none;
       }
       .toolbar {
-        width: 1110px;
-        margin: 0 auto 20px;
+        width: 100%;
+        max-width: 1110px;
+        margin: 0 auto 6px;
         display: flex;
-        gap: 12px;
-        justify-content: center;
+        gap: 10px;
+        justify-content: space-between;
         flex-wrap: wrap;
+        align-items: center;
       }
       .view-requests-button {
         height: 48px;
@@ -84,12 +99,14 @@
         background: #d9ebd7;
       }
       .apply-form {
-        width: 1110px;
+        width: 100%;
+        max-width: 1110px;
         background: #fff;
         border-radius: 24px;
-        padding: 24px 100px 40px;
-        margin: 0 auto 40px;
+        padding: clamp(24px, 5vw, 40px) clamp(20px, 7vw, 100px);
+        margin: 0 auto 32px;
         box-sizing: border-box;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
       }
       h3.page-subtitle {
         margin: 0 0 8px;
@@ -104,11 +121,11 @@
         width: 100%;
         background: #ffeed9;
         border-radius: 16px;
-        padding: 10px 16px;
+        padding: 12px 16px;
         display: flex;
         align-items: center;
         gap: 16px;
-        margin: 14px 0;
+        margin: 12px 0;
         justify-content: space-between;
         box-sizing: border-box;
       }
@@ -150,8 +167,8 @@
         align-items: center;
         justify-content: center;
         height: 32px;
-        padding: 0 16px;
-        border-radius: 24px;
+        padding: 0 14px;
+        border-radius: 999px;
         border: none;
         cursor: pointer;
         background: #275d2b;
@@ -161,6 +178,15 @@
         white-space: nowrap;
         flex: 0 0 auto;
         text-decoration: none;
+        gap: 8px;
+      }
+      .btn-more .btn-arrow {
+        width: 20px;
+        height: 20px;
+        display: none;
+      }
+      .btn-more .btn-label {
+        display: inline;
       }
       .empty {
         text-align: center;
@@ -251,24 +277,90 @@
         opacity: 1;
       }
 
-      @media (max-width: 1200px) {
-        .apply-header,
-        .apply-form,
+      @media (max-width: 1024px) {
+        main.mentor-requests-page {
+          padding: 20px 12px 60px;
+        }
+        .apply-header {
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+        }
+        .apply-arrow {
+          align-self: flex-end;
+        }
         .toolbar {
-          width: 90%;
-          padding-left: 30px;
-          padding-right: 30px;
+          justify-content: center;
+          gap: 12px;
         }
         .req-row {
-          width: 100%;
+          flex-wrap: wrap;
+        }
+        .req-date {
+          font-size: 16px;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .req-row {
+          align-items: flex-start;
+        }
+        .req-left {
+          flex-wrap: wrap;
+          gap: 10px;
         }
         .req-name {
-          max-width: 50vw;
+          width: 100%;
+          order: 3;
+          white-space: normal;
+          line-height: 1.4;
+        }
+        .req-date {
+          order: 2;
+        }
+        .btn-more {
+          width: 52px;
+          height: 52px;
+          padding: 12px;
+          border-radius: 16px;
+          align-self: flex-end;
+        }
+        .btn-more .btn-label {
+          display: none;
+        }
+        .btn-more .btn-arrow {
+          display: block;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .apply-header {
+          gap: 12px;
+        }
+        .apply-title {
+          font-size: 26px;
+        }
+        .back-button {
+          width: 100%;
+          justify-content: center;
         }
       }
     </style>
   </head>
   <body>
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/sidebar/burger.svg" alt="" />
+    </button>
+
+    <a href="/" class="header-logo" aria-label="Головна">
+      <img src="assets/emblem.svg" alt="IPS" />
+    </a>
+
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
     <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -293,26 +385,30 @@
       <span>Вийти з акаунту</span>
     </div>
   </aside>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-    <div class="apply-header">
-      <div class="apply-title">Менторство</div>
-      <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
-      <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
-    </div>
-
-    <div class="toolbar">
-      <a href="career-faq.html" class="back-button" style="margin: 0">
-        <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
-      </a>
-    </div>
-
-    <div class="apply-form">
-      <h3 class="page-subtitle">Заявки учасників</h3>
-      <div id="list"></div>
-      <div id="empty" class="empty" style="display: none">
-        Поки що немає заявок учасників.
+    <main class="mentor-requests-page" id="mainContent">
+      <div class="apply-header">
+        <div class="apply-title">Менторство</div>
+        <img class="apply-image" src="./assets/career-apply.png" alt="Person" />
+        <img class="apply-arrow" src="./assets/library/arrow.png" alt="Arrow" />
       </div>
-    </div>
+
+      <div class="toolbar">
+        <a href="career-faq.html" class="back-button" style="margin: 0">
+          <img src="./assets/library/arrow-main.svg" alt="Back" /> Головна
+        </a>
+        <a href="career-requests.html" class="view-requests-button">Подані заявки</a>
+      </div>
+
+      <div class="apply-form">
+        <h3 class="page-subtitle">Заявки учасників</h3>
+        <div id="list"></div>
+        <div id="empty" class="empty" style="display: none">
+          Поки що немає заявок учасників.
+        </div>
+      </div>
+    </main>
 
 <script>
   window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
@@ -457,9 +553,12 @@
         const id = item._id || item.id || (item.application && (item.application._id || item.application.id)) || "";
         const more = document.createElement("a");
         more.className = "btn-more";
-        more.textContent = "Дізнатись більше";
         more.href = `career-mentor-request.html?id=${encodeURIComponent(id)}`;
         more.setAttribute("aria-label", "Відкрити заявку детально");
+        more.innerHTML = `
+          <span class="btn-label">Дізнатись більше</span>
+          <img src="./assets/library/arrow.png" alt="Arrow" class="btn-arrow" />
+        `;
         row.append(left, more);
         return row;
       }

@@ -20,11 +20,49 @@ exports.createCourse = async (req, res) => {
     const timeStart = req.body.courseTime?.start || req.body.startTime || '';
     const timeEnd   = req.body.courseTime?.end   || req.body.endTime   || '';
 
+    // POST /api/courses
+exports.createCourse = async (req, res) => {
+  try {
+    const startRaw = req.body.courseDates?.start || req.body.startDate;
+    const endRaw   = req.body.courseDates?.end   || req.body.endDate;
+
+    if (!startRaw || !endRaw) {
+      return res.status(400).json({ message: 'Вкажіть дати початку і завершення курсу' });
+    }
+
+    const startDate = new Date(`${startRaw}T00:00:00Z`);
+    const endDate   = new Date(`${endRaw}T23:59:59Z`);
+    if (isNaN(startDate) || isNaN(endDate)) {
+      return res.status(400).json({ message: 'Некоректний формат дат' });
+    }
+
+    const timeStart = req.body.courseTime?.start || req.body.startTime || '';
+    const timeEnd   = req.body.courseTime?.end   || req.body.endTime   || '';
+
+    // 👇 Нормализуем units, если они пришли
+    let units = [];
+    if (Array.isArray(req.body.units)) {
+      units = req.body.units.map((u) => ({
+        date: u.date ? new Date(u.date) : null,
+        startTime: u.startTime || '',
+        endTime: u.endTime || '',
+        unitType: u.unitType,
+        title: u.title || '',
+        hours: typeof u.hours === 'number' ? u.hours : null,
+        members: Array.isArray(u.members)
+          ? u.members.map((m) => ({
+              user: m.user,
+              mode: m.mode, // 'проходив' | 'проводив'
+            }))
+          : [],
+      })).filter(u => u.date && u.unitType); // відкидаємо некоректні
+    }
+
     const course = new Course({
-       creatorId:   req.body.creatorId || null,
+      creatorId:   req.body.creatorId || null,
       creatorName: req.body.creatorName || '',
       creatorRole: req.body.creatorRole || '',
-      mainType: req.body.mainType,             
+      mainType: req.body.mainType,
       formatType: req.body.formatType || null,
       courseTitle: req.body.courseTitle,
       courseSubtitle: req.body.courseSubtitle,
@@ -38,7 +76,7 @@ exports.createCourse = async (req, res) => {
       courseDuration: req.body.courseDuration,
       coursePrice: req.body.coursePrice,
       zoomLink: req.body.zoomLink,
-       siteLink:
+      siteLink:
         req.body.siteLink ||
         req.body.publicUrl ||
         req.body.pageUrl ||
@@ -46,7 +84,19 @@ exports.createCourse = async (req, res) => {
         req.body.websiteUrl ||
         '',
       status: 'WAITING_FOR_APPROVAL',
+
+      // 👇 НОВЕ ПОЛЕ
+      units,
     });
+
+    await course.save();
+    res.status(201).json({ success: true, course });
+
+  } catch (err) {
+    console.error('❌ Error creating course:', err);
+    res.status(500).json({ message: 'Помилка при створенні курсу', error: err.message });
+  }
+};
 
     await course.save();
     res.status(201).json({ success: true, course });

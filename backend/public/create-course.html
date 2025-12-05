@@ -139,6 +139,18 @@
   <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
 </div>
 
+        <!-- ЮНІТИ КУРСУ -->
+        <div class="form-group">
+          <label>Юніти курсу (заняття)</label>
+          <button type="button" id="addUnitBtn" class="small-button">+ Додати заняття</button>
+
+          <!-- Список доданих юнітів -->
+          <div id="unitsList" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
+
+          <small style="display:block; margin-top:8px; color:#777;">
+            Додайте дати та час кожного заняття та вкажіть, хто проходив, а хто проводив.
+          </small>
+        </div>
 
         <div class="form-group">
           <label>Тривалість курсу</label>
@@ -179,6 +191,67 @@
     <button onclick="saveSelectedParticipants()" style="margin-top: 20px;">Зберегти вибір</button>
   </div>
 </div>
+
+        <!-- МОДАЛ ДО ДОДАВАННЯ ЮНІТА -->
+        <div id="unitModal" class="modal" style="display:none;">
+          <div class="modal-content">
+            <span class="close" onclick="closeUnitModal()">&times;</span>
+            <h3>Додати / редагувати заняття</h3>
+
+            <div class="form-group">
+              <label>Дата заняття</label>
+              <input type="text" id="unitDate" class="datepicker" placeholder="дд.мм.рррр" />
+            </div>
+
+            <div class="form-group">
+              <label>Час проведення</label>
+              <div class="time-range">
+                <input type="time" id="unitStartTime" />
+                <span>–</span>
+                <input type="time" id="unitEndTime" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Тип юніта</label>
+              <select id="unitType">
+                <option value="">Оберіть тип</option>
+                <option value="Особистий аналіз">Особистий аналіз</option>
+                <option value="Індивідуальна супервізія">Індивідуальна супервізія</option>
+                <option value="Групова супервізія">Групова супервізія</option>
+                <option value="Менторське заняття">Менторське заняття</option>
+                <option value="Лекція">Лекція</option>
+                <option value="Семінар">Семінар</option>
+                <option value="Терапевтична група">Терапевтична група</option>
+                <option value="Супервізійно-семінарське заняття">Супервізійно-семінарське заняття</option>
+                <option value="Парна терапія">Парна терапія</option>
+                <option value="Лекторій">Лекторій</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Назва / тема заняття (необовʼязково)</label>
+              <input type="text" id="unitTitle" placeholder="Наприклад: Заняття 1. Вступ" />
+            </div>
+
+            <div class="form-group">
+              <label>Кількість годин (для обліку)</label>
+              <input type="number" step="0.25" min="0" id="unitHours" placeholder="Наприклад: 2" />
+            </div>
+
+            <div class="form-group">
+              <label>Учасники та роль в юніті</label>
+              <small style="display:block; margin-bottom:6px; color:#777;">
+                Список формується з обраних учасників курсу. Для кожного вкажіть, чи він <b>проходив</b> чи <b>проводив</b>.
+              </small>
+              <div id="unitMembersContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
+            </div>
+
+            <button type="button" onclick="saveUnitFromModal()" class="small-button" style="margin-top: 16px;">
+              Зберегти заняття
+            </button>
+          </div>
+        </div>
 
 
 

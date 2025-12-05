@@ -370,7 +370,6 @@ function closeUnitModal() {
 
 // сохраняем юнит с привязкой к дню
 function saveUnitFromModal() {
-  const rawDate = document.getElementById('unitDate').value;      // если хочешь всё-таки дату
   const startTime = document.getElementById('unitStartTime').value;
   const endTime = document.getElementById('unitEndTime').value;
   const unitType = document.getElementById('unitType').value;
@@ -388,19 +387,20 @@ function saveUnitFromModal() {
     return;
   }
 
-  // собираем участников
+  // збираємо учасників
   const members = [];
-  document.querySelectorAll('#unitMembersContainer .unit-member-row').forEach(row => {
-    const userId = row.dataset.userId;
-    const mode = row.querySelector('.unit-member-mode').value;
-    if (userId && mode) {
-      members.push({ user: userId, mode });
-    }
-  });
+  document
+    .querySelectorAll('#unitMembersContainer .unit-member-row')
+    .forEach((row) => {
+      const userId = row.dataset.userId;
+      const mode = row.querySelector('.unit-member-mode').value;
+      if (userId && mode) {
+        members.push({ user: userId, mode });
+      }
+    });
 
   const unit = {
     dayName: currentUnitDayName, // Понеділок, Вівторок і т.д.
-    date: rawDate || null,       // если захочешь потом привязать к конкретным датам
     startTime,
     endTime,
     unitType,
@@ -410,6 +410,7 @@ function saveUnitFromModal() {
   };
 
   units.push(unit);
+  // тут можно буде зробити preview по дням, якщо захочеш
   closeUnitModal();
 }
   </script>

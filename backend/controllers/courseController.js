@@ -1,7 +1,6 @@
 const Course = require('../models/Course');
 
 // POST /api/courses
-// POST /api/courses
 exports.createCourse = async (req, res) => {
   try {
     const startRaw = req.body.courseDates?.start || req.body.startDate;
@@ -20,42 +19,29 @@ exports.createCourse = async (req, res) => {
     const timeStart = req.body.courseTime?.start || req.body.startTime || '';
     const timeEnd   = req.body.courseTime?.end   || req.body.endTime   || '';
 
-    // POST /api/courses
-exports.createCourse = async (req, res) => {
-  try {
-    const startRaw = req.body.courseDates?.start || req.body.startDate;
-    const endRaw   = req.body.courseDates?.end   || req.body.endDate;
-
-    if (!startRaw || !endRaw) {
-      return res.status(400).json({ message: 'Вкажіть дати початку і завершення курсу' });
-    }
-
-    const startDate = new Date(`${startRaw}T00:00:00Z`);
-    const endDate   = new Date(`${endRaw}T23:59:59Z`);
-    if (isNaN(startDate) || isNaN(endDate)) {
-      return res.status(400).json({ message: 'Некоректний формат дат' });
-    }
-
-    const timeStart = req.body.courseTime?.start || req.body.startTime || '';
-    const timeEnd   = req.body.courseTime?.end   || req.body.endTime   || '';
-
-    // 👇 Нормализуем units, если они пришли
+    // 👇 Нормалізуємо юніти, якщо вони прийшли з фронта
     let units = [];
     if (Array.isArray(req.body.units)) {
-      units = req.body.units.map((u) => ({
-        date: u.date ? new Date(u.date) : null,
-        startTime: u.startTime || '',
-        endTime: u.endTime || '',
-        unitType: u.unitType,
-        title: u.title || '',
-        hours: typeof u.hours === 'number' ? u.hours : null,
-        members: Array.isArray(u.members)
-          ? u.members.map((m) => ({
-              user: m.user,
-              mode: m.mode, // 'проходив' | 'проводив'
-            }))
-          : [],
-      })).filter(u => u.date && u.unitType); // відкидаємо некоректні
+      units = req.body.units
+        .map((u) => {
+          const unitDate = u.date ? new Date(u.date) : null;
+
+          return {
+            date: unitDate,                      // Date
+            startTime: u.startTime || '',
+            endTime: u.endTime || '',
+            unitType: u.unitType,                // 'Лекція', 'Семінар' тощо
+            title: u.title || '',
+            hours: typeof u.hours === 'number' ? u.hours : null,
+            members: Array.isArray(u.members)
+              ? u.members.map((m) => ({
+                  user: m.user,
+                  mode: m.mode === 'проводив' ? 'проводив' : 'проходив', // захист від некоректних значень
+                }))
+              : [],
+          };
+        })
+        .filter((u) => u.date && u.unitType); // відкидаємо порожні/некоректні юніти
     }
 
     const course = new Course({
@@ -85,28 +71,17 @@ exports.createCourse = async (req, res) => {
         '',
       status: 'WAITING_FOR_APPROVAL',
 
-      // 👇 НОВЕ ПОЛЕ
+      // 🔥 Нове поле: масив юнітів (занять / сесій) в рамках курсу
       units,
     });
 
     await course.save();
-    res.status(201).json({ success: true, course });
-
+    return res.status(201).json({ success: true, course });
   } catch (err) {
     console.error('❌ Error creating course:', err);
-    res.status(500).json({ message: 'Помилка при створенні курсу', error: err.message });
+    return res.status(500).json({ message: 'Помилка при створенні курсу', error: err.message });
   }
 };
-
-    await course.save();
-    res.status(201).json({ success: true, course });
-
-  } catch (err) {
-    console.error('❌ Error creating course:', err);
-    res.status(500).json({ message: 'Помилка при створенні курсу', error: err.message });
-  }
-};
-
 
 // PUT /api/courses/:id/approve
 exports.approveCourse = async (req, res) => {

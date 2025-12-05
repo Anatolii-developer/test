@@ -99,19 +99,60 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Оберіть дні проведення курсу</label>
-          <div class="weekdays-checkboxes">
-            <label><input type="checkbox" name="courseDays" value="Понеділок" /> Понеділок</label>
-            <label><input type="checkbox" name="courseDays" value="Вівторок" /> Вівторок</label>
-            <label><input type="checkbox" name="courseDays" value="Середа" /> Середа</label>
-            <label><input type="checkbox" name="courseDays" value="Четвер" /> Четвер</label>
-            <label><input type="checkbox" name="courseDays" value="П’ятниця" /> П’ятниця</label>
-            <label><input type="checkbox" name="courseDays" value="Субота" /> Субота</label>
-            <label><input type="checkbox" name="courseDays" value="Неділя" /> Неділя</label>
-          </div>
-        </div>
-
+<div class="form-group">
+  <label>Оберіть дні проведення курсу</label>
+  <div class="weekdays-checkboxes">
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="Понеділок"
+             onchange="handleCourseDayChange(this, 'Понеділок')" />
+      Понеділок
+    </label>
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="Вівторок"
+             onchange="handleCourseDayChange(this, 'Вівторок')" />
+      Вівторок
+    </label>
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="Середа"
+             onchange="handleCourseDayChange(this, 'Середа')" />
+      Середа
+    </label>
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="Четвер"
+             onchange="handleCourseDayChange(this, 'Четвер')" />
+      Четвер
+    </label>
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="П’ятниця"
+             onchange="handleCourseDayChange(this, 'П’ятниця')" />
+      П’ятниця
+    </label>
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="Субота"
+             onchange="handleCourseDayChange(this, 'Субота')" />
+      Субота
+    </label>
+    <label>
+      <input type="checkbox"
+             name="courseDays"
+             value="Неділя"
+             onchange="handleCourseDayChange(this, 'Неділя')" />
+      Неділя
+    </label>
+  </div>
+</div>
         <div class="form-group">
           <label>Оберіть години проведення</label>
           <div class="time-range">
@@ -139,18 +180,8 @@
   <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
 </div>
 
-        <!-- ЮНІТИ КУРСУ -->
-        <div class="form-group">
-          <label>Юніти курсу (заняття)</label>
-          <button type="button" id="addUnitBtn" class="small-button">+ Додати заняття</button>
 
-          <!-- Список доданих юнітів -->
-          <div id="unitsList" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
-
-          <small style="display:block; margin-top:8px; color:#777;">
-            Додайте дати та час кожного заняття та вкажіть, хто проходив, а хто проводив.
-          </small>
-        </div>
+    
 
         <div class="form-group">
           <label>Тривалість курсу</label>
@@ -268,6 +299,125 @@
         });
       }
     });
+
+    // массив юнитов и текущий день, для которого настраиваем занятие
+let units = [];
+let currentUnitDayName = null;
+
+// вызывается при клике на чекбокс дня
+function handleCourseDayChange(checkbox, dayName) {
+  if (checkbox.checked) {
+    // запоминаем, для какого дня сейчас настраиваем занятие
+    currentUnitDayName = dayName;
+    openUnitModalForDay(dayName);
+  } else {
+    // если ты хочешь при снятии галочки удалять юниты этого дня — можно тут дописать фильтрацию
+    // units = units.filter(u => u.dayName !== dayName);
+    // renderUnitsList(); // если будешь где-то показывать список
+  }
+}
+
+// открываем уже существующую модалку, но дополнительно знаем dayName
+function openUnitModalForDay(dayName) {
+  const modal = document.getElementById('unitModal');
+  if (!modal) return;
+
+  // очистка полей
+  document.getElementById('unitDate').value = '';
+  document.getElementById('unitStartTime').value = '';
+  document.getElementById('unitEndTime').value = '';
+  document.getElementById('unitType').value = '';
+  document.getElementById('unitTitle').value = '';
+  document.getElementById('unitHours').value = '';
+
+  const membersContainer = document.getElementById('unitMembersContainer');
+  membersContainer.innerHTML = '';
+
+  // выводим участников с выбором "проходив / проводив"
+  if (Array.isArray(window.selectedParticipants)) {
+    window.selectedParticipants.forEach((p) => {
+      const row = document.createElement('div');
+      row.className = 'unit-member-row';
+      row.dataset.userId = p._id || p.id;
+
+      row.innerHTML = `
+        <span>${p.fullName || p.name || p.email}</span>
+        <select class="unit-member-mode">
+          <option value="проходив">проходив</option>
+          <option value="проводив">проводив</option>
+        </select>
+      `;
+      membersContainer.appendChild(row);
+    });
+  }
+
+  // можно где-то в модалке показать, для какого дня настраиваем
+  // например, добавить span с id="unitDayLabel" и тут его обновлять:
+  let label = document.getElementById('unitDayLabel');
+  if (!label) {
+    label = document.createElement('div');
+    label.id = 'unitDayLabel';
+    label.style.marginBottom = '8px';
+    label.style.fontWeight = '500';
+    modal.querySelector('.modal-content h3').insertAdjacentElement('afterend', label);
+  }
+  label.textContent = `День: ${dayName}`;
+
+  modal.style.display = 'block';
+}
+
+function closeUnitModal() {
+  const modal = document.getElementById('unitModal');
+  if (modal) modal.style.display = 'none';
+  currentUnitDayName = null;
+}
+
+// сохраняем юнит с привязкой к дню
+function saveUnitFromModal() {
+  const rawDate = document.getElementById('unitDate').value;      // если хочешь всё-таки дату
+  const startTime = document.getElementById('unitStartTime').value;
+  const endTime = document.getElementById('unitEndTime').value;
+  const unitType = document.getElementById('unitType').value;
+  const title = document.getElementById('unitTitle').value.trim();
+  const hoursValue = document.getElementById('unitHours').value;
+  const hours = hoursValue ? Number(hoursValue) : null;
+
+  if (!currentUnitDayName) {
+    alert('Не визначено день заняття');
+    return;
+  }
+
+  if (!unitType) {
+    alert('Оберіть тип юніта');
+    return;
+  }
+
+  // собираем участников
+  const members = [];
+  document.querySelectorAll('#unitMembersContainer .unit-member-row').forEach(row => {
+    const userId = row.dataset.userId;
+    const mode = row.querySelector('.unit-member-mode').value;
+    if (userId && mode) {
+      members.push({ user: userId, mode });
+    }
+  });
+
+  const unit = {
+    dayName: currentUnitDayName, // Понеділок, Вівторок и т.д.
+    date: rawDate || null,       // если захочешь потом привязать к конкретным датам
+    startTime,
+    endTime,
+    unitType,
+    title,
+    hours,
+    members,
+  };
+
+  units.push(unit);
+  // если захочешь где-то рендерить units — можно сделать renderUnitsList()
+
+  closeUnitModal();
+}
   </script>
 </body>
 </html>

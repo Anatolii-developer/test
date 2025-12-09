@@ -597,13 +597,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-function openUserModal() {
-  
+async function openUserModal() {
+  try {
+    // підтягуємо юзерів прямо перед відкриттям, щоб мати повний і свіжий список
+    const res = await fetch(`${API_BASE}/api/users`);
+    if (res.ok) {
+      users = await res.json();
+    } else {
+      console.error("Не вдалося завантажити користувачів: ", res.status, res.statusText);
+    }
+  } catch (err) {
+    console.error("Не вдалося завантажити користувачів:", err);
+  }
+
   document.getElementById("userModal").style.display = "block";
   const userList = document.getElementById("userList");
+  if (!userList) return;
   userList.innerHTML = "";
 
   users.forEach(user => {
+    if (!user || !user._id) return;
+
     const wrapper = document.createElement("div");
 wrapper.style.display = "flex";
 wrapper.style.justifyContent = "space-between";

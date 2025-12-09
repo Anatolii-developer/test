@@ -161,14 +161,6 @@
     </label>
   </div>
 </div>
-        <div class="form-group">
-          <label>Оберіть години проведення</label>
-          <div class="time-range">
-            <input type="time" name="startTime" />
-            <span>–</span>
-            <input type="time" name="endTime" />
-          </div>
-        </div>
 
         <div class="form-group">
           <label>Оберіть тип курсу</label>
@@ -279,6 +271,12 @@
               <small style="display:block; margin-bottom:6px; color:#777;">
                 Відмітьте, хто бере участь цього дня, та вкажіть роль: <b>Учасник</b> чи <b>Лектор</b>.
               </small>
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+                <select id="unitMemberPicker" style="padding:6px 10px; border-radius:8px; min-width: 220px;">
+                  <option value="">Оберіть учасника</option>
+                </select>
+                <button type="button" onclick="addUnitMemberFromPicker()" class="small-button" style="padding:8px 14px;">+ Додати</button>
+              </div>
               <div id="unitMembersContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
 
@@ -341,6 +339,78 @@ function bindUnitTimeAutoCalc() {
   endInput.onchange = recalc;
 }
 
+function getUserLabelById(userId) {
+  const userObj =
+    (Array.isArray(window.users) && window.users.find((u) => u._id === userId || u.id === userId)) || null;
+  return (
+    (userObj &&
+      (userObj.fullName ||
+        `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() ||
+        userObj.email)) ||
+    userId
+  );
+}
+
+function renderUnitMemberPicker() {
+  const picker = document.getElementById('unitMemberPicker');
+  if (!picker) return;
+  picker.innerHTML = '<option value=\"\">Оберіть учасника</option>';
+  if (!Array.isArray(window.users)) return;
+
+  const set = new Set(window.selectedParticipants || []);
+  window.users.forEach((u) => {
+    if (!u || !u._id) return;
+    if (set.has(u._id)) return;
+    const opt = document.createElement('option');
+    opt.value = u._id;
+    opt.textContent = getUserLabelById(u._id);
+    picker.appendChild(opt);
+  });
+}
+
+function createUnitMemberRow(pId) {
+  const label = getUserLabelById(pId);
+  const row = document.createElement('div');
+  row.className = 'unit-member-row';
+  row.dataset.userId = pId;
+  row.style.display = 'flex';
+  row.style.alignItems = 'center';
+  row.style.gap = '10px';
+
+  row.innerHTML = `
+    <label style="display:flex; align-items:center; gap:8px; flex:1;">
+      <input type="checkbox" class="unit-member-include" checked />
+      <span>${label}</span>
+    </label>
+    <select class="unit-member-mode" style="padding:6px 8px; border-radius:6px;">
+      <option value="проходив">Учасник</option>
+      <option value="проводив">Лектор</option>
+    </select>
+  `;
+  return row;
+}
+
+function addUnitMemberFromPicker() {
+  const picker = document.getElementById('unitMemberPicker');
+  const membersContainer = document.getElementById('unitMembersContainer');
+  if (!picker || !membersContainer) return;
+  const userId = picker.value;
+  if (!userId) {
+    alert('Оберіть учасника');
+    return;
+  }
+  if (!Array.isArray(window.selectedParticipants)) window.selectedParticipants = [];
+  if (window.selectedParticipants.includes(userId)) {
+    picker.value = '';
+    return;
+  }
+  window.selectedParticipants.push(userId);
+  if (typeof updateSelectedDisplay === 'function') updateSelectedDisplay();
+  membersContainer.appendChild(createUnitMemberRow(userId));
+  picker.value = '';
+  renderUnitMemberPicker();
+}
+
 // вызывается при клике на чекбокс дня
 function handleCourseDayChange(checkbox, dayName) {
   if (checkbox.checked) {
@@ -369,32 +439,12 @@ function openUnitModalForDay(dayName) {
 
   const membersContainer = document.getElementById('unitMembersContainer');
   membersContainer.innerHTML = '';
+  renderUnitMemberPicker();
 
   // выводим участников с выбором "проходив / проводив"
   if (Array.isArray(window.selectedParticipants)) {
     window.selectedParticipants.forEach((pId) => {
-      const userObj = (Array.isArray(window.users) && window.users.find((u) => u._id === pId || u.id === pId)) || null;
-      const label =
-        (userObj && (userObj.fullName || `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() || userObj.email)) ||
-        pId;
-      const row = document.createElement('div');
-      row.className = 'unit-member-row';
-      row.dataset.userId = pId;
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.gap = '10px';
-
-      row.innerHTML = `
-        <label style="display:flex; align-items:center; gap:8px; flex:1;">
-          <input type="checkbox" class="unit-member-include" checked />
-          <span>${label}</span>
-        </label>
-        <select class="unit-member-mode" style="padding:6px 8px; border-radius:6px;">
-          <option value="проходив">Учасник</option>
-          <option value="проводив">Лектор</option>
-        </select>
-      `;
-      membersContainer.appendChild(row);
+      membersContainer.appendChild(createUnitMemberRow(pId));
     });
   }
 

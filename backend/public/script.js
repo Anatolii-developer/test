@@ -581,8 +581,17 @@ let selectedParticipants = window.selectedParticipants || [];
 window.selectedParticipants = selectedParticipants;
 
 function syncSelectedParticipants(nextArr) {
-  selectedParticipants = nextArr;
-  window.selectedParticipants = nextArr;
+  selectedParticipants = Array.isArray(nextArr) ? nextArr : [];
+  window.selectedParticipants = selectedParticipants;
+}
+
+function ensureParticipantsArray() {
+  if (!Array.isArray(selectedParticipants)) {
+    selectedParticipants = [];
+  }
+  if (!Array.isArray(window.selectedParticipants)) {
+    window.selectedParticipants = selectedParticipants;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -598,6 +607,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 async function openUserModal() {
+  ensureParticipantsArray();
   try {
     // підтягуємо юзерів прямо перед відкриттям, щоб мати повний і свіжий список
     const res = await fetch(`${API_BASE}/api/users`);
@@ -660,6 +670,7 @@ function saveSelectedParticipants() {
 }
 
 function updateSelectedDisplay() {
+  ensureParticipantsArray();
   const container = document.getElementById("selectedParticipants");
   container.innerHTML = "";
 

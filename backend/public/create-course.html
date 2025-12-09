@@ -275,9 +275,9 @@
             </div>
 
             <div class="form-group">
-              <label>Учасники та роль в юніті</label>
+              <label>Учасники та роль у дні</label>
               <small style="display:block; margin-bottom:6px; color:#777;">
-                Список формується з обраних учасників курсу. Для кожного вкажіть, чи він <b>проходив</b> чи <b>проводив</b>.
+                Відмітьте, хто бере участь цього дня, та вкажіть роль: <b>Учасник</b> чи <b>Лектор</b>.
               </small>
               <div id="unitMembersContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
@@ -380,12 +380,18 @@ function openUnitModalForDay(dayName) {
       const row = document.createElement('div');
       row.className = 'unit-member-row';
       row.dataset.userId = pId;
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.gap = '10px';
 
       row.innerHTML = `
-        <span>${label}</span>
-        <select class="unit-member-mode">
-          <option value="проходив">проходив</option>
-          <option value="проводив">проводив</option>
+        <label style="display:flex; align-items:center; gap:8px; flex:1;">
+          <input type="checkbox" class="unit-member-include" checked />
+          <span>${label}</span>
+        </label>
+        <select class="unit-member-mode" style="padding:6px 8px; border-radius:6px;">
+          <option value="проходив">Учасник</option>
+          <option value="проводив">Лектор</option>
         </select>
       `;
       membersContainer.appendChild(row);
@@ -439,7 +445,9 @@ function saveUnitFromModal() {
     .querySelectorAll('#unitMembersContainer .unit-member-row')
     .forEach((row) => {
       const userId = row.dataset.userId;
+      const include = row.querySelector('.unit-member-include');
       const mode = row.querySelector('.unit-member-mode').value;
+      if (include && !include.checked) return;
       if (userId && mode) {
         members.push({ user: userId, mode });
       }

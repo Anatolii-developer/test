@@ -342,13 +342,17 @@ function bindUnitTimeAutoCalc() {
 function getUserLabelById(userId) {
   const userObj =
     (Array.isArray(window.users) && window.users.find((u) => u._id === userId || u.id === userId)) || null;
-  return (
-    (userObj &&
-      (userObj.fullName ||
-        `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() ||
-        userObj.email)) ||
-    userId
-  );
+  if (userObj) {
+    const candidate =
+      userObj.fullName ||
+      userObj.name ||
+      `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() ||
+      userObj.username ||
+      userObj.email ||
+      userObj.phone;
+    if (candidate && candidate.trim()) return candidate.trim();
+  }
+  return userId;
 }
 
 function renderUnitMemberPicker() {

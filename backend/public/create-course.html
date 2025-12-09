@@ -66,13 +66,21 @@
     <section class="create-course-content">
       <form id="createCourseForm">
         <div class="form-group">
-          <label>Оберіть тип заходу</label>
+          <label>Оберіть головний вид</label>
           <div class="radio-group">
-            <label><input type="radio" name="eventType" value="Курс" /> Курс</label>
-            <label><input type="radio" name="eventType" value="Група" /> Група</label>
-            <label><input type="radio" name="eventType" value="Супервізія" /> Супервізія</label>
-            <label><input type="radio" name="eventType" value="Лекція" /> Лекція</label>
-            <label><input type="radio" name="eventType" value="Семінар" /> Семінар</label>
+            <label><input type="radio" name="mainType" value="Курс" /> Курс</label>
+            <label><input type="radio" name="mainType" value="Підвищення кваліфікації" /> Підвищення кваліфікації</label>
+            <label><input type="radio" name="mainType" value="Конференція" /> Конференція</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Оберіть формат (за потреби)</label>
+          <div class="radio-group">
+            <label><input type="radio" name="formatType" value="Група" /> Група</label>
+            <label><input type="radio" name="formatType" value="Супервізія" /> Супервізія</label>
+            <label><input type="radio" name="formatType" value="Лекція" /> Лекція</label>
+            <label><input type="radio" name="formatType" value="Семінар" /> Семінар</label>
           </div>
         </div>
 
@@ -300,6 +308,39 @@
 let units = [];
 let currentUnitDayName = null;
 
+function parseTimeToMinutes(value) {
+  if (!value) return null;
+  const [h, m] = value.split(':').map(Number);
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  return h * 60 + m;
+}
+
+function calculateHoursFromTimes(start, end) {
+  const startMin = parseTimeToMinutes(start);
+  const endMin = parseTimeToMinutes(end);
+  if (startMin == null || endMin == null) return null;
+  const diff = endMin - startMin;
+  if (diff <= 0) return null;
+  return Math.round((diff / 60) * 100) / 100;
+}
+
+function bindUnitTimeAutoCalc() {
+  const startInput = document.getElementById('unitStartTime');
+  const endInput = document.getElementById('unitEndTime');
+  const hoursInput = document.getElementById('unitHours');
+  if (!startInput || !endInput || !hoursInput) return;
+
+  const recalc = () => {
+    const hours = calculateHoursFromTimes(startInput.value, endInput.value);
+    hoursInput.value = hours != null ? hours : '';
+  };
+
+  startInput.oninput = recalc;
+  startInput.onchange = recalc;
+  endInput.oninput = recalc;
+  endInput.onchange = recalc;
+}
+
 // вызывается при клике на чекбокс дня
 function handleCourseDayChange(checkbox, dayName) {
   if (checkbox.checked) {
@@ -324,19 +365,24 @@ function openUnitModalForDay(dayName) {
   document.getElementById('unitType').value = '';
   document.getElementById('unitTitle').value = '';
   document.getElementById('unitHours').value = '';
+  bindUnitTimeAutoCalc();
 
   const membersContainer = document.getElementById('unitMembersContainer');
   membersContainer.innerHTML = '';
 
   // выводим участников с выбором "проходив / проводив"
   if (Array.isArray(window.selectedParticipants)) {
-    window.selectedParticipants.forEach((p) => {
+    window.selectedParticipants.forEach((pId) => {
+      const userObj = (Array.isArray(window.users) && window.users.find((u) => u._id === pId || u.id === pId)) || null;
+      const label =
+        (userObj && (userObj.fullName || `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() || userObj.email)) ||
+        pId;
       const row = document.createElement('div');
       row.className = 'unit-member-row';
-      row.dataset.userId = p._id || p.id;
+      row.dataset.userId = pId;
 
       row.innerHTML = `
-        <span>${p.fullName || p.name || p.email}</span>
+        <span>${label}</span>
         <select class="unit-member-mode">
           <option value="проходив">проходив</option>
           <option value="проводив">проводив</option>
@@ -374,7 +420,8 @@ function saveUnitFromModal() {
   const unitType = document.getElementById('unitType').value;
   const title = document.getElementById('unitTitle').value.trim();
   const hoursValue = document.getElementById('unitHours').value;
-  const hours = hoursValue ? Number(hoursValue) : null;
+  const autoHours = calculateHoursFromTimes(startTime, endTime);
+  const hours = hoursValue !== '' ? Number(hoursValue) : autoHours;
 
   if (!currentUnitDayName) {
     alert('Не визначено день заняття');

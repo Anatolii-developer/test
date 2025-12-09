@@ -24,32 +24,50 @@ exports.createCourse = async (req, res) => {
     if (Array.isArray(req.body.units)) {
       units = req.body.units
         .map((u) => {
-          const unitDate = u.date ? new Date(u.date) : null;
+          const unitDateRaw = u.date || null;
+          const unitDate = unitDateRaw ? new Date(unitDateRaw) : null;
+          const hoursNumber =
+            typeof u.hours === 'number'
+              ? u.hours
+              : typeof u.hours === 'string' && u.hours.trim() !== ''
+                ? Number(u.hours)
+                : null;
 
           return {
-            date: unitDate,                      // Date
+            dayName: u.dayName || u.day || null, // Понеділок, Вівторок тощо
+            date: unitDate && !isNaN(unitDate) ? unitDate : null,
             startTime: u.startTime || '',
             endTime: u.endTime || '',
-            unitType: u.unitType,                // 'Лекція', 'Семінар' тощо
+            unitType: u.unitType, // 'Лекція', 'Семінар' тощо
             title: u.title || '',
-            hours: typeof u.hours === 'number' ? u.hours : null,
+            hours: Number.isFinite(hoursNumber) ? hoursNumber : null,
             members: Array.isArray(u.members)
-              ? u.members.map((m) => ({
-                  user: m.user,
-                  mode: m.mode === 'проводив' ? 'проводив' : 'проходив', // захист від некоректних значень
-                }))
+              ? u.members
+                  .filter((m) => m && m.user && m.mode)
+                  .map((m) => ({
+                    user: m.user,
+                    mode: m.mode === 'проводив' ? 'проводив' : 'проходив', // захист від некоректних значень
+                  }))
               : [],
           };
         })
-        .filter((u) => u.date && u.unitType); // відкидаємо порожні/некоректні юніти
+        .filter((u) => (u.dayName || u.date) && u.unitType); // відкидаємо порожні/некоректні юніти
+    }
+
+    const mainType = req.body.mainType || req.body.eventType || null;
+    const formatTypeRaw = req.body.formatType ?? null;
+    const formatType = formatTypeRaw === '' ? null : formatTypeRaw;
+
+    if (!mainType) {
+      return res.status(400).json({ message: 'Вкажіть головний вид курсу' });
     }
 
     const course = new Course({
       creatorId:   req.body.creatorId || null,
       creatorName: req.body.creatorName || '',
       creatorRole: req.body.creatorRole || '',
-      mainType: req.body.mainType,
-      formatType: req.body.formatType || null,
+      mainType,
+      formatType,
       courseTitle: req.body.courseTitle,
       courseSubtitle: req.body.courseSubtitle,
       courseDescription: req.body.courseDescription,

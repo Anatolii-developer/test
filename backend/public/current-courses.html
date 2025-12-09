@@ -159,7 +159,7 @@
         <p class="modal-course-description">${course.courseDescription}</p>
         <div class="modal-course-info">
           <div><span class="modal-course-label">Тип заходу:</span> <span class="modal-course-answer">${
-            course.eventType
+            course.mainType || course.eventType || ""
           }</span></div>
           <div><span class="modal-course-label">Дати проведення курсу:</span> <span class="modal-course-answer">${start} – ${end}</span></div>
           <div><span class="modal-course-label">Дні проведення курсу:</span> <span class="modal-course-answer">${course.courseDays.join(

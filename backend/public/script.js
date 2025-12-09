@@ -844,6 +844,11 @@ window.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    if (!form.mainType || !form.mainType.value) {
+      alert("Оберіть головний вид курсу");
+      return;
+    }
+
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const creatorId = storedUser?._id;
 
@@ -859,8 +864,33 @@ window.addEventListener("DOMContentLoaded", () => {
       console.error("Помилка при отриманні даних користувача:", err);
     }
 
+    const formatType = form.formatType ? form.formatType.value || null : null;
+    const participantsPayload = Array.from(new Set(selectedParticipants || []));
+    const unitsPayload = Array.isArray(window.units)
+      ? window.units
+          .map((u) => ({
+            dayName: u.dayName || null,
+            date: u.date || null,
+            startTime: u.startTime || "",
+            endTime: u.endTime || "",
+            unitType: u.unitType || "",
+            title: u.title || "",
+            hours:
+              typeof u.hours === "number"
+                ? u.hours
+                : u.hours !== undefined && u.hours !== null && u.hours !== ""
+                  ? Number(u.hours)
+                  : null,
+            members: Array.isArray(u.members)
+              ? u.members.map((m) => ({ user: m.user, mode: m.mode }))
+              : [],
+          }))
+          .filter((u) => u.dayName && u.unitType)
+      : [];
+
     const formData = {
-      eventType: form.eventType.value,
+      mainType: form.mainType.value,
+      formatType,
       courseTitle: form.courseTitle.value,
       courseSubtitle: form.courseSubtitle.value,
       courseDescription: form.courseDescription.value,
@@ -877,7 +907,8 @@ window.addEventListener("DOMContentLoaded", () => {
       courseDuration: form.courseDuration.value,
       coursePrice: form.coursePrice.value,
       zoomLink: form.zoomLink.value,
-      participants: selectedParticipants,
+      participants: participantsPayload,
+      units: unitsPayload,
       creatorId,
       creatorName,
       creatorRole

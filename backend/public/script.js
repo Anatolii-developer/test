@@ -577,7 +577,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let users = [];
-let selectedParticipants = [];
+let selectedParticipants = window.selectedParticipants || [];
+window.selectedParticipants = selectedParticipants;
+
+function syncSelectedParticipants(nextArr) {
+  selectedParticipants = nextArr;
+  window.selectedParticipants = nextArr;
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (window.location.pathname.includes("registration")) return;
@@ -618,7 +624,7 @@ checkbox.addEventListener("change", () => {
   if (checkbox.checked) {
     selectedParticipants.push(user._id);
   } else {
-    selectedParticipants = selectedParticipants.filter(id => id !== user._id);
+    syncSelectedParticipants(selectedParticipants.filter(id => id !== user._id));
   }
   updateSelectedDisplay();
 });
@@ -663,7 +669,7 @@ function updateSelectedDisplay() {
     removeBtn.style.cursor = "pointer";
     removeBtn.style.color = "red";
     removeBtn.addEventListener("click", () => {
-      selectedParticipants = selectedParticipants.filter(pid => pid !== id);
+      syncSelectedParticipants(selectedParticipants.filter(pid => pid !== id));
       updateSelectedDisplay();
     });
 

@@ -100,6 +100,16 @@
         </div>
 
         <div class="form-group">
+  <label>Оберіть учасників</label>
+  <button type="button" onclick="openUserModal()" class="small-button">+ Додати учасників</button>
+</div>
+
+<div class="form-group">
+  <label>Обрані учасники</label>
+  <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+</div>
+
+        <div class="form-group">
           <label>Оберіть дати проведення курсу</label>
           <div class="date-range">
             <input type="text" name="startDate" class="datepicker" placeholder="дд.мм.рррр" />
@@ -170,15 +180,7 @@
           </div>
         </div>
 
-<div class="form-group">
-  <label>Оберіть учасників</label>
-  <button type="button" onclick="openUserModal()" class="small-button">+ Додати учасників</button>
-</div>
 
-<div class="form-group">
-  <label>Обрані учасники</label>
-  <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-</div>
 
 
     

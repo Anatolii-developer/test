@@ -606,58 +606,83 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
+function getUserDisplayName(user) {
+  if (!user) return "";
+  const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+  return name || user.username || user.email || user._id;
+}
+
+function renderUserList(searchTerm = "") {
+  const userList = document.getElementById("userList");
+  if (!userList) return;
+
+  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+  const filteredUsers = users.filter((user) => {
+    if (!user || !user._id) return false;
+    const displayName = getUserDisplayName(user).toLowerCase();
+    return displayName.includes(lowerCaseSearchTerm);
+  });
+
+  userList.innerHTML = ""; // Очищаємо список перед рендерингом
+
+  filteredUsers.forEach((user) => {
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.justifyContent = "space-between";
+    wrapper.style.alignItems = "center";
+    wrapper.style.padding = "6px 0";
+    wrapper.style.gap = "12px";
+
+    const name = document.createElement("span");
+    name.textContent = getUserDisplayName(user);
+    name.style.flex = "1";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = user._id;
+    checkbox.checked = selectedParticipants.includes(user._id);
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        if (!selectedParticipants.includes(user._id)) {
+          selectedParticipants.push(user._id);
+        }
+      } else {
+        syncSelectedParticipants(
+          selectedParticipants.filter((id) => id !== user._id)
+        );
+      }
+      updateSelectedDisplay();
+    });
+
+    wrapper.appendChild(name);
+    wrapper.appendChild(checkbox);
+    userList.appendChild(wrapper);
+  });
+}
+
 async function openUserModal() {
   ensureParticipantsArray();
   try {
-    // підтягуємо юзерів прямо перед відкриттям, щоб мати повний і свіжий список
     const res = await fetch(`${API_BASE}/api/users`);
     if (res.ok) {
       users = await res.json();
+      window.users = users; // Зберігаємо в глобальну область видимості
     } else {
-      console.error("Не вдалося завантажити користувачів: ", res.status, res.statusText);
+      console.error(
+        "Не вдалося завантажити користувачів: ",
+        res.status,
+        res.statusText
+      );
     }
   } catch (err) {
     console.error("Не вдалося завантажити користувачів:", err);
   }
 
   document.getElementById("userModal").style.display = "block";
-  const userList = document.getElementById("userList");
-  if (!userList) return;
-  userList.innerHTML = "";
-
-  users.forEach(user => {
-    if (!user || !user._id) return;
-
-    const wrapper = document.createElement("div");
-wrapper.style.display = "flex";
-wrapper.style.justifyContent = "space-between";
-wrapper.style.alignItems = "center";
-wrapper.style.padding = "6px 0";
-wrapper.style.gap = "12px";  // расстояние между текстом и чекбоксом
-
-const name = document.createElement("span");
-name.textContent = `${user.firstName} ${user.lastName}`;
-name.style.flex = "1";  // чтобы имя занимало всё свободное место
-
-const checkbox = document.createElement("input");
-checkbox.type = "checkbox";
-checkbox.value = user._id;
-checkbox.checked = selectedParticipants.includes(user._id);
-
-checkbox.addEventListener("change", () => {
-  if (checkbox.checked) {
-    selectedParticipants.push(user._id);
-  } else {
-    syncSelectedParticipants(selectedParticipants.filter(id => id !== user._id));
-  }
-  updateSelectedDisplay();
-});
-
-wrapper.appendChild(name);
-wrapper.appendChild(checkbox);
-userList.appendChild(wrapper);
-
-  });
+  document.getElementById("searchInput").value = ""; // Очищаємо пошук
+  renderUserList(); // Перший рендер без фільтрації
 }
 
 function closeUserModal() {
@@ -674,8 +699,8 @@ function updateSelectedDisplay() {
   const container = document.getElementById("selectedParticipants");
   container.innerHTML = "";
 
-  selectedParticipants.forEach(id => {
-    const user = users.find(u => u._id === id);
+  selectedParticipants.forEach((id) => {
+    const user = users.find((u) => u._id === id);
     if (!user) return;
 
     const item = document.createElement("div");
@@ -687,14 +712,14 @@ function updateSelectedDisplay() {
     item.style.borderRadius = "12px";
 
     const name = document.createElement("span");
-    name.textContent = `${user.firstName} ${user.lastName}`;
+    name.textContent = getUserDisplayName(user);
 
     const removeBtn = document.createElement("span");
     removeBtn.textContent = "✕";
     removeBtn.style.cursor = "pointer";
     removeBtn.style.color = "red";
     removeBtn.addEventListener("click", () => {
-      syncSelectedParticipants(selectedParticipants.filter(pid => pid !== id));
+      syncSelectedParticipants(selectedParticipants.filter((pid) => pid !== id));
       updateSelectedDisplay();
     });
 

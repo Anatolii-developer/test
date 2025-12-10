@@ -67,10 +67,19 @@
       <form id="createCourseForm">
         <div class="form-group">
           <label>Оберіть головний вид</label>
-          <div class="radio-group">
-            <label><input type="radio" name="mainType" value="Курс" /> Курс</label>
-            <label><input type="radio" name="mainType" value="Підвищення кваліфікації" /> Підвищення кваліфікації</label>
-            <label><input type="radio" name="mainType" value="Конференція" /> Конференція</label>
+          <div class="format-chip-group">
+            <label class="format-chip">
+              <input type="radio" name="mainType" value="Курс" />
+              <span>Курс</span>
+            </label>
+            <label class="format-chip">
+              <input type="radio" name="mainType" value="Підвищення кваліфікації" />
+              <span>Підвищення кваліфікації</span>
+            </label>
+            <label class="format-chip">
+              <input type="radio" name="mainType" value="Конференція" />
+              <span>Конференція</span>
+            </label>
           </div>
         </div>
 

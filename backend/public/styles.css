@@ -2857,6 +2857,17 @@ input:checked+.slider:before {
   margin-top: 12px;
 }
 
+.format-radio-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 20px;
+  align-items: center;
+}
+
+.format-radio-group label {
+  font-size: 16px;
+}
+
 .format-multi__hint {
   color: #6b6b6b;
   font-size: 14px;

@@ -57,6 +57,19 @@ exports.createCourse = async (req, res) => {
     const mainType = req.body.mainType || req.body.eventType || null;
     const formatTypeRaw = req.body.formatType ?? null;
     const formatType = formatTypeRaw === '' ? null : formatTypeRaw;
+    const formatDetailsSource = Array.isArray(req.body.formatDetails)
+      ? req.body.formatDetails
+      : typeof req.body.formatDetails === 'string' && req.body.formatDetails.trim() !== ''
+        ? [req.body.formatDetails]
+        : [];
+    const formatDetails = Array.from(
+      new Set(
+        formatDetailsSource
+          .filter((v) => typeof v === 'string')
+          .map((v) => v.trim())
+          .filter(Boolean)
+      )
+    );
 
     if (!mainType) {
       return res.status(400).json({ message: 'Вкажіть головний вид курсу' });
@@ -68,6 +81,7 @@ exports.createCourse = async (req, res) => {
       creatorRole: req.body.creatorRole || '',
       mainType,
       formatType,
+      formatDetails,
       courseTitle: req.body.courseTitle,
       courseSubtitle: req.body.courseSubtitle,
       courseDescription: req.body.courseDescription,

@@ -91,6 +91,10 @@ const courseSchema = new mongoose.Schema({
     enum: ['Група', 'Супервізія', 'Лекція', 'Семінар', null],
     default: null,
   },
+  formatDetails: {
+    type: [String],
+    default: [],
+  },
   courseTitle: String,
   courseSubtitle: String,
   courseDescription: String,

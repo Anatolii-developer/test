@@ -921,6 +921,9 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const formatType = form.formatType ? form.formatType.value || null : null;
+    const formatDetails = Array.from(form.querySelectorAll('input[name="formatDetails"]:checked'))
+      .map((item) => item.value)
+      .filter(Boolean);
     const participantsPayload = Array.from(new Set(selectedParticipants || []));
     const unitsPayload = Array.isArray(window.units)
       ? window.units
@@ -954,6 +957,7 @@ window.addEventListener("DOMContentLoaded", () => {
         start: form.startDate.value,
         end: form.endDate.value
       },
+      formatDetails,
       courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
       courseTime: {
         start: form.startTime.value,

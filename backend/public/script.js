@@ -921,8 +921,9 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const formatType = form.formatType ? form.formatType.value || null : null;
-    const formatDetails = Array.from(form.querySelectorAll('input[name="formatDetails"]:checked'))
-      .map((item) => item.value)
+    const formatDetailsSelect = form.querySelector('#formatDetails');
+    const formatDetails = Array.from(formatDetailsSelect ? formatDetailsSelect.selectedOptions : [])
+      .map((opt) => opt.value)
       .filter(Boolean);
     const participantsPayload = Array.from(new Set(selectedParticipants || []));
     const unitsPayload = Array.isArray(window.units)

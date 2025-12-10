@@ -74,28 +74,28 @@
           </div>
         </div>
 
-         <div class="form-group">
+        <div class="form-group">
           <label>Оберіть формат (за потреби)</label>
-          <div class="radio-group">
-            <label><input type="radio" name="formatType" value="Група" /> Група</label>
-            <label><input type="radio" name="formatType" value="Супервізія" /> Супервізія</label>
-            <label><input type="radio" name="formatType" value="Лекція" /> Лекція</label>
-            <label><input type="radio" name="formatType" value="Семінар" /> Семінар</label>
-             <option value="Особистий аналіз">Особистий аналіз</option>
-                <option value="Індивідуальна супервізія">Індивідуальна супервізія</option>
-                <option value="Групова супервізія">Групова супервізія</option>
-                <option value="Менторське заняття">Менторське заняття</option>
-                <option value="Лекція">Лекція</option>
-                <option value="Семінар">Семінар</option>
-                <option value="Терапевтична група">Терапевтична група</option>
-                <option value="Супервізійно-семінарське заняття">Супервізійно-семінарське заняття</option>
-                <option value="Парна терапія">Парна терапія</option>
-                <option value="Лекторій">Лекторій</option>
+          <div class="format-multi">
+            <select name="formatDetails" id="formatDetails" multiple class="format-select">
+              <option value="Група">Група</option>
+              <option value="Супервізія">Супервізія</option>
+              <option value="Лекція">Лекція</option>
+              <option value="Семінар">Семінар</option>
+              <option value="Особистий аналіз">Особистий аналіз</option>
+              <option value="Індивідуальна супервізія">Індивідуальна супервізія</option>
+              <option value="Групова супервізія">Групова супервізія</option>
+              <option value="Менторське заняття">Менторське заняття</option>
+              <option value="Терапевтична група">Терапевтична група</option>
+              <option value="Супервізійно-семінарське заняття">Супервізійно-семінарське заняття</option>
+              <option value="Парна терапія">Парна терапія</option>
+              <option value="Лекторій">Лекторій</option>
+            </select>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Назва курсу</label
+          <label>Назва курсу</label>
           <input type="text" name="courseTitle" placeholder="Введіть назву" />
         </div>
 

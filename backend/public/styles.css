@@ -2895,6 +2895,7 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   cursor: pointer;
+  gap: 10px;
 }
 
 .format-chip input {
@@ -2904,53 +2905,43 @@ input:checked+.slider:before {
 }
 
 .format-chip span {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background: #f9f9f9;
+  padding: 4px 0;
   color: #2f2f2f;
   font-size: 15px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  background: transparent;
+  border: none;
 }
 
 .format-chip span::before {
   content: "";
-  width: 16px;
-  height: 16px;
-  border: 2px solid #d0d0d0;
-  border-radius: 4px;
-  background: #fff;
+  width: 24px;
+  height: 24px;
+  background: url('assets/choice-button/default.png') center/contain no-repeat;
   flex-shrink: 0;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.format-chip input:checked + span {
-  border-color: #275D2B;
-  background: #f2f8f3;
-  color: #1f4124;
-  box-shadow: 0 4px 14px rgba(39, 93, 43, 0.14);
-  font-weight: 600;
+.format-chip:hover span::before {
+  background-image: url('assets/choice-button/hover.png');
 }
 
+.format-chip input:focus-visible + span::before {
+  background-image: url('assets/choice-button/focus.png');
+}
+
+.format-chip:active span::before,
 .format-chip input:checked + span::before {
-  border-color: #275D2B;
-  background: linear-gradient(135deg, #2f7b38 0%, #275D2B 100%);
-  box-shadow: inset 0 0 0 2px #f2f8f3;
+  background-image: url('assets/choice-button/press.png');
 }
 
-.format-chip span:hover {
-  border-color: #c8c8c8;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+.format-chip input:disabled + span {
+  color: #9a9a9a;
 }
 
-.format-chip input:focus-visible + span {
-  outline: 2px solid #275D2B;
-  outline-offset: 2px;
+.format-chip input:disabled + span::before {
+  background-image: url('assets/choice-button/disabled.png');
 }
 
 @media (max-width: 640px) {

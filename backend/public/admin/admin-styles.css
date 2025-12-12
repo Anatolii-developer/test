@@ -29,6 +29,17 @@ body {
   background-color: #97C194;
 }
 
+/* Вирівнювання сторінок з формою створення курсу в адмінці */
+body.create-course-page .admin-main {
+  width: 100%;
+  margin: 0;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
 
 .requests-table td {
   vertical-align: top;

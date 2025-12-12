@@ -3,54 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Створити курс</title>
+  <title>Створити курс (Admin)</title>
   <link rel="stylesheet" href="admin-styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
 </head>
-<body class="with-sidebar">
+<body class="with-sidebar create-course-page">
   <aside class="sidebar" id="sidebar"></aside>
 
-  <div id="mainContentWrapper">
-  <main id="admin-main">
+  <main class="admin-main">
+    <div class="main-header">
+      <h2>Створити курс</h2>
+      <img src="../assets/courses/create.png" alt="Create Course" />
+    </div>
 
+    <div class="completed-nav-buttons">
+      <a href="admin-all-courses.html" class="completed-nav-button secondary">Головна</a>
+      <a href="admin-all-courses.html?status=Пройдений" class="completed-nav-button secondary">Пройдені курси</a>
+      <a href="admin-all-courses.html?status=Поточний" class="completed-nav-button secondary">Поточні курси</a>
+      <a href="admin-all-courses.html?status=Запланований" class="completed-nav-button secondary">Заплановані курси</a>
+      <a href="admin-create-course.html" class="completed-nav-button create">Створити курс</a>
+    </div>
 
-<div class="completed-nav-buttons">
-  <div class="top-buttons">
-     <a href="admin-create-course.html" class="completed-nav-button create">Створити</a>
-    <button class="completed-nav-button" data-status="Запланований">Заплановані</button>
-    <button class="completed-nav-button" data-status="Поточний">Поточні</button>
-    <button class="completed-nav-button" data-status="Пройдений">Пройдені</button>
-  </div>
-
-  <div class="bottom-center-button">
-    <button class="completed-nav-button" data-status="WAITING_FOR_APPROVAL">Заявки на курси</button>
-  </div>
-</div>
     <section class="create-course-content">
       <form id="createCourseForm">
-        <!-- ГОЛОВНИЙ ВИД -->
-<div class="form-group">
-  <label>Оберіть головний вид</label>
-  <div class="radio-group">
-    <label><input type="radio" name="mainType" value="Курс" /> Курс</label>
-    <label><input type="radio" name="mainType" value="Підвищення кваліфікації" /> Підвищення кваліфікації</label>
-    <label><input type="radio" name="mainType" value="Конференція" /> Конференція</label>
-  </div>
-</div>
+        <div class="form-group">
+          <label>Оберіть головний вид</label>
+          <div class="format-chip-group">
+            <label class="format-chip">
+              <input type="radio" name="mainType" value="Курс" />
+              <span>Курс</span>
+            </label>
+            <label class="format-chip">
+              <input type="radio" name="mainType" value="Підвищення кваліфікації" />
+              <span>Підвищення кваліфікації</span>
+            </label>
+            <label class="format-chip">
+              <input type="radio" name="mainType" value="Конференція" />
+              <span>Конференція</span>
+            </label>
+          </div>
+        </div>
 
-<!-- ФОРМАТ (необов’язково) -->
-<div class="form-group">
-  <label>Оберіть формат (за потреби)</label>
-  <div class="radio-group">
-    <label><input type="radio" name="formatType" value="Група" /> Група</label>
-    <label><input type="radio" name="formatType" value="Супервізія" /> Супервізія</label>
-    <label><input type="radio" name="formatType" value="Лекція" /> Лекція</label>
-    <label><input type="radio" name="formatType" value="Семінар" /> Семінар</label>
-  </div>
-</div>
+        <div class="form-group">
+          <div class="format-multi">
+            <div class="format-multi__hint">Обирайте потрібні формати (можна кілька)</div>
+            <div class="format-chip-group two-col">
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Група" />
+                <span>Група</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Супервізія" />
+                <span>Супервізія</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Лекція" />
+                <span>Лекція</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Семінар" />
+                <span>Семінар</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Особистий аналіз" />
+                <span>Особистий аналіз</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Індивідуальна супервізія" />
+                <span>Індивідуальна супервізія</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Групова супервізія" />
+                <span>Групова супервізія</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Менторське заняття" />
+                <span>Менторське заняття</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Терапевтична група" />
+                <span>Терапевтична група</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Супервізійно-семінарське заняття" />
+                <span>Супервізійно-семінарське заняття</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Парна терапія" />
+                <span>Парна терапія</span>
+              </label>
+              <label class="format-chip">
+                <input type="checkbox" name="formatDetails" value="Лекторій" />
+                <span>Лекторій</span>
+              </label>
+            </div>
+          </div>
+        </div>
 
         <div class="form-group">
           <label>Назва курсу</label>
@@ -68,56 +119,69 @@
         </div>
 
         <div class="form-group">
+          <label>Оберіть учасників</label>
+          <button type="button" onclick="openUserModal()" class="small-button">+ Додати учасників</button>
+        </div>
+
+        <div class="form-group">
+          <label>Обрані учасники</label>
+          <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        </div>
+
+        <div class="form-group">
           <label>Оберіть дати проведення курсу</label>
           <div class="date-range">
-            <input type="text" name="startDate" class="date-pick" placeholder="дд.мм.рррр" />
-            <input type="text" name="endDate" class="date-pick" placeholder="дд.мм.рррр" />
+            <input type="text" name="startDate" class="datepicker" placeholder="дд.мм.рррр" />
+            <input type="text" name="endDate" class="datepicker" placeholder="дд.мм.рррр" />
           </div>
-          <input type="text" id="durationHuman" placeholder="Тривалість (обчислюється)" disabled />
-          <input type="hidden" name="courseDuration" id="courseDuration" />
         </div>
 
         <div class="form-group">
           <label>Оберіть дні проведення курсу</label>
           <div class="weekdays-checkboxes">
-            <label><input type="checkbox" name="courseDays" value="Понеділок" /> Понеділок</label>
-            <label><input type="checkbox" name="courseDays" value="Вівторок" /> Вівторок</label>
-            <label><input type="checkbox" name="courseDays" value="Середа" /> Середа</label>
-            <label><input type="checkbox" name="courseDays" value="Четвер" /> Четвер</label>
-            <label><input type="checkbox" name="courseDays" value="П’ятниця" /> П’ятниця</label>
-            <label><input type="checkbox" name="courseDays" value="Субота" /> Субота</label>
-            <label><input type="checkbox" name="courseDays" value="Неділя" /> Неділя</label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Оберіть години проведення</label>
-          <div class="time-range">
-            <input type="time" name="startTime" />
-            <span>–</span>
-            <input type="time" name="endTime" />
+            <label>
+              <input type="checkbox" name="courseDays" value="Понеділок" onchange="handleCourseDayChange(this, 'Понеділок')" />
+              Понеділок
+            </label>
+            <label>
+              <input type="checkbox" name="courseDays" value="Вівторок" onchange="handleCourseDayChange(this, 'Вівторок')" />
+              Вівторок
+            </label>
+            <label>
+              <input type="checkbox" name="courseDays" value="Середа" onchange="handleCourseDayChange(this, 'Середа')" />
+              Середа
+            </label>
+            <label>
+              <input type="checkbox" name="courseDays" value="Четвер" onchange="handleCourseDayChange(this, 'Четвер')" />
+              Четвер
+            </label>
+            <label>
+              <input type="checkbox" name="courseDays" value="П’ятниця" onchange="handleCourseDayChange(this, 'П’ятниця')" />
+              П’ятниця
+            </label>
+            <label>
+              <input type="checkbox" name="courseDays" value="Субота" onchange="handleCourseDayChange(this, 'Субота')" />
+              Субота
+            </label>
+            <label>
+              <input type="checkbox" name="courseDays" value="Неділя" onchange="handleCourseDayChange(this, 'Неділя')" />
+              Неділя
+            </label>
           </div>
         </div>
 
         <div class="form-group">
           <label>Оберіть тип курсу</label>
-          <div class="radio-group">
+          <div class="radio-group access-type-group">
             <label><input type="radio" name="accessType" value="Відкрита група" /> Відкрита група</label>
             <label><input type="radio" name="accessType" value="Закрита група" /> Закрита група</label>
           </div>
         </div>
 
-       <div class="form-group">
-  <label>Оберіть учасників</label>
-  <select name="participants" id="participantsSelect" multiple></select>
-  <button type="button" onclick="openUserModal()" class="small-button">+ Додати нового</button>
-</div>
-<div class="form-group">
-  <label>Обрані учасники</label>
-  <div id="selectedParticipants" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-</div>
-
-
+        <div class="form-group">
+          <label>Тривалість курсу</label>
+          <input type="text" name="courseDuration" placeholder="Наприклад: 4 тижні, 8 занять" />
+        </div>
 
         <div class="form-group">
           <label>Вартість курсу</label>
@@ -128,10 +192,6 @@
           <label>Посилання на Zoom</label>
           <input type="text" name="zoomLink" placeholder="Вставте Zoom-посилання" />
         </div>
-        <div class="form-group">
-          <label>Посилання на сторінку курсу (на сайті)</label>
-          <input type="url" name="siteLink" placeholder="https://…" />
-        </div>
 
         <div class="save-btn-wrapper">
           <button type="submit" class="save-btn">Зберегти</button>
@@ -139,353 +199,332 @@
       </form>
     </section>
   </main>
+
+  <div id="userModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+      <span class="close" onclick="closeUserModal()">&times;</span>
+      <h3>Оберіть учасників</h3>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Пошук учасника..."
+        oninput="renderUserList(this.value)"
+        style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px;"
+      />
+
+      <div id="userList" style="margin-top: 16px; max-height: 300px; overflow-y: auto;"></div>
+
+      <button onclick="saveSelectedParticipants()" style="margin-top: 20px;">Зберегти вибір</button>
+    </div>
   </div>
-    <script src="admin-auth.js"></script>
- <script>
-  // Define API_BASE at the top of the main script block
-  const API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
-  document.addEventListener("DOMContentLoaded", () => {
-    if (typeof renderAdminSidebar === "function") {
-      renderAdminSidebar("admin-create-course.html");
-    }
-    if (typeof requireAdminPage === "function") {
-      requireAdminPage();
-    }
-    load();
-  });
 
-let allUsers = [];
-let selectedUserIds = new Set();
+  <div id="unitModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+      <span class="close" onclick="closeUnitModal()">&times;</span>
+      <h3>Додати / редагувати заняття</h3>
 
+      <div class="form-group">
+        <label>Тип юніта</label>
+        <select id="unitType">
+          <option value="">Оберіть тип</option>
+          <option value="Особистий аналіз">Особистий аналіз</option>
+          <option value="Індивідуальна супервізія">Індивідуальна супервізія</option>
+          <option value="Групова супервізія">Групова супервізія</option>
+          <option value="Менторське заняття">Менторське заняття</option>
+          <option value="Лекція">Лекція</option>
+          <option value="Семінар">Семінар</option>
+          <option value="Терапевтична група">Терапевтична група</option>
+          <option value="Супервізійно-семінарське заняття">Супервізійно-семінарське заняття</option>
+          <option value="Парна терапія">Парна терапія</option>
+          <option value="Лекторій">Лекторій</option>
+        </select>
+      </div>
 
+      <div class="form-group">
+        <label>Час проведення</label>
+        <div class="time-range">
+          <input type="time" id="unitStartTime" />
+          <span>–</span>
+          <input type="time" id="unitEndTime" />
+        </div>
+      </div>
 
-function renderUserList(users) {
-  const userList = document.getElementById("userList");
-  userList.innerHTML = "";
-  users.forEach(user => {
-    const fullName = getFullName(user);
-    const div = document.createElement("div");
-    div.innerHTML = `<label><input type="checkbox" value="${user._id}" ${selectedUserIds.has(user._id) ? 'checked' : ''}/> ${fullName || user.email}</label>`;
-    userList.appendChild(div);
-  });
-}
+      <div class="form-group">
+        <label>Назва / тема заняття (необовʼязково)</label>
+        <input type="text" id="unitTitle" placeholder="Наприклад: Заняття 1. Вступ" />
+      </div>
 
+      <div class="form-group">
+        <label>Кількість годин (для обліку)</label>
+        <input type="number" step="0.25" min="0" id="unitHours" placeholder="Наприклад: 2" />
+      </div>
 
+      <div class="form-group">
+        <label>Учасники та роль у дні</label>
+        <small style="display:block; margin-bottom:6px; color:#777;">
+          Відмітьте, хто бере участь цього дня, та вкажіть роль: <b>Учасник</b> чи <b>Лектор</b>.
+        </small>
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+          <select id="unitMemberPicker" style="padding:6px 10px; border-radius:8px; min-width: 220px;">
+            <option value="">Оберіть учасника</option>
+          </select>
+          <button type="button" onclick="addUnitMemberFromPicker()" class="small-button" style="padding:8px 14px;">+ Додати</button>
+        </div>
+        <div id="unitMembersContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
 
-async function openUserModal() {
-  try {
-    const res = await fetch(`${API_BASE}/api/users`, { credentials: "include" });
-    const users = await res.json();
-    allUsers = users;
-    renderUserList(users);
-    document.getElementById("userModal").style.display = "flex";
-  } catch (err) {
-    console.error("Не вдалося завантажити користувачів", err);
-    alert("Помилка при відкритті модального вікна");
-  }
-}
-
-
-function closeUserModal() {
-  document.getElementById("userModal").style.display = "none";
-}
-
-
-
-    function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const arrow = document.getElementById('toggleArrow');
-
-  sidebar.classList.toggle('expanded');
-  sidebar.classList.toggle('collapsed');
-
-  arrow.style.transform = sidebar.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0deg)';
-}
-
-function logoutUser() {
-  window.location.href = "login.html";
-}
-
-function daysBetweenISO(a,b){
-  if(!a || !b) return null;
-  const A = new Date(a), B = new Date(b);
-  if (isNaN(A) || isNaN(B)) return null;
-  // нормализуем к полночі UTC, щоб не з'їхало на часових поясах
-  const AU = Date.UTC(A.getFullYear(),A.getMonth(),A.getDate());
-  const BU = Date.UTC(B.getFullYear(),B.getMonth(),B.getDate());
-  return Math.round((BU - AU) / (1000*60*60*24)) + 1; // включно з обома датами
-}
-
-function humanDurationFromRange(startISO, endISO){
-  const d = daysBetweenISO(startISO, endISO);
-  if (d == null || d <= 0) return '';
-  const weeks = Math.floor(d / 7);
-  const rest  = d % 7;
-  const weeksPart = weeks ? `${weeks} тижн.` : '';
-  const restPart  = rest ? `${rest} дн.` : (weeks ? '' : `${d} дн.`);
-  const parts = [weeksPart, restPart].filter(Boolean).join(' ');
-  return `${d} днів${weeks ? ` (${parts})` : ''}`;
-}
-
-
-function bindMainDateDuration(){
-  const s = document.querySelector('input[name="startDate"]');
-  const e = document.querySelector('input[name="endDate"]');
-  const h = document.getElementById('durationHuman');
-  const hidden = document.getElementById('courseDuration');
-
-  function recalc(){
-    const val = humanDurationFromRange(s && s.value, e && e.value);
-    if (h) h.value = val || '';
-    if (hidden) hidden.value = val || '';
-  }
-
-  if (s) s.addEventListener('change', () => {
-    if (e && e.value && s.value > e.value) e.value = s.value;
-    recalc();
-  });
-  if (e) e.addEventListener('change', () => {
-    if (s && s.value && e.value < s.value) s.value = e.value;
-    recalc();
-  });
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  bindMainDateDuration();
-});
-
-async function loadParticipants() {
-  try {
-    const res = await fetch(`${API_BASE}/api/users`, { credentials: "include" });
-    const users = await res.json();
-
-    const select = document.getElementById("participantsSelect");
-    users.forEach(user => {
-      const option = document.createElement("option");
-      option.value = user._id;
-      option.textContent = user.fullName || user.email || "User";
-      select.appendChild(option);
-    });
-  } catch (err) {
-    console.error("Помилка при завантаженні учасників", err);
-  }
-}
-
-window.addEventListener("DOMContentLoaded", loadParticipants);
-
-
-document.getElementById("createCourseForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-
-  const form = e.target;
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-
-  const startDate = form.startDate.value;
-  const endDate   = form.endDate.value;
-
-  const durationHidden = document.getElementById('courseDuration');
-  if (durationHidden && !durationHidden.value && form.startDate.value && form.endDate.value){
-    durationHidden.value = humanDurationFromRange(form.startDate.value, form.endDate.value);
-  }
-
-  const rawSite = form.siteLink?.value?.trim() || '';
-  const siteLink = rawSite && !/^https?:\/\//i.test(rawSite) ? 'https://' + rawSite : rawSite;
-
-  const formData = {
-    mainType: form.mainType.value,                   
-    formatType: form.formatType?.value || null,
-    courseTitle: form.courseTitle.value,
-    courseSubtitle: form.courseSubtitle.value,
-    courseDescription: form.courseDescription.value,
-    courseDates: {
-      start: startDate,
-      end: endDate
-    },
-    courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
-    courseTime: {
-      start: form.startTime.value,
-      end: form.endTime.value
-    },
-    accessType: form.accessType.value,
-    courseDuration: (durationHidden ? durationHidden.value : form.courseDuration.value),
-    coursePrice: form.coursePrice.value,
-    zoomLink: form.zoomLink.value,
-    siteLink,
-    publicUrl: siteLink,
-    pageUrl: siteLink,
-    website: siteLink,
-    websiteUrl: siteLink,
-    participants: Array.from(selectedUserIds),
-    creatorId: storedUser?._id || null,
-    creatorName: `${storedUser?.firstName || ""} ${storedUser?.lastName || ""}`.trim(),
-    creatorRole: storedUser?.role || "",
-  };
-
-  try {
-    const res = await fetch(`${API_BASE}/api/courses`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-      credentials: "include"
-    });
-
-    const result = await res.json();
-
-    if (!res.ok) {
-      console.error("❌ Server returned error:", result);
-      alert("Помилка при збереженні курсу: " + (result.message || "Невідома помилка"));
-      return;
-    }
-
-    alert("Курс успішно збережено");
-    form.reset();
-  } catch (err) {
-    console.error("❌ Помилка на фронтенді:", err);
-    alert("Сервер тимчасово недоступний");
-  }
-});
-
-
-function updateSelectedDisplay() {
-  const container = document.getElementById("selectedParticipants");
-  container.innerHTML = "";
-  const select = document.getElementById("participantsSelect");
-  select.innerHTML = "";
-
-  allUsers.forEach(user => {
-    if (selectedUserIds.has(user._id)) {
-      const fullName = getFullName(user);
-      const badge = document.createElement("span");
-      badge.className = "tag";
-      badge.innerHTML = `${fullName || user.email} <button class="remove-btn" onclick="removeSelected('${user._id}')">✖</button>`;
-      container.appendChild(badge);
-
-      const opt = document.createElement("option");
-      opt.value = user._id;
-      opt.selected = true;
-      select.appendChild(opt);
-    }
-  });
-}
-
-
-function removeSelected(id) {
-  selectedUserIds.delete(id);
-  updateSelectedDisplay();
-}
-
-
-function confirmParticipants() {
-  const checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');
-  checkboxes.forEach(cb => {
-    if (cb.checked) selectedUserIds.add(cb.value);
-    else selectedUserIds.delete(cb.value);
-  });
-  updateSelectedDisplay();
-  document.getElementById("userModal").style.display = "none";
-}
-
-function getFullName(user) {
-  return [user.firstName, user.lastName].filter(Boolean).join(" ");
-}
-
-function filterUsers() {
-  const query = document.getElementById("userSearch").value.toLowerCase();
-  const filtered = allUsers.filter(user => {
-    const fullName = getFullName(user).toLowerCase();
-    return fullName.includes(query);
-  });
-  renderUserList(filtered);
-}
-
-
-
-async function createNewUser() {
-  const fullName = document.getElementById("newUserFullName").value.trim();
-  const email = document.getElementById("newUserEmail").value.trim();
-
-  if (!fullName || !email) {
-    alert("Введіть імʼя та email");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/api/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email }),
-      credentials: "include"
-    });
-
-    const newUser = await res.json();
-
-    const select = document.getElementById("participantsSelect");
-    const option = document.createElement("option");
-    option.value = newUser._id;
-    option.textContent = newUser.fullName || newUser.email;
-    option.selected = true;
-    select.appendChild(option);
-
-    closeUserModal();
-  } catch (err) {
-    alert("Помилка при створенні користувача");
-    console.error(err);
-  }
-}
- function logoutUser(){
-    try{
-      // чистимо локальне
-      localStorage.removeItem('user');
-      ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
-    }catch(_){}
-
-    // пробуємо вийти і на бекенді (ігноруємо помилки мережі)
-    fetch(`${API_BASE}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
-
-    // редірект на логін з поверненням
-    const back = encodeURIComponent(location.pathname + location.search);
-    location.href = `admin-login.html?returnUrl=${back}`;
-  }
-
-  // прив’язуємо до кнопки
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnLogout');
-    if (btn) btn.addEventListener('click', logoutUser);
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-  const here = location.pathname.split('/').pop();
-  document.querySelectorAll('.sidebar nav a').forEach(a=>{
-    if (a.getAttribute('href') === here) a.classList.add('active');
-  });
-});
-
-  </script>
+      <button type="button" onclick="saveUnitFromModal()" class="small-button" style="margin-top: 16px;">
+        Зберегти заняття
+      </button>
+    </div>
+  </div>
 
   <script>
-    // Initialize Flatpickr on the two date inputs
-    document.addEventListener('DOMContentLoaded', function () {
-      const opts = {
-        locale: flatpickr.l10ns.uk,
-        altInput: true,          // show pretty format to user
-        altFormat: 'd.m.Y',      // DD.MM.YYYY display
-        dateFormat: 'Y-m-d',     // keep ISO value for scripts/back-end
-        allowInput: true
-      };
-      flatpickr('input[name="startDate"]', opts);
-      flatpickr('input[name="endDate"]', opts);
+    window.API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
+  </script>
+  <script src="admin-auth.js"></script>
+  <script src="../script.js"></script>
+  <script>
+    function logoutUser(){
+      try{
+        localStorage.removeItem('user');
+        ['token','authToken','jwt','accessToken','bearer'].forEach(k => localStorage.removeItem(k));
+      }catch(_){}
+
+      fetch(`${API_BASE}/api/users/logout`, { method:'POST', credentials:'include' }).catch(()=>{});
+
+      const back = encodeURIComponent(location.pathname + location.search);
+      location.href = `admin-login.html?returnUrl=${back}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof renderAdminSidebar === "function") {
+        renderAdminSidebar("admin-create-course.html");
+      }
+      if (typeof requireAdminPage === "function") {
+        requireAdminPage();
+      }
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.flatpickr) {
+        flatpickr('.datepicker', {
+          dateFormat: 'Y-m-d',
+          altInput: true,
+          altFormat: 'd.m.Y',
+          allowInput: true,
+          locale: window.flatpickr.l10ns.uk
+        });
+      }
+    });
 
-<div id="userModal" class="modal" style="display: none;">
-  <div class="modal-content">
-    <h3>Обрати учасників</h3>
-    <input type="text" id="userSearch" placeholder="Пошук..." oninput="filterUsers()" />
-    <div id="userList" style="max-height: 200px; overflow-y: auto; margin: 10px 0;"></div>
-    <button onclick="confirmParticipants()">Додати вибраних</button>
-    <button onclick="closeUserModal()">Скасувати</button>
-  </div>
-</div>
+    let units = [];
+    window.units = units;
+    let currentUnitDayName = null;
 
+    function parseTimeToMinutes(value) {
+      if (!value) return null;
+      const parts = value.split(':').map(Number);
+      if (parts.length !== 2 || parts.some((n) => Number.isNaN(n))) return null;
+      const [h, m] = parts;
+      return h * 60 + m;
+    }
+
+    function calculateHoursFromTimes(start, end) {
+      const startMin = parseTimeToMinutes(start);
+      const endMin = parseTimeToMinutes(end);
+      if (startMin == null || endMin == null) return null;
+      const diff = endMin - startMin;
+      if (diff <= 0) return null;
+      return Math.round((diff / 60) * 100) / 100;
+    }
+
+    function bindUnitTimeAutoCalc() {
+      const startInput = document.getElementById('unitStartTime');
+      const endInput = document.getElementById('unitEndTime');
+      const hoursInput = document.getElementById('unitHours');
+      if (!startInput || !endInput || !hoursInput) return;
+
+      const recalc = () => {
+        const hours = calculateHoursFromTimes(startInput.value, endInput.value);
+        hoursInput.value = hours != null ? hours : '';
+      };
+
+      startInput.oninput = recalc;
+      startInput.onchange = recalc;
+      endInput.oninput = recalc;
+      endInput.onchange = recalc;
+    }
+
+    function getUserLabelById(userId) {
+      const userObj =
+        (Array.isArray(window.users) && window.users.find((u) => u._id === userId || u.id === userId)) || null;
+      if (userObj) {
+        const candidate =
+          userObj.fullName ||
+          userObj.name ||
+          `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim() ||
+          userObj.username ||
+          userObj.email ||
+          userObj.phone;
+        if (candidate && candidate.trim()) return candidate.trim();
+      }
+      return userId;
+    }
+
+    function renderUnitMemberPicker() {
+      const picker = document.getElementById('unitMemberPicker');
+      if (!picker) return;
+      picker.innerHTML = '<option value="">Оберіть учасника</option>';
+      if (!Array.isArray(window.users)) return;
+
+      const set = new Set(window.selectedParticipants || []);
+      window.users.forEach((u) => {
+        if (!u || !u._id) return;
+        if (set.has(u._id)) return;
+        const opt = document.createElement('option');
+        opt.value = u._id;
+        opt.textContent = getUserLabelById(u._id);
+        picker.appendChild(opt);
+      });
+    }
+
+    function createUnitMemberRow(pId) {
+      const label = getUserLabelById(pId);
+      const row = document.createElement('div');
+      row.className = 'unit-member-row';
+      row.dataset.userId = pId;
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.gap = '10px';
+
+      row.innerHTML = `
+        <label style="display:flex; align-items:center; gap:8px; flex:1;">
+          <input type="checkbox" class="unit-member-include" checked />
+          <span>${label}</span>
+        </label>
+        <select class="unit-member-mode" style="padding:6px 8px; border-radius:6px;">
+          <option value="проходив">Учасник</option>
+          <option value="проводив">Лектор</option>
+        </select>
+      `;
+      return row;
+    }
+
+    function addUnitMemberFromPicker() {
+      const picker = document.getElementById('unitMemberPicker');
+      const membersContainer = document.getElementById('unitMembersContainer');
+      if (!picker || !membersContainer) return;
+      const userId = picker.value;
+      if (!userId) {
+        alert('Оберіть учасника');
+        return;
+      }
+      if (!Array.isArray(window.selectedParticipants)) window.selectedParticipants = [];
+      if (window.selectedParticipants.includes(userId)) {
+        picker.value = '';
+        return;
+      }
+      window.selectedParticipants.push(userId);
+      if (typeof updateSelectedDisplay === 'function') updateSelectedDisplay();
+      membersContainer.appendChild(createUnitMemberRow(userId));
+      picker.value = '';
+      renderUnitMemberPicker();
+    }
+
+    function handleCourseDayChange(checkbox, dayName) {
+      if (checkbox.checked) {
+        currentUnitDayName = dayName;
+        openUnitModalForDay(dayName);
+      }
+    }
+
+    function openUnitModalForDay(dayName) {
+      const modal = document.getElementById('unitModal');
+      if (!modal) return;
+
+      document.getElementById('unitStartTime').value = '';
+      document.getElementById('unitEndTime').value = '';
+      document.getElementById('unitType').value = '';
+      document.getElementById('unitTitle').value = '';
+      document.getElementById('unitHours').value = '';
+      bindUnitTimeAutoCalc();
+
+      const membersContainer = document.getElementById('unitMembersContainer');
+      membersContainer.innerHTML = '';
+      renderUnitMemberPicker();
+
+      if (Array.isArray(window.selectedParticipants)) {
+        window.selectedParticipants.forEach((pId) => {
+          membersContainer.appendChild(createUnitMemberRow(pId));
+        });
+      }
+
+      let label = document.getElementById('unitDayLabel');
+      if (!label) {
+        label = document.createElement('div');
+        label.id = 'unitDayLabel';
+        label.style.marginBottom = '8px';
+        label.style.fontWeight = '500';
+        modal.querySelector('.modal-content h3').insertAdjacentElement('afterend', label);
+      }
+      label.textContent = `День: ${dayName}`;
+
+      modal.style.display = 'block';
+    }
+
+    function closeUnitModal() {
+      const modal = document.getElementById('unitModal');
+      if (modal) modal.style.display = 'none';
+      currentUnitDayName = null;
+    }
+
+    function saveUnitFromModal() {
+      const startTime = document.getElementById('unitStartTime').value;
+      const endTime = document.getElementById('unitEndTime').value;
+      const unitType = document.getElementById('unitType').value;
+      const title = document.getElementById('unitTitle').value.trim();
+      const hoursValue = document.getElementById('unitHours').value;
+      const autoHours = calculateHoursFromTimes(startTime, endTime);
+      const hours = hoursValue !== '' ? Number(hoursValue) : autoHours;
+
+      if (!currentUnitDayName) {
+        alert('Не визначено день заняття');
+        return;
+      }
+
+      if (!unitType) {
+        alert('Оберіть тип юніта');
+        return;
+      }
+
+      const members = [];
+      document
+        .querySelectorAll('#unitMembersContainer .unit-member-row')
+        .forEach((row) => {
+          const userId = row.dataset.userId;
+          const include = row.querySelector('.unit-member-include');
+          const mode = row.querySelector('.unit-member-mode').value;
+          if (include && !include.checked) return;
+          if (userId && mode) {
+            members.push({ user: userId, mode });
+          }
+        });
+
+      const unit = {
+        dayName: currentUnitDayName,
+        startTime,
+        endTime,
+        unitType,
+        title,
+        hours,
+        members,
+      };
+
+      units.push(unit);
+      closeUnitModal();
+    }
+  </script>
 </body>
 </html>

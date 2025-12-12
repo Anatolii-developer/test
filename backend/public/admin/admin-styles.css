@@ -29,6 +29,19 @@ body {
   background-color: #97C194;
 }
 
+/* Додатково зсуваємо адмін-сторінку створення курсу правіше відносно сайдбара */
+body.create-course-page {
+  padding-left: calc(var(--sb-w) + 24px) !important;
+  padding-right: 24px;
+}
+
+body.create-course-page .main-header,
+body.create-course-page .create-course-content,
+body.create-course-page .completed-nav-buttons {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Вирівнювання сторінок з формою створення курсу в адмінці */
 body.create-course-page .admin-main {
   width: 100%;

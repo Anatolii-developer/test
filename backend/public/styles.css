@@ -5144,7 +5144,7 @@ body.course-progress-page .progress-table th {
   font-size: 12px;
   letter-spacing: 0.08em;
   color: #6B6B6B;
-  text-align: left;
+  text-align: center;
   padding-bottom: 12px;
 }
 
@@ -5157,6 +5157,10 @@ body.course-progress-page .progress-table td {
   padding: 10px 0;
   font-size: 15px;
   color: #353535;
+}
+
+body.course-progress-page .progress-table tbody td {
+  background: #F3F2F1;
 }
 
 body.course-progress-page .progress-table tbody tr + tr td {

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Пройдено в IPS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="course-progress-page">
+  <header class="site-header">
+    <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+      <img src="assets/sidebar/burger.svg" alt="" />
+    </button>
+
+    <a href="/" class="header-logo" aria-label="Головна">
+      <img src="assets/emblem.svg" alt="IPS" />
+    </a>
+
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+      UA ▼
+    </button>
+  </header>
+
+  <aside class="sidebar collapsed" id="sidebar">
+    <div class="toggle-button" onclick="toggleSidebar()">
+      <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
+    </div>
+    <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+    <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+    <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+    <nav>
+      <a href="profile.html"><img src="assets/sidebar/profile.svg" alt="" /><span>Про Мене</span></a>
+      <a href="mycertificates.html"><img src="assets/sidebar/news.svg" alt="" /><span>Мої Сертифікати</span></a>
+      <a href="career-faq.html"><img src="assets/sidebar/10.svg" alt="" /><span>Планування Кар'єри</span></a>
+      <a href="library.html"><img src="assets/sidebar/3.svg" alt="" /><span>Бібліотека</span></a>
+      <a href="my-courses.html"><img src="assets/sidebar/5.svg" alt="" /><span>Мої Курси</span></a>
+      <a href="forum/index.html">
+        <img src="assets/sidebar/forum.svg" alt="Форум" />
+        <span>Форум</span>
+      </a>
+    </nav>
+    <div class="logout">
+      <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+      <span>Вийти з акаунту</span>
+    </div>
+  </aside>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+  <main id="mainContent">
+    <div class="progress-top">
+      <button class="progress-lang" type="button" aria-label="Мова інтерфейсу">UA</button>
+    </div>
+
+    <section class="progress-hero">
+      <div class="progress-hero-text">
+        <h1>Пройдено в IPS</h1>
+      </div>
+      <img class="progress-hero-img" src="assets/career-img.png" alt="Навчання" />
+    </section>
+
+    <a class="progress-home-btn" href="my-courses.html">
+      <img src="assets/home.svg" alt="" />
+      Головна
+    </a>
+
+    <section class="progress-table-card">
+      <div class="progress-table-shell">
+        <table class="progress-table" aria-label="Таблиця проходження в IPS">
+          <thead>
+            <tr>
+              <th>UNIT NAME</th>
+              <th>TOTALLY</th>
+              <th>CONDUCTED</th>
+              <th>COMPLETED</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Проходження особистого аналізу</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведення особистого аналізу</td>
+              <td><span class="progress-pill">104</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проходження індивідуальної супервізії</td>
+              <td><span class="progress-pill">12</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проходження групової супервізії</td>
+              <td><span class="progress-pill">34</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведення індивідуальної супервізії</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведення групової супервізії</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Пройдено менторські заняття</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведено менторські заняття</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Пройдені лекції</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведені лекції</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Пройдені семінари</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведені семінари</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Пройдені групи</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>Проведені групи</td>
+              <td><span class="progress-pill">56</span></td>
+              <td>36</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button class="progress-filter-btn" type="button">Налаштувати фільтр по таблиці</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

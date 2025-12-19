@@ -299,6 +299,11 @@ function enableEdit(fieldId, mongoKey) {
   input.style.fontSize = "16px";
   input.style.border = "1px solid #ccc";
   input.style.borderRadius = "8px";
+  if (mongoKey === "experience") {
+    input.setAttribute("inputmode", "numeric");
+    input.setAttribute("pattern", "\\d*");
+    input.setAttribute("placeholder", "Напр.: 5");
+  }
 
   // Кнопка сохранить
   const checkIcon = document.createElement("img");
@@ -317,6 +322,9 @@ function enableEdit(fieldId, mongoKey) {
   parentP.insertAdjacentElement("afterend", container);
 
   input.addEventListener("input", () => {
+    if (mongoKey === "experience") {
+      input.value = input.value.replace(/\D+/g, "");
+    }
     updatedProfileData[mongoKey] = input.value.trim();
   });
 

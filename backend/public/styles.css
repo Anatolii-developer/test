@@ -5128,7 +5128,7 @@ body.course-progress-page .progress-table-shell {
   width: 100%;
   border-radius: 14px;
   border: 1px solid #DADADA;
-  background: #FAFAF6;
+  background: #FFFEF9;
   padding: 18px 20px;
   overflow-x: auto;
 }
@@ -5146,6 +5146,10 @@ body.course-progress-page .progress-table th {
   color: #6B6B6B;
   text-align: center;
   padding-bottom: 12px;
+}
+
+body.course-progress-page .progress-table thead th {
+  background: transparent;
 }
 
 body.course-progress-page .progress-table th:nth-child(n + 2),

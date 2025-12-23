@@ -1611,3 +1611,159 @@ async function applySidebarAvatar(selector = '.sidebar .profile') {
 document.addEventListener('DOMContentLoaded', () => {
   applySidebarAvatar();
 });
+
+function courseProgressNormalizeId(value) {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') return value._id || value.id || null;
+  return null;
+}
+
+function courseProgressIdsMatch(a, b) {
+  const aId = courseProgressNormalizeId(a);
+  const bId = courseProgressNormalizeId(b);
+  return aId && bId && String(aId) === String(bId);
+}
+
+function courseProgressGetUnitMode(unit, userId) {
+  if (!unit || !Array.isArray(unit.members)) return null;
+  const member = unit.members.find((m) => courseProgressIdsMatch(m.user, userId));
+  return member ? member.mode : null;
+}
+
+function courseProgressGetUnitAmount(unit) {
+  const hours = Number(unit?.hours);
+  if (Number.isFinite(hours) && hours > 0) return hours;
+  return 1;
+}
+
+function courseProgressFormatValue(value) {
+  if (!Number.isFinite(value) || value <= 0) return '0';
+  const rounded = Math.round(value * 100) / 100;
+  if (Number.isInteger(rounded)) return String(rounded);
+  return rounded.toFixed(2).replace(/\.?0+$/, '');
+}
+
+function courseProgressEnsureBucket(map, key, label) {
+  if (!map[key]) {
+    map[key] = { key, label, taught: 0, attended: 0 };
+  }
+  return map[key];
+}
+
+async function loadCourseProgress() {
+  const tableBody = document.getElementById('courseProgressBody');
+  if (!tableBody || !document.body.classList.contains('course-progress-page')) return;
+
+  tableBody.innerHTML = '<tr><td colspan="4">Завантаження...</td></tr>';
+
+  const user = typeof getFreshUserSafe === 'function' ? await getFreshUserSafe() : null;
+  if (!user || !user._id) {
+    tableBody.innerHTML = '<tr><td colspan="4">Увійдіть, щоб побачити прогрес</td></tr>';
+    return;
+  }
+
+  let courses = [];
+  try {
+    const res = await fetch(`${API_BASE}/api/courses`, { credentials: 'include' });
+    const data = await res.json();
+    courses = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error('Помилка при завантаженні курсів:', err);
+    tableBody.innerHTML = '<tr><td colspan="4">Не вдалося завантажити дані</td></tr>';
+    return;
+  }
+
+  const baseTypes = [
+    { key: 'Особистий аналіз', label: 'Особистий аналіз' },
+    { key: 'Індивідуальна супервізія', label: 'Індивідуальна супервізія' },
+    { key: 'Групова супервізія', label: 'Групова супервізія' },
+    { key: 'Менторське заняття', label: 'Менторське заняття' },
+    { key: 'Лекція', label: 'Лекція' },
+    { key: 'Семінар', label: 'Семінар' },
+    { key: 'Терапевтична група', label: 'Терапевтична група' },
+    { key: 'Супервізійно-семінарське заняття', label: 'Супервізійно-семінарське заняття' },
+    { key: 'Парна терапія', label: 'Проведення парної терапії' },
+    { key: 'Лекторій', label: 'Лекторій' },
+    { key: 'Конференція', label: 'Конференція' },
+  ];
+
+  const stats = {};
+  baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
+  const extraStats = {};
+
+  courses.forEach((course) => {
+    if (!course || course.status !== 'Пройдений') return;
+
+    let courseHasTaught = false;
+    let courseHasAttended = false;
+
+    if (Array.isArray(course.units)) {
+      course.units.forEach((unit) => {
+        if (!unit || !unit.unitType) return;
+        const mode = courseProgressGetUnitMode(unit, user._id);
+        if (!mode) return;
+        const amount = courseProgressGetUnitAmount(unit);
+        const bucket =
+          stats[unit.unitType] ||
+          courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
+
+        if (mode === 'проводив') {
+          bucket.taught += amount;
+          courseHasTaught = true;
+        } else {
+          bucket.attended += amount;
+          courseHasAttended = true;
+        }
+      });
+    }
+
+    if (course.mainType === 'Конференція') {
+      const bucket =
+        stats['Конференція'] ||
+        courseProgressEnsureBucket(extraStats, 'Конференція', 'Конференція');
+      const isCreator = courseProgressIdsMatch(course.creatorId, user._id);
+      const isParticipant = Array.isArray(course.participants)
+        ? course.participants.some((p) => courseProgressIdsMatch(p, user._id))
+        : false;
+      const taught = isCreator || courseHasTaught;
+      const attended = isParticipant || courseHasAttended;
+
+      if (taught) bucket.taught += 1;
+      if (attended) bucket.attended += 1;
+    }
+  });
+
+  const baseKeys = baseTypes.map((type) => type.key);
+  const extraKeys = Object.keys(extraStats)
+    .filter((key) => !baseKeys.includes(key))
+    .sort((a, b) => a.localeCompare(b, 'uk'));
+  const rows = [
+    ...baseTypes.map((type) => stats[type.key]),
+    ...extraKeys.map((key) => extraStats[key]),
+  ];
+
+  tableBody.innerHTML = '';
+  if (!rows.length) {
+    tableBody.innerHTML = '<tr><td colspan="4">Немає даних</td></tr>';
+    return;
+  }
+
+  rows.forEach((row) => {
+    const total = row.taught + row.attended;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.label}</td>
+      <td><span class="progress-pill">${courseProgressFormatValue(total)}</span></td>
+      <td>${courseProgressFormatValue(row.taught)}</td>
+      <td>${courseProgressFormatValue(row.attended)}</td>
+    `;
+    tableBody.appendChild(tr);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.body.classList.contains('course-progress-page')) {
+    loadCourseProgress();
+  }
+});

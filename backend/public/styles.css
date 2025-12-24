@@ -5146,14 +5146,16 @@ body.course-progress-page .progress-table-shell {
   width: 100%;
   border-radius: 14px;
   border: 1px solid #DADADA;
-  background: #FFFEF9;
-  padding: 18px 20px;
+  background: #fff;
+  padding: 0;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 body.course-progress-page .progress-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   min-width: 640px;
 }
 
@@ -5171,6 +5173,14 @@ body.course-progress-page .progress-table th {
 
 body.course-progress-page .progress-table thead th {
   background: #F3F2F1;
+}
+
+body.course-progress-page .progress-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+body.course-progress-page .progress-table thead th:last-child {
+  border-top-right-radius: 12px;
 }
 
 body.course-progress-page .progress-table th:nth-child(n + 2),

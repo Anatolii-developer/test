@@ -5204,8 +5204,8 @@ body.course-progress-page .progress-filter-btn {
 }
 
 body.course-progress-page .progress-download-btn {
-  width: 24px;
-  height: 24px;
+  width: 48px;
+  height: 48px;
   border-radius: 0;
   border: none;
   background: transparent;

@@ -5184,6 +5184,14 @@ body.course-progress-page .progress-pill {
   font-size: 13px;
 }
 
+body.course-progress-page .progress-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
 body.course-progress-page .progress-filter-btn {
   border: none;
   background: #E77718;
@@ -5195,8 +5203,31 @@ body.course-progress-page .progress-filter-btn {
   box-shadow: 0 6px 16px rgba(231, 119, 24, 0.25);
 }
 
+body.course-progress-page .progress-download-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #E77718;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(231, 119, 24, 0.25);
+  padding: 0;
+}
+
+body.course-progress-page .progress-download-btn img {
+  width: 20px;
+  height: 20px;
+}
+
 body.course-progress-page .progress-filter-btn:hover,
 body.course-progress-page .progress-home-btn:hover {
+  opacity: 0.92;
+}
+
+body.course-progress-page .progress-download-btn:hover {
   opacity: 0.92;
 }
 

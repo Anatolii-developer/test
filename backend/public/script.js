@@ -1644,6 +1644,11 @@ function courseProgressFormatValue(value) {
   return rounded.toFixed(2).replace(/\.?0+$/, '');
 }
 
+function courseProgressFormatShortDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('uk-UA');
+}
+
 function courseProgressParseDate(value) {
   if (!value) return null;
   const date = new Date(value);
@@ -1681,6 +1686,41 @@ function courseProgressCourseMatchesFilters(course, filters) {
   }
 
   return true;
+}
+
+function courseProgressUpdateFilterSummary(filters) {
+  const summary = document.getElementById('progressFilterSummary');
+  if (!summary) return;
+  const items = [];
+
+  if (filters?.category) {
+    items.push(`Категорія: ${filters.category}`);
+  }
+
+  if (filters?.from || filters?.to) {
+    const fromLabel = filters.from ? courseProgressFormatShortDate(filters.from) : '';
+    const toLabel = filters.to ? courseProgressFormatShortDate(filters.to) : '';
+    let periodText = '';
+    if (fromLabel && toLabel) {
+      periodText = `${fromLabel} — ${toLabel}`;
+    } else if (fromLabel) {
+      periodText = `з ${fromLabel}`;
+    } else if (toLabel) {
+      periodText = `до ${toLabel}`;
+    }
+    if (periodText) items.push(`Період: ${periodText}`);
+  }
+
+  if (!items.length) {
+    summary.style.display = 'none';
+    summary.innerHTML = '';
+    return;
+  }
+
+  summary.style.display = 'flex';
+  summary.innerHTML = items
+    .map((text) => `<span class="progress-filter-chip">${text}</span>`)
+    .join('');
 }
 
 function courseProgressEnsureBucket(map, key, label) {
@@ -1731,6 +1771,7 @@ async function loadCourseProgress() {
   baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
   const extraStats = {};
   const filters = courseProgressGetActiveFilters();
+  courseProgressUpdateFilterSummary(filters);
 
   courses.forEach((course) => {
     if (!course || course.status !== 'Пройдений') return;
@@ -1783,14 +1824,17 @@ async function loadCourseProgress() {
     ...baseTypes.map((type) => stats[type.key]),
     ...extraKeys.map((key) => extraStats[key]),
   ];
+  const displayRows = filters.category
+    ? rows.filter((row) => row.taught + row.attended > 0)
+    : rows;
 
   tableBody.innerHTML = '';
-  if (!rows.length) {
+  if (!displayRows.length) {
     tableBody.innerHTML = '<tr><td colspan="4">Немає даних</td></tr>';
     return;
   }
 
-  rows.forEach((row) => {
+  displayRows.forEach((row) => {
     const total = row.taught + row.attended;
     const tr = document.createElement('tr');
     tr.innerHTML = `

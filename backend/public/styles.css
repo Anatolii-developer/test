@@ -5105,6 +5105,24 @@ body.course-progress-page .progress-home-btn {
   box-shadow: 0 8px 18px rgba(27, 77, 27, 0.2);
 }
 
+body.course-progress-page .progress-filter-summary {
+  width: min(980px, 100%);
+  margin: 0 auto 20px;
+  display: none;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body.course-progress-page .progress-filter-chip {
+  background: #FFFEF9;
+  border: 1px solid #D7E3D0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #2E2E2E;
+  box-shadow: 0 6px 14px rgba(39, 93, 43, 0.08);
+}
+
 body.course-progress-page .progress-home-btn img {
   width: 16px;
   height: 16px;
@@ -5370,6 +5388,10 @@ body.course-progress-filter-page .progress-filter-submit {
 
   body.course-progress-page .progress-table-shell {
     padding: 14px;
+  }
+
+  body.course-progress-page .progress-filter-summary {
+    justify-content: center;
   }
 
   body.course-progress-filter-page .progress-filter-card {

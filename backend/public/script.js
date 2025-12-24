@@ -1644,6 +1644,45 @@ function courseProgressFormatValue(value) {
   return rounded.toFixed(2).replace(/\.?0+$/, '');
 }
 
+function courseProgressParseDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function courseProgressGetActiveFilters() {
+  const params = new URLSearchParams(window.location.search);
+  const from = courseProgressParseDate(params.get('from'));
+  const to = courseProgressParseDate(params.get('to'));
+  const category = params.get('category');
+  return {
+    from,
+    to,
+    category: category && category.trim() ? category.trim() : null,
+  };
+}
+
+function courseProgressCourseMatchesFilters(course, filters) {
+  if (!filters) return true;
+  if (filters.category && course?.mainType !== filters.category) return false;
+
+  if (filters.from || filters.to) {
+    const endRaw = course?.courseDates?.end;
+    const startRaw = course?.courseDates?.start;
+    const dateRaw = endRaw || startRaw;
+    const dateValue = dateRaw ? new Date(dateRaw) : null;
+    if (!dateValue || Number.isNaN(dateValue.getTime())) return false;
+    if (filters.from && dateValue < filters.from) return false;
+    if (filters.to) {
+      const endLimit = new Date(filters.to);
+      endLimit.setHours(23, 59, 59, 999);
+      if (dateValue > endLimit) return false;
+    }
+  }
+
+  return true;
+}
+
 function courseProgressEnsureBucket(map, key, label) {
   if (!map[key]) {
     map[key] = { key, label, taught: 0, attended: 0 };
@@ -1691,9 +1730,11 @@ async function loadCourseProgress() {
   const stats = {};
   baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
   const extraStats = {};
+  const filters = courseProgressGetActiveFilters();
 
   courses.forEach((course) => {
     if (!course || course.status !== 'Пройдений') return;
+    if (!courseProgressCourseMatchesFilters(course, filters)) return;
 
     let courseHasTaught = false;
     let courseHasAttended = false;
@@ -2044,5 +2085,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (extractBtn) {
       extractBtn.addEventListener('click', downloadCourseExtract);
     }
+  }
+
+  if (document.body.classList.contains('course-progress-filter-page')) {
+    const applyBtn = document.querySelector('.progress-filter-submit');
+    if (!applyBtn) return;
+    applyBtn.addEventListener('click', () => {
+      const from = document.querySelector('input[name="from"]')?.value || '';
+      const to = document.querySelector('input[name="to"]')?.value || '';
+      const category = document.querySelector('input[name="courseCategory"]:checked')?.value || '';
+
+      const params = new URLSearchParams();
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+      if (category) params.set('category', category);
+
+      const target = `course-progress.html${params.toString() ? `?${params.toString()}` : ''}`;
+      window.location.href = target;
+    });
   }
 });

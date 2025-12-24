@@ -1762,8 +1762,287 @@ async function loadCourseProgress() {
   });
 }
 
+function courseProgressGetFullName(user) {
+  if (!user) return '__________';
+  const fullName = [user.lastName, user.firstName, user.middleName]
+    .map((part) => (part || '').trim())
+    .filter(Boolean)
+    .join(' ');
+  return (
+    fullName ||
+    (user.fullName || '').trim() ||
+    (user.name || '').trim() ||
+    (user.username || '').trim() ||
+    (user.email || '').trim() ||
+    '__________'
+  );
+}
+
+function courseProgressFormatDateUA(value) {
+  const date = value instanceof Date ? value : new Date();
+  const months = [
+    'січня',
+    'лютого',
+    'березня',
+    'квітня',
+    'травня',
+    'червня',
+    'липня',
+    'серпня',
+    'вересня',
+    'жовтня',
+    'листопада',
+    'грудня',
+  ];
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = months[date.getMonth()] || '';
+  const year = date.getFullYear();
+  return `«${day}» ${month} ${year}р.`;
+}
+
+function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
+  const safeName = String(fullName || '').replace(/[<>]/g, '');
+  const safeDate = String(dateText || '').replace(/[<>]/g, '');
+  const safeBase = String(baseHref || '').replace(/"/g, '&quot;');
+
+  return `<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <base href="${safeBase}">
+  <title>Довідка</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --accent: #e77718;
+      --text: #1f1f1f;
+      --muted: #5b5b5b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+      background: #f0f0f0;
+      color: var(--text);
+    }
+    .extract-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20mm 18mm 28mm;
+      position: relative;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    }
+    .extract-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .extract-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+    .extract-logo-box {
+      width: 76px;
+      height: 76px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+    .extract-logo-box img {
+      width: 48px;
+      height: 48px;
+      filter: brightness(0) invert(1);
+    }
+    .extract-brand-text {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .extract-contact {
+      text-align: right;
+      font-size: 12px;
+      color: #444;
+      line-height: 1.4;
+      min-width: 220px;
+    }
+    .extract-contact .ua {
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .extract-title {
+      text-align: center;
+      margin: 26px 0 12px;
+      font-size: 24px;
+      letter-spacing: 0.08em;
+    }
+    .extract-lead {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .extract-name {
+      text-align: center;
+      font-size: 20px;
+      color: var(--accent);
+      font-style: italic;
+      font-weight: 600;
+      margin: 10px 0 18px;
+    }
+    .extract-text {
+      font-size: 14px;
+      line-height: 1.65;
+      margin: 0 0 10px;
+    }
+    .extract-text.indent {
+      text-indent: 26px;
+    }
+    .extract-footer {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 18mm;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+    .extract-sign {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 34px;
+      font-size: 13px;
+    }
+    .extract-signature-line {
+      width: 200px;
+      border-top: 1px solid #222;
+      margin-left: auto;
+    }
+    @media print {
+      body { background: #fff; }
+      .extract-page {
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+    @page { size: A4; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="extract-page">
+    <div class="extract-header">
+      <div class="extract-brand">
+        <div class="extract-logo-box">
+          <img src="assets/emblem.svg" alt="IPS" />
+        </div>
+        <div class="extract-brand-text">
+          INSTITUTE OF<br />PROFESSIONAL<br />SUPERVISION
+        </div>
+      </div>
+      <div class="extract-contact">
+        <span class="ua">ІНСТИТУТ ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ</span>
+        +380502103231, mamko.vp@gmail.com<br />
+        mamko-prof-supervision.com
+      </div>
+    </div>
+
+    <h1 class="extract-title">ДОВІДКА</h1>
+    <div class="extract-lead">Цим листом підтверджую, що</div>
+    <div class="extract-name">${safeName}</div>
+
+    <p class="extract-text">
+      проходить супервізії клінічної практики під моїм керівництвом в ІНСТИТУТІ
+      ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
+      супервізійної роботи ${safeName} демонструє високий рівень професійної
+      рефлексії, здатність до глибокого аналізу терапевтичного процесу та
+      розуміння динаміки переносу й контрпереносу.
+    </p>
+    <p class="extract-text indent">
+      Вона уважно ставиться до проявів власних емоційних реакцій у взаємодії з
+      клієнтом, вміє їх усвідомлювати, аналізувати й використовувати як
+      інструмент для глибшого розуміння клієнтського матеріалу.
+    </p>
+    <p class="extract-text indent">
+      У роботі характеризується етичністю, відповідальністю, емпатією та
+      стабільністю професійної позиції. Активно включається в процес супервізії,
+      відкрита до зворотного зв’язку та саморозвитку.
+    </p>
+    <p class="extract-text indent">
+      Рекомендую ${safeName} як уважного, професійного й зрілого спеціаліста,
+      який розвивається в межах психоаналітичного підходу.
+    </p>
+
+    <div class="extract-sign">
+      <div>${safeDate}</div>
+      <div class="extract-signature-line"></div>
+    </div>
+
+    <div class="extract-footer">
+      <span>+380502103231</span>
+      <span>mamko.vp@gmail.com</span>
+      <span>IPS, Київ, Україна</span>
+    </div>
+  </div>
+  <script>
+    window.onload = () => {
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    };
+    window.onafterprint = () => {
+      window.close();
+    };
+  </script>
+</body>
+</html>`;
+}
+
+async function downloadCourseExtract() {
+  const user = typeof getFreshUserSafe === 'function' ? await getFreshUserSafe() : null;
+  if (!user || !user._id) {
+    alert('Увійдіть, щоб завантажити витяг.');
+    return;
+  }
+
+  const fullName = courseProgressGetFullName(user);
+  const dateText = courseProgressFormatDateUA(new Date());
+  const baseHref = new URL('.', window.location.href).href;
+  const html = courseProgressBuildExtractHtml({ fullName, dateText, baseHref });
+
+  const extractWindow = window.open('', '_blank');
+  if (!extractWindow) {
+    alert('Дозвольте відкриття нового вікна для завантаження витягу.');
+    return;
+  }
+
+  extractWindow.document.open();
+  extractWindow.document.write(html);
+  extractWindow.document.close();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (document.body.classList.contains('course-progress-page')) {
     loadCourseProgress();
+    const extractBtn = document.getElementById('downloadExtractBtn');
+    if (extractBtn) {
+      extractBtn.addEventListener('click', downloadCourseExtract);
+    }
   }
 });

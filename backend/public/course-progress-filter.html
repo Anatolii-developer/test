@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Пройдено в IPS</title>
+  <title>Фільтр витягу</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body class="course-progress-page">
+<body class="course-progress-page course-progress-filter-page">
   <header class="site-header">
     <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
       <img src="assets/sidebar/burger.svg" alt="" />
@@ -64,30 +64,44 @@
       Головна
     </a>
 
-    <section class="progress-table-card">
-      <div class="progress-table-shell">
-        <table class="progress-table" aria-label="Таблиця проходження в IPS">
-          <thead>
-            <tr>
-              <th>Тип активності</th>
-              <th>Всього</th>
-              <th>Проведено</th>
-              <th>Пройдено</th>
-            </tr>
-          </thead>
-          <tbody id="courseProgressBody">
-            <tr>
-              <td colspan="4">Завантаження...</td>
-            </tr>
-          </tbody>
-        </table>
+    <section class="progress-filter-card">
+      <h2>Витяг з практики</h2>
+      <div class="progress-filter-divider"></div>
+
+      <div class="progress-filter-block">
+        <p class="progress-filter-label">Оберіть період для витягу з практики</p>
+        <div class="progress-filter-dates">
+          <label class="progress-filter-date">
+            <span>From</span>
+            <input type="date" name="from" />
+          </label>
+          <label class="progress-filter-date">
+            <span>to</span>
+            <input type="date" name="to" />
+          </label>
+        </div>
       </div>
 
-      <div class="progress-actions">
-        <a class="progress-filter-btn" href="course-progress-filter.html">Налаштувати фільтр по таблиці</a>
-        <button class="progress-download-btn" type="button" id="downloadExtractBtn" aria-label="Завантажити витяг">
-          <img src="assets/download-icon.svg" alt="" />
-        </button>
+      <div class="progress-filter-block">
+        <p class="progress-filter-label">Оберіть категорію</p>
+        <div class="progress-filter-options">
+          <label class="progress-filter-option">
+            <input type="radio" name="courseCategory" value="Конференція" />
+            <span>Конференція</span>
+          </label>
+          <label class="progress-filter-option">
+            <input type="radio" name="courseCategory" value="Курс" />
+            <span>Курси</span>
+          </label>
+          <label class="progress-filter-option">
+            <input type="radio" name="courseCategory" value="Підвищення кваліфікації" />
+            <span>Підвищення кваліфікації</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="progress-filter-actions">
+        <button class="progress-filter-submit" type="button">Переглянути</button>
       </div>
     </section>
   </main>

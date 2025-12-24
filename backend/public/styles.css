@@ -5201,6 +5201,10 @@ body.course-progress-page .progress-filter-btn {
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(231, 119, 24, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 body.course-progress-page .progress-download-btn {
@@ -5229,6 +5233,107 @@ body.course-progress-page .progress-home-btn:hover {
 
 body.course-progress-page .progress-download-btn:hover {
   opacity: 0.7;
+}
+
+body.course-progress-filter-page .progress-filter-card {
+  width: min(980px, 100%);
+  margin: 0 auto 60px;
+  background: #FFFEF9;
+  border-radius: 22px;
+  padding: 32px 36px 38px;
+  border: 1px solid #D7E3D0;
+  box-shadow: 0 10px 20px rgba(39, 93, 43, 0.08);
+}
+
+body.course-progress-filter-page .progress-filter-card h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: #3A3A3A;
+  margin-bottom: 12px;
+}
+
+body.course-progress-filter-page .progress-filter-divider {
+  height: 1px;
+  background: #E2E2E2;
+  margin-bottom: 22px;
+}
+
+body.course-progress-filter-page .progress-filter-block {
+  margin-bottom: 24px;
+}
+
+body.course-progress-filter-page .progress-filter-label {
+  font-size: 14px;
+  color: #4E4E4E;
+  margin-bottom: 12px;
+}
+
+body.course-progress-filter-page .progress-filter-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+body.course-progress-filter-page .progress-filter-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #E77718;
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: #fff;
+}
+
+body.course-progress-filter-page .progress-filter-date span {
+  font-size: 12px;
+  color: #8A8A8A;
+  text-transform: uppercase;
+}
+
+body.course-progress-filter-page .progress-filter-date input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #2D2D2D;
+  min-width: 160px;
+}
+
+body.course-progress-filter-page .progress-filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body.course-progress-filter-page .progress-filter-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #4A4A4A;
+}
+
+body.course-progress-filter-page .progress-filter-option input {
+  accent-color: #E77718;
+  width: 16px;
+  height: 16px;
+}
+
+body.course-progress-filter-page .progress-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+body.course-progress-filter-page .progress-filter-submit {
+  border: none;
+  background: #2D5C2D;
+  color: #fff;
+  padding: 10px 30px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(45, 92, 45, 0.25);
 }
 
 @media (max-width: 1024px) {
@@ -5265,5 +5370,22 @@ body.course-progress-page .progress-download-btn:hover {
 
   body.course-progress-page .progress-table-shell {
     padding: 14px;
+  }
+
+  body.course-progress-filter-page .progress-filter-card {
+    padding: 24px 18px 28px;
+  }
+
+  body.course-progress-filter-page .progress-filter-dates {
+    flex-direction: column;
+  }
+
+  body.course-progress-filter-page .progress-filter-date {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  body.course-progress-filter-page .progress-filter-actions {
+    justify-content: center;
   }
 }

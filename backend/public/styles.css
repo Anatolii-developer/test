@@ -5204,22 +5204,22 @@ body.course-progress-page .progress-filter-btn {
 }
 
 body.course-progress-page .progress-download-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 0;
   border: none;
-  background: #E77718;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(231, 119, 24, 0.25);
+  box-shadow: none;
   padding: 0;
 }
 
 body.course-progress-page .progress-download-btn img {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 
 body.course-progress-page .progress-filter-btn:hover,
@@ -5228,7 +5228,7 @@ body.course-progress-page .progress-home-btn:hover {
 }
 
 body.course-progress-page .progress-download-btn:hover {
-  opacity: 0.92;
+  opacity: 0.7;
 }
 
 @media (max-width: 1024px) {

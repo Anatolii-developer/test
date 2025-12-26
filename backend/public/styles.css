@@ -5441,72 +5441,48 @@ body.practice-page {
 }
 
 /* Контейнер для центрирования контента */
+/* --- Контейнер --- */
+/* Увеличиваем ширину контейнера, чтобы вместить карточку 1110px */
 .practice-container {
     width: 100%;
-    max-width: 800px; /* Ограничиваем ширину, чтобы карточки не были слишком широкими */
+    max-width: 1150px; /* Чуть больше самой карточки */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-top: 40px;
+    padding-bottom: 60px;
 }
 
-/* Кнопка языка справа сверху */
-.top-controls-practice {
-    position: absolute;
-    top: 30px;
-    right: 40px;
-}
-
-/* Секция с диваном и заголовком */
-.practice-hero {
-    text-align: center;
-    margin-bottom: 40px;
-    width: 100%;
-}
-
-.hero-img-practice {
-    max-width: 400px;
-    width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto 20px;
-}
-
-.practice-title {
-    color: #FFFFFF;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-align: center;
-    font-weight: 700;
-     margin-bottom: 30px;
-}
-
-/* Обертка для карточек */
 .practice-cards-wrapper {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    width: 100%;
+    gap: 28px; /* Отступ между карточками */
+    align-items: center;
 }
 
 .practice-card-link {
     text-decoration: none;
     display: block;
-    width: 100%;
+    /* Убираем width: 100%, чтобы ссылка не растягивалась больше карточки */
+    width: auto; 
 }
 
-/* Сама карточка */
+/* --- Сама Карточка (Размеры 1110x212) --- */
 .practice-card {
+    width: 1110px;      /* ВАШ РАЗМЕР */
+    height: 212px;      /* ВАШ РАЗМЕР */
     background-color: #FFFFFF;
     border-radius: 24px;
-    padding: 10px 30px; /* Компактные отступы сверху/снизу */
-    height: 120px;      /* Фиксированная высота как на макете */
+    padding: 0 100px;   /* Большие отступы по бокам, чтобы контент был не у края */
     display: flex;
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; 
+    position: relative;
 }
 
 .practice-card:hover {
@@ -5514,75 +5490,81 @@ body.practice-page {
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
+/* --- Текст внутри карточки --- */
 .card-content {
     flex-grow: 1;
 }
 
 .card-title {
-    color: #2D2D2D;
-    margin: 0;
-    font-family: var(--font-family);
+    font-family: 'Poppins', sans-serif; /* Ваш шрифт */
+    font-size: 32px;    /* Увеличили шрифт, так как карточка большая */
     font-weight: 600;
+    color: #2D2D2D;
+    margin-bottom: 40px;
 }
 
-/* Правая часть карточки (картинка + стрелка) */
+/* --- Правая часть (Картинка + Стрелка) --- */
 .card-visuals {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 40px; /* Расстояние между картинкой и стрелкой */
     height: 100%;
 }
 
 .card-mini-img {
-    height: 90px; /* Высота иллюстраций внутри карточки */
+    height: 140px; /* Картинка больше, чтобы соответствовать высоте 212px */
     width: auto;
     object-fit: contain;
-    margin-bottom: -10px; /* Небольшой сдвиг вниз для эффекта "выглядывания" */
+    margin-bottom: 0;
 }
 
 .card-arrow-circle {
-    width: 40px;
-    height: 40px;
+    /* Если нужна круглая кнопка со стрелкой */
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    color: #E37009; /* Оранжевый цвет стрелки из ваших переменных */
-    font-size: 24px;
+    justify-content: center;
+    font-size: 32px;
+    color: #E37009; /* Оранжевый */
 }
 
-/* --- Адаптив для мобильных (на основе вашего медиа-запроса 480px) --- */
-@media (max-width: 480px) {
+/* --- Адаптивность (чтобы не ломалось на экранах меньше 1110px) --- */
+@media (max-width: 1140px) {
     .practice-container {
-        padding: 20px 16px;
-        max-width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
     }
-
-    .hero-img-practice {
-        max-width: 280px;
+    
+    .practice-card {
+        width: 100%; /* На планшетах занимаем всю доступную ширину */
+        max-width: 1110px;
+        padding: 0 40px; /* Уменьшаем боковые отступы */
     }
+}
 
-    .practice-title {
-        font-size: 32px; /* Меньше для мобильных */
-        line-height: 40px;
-    }
-
+@media (max-width: 768px) {
     .practice-card {
         height: auto;
-        padding: 20px;
+        min-height: 212px;
+        padding: 30px;
         flex-direction: column;
-        align-items: center;
+        justify-content: center;
+        gap: 20px;
         text-align: center;
-        gap: 16px;
     }
-
+    
     .card-visuals {
         width: 100%;
         justify-content: space-between;
-        flex-direction: row;
+        gap: 20px;
+    }
+    
+    .card-title {
+        font-size: 24px;
     }
     
     .card-mini-img {
-        height: 80px;
-        margin-bottom: 0;
+        height: 100px;
     }
 }

@@ -967,10 +967,6 @@ window.addEventListener("DOMContentLoaded", () => {
       },
       formatDetails,
       courseDays: [...form.querySelectorAll('input[name="courseDays"]:checked')].map(cb => cb.value),
-      courseTime: {
-        start: form.startTime.value,
-        end: form.endTime.value
-      },
       accessType: form.accessType.value,
       courseDuration: form.courseDuration.value,
       coursePrice: form.coursePrice.value,

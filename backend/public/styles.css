@@ -5440,12 +5440,28 @@ body.practice-page {
     background-image: none; /* Убираем фоновую картинку других страниц, если она есть */
 }
 
-/* Контейнер для центрирования контента */
-/* --- Контейнер --- */
-/* Увеличиваем ширину контейнера, чтобы вместить карточку 1110px */
+/* --- Секция Hero (Картинка + Заголовок) --- */
+.practice-hero {
+    text-align: center;
+    width: 100%;
+    /* Увеличиваем отступ снизу, чтобы отодвинуть кнопки */
+    margin-bottom: 80px;  /* Было меньше, теперь больше пространства */
+}
+
+/* --- Главный заголовок "PRACTICE RECORDS" --- */
+.practice-title {
+    color: #FFFFFF !important; /* Принудительно белый цвет */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 20px;
+}
+
+/* --- Остальной ваш код для карточек остается без изменений --- */
 .practice-container {
     width: 100%;
-    max-width: 1150px; /* Чуть больше самой карточки */
+    max-width: 1150px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -5453,6 +5469,7 @@ body.practice-page {
     padding-top: 40px;
     padding-bottom: 60px;
 }
+
 
 .practice-cards-wrapper {
     width: 100%;

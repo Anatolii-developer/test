@@ -5498,7 +5498,7 @@ body.practice-page {
 /* Сама карточка */
 .practice-card {
     background-color: #FFFFFF;
-    border-radius: 8px;
+    border-radius: 24px;
     padding: 10px 30px; /* Компактные отступы сверху/снизу */
     height: 120px;      /* Фиксированная высота как на макете */
     display: flex;

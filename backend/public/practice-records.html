@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Records</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="practice-page"> <aside class="sidebar collapsed">
+        <div class="sidebar-top">
+             <a href="#" class="logo-link">
+                <img src="assets/logo-small.png" alt="Logo" class="logo-collapsed">
+            </a>
+            
+            <div class="line"></div>
+
+            <img src="assets/avatar.png" alt="Profile" class="profile">
+
+            <nav>
+                <a href="#"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+                <a href="#"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
+                <a href="#" class="active"><i class="fa-solid fa-book-open"></i><span>Practice</span></a>
+                <a href="#"><i class="fa-solid fa-box-archive"></i><span>Library</span></a>
+            </nav>
+        </div>
+
+        <div class="logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Logout</span>
+        </div>
+        
+        <div class="toggle-button">
+            <img src="assets/arrow-left.svg" alt="Toggle">
+        </div>
+    </aside>
+
+    <main id="mainContent">
+        
+        <div class="top-controls-practice">
+            <button class="lang-switch">
+                <i class="fa-solid fa-globe" style="font-size: 24px; color: white;"></i>
+            </button>
+        </div>
+
+        <div class="practice-container">
+            <div class="practice-hero">
+                <img src="assets/practise-records.png" alt="Relaxing" class="hero-img-practice">
+                <h1 class="h1 practice-title">PRACTICE RECORDS</h1>
+            </div>
+
+            <div class="practice-cards-wrapper">
+                
+                <a href="course-progress.html" class="practice-card-link">
+                    <div class="practice-card">
+                        <div class="card-content">
+                            <h2 class="h3 card-title">Пройдено в IPS</h2>
+                        </div>
+                        <div class="card-visuals">
+                            <img src="assets/career-img.png" alt="Sitting" class="card-mini-img">
+                            <div class="card-arrow-circle">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="#" class="practice-card-link">
+                    <div class="practice-card">
+                        <div class="card-content">
+                            <h2 class="h3 card-title">Пройдено поза IPS</h2>
+                        </div>
+                        <div class="card-visuals">
+                            <img src="assets/completed-out.png" alt="Plant" class="card-mini-img">
+                            <div class="card-arrow-circle">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Скрипт для работы сайдбара (если у вас его еще нет)
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.querySelector('.toggle-button');
+        
+        if(toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                sidebar.classList.toggle('expanded');
+            });
+        }
+    </script>
+</body>
+</html>

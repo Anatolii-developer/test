@@ -5428,3 +5428,160 @@ body.course-progress-filter-page .progress-filter-submit {
     justify-content: center;
   }
 }
+
+
+/* =========================================
+   PRACTICE RECORDS PAGE SPECIFIC STYLES
+   ========================================= */
+
+/* Фон страницы (специфичный зеленый цвет со скриншота) */
+body.practice-page {
+    background-color: #9ABCA0; /* Шалфейно-зеленый */
+    background-image: none; /* Убираем фоновую картинку других страниц, если она есть */
+}
+
+/* Контейнер для центрирования контента */
+.practice-container {
+    width: 100%;
+    max-width: 800px; /* Ограничиваем ширину, чтобы карточки не были слишком широкими */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+/* Кнопка языка справа сверху */
+.top-controls-practice {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+}
+
+/* Секция с диваном и заголовком */
+.practice-hero {
+    text-align: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.hero-img-practice {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.practice-title {
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Обертка для карточек */
+.practice-cards-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.practice-card-link {
+    text-decoration: none;
+    display: block;
+    width: 100%;
+}
+
+/* Сама карточка */
+.practice-card {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 10px 30px; /* Компактные отступы сверху/снизу */
+    height: 120px;      /* Фиксированная высота как на макете */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.practice-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card-content {
+    flex-grow: 1;
+}
+
+.card-title {
+    color: #2D2D2D;
+    margin: 0;
+    font-family: var(--font-family);
+    font-weight: 600;
+}
+
+/* Правая часть карточки (картинка + стрелка) */
+.card-visuals {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 100%;
+}
+
+.card-mini-img {
+    height: 90px; /* Высота иллюстраций внутри карточки */
+    width: auto;
+    object-fit: contain;
+    margin-bottom: -10px; /* Небольшой сдвиг вниз для эффекта "выглядывания" */
+}
+
+.card-arrow-circle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: #E37009; /* Оранжевый цвет стрелки из ваших переменных */
+    font-size: 24px;
+}
+
+/* --- Адаптив для мобильных (на основе вашего медиа-запроса 480px) --- */
+@media (max-width: 480px) {
+    .practice-container {
+        padding: 20px 16px;
+        max-width: 100%;
+    }
+
+    .hero-img-practice {
+        max-width: 280px;
+    }
+
+    .practice-title {
+        font-size: 32px; /* Меньше для мобильных */
+        line-height: 40px;
+    }
+
+    .practice-card {
+        height: auto;
+        padding: 20px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
+    }
+
+    .card-visuals {
+        width: 100%;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    
+    .card-mini-img {
+        height: 80px;
+        margin-bottom: 0;
+    }
+}

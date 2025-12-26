@@ -6,39 +6,61 @@
     <title>Practice Records</title>
     <link rel="stylesheet" href="styles.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body class="practice-page"> <aside class="sidebar collapsed">
-        <div class="sidebar-top">
-             <a href="#" class="logo-link">
-                <img src="assets/logo-small.png" alt="Logo" class="logo-collapsed">
-            </a>
-            
-            <div class="line"></div>
+<body class="practice-page">
 
-            <img src="assets/avatar.png" alt="Profile" class="profile">
+    <header class="site-header">
+        <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
+            <img src="assets/sidebar/burger.svg" alt="" />
+        </button>
 
-            <nav>
-                <a href="#"><i class="fa-regular fa-user"></i><span>Profile</span></a>
-                <a href="#"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
-                <a href="#" class="active"><i class="fa-solid fa-book-open"></i><span>Practice</span></a>
-                <a href="#"><i class="fa-solid fa-box-archive"></i><span>Library</span></a>
-            </nav>
-        </div>
+        <a href="/" class="header-logo" aria-label="Головна">
+            <img src="assets/emblem.svg" alt="IPS" />
+        </a>
 
-        <div class="logout">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>Logout</span>
+        <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+            UA ▼
+        </button>
+    </header>
+
+    <aside class="sidebar collapsed" id="sidebar">
+        <div class="toggle-button" onclick="toggleSidebar()">
+            <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
         </div>
         
-        <div class="toggle-button">
-            <img src="assets/arrow-left.svg" alt="Toggle">
+        <img class="logo" src="assets/sidebar/IPS Logo (2).svg" alt="Logo" id="logoExpanded" />
+        <img class="logo-collapsed" src="assets/sidebar/IPS Logo (1).svg" alt="Logo Small" id="logoCollapsed" />
+        
+        <img class="profile" src="assets/profile-photo.png" alt="User" width="40" height="40" />
+        
+        <nav>
+            <a href="profile.html"><img src="assets/sidebar/profile.svg" alt="" /><span>Про Мене</span></a>
+            <a href="mycertificates.html"><img src="assets/sidebar/news.svg" alt="" /><span>Мої Сертифікати</span></a>
+            <a href="career-faq.html"><img src="assets/sidebar/10.svg" alt="" /><span>Планування Кар'єри</span></a>
+            <a href="library.html"><img src="assets/sidebar/3.svg" alt="" /><span>Бібліотека</span></a>
+            
+            <a href="my-courses.html" class="active"><img src="assets/sidebar/5.svg" alt="" /><span>Мої Курси</span></a>
+            
+            <a href="forum/index.html">
+                <img src="assets/sidebar/forum.svg" alt="Форум" />
+                <span>Форум</span>
+            </a>
+        </nav>
+        
+        <div class="logout">
+            <img src="assets/sidebar/log-out.svg" alt="Logout Icon" width="20" height="20" />
+            <span>Вийти з акаунту</span>
         </div>
     </aside>
+
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
 
     <main id="mainContent">
         
         <div class="top-controls-practice">
-            <button class="lang-switch">
+            <button class="lang-switch" style="border: 2px solid white; border-radius: 50%; width: 40px; height: 40px; background: transparent;">
                 <i class="fa-solid fa-globe" style="font-size: 24px; color: white;"></i>
             </button>
         </div>
@@ -83,17 +105,6 @@
         </div>
     </main>
 
-    <script>
-        // Скрипт для работы сайдбара (если у вас его еще нет)
-        const sidebar = document.querySelector('.sidebar');
-        const toggleBtn = document.querySelector('.toggle-button');
-        
-        if(toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                sidebar.classList.toggle('expanded');
-            });
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

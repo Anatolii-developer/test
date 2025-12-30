@@ -540,7 +540,7 @@
     try {
       res = await fetch(url, { method: "GET", credentials: "include", headers });
     } catch (e) {
-      // Здесь попадём при CORS/mixed content/сетевой ошибке
+      
       console.error("FETCH FAILED:", e);
       throw new Error("Failed to fetch (CORS / network / mixed content?)");
     }

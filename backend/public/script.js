@@ -1633,6 +1633,57 @@ function courseProgressGetUnitAmount(unit) {
   return 1;
 }
 
+function courseProgressGetDateOnly(value) {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
+
+function courseProgressGetWeekdayIndex(dayName) {
+  const map = {
+    'Неділя': 0,
+    'Понеділок': 1,
+    'Вівторок': 2,
+    'Середа': 3,
+    'Четвер': 4,
+    'П’ятниця': 5,
+    "П'ятниця": 5,
+    'Субота': 6,
+  };
+  return Object.prototype.hasOwnProperty.call(map, dayName) ? map[dayName] : null;
+}
+
+function courseProgressCountWeekdayOccurrences(startDate, endDate, weekdayIndex) {
+  if (!startDate || !endDate || weekdayIndex == null) return 0;
+  if (endDate < startDate) return 0;
+  const startDay = startDate.getUTCDay();
+  const delta = (weekdayIndex - startDay + 7) % 7;
+  const first = new Date(startDate);
+  first.setUTCDate(startDate.getUTCDate() + delta);
+  if (first > endDate) return 0;
+  const diffDays = Math.floor((endDate - first) / 86400000);
+  return 1 + Math.floor(diffDays / 7);
+}
+
+function courseProgressGetUnitOccurrences(unit, course) {
+  if (!unit) return 0;
+  const startDate = courseProgressGetDateOnly(course?.courseDates?.start);
+  const endDate = courseProgressGetDateOnly(course?.courseDates?.end);
+
+  if (unit.date) {
+    const unitDate = courseProgressGetDateOnly(unit.date);
+    if (!unitDate) return 0;
+    if (startDate && unitDate < startDate) return 0;
+    if (endDate && unitDate > endDate) return 0;
+    return 1;
+  }
+
+  const weekdayIndex = courseProgressGetWeekdayIndex(unit.dayName);
+  if (!startDate || !endDate || weekdayIndex == null) return 1;
+  return courseProgressCountWeekdayOccurrences(startDate, endDate, weekdayIndex);
+}
+
 function courseProgressFormatValue(value) {
   if (!Number.isFinite(value) || value <= 0) return '0';
   const rounded = Math.round(value * 100) / 100;
@@ -1781,7 +1832,9 @@ async function loadCourseProgress() {
         if (!unit || !unit.unitType) return;
         const mode = courseProgressGetUnitMode(unit, user._id);
         if (!mode) return;
-        const amount = courseProgressGetUnitAmount(unit);
+        const occurrences = courseProgressGetUnitOccurrences(unit, course);
+        if (!occurrences) return;
+        const amount = courseProgressGetUnitAmount(unit) * occurrences;
         const bucket =
           stats[unit.unitType] ||
           courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);

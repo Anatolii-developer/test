@@ -1628,8 +1628,6 @@ function courseProgressGetUnitMode(unit, userId) {
 }
 
 function courseProgressGetUnitAmount(unit) {
-  const hours = Number(unit?.hours);
-  if (Number.isFinite(hours) && hours > 0) return hours;
   return 1;
 }
 
@@ -1640,30 +1638,14 @@ function courseProgressGetDateOnly(value) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 }
 
-function courseProgressGetWeekdayIndex(dayName) {
-  const map = {
-    'Неділя': 0,
-    'Понеділок': 1,
-    'Вівторок': 2,
-    'Середа': 3,
-    'Четвер': 4,
-    'П’ятниця': 5,
-    "П'ятниця": 5,
-    'Субота': 6,
-  };
-  return Object.prototype.hasOwnProperty.call(map, dayName) ? map[dayName] : null;
-}
-
-function courseProgressCountWeekdayOccurrences(startDate, endDate, weekdayIndex) {
-  if (!startDate || !endDate || weekdayIndex == null) return 0;
-  if (endDate < startDate) return 0;
-  const startDay = startDate.getUTCDay();
-  const delta = (weekdayIndex - startDay + 7) % 7;
-  const first = new Date(startDate);
-  first.setUTCDate(startDate.getUTCDate() + delta);
-  if (first > endDate) return 0;
-  const diffDays = Math.floor((endDate - first) / 86400000);
-  return 1 + Math.floor(diffDays / 7);
+function courseProgressGetCourseWeeks(course) {
+  const startDate = courseProgressGetDateOnly(course?.courseDates?.start);
+  const endDate = courseProgressGetDateOnly(course?.courseDates?.end);
+  if (!startDate || !endDate || endDate < startDate) return null;
+  const diffDays = Math.floor((endDate - startDate) / 86400000);
+  const totalDays = diffDays + 1;
+  const weeks = Math.round(totalDays / 7);
+  return Math.max(1, weeks);
 }
 
 function courseProgressGetUnitOccurrences(unit, course) {
@@ -1679,9 +1661,8 @@ function courseProgressGetUnitOccurrences(unit, course) {
     return 1;
   }
 
-  const weekdayIndex = courseProgressGetWeekdayIndex(unit.dayName);
-  if (!startDate || !endDate || weekdayIndex == null) return 1;
-  return courseProgressCountWeekdayOccurrences(startDate, endDate, weekdayIndex);
+  const weeks = courseProgressGetCourseWeeks(course);
+  return weeks || 1;
 }
 
 function courseProgressFormatValue(value) {

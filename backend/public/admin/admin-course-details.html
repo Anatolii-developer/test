@@ -127,6 +127,96 @@
       .date-popover label { font-weight:600; font-size:12px; display:block; margin:0 0 4px; }
       .date-popover input[type="date"] { padding:8px 10px; border:1px solid #ddd; border-radius:8px; }
       .date-popover .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+
+      .units-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+      .units-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .units-empty {
+        color: #777;
+        font-size: 14px;
+      }
+      .unit-card {
+        border: 1px solid #f0c08b;
+        border-radius: 14px;
+        padding: 14px;
+        background: #fff;
+      }
+      .unit-card.unit-card-error {
+        border-color: #a31d1d;
+      }
+      .unit-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .unit-grid label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #444;
+      }
+      .unit-grid input,
+      .unit-grid select {
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 2px solid #e37009;
+        border-radius: 8px;
+        background-color: #fffef9;
+        color: #333;
+      }
+      .unit-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .unit-members-summary {
+        font-size: 12px;
+        color: #666;
+      }
+      .unit-action-btn {
+        border: none;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        background: #e37009;
+        color: #fff;
+      }
+      .unit-action-btn.secondary {
+        background: #888;
+      }
+      .unit-action-btn.danger {
+        background: #a31d1d;
+      }
+      .unit-members-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .unit-member-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+      }
+      .unit-member-row select {
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
     </style>
   </head>
   <body class="with-sidebar">
@@ -227,6 +317,14 @@
         <button class="edit-btn" onclick="openParticipantsModal()">
           <img src="../assets/edit-icon.svg" alt="Edit" />
         </button>
+      </div>
+
+      <div class="editable-block" id="unitsBlock">
+        <label>Юніти (заняття)</label>
+        <div class="units-toolbar">
+          <button type="button" class="unit-action-btn" onclick="addUnitCard()">+ Додати юніт</button>
+        </div>
+        <div id="unitsContainer" class="units-list"></div>
       </div>
 
       <div class="editable-block">
@@ -362,6 +460,32 @@
   let courseId;
   let allUsers = [];
   let selectedParticipantIds = [];
+  let courseParticipants = [];
+  let unitMembersTargetCard = null;
+  let unitMembersAvailable = [];
+  let unitMembersCurrent = [];
+
+  const UNIT_DAY_OPTIONS = [
+    "Понеділок",
+    "Вівторок",
+    "Середа",
+    "Четвер",
+    "П’ятниця",
+    "Субота",
+    "Неділя",
+  ];
+  const UNIT_TYPE_OPTIONS = [
+    "Особистий аналіз",
+    "Індивідуальна супервізія",
+    "Групова супервізія",
+    "Менторське заняття",
+    "Лекція",
+    "Семінар",
+    "Терапевтична група",
+    "Супервізійно-семінарське заняття",
+    "Парна терапія",
+    "Лекторій",
+  ];
 
   // --- Utils ---
   function $(id) { return document.getElementById(id); }
@@ -382,6 +506,42 @@
     if (!el) return;
     el.disabled = false;
     el.focus();
+  }
+
+  function normalizeUserId(value) {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    if (typeof value === "object") return value._id || value.id || "";
+    return "";
+  }
+
+  function getUserLabelById(userId) {
+    const id = normalizeUserId(userId);
+    if (!id) return "";
+    const fromAll = Array.isArray(allUsers)
+      ? allUsers.find((u) => normalizeUserId(u) === id)
+      : null;
+    const fromCourse = Array.isArray(courseParticipants)
+      ? courseParticipants.find((u) => normalizeUserId(u) === id)
+      : null;
+    const user = fromAll || fromCourse;
+    if (!user) return id;
+    return (
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
+      user.email ||
+      id
+    );
+  }
+
+  function getUserLabel(user) {
+    if (!user) return "";
+    return (
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
+      user.email ||
+      normalizeUserId(user)
+    );
   }
 
   // --- Date helpers for single-input range control ---
@@ -410,6 +570,218 @@
     const eIso = normalizeISO(endVal);
     const input = $("dateRangeInput");
     if (input) input.value = (sIso || eIso) ? `${toDMY(sIso)} – ${toDMY(eIso)}` : "";
+  }
+
+  function parseUnitMembersData(value) {
+    if (!value) return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function normalizeUnitMember(member) {
+    const userId = normalizeUserId(member?.user || member);
+    if (!userId) return null;
+    const mode = member?.mode === "проводив" ? "проводив" : "проходив";
+    return { user: userId, mode };
+  }
+
+  function normalizeUnitMembers(members) {
+    if (!Array.isArray(members)) return [];
+    return members.map(normalizeUnitMember).filter(Boolean);
+  }
+
+  function formatUnitMembersSummary(members) {
+    if (!members.length) return "Немає учасників";
+    const names = members.map((m) => getUserLabelById(m.user)).filter(Boolean);
+    const limit = 4;
+    if (names.length <= limit) return names.join(", ");
+    return `${names.slice(0, limit).join(", ")} +${names.length - limit}`;
+  }
+
+  function updateUnitMembersSummary(card) {
+    if (!card) return;
+    const summary = card.querySelector(".unit-members-summary");
+    if (!summary) return;
+    const members = parseUnitMembersData(card.dataset.members);
+    summary.textContent = formatUnitMembersSummary(members);
+  }
+
+  function updateAllUnitMemberSummaries() {
+    document.querySelectorAll(".unit-card").forEach((card) => updateUnitMembersSummary(card));
+  }
+
+  function createSelectOptions(select, options, value, allowEmpty) {
+    if (!select) return;
+    const emptyOpt = allowEmpty ? '<option value="">—</option>' : "";
+    select.innerHTML =
+      emptyOpt +
+      options
+        .map((opt) => `<option value="${opt}">${opt}</option>`)
+        .join("");
+    if (value) select.value = value;
+  }
+
+  function getDayNameFromDate(value) {
+    if (!value) return "";
+    const date = new Date(`${value}T12:00:00`);
+    if (isNaN(date.getTime())) return "";
+    const map = ["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П’ятниця", "Субота"];
+    return map[date.getDay()] || "";
+  }
+
+  function createUnitCard(unit = {}) {
+    const card = document.createElement("div");
+    card.className = "unit-card";
+    if (unit._id) card.dataset.unitId = unit._id;
+
+    const members = normalizeUnitMembers(unit.members);
+    card.dataset.members = JSON.stringify(members);
+
+    card.innerHTML = `
+      <div class="unit-grid">
+        <label>День тижня
+          <select class="unit-day"></select>
+        </label>
+        <label>Дата
+          <input class="unit-date" type="date" />
+        </label>
+        <label>Початок
+          <input class="unit-start" type="time" />
+        </label>
+        <label>Кінець
+          <input class="unit-end" type="time" />
+        </label>
+        <label>Тип
+          <select class="unit-type"></select>
+        </label>
+        <label>Назва
+          <input class="unit-title" type="text" />
+        </label>
+        <label>Години
+          <input class="unit-hours" type="number" step="0.25" min="0" />
+        </label>
+      </div>
+      <div class="unit-meta-row">
+        <div class="unit-members-row">
+          <span class="unit-members-summary"></span>
+          <button type="button" class="unit-action-btn secondary" onclick="openUnitMembersModal(this)">Учасники</button>
+        </div>
+        <button type="button" class="unit-action-btn danger" onclick="removeUnitCard(this)">Видалити</button>
+      </div>
+    `;
+
+    const daySelect = card.querySelector(".unit-day");
+    const typeSelect = card.querySelector(".unit-type");
+    const dayValue = unit.dayName === "П'ятниця" ? "П’ятниця" : (unit.dayName || "");
+    createSelectOptions(daySelect, UNIT_DAY_OPTIONS, dayValue, true);
+    createSelectOptions(typeSelect, UNIT_TYPE_OPTIONS, unit.unitType || "", true);
+
+    const dateInput = card.querySelector(".unit-date");
+    const startInput = card.querySelector(".unit-start");
+    const endInput = card.querySelector(".unit-end");
+    const titleInput = card.querySelector(".unit-title");
+    const hoursInput = card.querySelector(".unit-hours");
+
+    dateInput.value = toYMD(unit.date);
+    startInput.value = unit.startTime || "";
+    endInput.value = unit.endTime || "";
+    titleInput.value = unit.title || "";
+    hoursInput.value = Number.isFinite(Number(unit.hours)) ? Number(unit.hours) : "";
+
+    updateUnitMembersSummary(card);
+    return card;
+  }
+
+  function renderUnits(units) {
+    const container = $("unitsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    if (!Array.isArray(units) || !units.length) {
+      container.innerHTML = '<div class="units-empty">Немає юнітів</div>';
+      return;
+    }
+    units.forEach((unit) => {
+      container.appendChild(createUnitCard(unit));
+    });
+  }
+
+  function addUnitCard() {
+    const container = $("unitsContainer");
+    if (!container) return;
+    if (container.querySelector(".units-empty")) container.innerHTML = "";
+    container.appendChild(createUnitCard({}));
+  }
+
+  function removeUnitCard(btn) {
+    const card = btn?.closest(".unit-card");
+    if (!card) return;
+    const container = $("unitsContainer");
+    card.remove();
+    if (container && !container.querySelector(".unit-card")) {
+      container.innerHTML = '<div class="units-empty">Немає юнітів</div>';
+    }
+  }
+
+  function buildUnitsPayload() {
+    const cards = document.querySelectorAll(".unit-card");
+    const units = [];
+    let hasInvalid = false;
+
+    cards.forEach((card) => {
+      const unitType = card.querySelector(".unit-type")?.value?.trim() || "";
+      const dayNameRaw = card.querySelector(".unit-day")?.value?.trim() || "";
+      const dateVal = card.querySelector(".unit-date")?.value || "";
+      const startTime = card.querySelector(".unit-start")?.value || "";
+      const endTime = card.querySelector(".unit-end")?.value || "";
+      const title = card.querySelector(".unit-title")?.value?.trim() || "";
+      const hoursValue = card.querySelector(".unit-hours")?.value || "";
+
+      if (!unitType) {
+        card.classList.remove("unit-card-error");
+        return;
+      }
+
+      const dayName = dayNameRaw || (dateVal ? getDayNameFromDate(dateVal) : "");
+      if (!dayName) {
+        hasInvalid = true;
+        card.classList.add("unit-card-error");
+        return;
+      }
+
+      card.classList.remove("unit-card-error");
+
+      const hoursNumber = Number(hoursValue);
+      const hours = Number.isFinite(hoursNumber) && hoursNumber > 0 ? hoursNumber : null;
+      const members = parseUnitMembersData(card.dataset.members)
+        .map(normalizeUnitMember)
+        .filter(Boolean);
+
+      const payload = {
+        dayName,
+        date: dateVal ? new Date(`${dateVal}T12:00:00`).toISOString() : null,
+        startTime,
+        endTime,
+        unitType,
+        title,
+        hours,
+        members,
+      };
+
+      const unitId = card.dataset.unitId;
+      if (unitId) payload._id = unitId;
+
+      units.push(payload);
+    });
+
+    if (hasInvalid) {
+      return { error: "Заповніть день тижня або дату для кожного юніта з типом." };
+    }
+
+    return { units };
   }
 
   // --- Load course (with fallback if :id returns 404) ---
@@ -514,11 +886,14 @@
 
       // Учасники
       selectedParticipantIds = (course.participants || []).map(p => typeof p === "string" ? p : (p && p._id ? p._id : p));
+      courseParticipants = Array.isArray(course.participants) ? course.participants : [];
+      renderUnits(Array.isArray(course.units) ? course.units : []);
       try {
         const usersRes = await fetch(`${API}/api/users`, { credentials: "include" });
         if (usersRes.ok) {
           allUsers = await usersRes.json();
           updateParticipantsUI();
+          updateAllUnitMemberSummaries();
         }
       } catch (_) {}
     } catch (err) {
@@ -554,6 +929,13 @@
         end:   endVal   ? new Date(endVal   + (endVal.length   === 10 ? "T12:00:00" : "")).toISOString()   : null,
       },
     };
+
+    const unitsResult = buildUnitsPayload();
+    if (unitsResult.error) {
+      alert(unitsResult.error);
+      return;
+    }
+    body.units = unitsResult.units;
 
     try {
       const res = await fetch(`${API}/api/courses/${courseId}`, {
@@ -783,10 +1165,134 @@
   function updateParticipantsUI() {
     const input = $("participantsText");
     if (!input) return;
-    const names = allUsers
-      .filter((u) => selectedParticipantIds.includes(u._id))
-      .map((u) => [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email);
+    const names = selectedParticipantIds.map((id) => getUserLabelById(id)).filter(Boolean);
     input.value = names.join(", ");
+  }
+
+  function getAvailableUnitUsers() {
+    const map = new Map();
+    if (Array.isArray(allUsers)) {
+      allUsers.forEach((u) => {
+        const id = normalizeUserId(u);
+        if (id) map.set(id, u);
+      });
+    }
+    if (Array.isArray(courseParticipants)) {
+      courseParticipants.forEach((u) => {
+        const id = normalizeUserId(u);
+        if (id && !map.has(id)) map.set(id, u);
+      });
+    }
+    let users = Array.from(map.values());
+    if (Array.isArray(selectedParticipantIds) && selectedParticipantIds.length) {
+      const set = new Set(selectedParticipantIds.map((id) => String(id)));
+      users = users.filter((u) => set.has(String(normalizeUserId(u))));
+    }
+    users.sort((a, b) => getUserLabel(a).localeCompare(getUserLabel(b), "uk"));
+    return users;
+  }
+
+  function openUnitMembersModal(btn) {
+    const card = btn?.closest(".unit-card");
+    if (!card) return;
+    unitMembersTargetCard = card;
+    unitMembersAvailable = getAvailableUnitUsers();
+    unitMembersCurrent = parseUnitMembersData(card.dataset.members).map(normalizeUnitMember).filter(Boolean);
+    const search = $("unitMembersSearch");
+    if (search) search.value = "";
+    renderUnitMembersList("");
+    $("unitMembersModal").style.display = "flex";
+  }
+
+  function closeUnitMembersModal() {
+    $("unitMembersModal").style.display = "none";
+    unitMembersTargetCard = null;
+    unitMembersAvailable = [];
+    unitMembersCurrent = [];
+  }
+
+  function renderUnitMembersList(query) {
+    const container = $("unitMembersList");
+    if (!container) return;
+    const q = (query || "").toLowerCase().trim();
+    container.innerHTML = "";
+
+    if (!unitMembersAvailable.length) {
+      container.textContent = "Немає доступних учасників";
+      return;
+    }
+
+    const membersMap = new Map(
+      unitMembersCurrent.map((m) => [normalizeUserId(m.user), m.mode])
+    );
+
+    unitMembersAvailable
+      .filter((u) => {
+        const label = getUserLabel(u).toLowerCase();
+        return !q || label.includes(q);
+      })
+      .forEach((user) => {
+        const id = normalizeUserId(user);
+        const label = getUserLabel(user) || id;
+        const mode = membersMap.get(id) || "проходив";
+        const checked = membersMap.has(id);
+
+        const row = document.createElement("label");
+        row.className = "unit-member-row";
+        row.innerHTML = `
+          <input type="checkbox" value="${id}" ${checked ? "checked" : ""} />
+          <span>${label}</span>
+          <select ${checked ? "" : "disabled"}>
+            <option value="проходив">Учасник</option>
+            <option value="проводив">Лектор</option>
+          </select>
+        `;
+        const select = row.querySelector("select");
+        select.value = mode;
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        checkbox.onchange = () => {
+          select.disabled = !checkbox.checked;
+        };
+        container.appendChild(row);
+      });
+  }
+
+  function syncUnitMembersDraft() {
+    const rows = document.querySelectorAll("#unitMembersList .unit-member-row");
+    const draft = [];
+    rows.forEach((row) => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      const select = row.querySelector("select");
+      if (!checkbox || !select || !checkbox.checked) return;
+      draft.push({
+        user: checkbox.value,
+        mode: select.value === "проводив" ? "проводив" : "проходив",
+      });
+    });
+    unitMembersCurrent = draft;
+  }
+
+  function filterUnitMembers(e) {
+    syncUnitMembersDraft();
+    renderUnitMembersList(e?.target?.value || "");
+  }
+
+  function applyUnitMembers() {
+    if (!unitMembersTargetCard) return;
+    const rows = document.querySelectorAll("#unitMembersList .unit-member-row");
+    const updated = [];
+    rows.forEach((row) => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      const select = row.querySelector("select");
+      if (!checkbox || !select || !checkbox.checked) return;
+      updated.push({
+        user: checkbox.value,
+        mode: select.value === "проводив" ? "проводив" : "проходив",
+      });
+    });
+    unitMembersTargetCard.dataset.members = JSON.stringify(updated);
+    updateUnitMembersSummary(unitMembersTargetCard);
+    closeUnitMembersModal();
   }
 
   // --- Sidebar active highlight (tiny helper) ---
@@ -809,6 +1315,21 @@
         <div id="userList" style="margin: 10px 0"></div>
         <button onclick="applySelectedParticipants()">Застосувати</button>
         <button onclick="closeParticipantsModal()">Скасувати</button>
+      </div>
+    </div>
+
+    <div id="unitMembersModal" class="modal" style="display: none">
+      <div class="modal-content" style="max-height: 70vh; overflow-y: auto">
+        <h3>Учасники юніта</h3>
+        <input
+          id="unitMembersSearch"
+          type="text"
+          placeholder="Пошук..."
+          oninput="filterUnitMembers(event)"
+        />
+        <div id="unitMembersList" style="margin: 10px 0"></div>
+        <button onclick="applyUnitMembers()">Застосувати</button>
+        <button onclick="closeUnitMembersModal()">Скасувати</button>
       </div>
     </div>
   </body>

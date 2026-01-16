@@ -586,7 +586,17 @@
     const userId = normalizeUserId(member?.user || member);
     if (!userId) return null;
     const mode = member?.mode === "проводив" ? "проводив" : "проходив";
-    return { user: userId, mode };
+    const amountRaw = member?.amount;
+    const amount =
+      amountRaw !== null &&
+      amountRaw !== undefined &&
+      amountRaw !== "" &&
+      Number.isFinite(Number(amountRaw))
+        ? Number(amountRaw)
+        : null;
+    const payload = { user: userId, mode };
+    if (amount !== null) payload.amount = amount;
+    return payload;
   }
 
   function normalizeUnitMembers(members) {
@@ -1223,7 +1233,10 @@
     }
 
     const membersMap = new Map(
-      unitMembersCurrent.map((m) => [normalizeUserId(m.user), m.mode])
+      unitMembersCurrent.map((m) => [
+        normalizeUserId(m.user),
+        { mode: m.mode, amount: m.amount },
+      ])
     );
 
     unitMembersAvailable
@@ -1234,7 +1247,16 @@
       .forEach((user) => {
         const id = normalizeUserId(user);
         const label = getUserLabel(user) || id;
-        const mode = membersMap.get(id) || "проходив";
+        const saved = membersMap.get(id) || {};
+        const mode = saved.mode || "проходив";
+        const amountRaw = saved.amount;
+        const amountValue =
+          amountRaw !== null &&
+          amountRaw !== undefined &&
+          amountRaw !== "" &&
+          Number.isFinite(Number(amountRaw))
+            ? Number(amountRaw)
+            : "";
         const checked = membersMap.has(id);
 
         const row = document.createElement("label");
@@ -1246,12 +1268,24 @@
             <option value="проходив">Учасник</option>
             <option value="проводив">Лектор</option>
           </select>
+          <input
+            type="number"
+            class="unit-member-amount"
+            min="0"
+            step="0.25"
+            placeholder="Юніти"
+            ${checked ? "" : "disabled"}
+            style="width:90px;"
+          />
         `;
         const select = row.querySelector("select");
         select.value = mode;
+        const amountInput = row.querySelector(".unit-member-amount");
+        if (amountInput) amountInput.value = amountValue;
         const checkbox = row.querySelector('input[type="checkbox"]');
         checkbox.onchange = () => {
           select.disabled = !checkbox.checked;
+          if (amountInput) amountInput.disabled = !checkbox.checked;
         };
         container.appendChild(row);
       });
@@ -1263,10 +1297,20 @@
     rows.forEach((row) => {
       const checkbox = row.querySelector('input[type="checkbox"]');
       const select = row.querySelector("select");
+      const amountInput = row.querySelector(".unit-member-amount");
       if (!checkbox || !select || !checkbox.checked) return;
+      const amountRaw = amountInput?.value;
+      const amount =
+        amountRaw !== null &&
+        amountRaw !== undefined &&
+        amountRaw !== "" &&
+        Number.isFinite(Number(amountRaw))
+          ? Number(amountRaw)
+          : null;
       draft.push({
         user: checkbox.value,
         mode: select.value === "проводив" ? "проводив" : "проходив",
+        amount,
       });
     });
     unitMembersCurrent = draft;
@@ -1284,10 +1328,20 @@
     rows.forEach((row) => {
       const checkbox = row.querySelector('input[type="checkbox"]');
       const select = row.querySelector("select");
+      const amountInput = row.querySelector(".unit-member-amount");
       if (!checkbox || !select || !checkbox.checked) return;
+      const amountRaw = amountInput?.value;
+      const amount =
+        amountRaw !== null &&
+        amountRaw !== undefined &&
+        amountRaw !== "" &&
+        Number.isFinite(Number(amountRaw))
+          ? Number(amountRaw)
+          : null;
       updated.push({
         user: checkbox.value,
         mode: select.value === "проводив" ? "проводив" : "проходив",
+        amount,
       });
     });
     unitMembersTargetCard.dataset.members = JSON.stringify(updated);

@@ -138,6 +138,44 @@
       font-size: 14px;
     }
 
+    .unit-modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .unit-modal-field input[type="number"] {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #e37009;
+      background: #fffef9;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .unit-modal-hint {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #6e6e6e;
+    }
+
+    .unit-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    .unit-modal-actions .top-btn {
+      height: 40px;
+      padding: 0 18px;
+    }
+
     @media (max-width: 720px) {
       .progress-card {
         padding: 24px;
@@ -252,6 +290,37 @@
     </div>
   </main>
 
+  <div id="unitEditModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="modal-close" id="unitEditClose" aria-label="Закрити">&times;</span>
+      <h3>Юніти курсу</h3>
+      <p>Курс: <strong id="unitEditCourseTitle">—</strong></p>
+      <p>Користувач: <strong id="unitEditUserName">—</strong></p>
+
+      <label class="unit-modal-field">
+        Юніти для курсу
+        <input type="number" id="courseUnitsValue" min="0" step="0.25" placeholder="Напр. 1.5" />
+      </label>
+      <div class="unit-modal-hint" id="courseUnitsHint"></div>
+
+      <label class="unit-modal-field">
+        Юніти для користувача
+        <input type="number" id="userUnitsValue" min="0" step="0.25" placeholder="Напр. 1.0" />
+      </label>
+      <div class="unit-modal-hint" id="userUnitsHint"></div>
+
+      <label class="unit-modal-field" style="flex-direction: row; align-items: center; gap: 8px; font-weight: 500;">
+        <input type="checkbox" id="clearUserUnits" />
+        Очистити юніти для користувача
+      </label>
+
+      <div class="unit-modal-actions">
+        <button class="top-btn secondary" type="button" id="unitEditCancel">Скасувати</button>
+        <button class="top-btn" type="button" id="unitEditSave">Застосувати</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     window.API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
   </script>
@@ -276,6 +345,7 @@
     let allUsers = [];
     let allCourses = [];
     let activeUserId = null;
+    let activeCourseForEdit = null;
 
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof renderAdminSidebar === "function") {
@@ -286,6 +356,7 @@
       }
 
       bindFilters();
+      bindUnitModalActions();
       loadInitialData();
     });
 
@@ -402,6 +473,17 @@
       return "";
     }
 
+    function getAuthHeaders() {
+      let token = null;
+      try {
+        const u = JSON.parse(localStorage.getItem("user") || "null");
+        token = u?.token || u?.accessToken || null;
+      } catch (_) {}
+      const h = { "Content-Type": "application/json" };
+      if (token) h.Authorization = `Bearer ${token}`;
+      return h;
+    }
+
     function courseProgressNormalizeId(value) {
       if (!value) return null;
       if (typeof value === "string") return value;
@@ -415,13 +497,27 @@
       return aId && bId && String(aId) === String(bId);
     }
 
-    function courseProgressGetUnitMode(unit, userId) {
+    function courseProgressGetUnitMember(unit, userId) {
       if (!unit || !Array.isArray(unit.members)) return null;
-      const member = unit.members.find((m) => courseProgressIdsMatch(m.user, userId));
+      return unit.members.find((m) => courseProgressIdsMatch(m.user, userId)) || null;
+    }
+
+    function courseProgressGetUnitMode(unit, userId) {
+      const member = courseProgressGetUnitMember(unit, userId);
       return member ? member.mode : null;
     }
 
-    function courseProgressGetUnitAmount() {
+    function courseProgressGetUnitAmount(unit, member) {
+      const memberRaw = member?.amount;
+      if (memberRaw !== null && memberRaw !== undefined && memberRaw !== "") {
+        const memberAmount = Number(memberRaw);
+        if (Number.isFinite(memberAmount)) return memberAmount;
+      }
+      const hoursRaw = unit?.hours;
+      if (hoursRaw !== null && hoursRaw !== undefined && hoursRaw !== "") {
+        const hoursAmount = Number(hoursRaw);
+        if (Number.isFinite(hoursAmount)) return hoursAmount;
+      }
       return 1;
     }
 
@@ -549,6 +645,215 @@
         .join("");
     }
 
+    function extractPositiveNumber(value) {
+      if (value === null || value === undefined || value === "") return null;
+      const number = Number(value);
+      return Number.isFinite(number) && number >= 0 ? number : null;
+    }
+
+    function getUniformUnits(values) {
+      if (!values.length) return null;
+      const first = values[0];
+      if (values.every((v) => v === first)) return first;
+      return null;
+    }
+
+    function openUnitEditModal(courseId) {
+      const modal = document.getElementById("unitEditModal");
+      if (!modal) return;
+
+      const course = allCourses.find((c) => String(c._id) === String(courseId));
+      if (!course) return;
+      activeCourseForEdit = course;
+
+      const titleEl = document.getElementById("unitEditCourseTitle");
+      const userNameEl = document.getElementById("unitEditUserName");
+      const courseInput = document.getElementById("courseUnitsValue");
+      const userInput = document.getElementById("userUnitsValue");
+      const courseHint = document.getElementById("courseUnitsHint");
+      const userHint = document.getElementById("userUnitsHint");
+      const clearUser = document.getElementById("clearUserUnits");
+
+      const activeUser = allUsers.find((u) => normalizeId(u) === activeUserId);
+      if (titleEl) titleEl.textContent = course.courseTitle || "—";
+      if (userNameEl) userNameEl.textContent = activeUser ? getUserLabel(activeUser) : "—";
+
+      const units = Array.isArray(course.units) ? course.units : [];
+      const courseValues = units.map((unit) => extractPositiveNumber(unit?.hours));
+      const courseAllHave = units.length > 0 && courseValues.every((v) => v !== null);
+      const courseUniform = courseAllHave ? getUniformUnits(courseValues) : null;
+      const courseHasSome = courseValues.some((v) => v !== null);
+
+      if (courseInput) courseInput.value = courseUniform !== null ? courseUniform : "";
+      if (courseHint) {
+        if (!units.length) {
+          courseHint.textContent = "У курсі немає юнітів.";
+        } else if (courseUniform !== null) {
+          courseHint.textContent = `Однакове значення у ${units.length} юнітах.`;
+        } else if (courseHasSome) {
+          courseHint.textContent = "У юнітах різні значення.";
+        } else {
+          courseHint.textContent = "Значення не задане.";
+        }
+      }
+
+      const memberEntries = units
+        .map((unit) => ({ unit, member: courseProgressGetUnitMember(unit, activeUserId) }))
+        .filter((item) => item.member);
+      const memberAmounts = memberEntries.map((item) => extractPositiveNumber(item.member?.amount));
+      const userAllHave = memberEntries.length > 0 && memberAmounts.every((v) => v !== null);
+      const userUniform = userAllHave ? getUniformUnits(memberAmounts) : null;
+      const userHasSome = memberAmounts.some((v) => v !== null);
+
+      if (userInput) userInput.value = userUniform !== null ? userUniform : "";
+      if (userHint) {
+        if (!activeUserId) {
+          userHint.textContent = "Оберіть користувача, щоб змінити юніти.";
+        } else if (!memberEntries.length) {
+          userHint.textContent = "Користувач не доданий до юнітів курсу.";
+        } else if (userUniform !== null) {
+          userHint.textContent = `Однакове значення у ${memberEntries.length} юнітах.`;
+        } else if (userHasSome) {
+          userHint.textContent = `Різні значення у ${memberEntries.length} юнітах.`;
+        } else {
+          userHint.textContent = `Юніти з користувачем: ${memberEntries.length}.`;
+        }
+      }
+
+      const allowUserEdit = Boolean(activeUserId && memberEntries.length);
+      if (userInput) {
+        userInput.disabled = !allowUserEdit;
+        userInput.dataset.allowUser = allowUserEdit ? "1" : "0";
+      }
+      if (clearUser) {
+        clearUser.checked = false;
+        clearUser.disabled = !allowUserEdit;
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function closeUnitEditModal() {
+      const modal = document.getElementById("unitEditModal");
+      if (!modal) return;
+      modal.style.display = "none";
+      activeCourseForEdit = null;
+    }
+
+    async function applyUnitOverrides() {
+      if (!activeCourseForEdit) return;
+      const courseInput = document.getElementById("courseUnitsValue");
+      const userInput = document.getElementById("userUnitsValue");
+      const clearUser = document.getElementById("clearUserUnits");
+      const hasCourseInput = courseInput && String(courseInput.value || "").trim() !== "";
+      const hasUserInput = userInput && String(userInput.value || "").trim() !== "";
+      const courseValue = hasCourseInput ? extractPositiveNumber(courseInput.value) : null;
+      const userValue = hasUserInput ? extractPositiveNumber(userInput.value) : null;
+
+      if (hasCourseInput && courseValue === null) {
+        alert("Некоректне значення для юнітів курсу.");
+        return;
+      }
+      if (!clearUser?.checked && hasUserInput && userValue === null) {
+        alert("Некоректне значення для юнітів користувача.");
+        return;
+      }
+
+      const units = Array.isArray(activeCourseForEdit.units) ? activeCourseForEdit.units : [];
+      if (!units.length) {
+        alert("У курсі немає юнітів для оновлення.");
+        return;
+      }
+
+      const updatedUnits = units.map((unit) => {
+        const next = Object.assign({}, unit);
+        if (courseValue !== null) next.hours = courseValue;
+
+        if (activeUserId) {
+          const members = Array.isArray(unit.members) ? unit.members.map((member) => {
+            const userId = courseProgressNormalizeId(member?.user);
+            if (!userId) return null;
+            const mode = member?.mode === "проводив" ? "проводив" : "проходив";
+            const existingAmount = extractPositiveNumber(member?.amount);
+            const nextMember = { user: userId, mode };
+
+            if (courseProgressIdsMatch(userId, activeUserId)) {
+              if (clearUser?.checked) {
+                return nextMember;
+              }
+              if (userValue !== null) {
+                nextMember.amount = userValue;
+              } else if (existingAmount !== null) {
+                nextMember.amount = existingAmount;
+              }
+            } else if (existingAmount !== null) {
+              nextMember.amount = existingAmount;
+            }
+
+            return nextMember;
+          }).filter(Boolean) : [];
+          if (members.length) next.members = members;
+        }
+        return next;
+      });
+
+      try {
+        const fetcher = window.adminFetch
+          ? window.adminFetch
+          : (url, opts) => fetch(url, Object.assign({ credentials: "include" }, opts));
+        const res = await fetcher(`${API_BASE}/api/courses/${activeCourseForEdit._id}`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ units: updatedUnits }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || `HTTP ${res.status}`);
+        }
+
+        const updated = await res.json().catch(() => ({}));
+        const index = allCourses.findIndex((c) => String(c._id) === String(activeCourseForEdit._id));
+        if (index >= 0) {
+          allCourses[index].units = Array.isArray(updated.units) ? updated.units : updatedUnits;
+        }
+        activeCourseForEdit.units = Array.isArray(updated.units) ? updated.units : updatedUnits;
+        renderProgress();
+        closeUnitEditModal();
+      } catch (err) {
+        console.error("Помилка оновлення юнітів:", err);
+        alert(err.message || "Помилка оновлення юнітів");
+      }
+    }
+
+    function bindUnitModalActions() {
+      const modal = document.getElementById("unitEditModal");
+      const closeBtn = document.getElementById("unitEditClose");
+      const cancelBtn = document.getElementById("unitEditCancel");
+      const saveBtn = document.getElementById("unitEditSave");
+      const clearUser = document.getElementById("clearUserUnits");
+      const userInput = document.getElementById("userUnitsValue");
+
+      if (closeBtn) closeBtn.addEventListener("click", closeUnitEditModal);
+      if (cancelBtn) cancelBtn.addEventListener("click", closeUnitEditModal);
+      if (saveBtn) saveBtn.addEventListener("click", applyUnitOverrides);
+      if (modal) {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeUnitEditModal();
+        });
+      }
+      if (clearUser && userInput) {
+        clearUser.addEventListener("change", () => {
+          const allowUser = userInput.dataset.allowUser === "1";
+          if (!allowUser) {
+            clearUser.checked = false;
+            return;
+          }
+          userInput.disabled = clearUser.checked;
+        });
+      }
+    }
+
     function formatCoursePeriod(course) {
       const start = courseProgressFormatShortDate(courseProgressParseDate(course?.courseDates?.start));
       const end = courseProgressFormatShortDate(courseProgressParseDate(course?.courseDates?.end));
@@ -592,11 +897,12 @@
         if (Array.isArray(course.units)) {
           course.units.forEach((unit) => {
             if (!unit || !unit.unitType) return;
-            const mode = courseProgressGetUnitMode(unit, activeUserId);
-            if (!mode) return;
+            const member = courseProgressGetUnitMember(unit, activeUserId);
+            if (!member) return;
+            const mode = member.mode;
             const occurrences = courseProgressGetUnitOccurrences(unit, course);
             if (!occurrences) return;
-            const amount = courseProgressGetUnitAmount(unit) * occurrences;
+            const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
             const bucket =
               stats[unit.unitType] ||
               courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
@@ -689,7 +995,12 @@
             <td>${formatCoursePeriod(course)}</td>
             <td>${courseProgressFormatValue(row.taught)}</td>
             <td>${courseProgressFormatValue(row.attended)}</td>
-            <td><a class="more-btn" href="admin-course-details.html?id=${course._id}">Редагувати</a></td>
+            <td>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <a class="more-btn" href="admin-course-details.html?id=${course._id}">Редагувати</a>
+                <button class="more-btn" type="button" style="background:#888;" onclick="openUnitEditModal('${course._id}')">Юніти</button>
+              </div>
+            </td>
           `;
           courseBody.appendChild(tr);
         });

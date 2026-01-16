@@ -44,10 +44,22 @@ exports.createCourse = async (req, res) => {
             members: Array.isArray(u.members)
               ? u.members
                   .filter((m) => m && m.user && m.mode)
-                  .map((m) => ({
-                    user: m.user,
-                    mode: m.mode === 'проводив' ? 'проводив' : 'проходив', // захист від некоректних значень
-                  }))
+                  .map((m) => {
+                    const amountRaw = m.amount;
+                    const amount =
+                      amountRaw !== null &&
+                      amountRaw !== undefined &&
+                      amountRaw !== '' &&
+                      Number.isFinite(Number(amountRaw))
+                        ? Number(amountRaw)
+                        : null;
+                    const member = {
+                      user: m.user,
+                      mode: m.mode === 'проводив' ? 'проводив' : 'проходив', // захист від некоректних значень
+                    };
+                    if (amount !== null) member.amount = amount;
+                    return member;
+                  })
               : [],
           };
         })

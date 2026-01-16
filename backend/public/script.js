@@ -1621,13 +1621,27 @@ function courseProgressIdsMatch(a, b) {
   return aId && bId && String(aId) === String(bId);
 }
 
-function courseProgressGetUnitMode(unit, userId) {
+function courseProgressGetUnitMember(unit, userId) {
   if (!unit || !Array.isArray(unit.members)) return null;
-  const member = unit.members.find((m) => courseProgressIdsMatch(m.user, userId));
+  return unit.members.find((m) => courseProgressIdsMatch(m.user, userId)) || null;
+}
+
+function courseProgressGetUnitMode(unit, userId) {
+  const member = courseProgressGetUnitMember(unit, userId);
   return member ? member.mode : null;
 }
 
-function courseProgressGetUnitAmount(unit) {
+function courseProgressGetUnitAmount(unit, member) {
+  const memberRaw = member?.amount;
+  if (memberRaw !== null && memberRaw !== undefined && memberRaw !== '') {
+    const memberAmount = Number(memberRaw);
+    if (Number.isFinite(memberAmount)) return memberAmount;
+  }
+  const hoursRaw = unit?.hours;
+  if (hoursRaw !== null && hoursRaw !== undefined && hoursRaw !== '') {
+    const hoursAmount = Number(hoursRaw);
+    if (Number.isFinite(hoursAmount)) return hoursAmount;
+  }
   return 1;
 }
 
@@ -1811,11 +1825,12 @@ async function loadCourseProgress() {
     if (Array.isArray(course.units)) {
       course.units.forEach((unit) => {
         if (!unit || !unit.unitType) return;
-        const mode = courseProgressGetUnitMode(unit, user._id);
-        if (!mode) return;
+        const member = courseProgressGetUnitMember(unit, user._id);
+        if (!member) return;
+        const mode = member.mode;
         const occurrences = courseProgressGetUnitOccurrences(unit, course);
         if (!occurrences) return;
-        const amount = courseProgressGetUnitAmount(unit) * occurrences;
+        const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
         const bucket =
           stats[unit.unitType] ||
           courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);

@@ -13,6 +13,10 @@ const unitMemberSchema = new mongoose.Schema(
       enum: ['проходив', 'проводив'], // важливо для статистики
       required: true,
     },
+    amount: {
+      type: Number,
+      min: 0,
+    },
   },
   { _id: false }
 );

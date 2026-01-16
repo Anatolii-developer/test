@@ -112,7 +112,7 @@ window.renderAdminSidebar = function renderAdminSidebar(current) {
          <a href="admin-forum.html" ${here==='admin-forum.html'?'class="active"':''}>
            <img src="../assets/sidebar/10.svg" alt="" /><span>Форум</span>
          </a>
-        <a href="#" >
+        <a href="admin-course-progress.html" ${here==='admin-course-progress.html'?'class="active"':''}>
           <img src="../assets/sidebar/6.svg" alt="" /><span>Облік практики</span>
         </a>
         <a href="#">

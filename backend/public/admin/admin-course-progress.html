@@ -191,56 +191,28 @@
       <div class="progress-card">
         <div class="progress-header">
           <h1>Облік практики</h1>
-          <p>Адміністрування прогресу за курсами IPS.</p>
+          <p>Оберіть курс і коригуйте юніти для всіх учасників.</p>
         </div>
 
         <div class="filters-grid">
           <label>
-            Пошук користувача
-            <input type="text" id="userSearch" placeholder="Ім'я або email" />
+            Пошук курсу
+            <input type="text" id="courseSearch" placeholder="Назва курсу" />
           </label>
           <label>
-            Користувач
-            <select id="userSelect">
-              <option value="">Оберіть користувача</option>
+            Курс
+            <select id="courseSelect">
+              <option value="">Оберіть курс</option>
             </select>
           </label>
-          <label>
-            Період з
-            <input type="date" id="filterFrom" />
-          </label>
-          <label>
-            Період до
-            <input type="date" id="filterTo" />
-          </label>
-          <label>
-            Категорія
-            <select id="categoryFilter">
-              <option value="">Усі</option>
-              <option value="Конференція">Конференція</option>
-              <option value="Курс">Курси</option>
-              <option value="Підвищення кваліфікації">Підвищення кваліфікації</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="filters-actions">
-          <button class="top-btn" id="applyFilters">Оновити</button>
-          <button class="top-btn secondary" id="resetFilters">Скинути</button>
         </div>
 
         <div class="progress-status" id="progressStatus"></div>
 
-        <div class="progress-summary" id="progressSummary">
-          <span>Користувач: <strong id="activeUserName">—</strong></span>
-          <span>Email: <strong id="activeUserEmail">—</strong></span>
-          <span>Всього: <strong id="totalCount">0</strong></span>
-          <span>Проведено: <strong id="taughtCount">0</strong></span>
-          <span>Пройдено: <strong id="attendedCount">0</strong></span>
+        <div class="progress-summary" id="courseSummary">
+          <span>Курс: <strong id="activeCourseTitle">—</strong></span>
+          <span>Період: <strong id="activeCourseDates">—</strong></span>
         </div>
-
-        <div class="progress-filter-summary" id="progressFilterSummary"></div>
-        <p class="progress-note">Підрахунок відповідає сторінці "Пройдено в IPS".</p>
 
         <div class="progress-table">
           <table class="requests-table" aria-label="Course progress">
@@ -253,9 +225,9 @@
                 <th>Корекція</th>
               </tr>
             </thead>
-            <tbody id="progressTableBody">
+            <tbody id="courseProgressBody">
               <tr>
-                <td colspan="5">Оберіть користувача для перегляду.</td>
+                <td colspan="5">Оберіть курс для перегляду.</td>
               </tr>
             </tbody>
           </table>
@@ -263,29 +235,36 @@
       </div>
 
       <div class="progress-card">
-        <h2 class="section-title">Деталі курсів</h2>
+        <h2 class="section-title">Учасник курсу</h2>
+        <div class="filters-grid">
+          <label>
+            Учасник
+            <select id="participantSelect">
+              <option value="">Оберіть учасника</option>
+            </select>
+          </label>
+        </div>
+        <div class="progress-summary" id="participantSummary">
+          <span>Користувач: <strong id="participantName">—</strong></span>
+          <span>Email: <strong id="participantEmail">—</strong></span>
+        </div>
         <div class="course-table">
-          <table class="requests-table" aria-label="Course details">
+          <table class="requests-table" aria-label="Participant progress">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Курс</th>
-                <th>Тип</th>
-                <th>Період</th>
+                <th>Тип активності</th>
+                <th>Всього</th>
                 <th>Проведено</th>
                 <th>Пройдено</th>
-                <th></th>
+                <th>Корекція</th>
               </tr>
             </thead>
-            <tbody id="courseDetailsBody">
+            <tbody id="participantProgressBody">
               <tr>
-                <td colspan="7">Оберіть користувача для перегляду.</td>
+                <td colspan="5">Оберіть учасника для перегляду.</td>
               </tr>
             </tbody>
           </table>
-        </div>
-        <div class="empty-state" id="courseEmptyState" style="display: none;">
-          Немає курсів для обраного користувача.
         </div>
       </div>
     </div>
@@ -367,12 +346,16 @@
       { key: "Конференція", label: "Конференція" },
     ];
 
-    let allUsers = [];
     let allCourses = [];
+    let activeCourseId = null;
+    let activeCourse = null;
+    let courseParticipants = [];
     let activeUserId = null;
     let activeCourseForEdit = null;
     let activeTypeForOverride = null;
-    let lastProgressRows = { base: {}, display: {} };
+    let activeOverrideScope = null;
+    let lastCourseRows = { base: {}, display: {} };
+    let lastUserRows = { base: {}, display: {} };
 
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof renderAdminSidebar === "function") {
@@ -382,71 +365,58 @@
         requireAdminPage();
       }
 
-      bindFilters();
+      bindCourseControls();
+      bindParticipantControls();
       bindUnitModalActions();
       bindTypeOverrideModalActions();
       loadInitialData();
     });
 
-    function bindFilters() {
-      const search = document.getElementById("userSearch");
-      const select = document.getElementById("userSelect");
-      const applyBtn = document.getElementById("applyFilters");
-      const resetBtn = document.getElementById("resetFilters");
+    function bindCourseControls() {
+      const search = document.getElementById("courseSearch");
+      const select = document.getElementById("courseSelect");
 
       if (search) {
         search.addEventListener("input", () => {
-          renderUserOptions(search.value || "");
-          renderProgress();
+          renderCourseOptions(search.value || "");
         });
       }
       if (select) {
         select.addEventListener("change", () => {
-          activeUserId = select.value || null;
-          renderProgress();
-        });
-      }
-
-      ["filterFrom", "filterTo", "categoryFilter"].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener("change", renderProgress);
-      });
-
-      if (applyBtn) applyBtn.addEventListener("click", renderProgress);
-      if (resetBtn) {
-        resetBtn.addEventListener("click", () => {
-          const from = document.getElementById("filterFrom");
-          const to = document.getElementById("filterTo");
-          const category = document.getElementById("categoryFilter");
-          if (from) from.value = "";
-          if (to) to.value = "";
-          if (category) category.value = "";
-          renderProgress();
+          activeCourseId = select.value || null;
+          if (activeCourseId) {
+            loadCourseDetails(activeCourseId);
+          } else {
+            resetCourseUI();
+          }
         });
       }
     }
 
+    function bindParticipantControls() {
+      const select = document.getElementById("participantSelect");
+      if (!select) return;
+      select.addEventListener("change", () => {
+        activeUserId = select.value || null;
+        renderParticipantTable();
+      });
+    }
+
     async function loadInitialData() {
-      setStatus("Завантаження даних...");
+      setStatus("Завантаження курсів...");
       try {
         const fetcher = window.adminFetch
           ? window.adminFetch
           : (url) => fetch(url, { credentials: "include" });
 
-        const [usersRes, coursesRes] = await Promise.all([
-          fetcher(`${API_BASE}/api/users?status=APPROVED`),
-          fetcher(`${API_BASE}/api/courses`),
-        ]);
-
-        allUsers = usersRes.ok ? await usersRes.json() : [];
+        const coursesRes = await fetcher(`${API_BASE}/api/courses`);
         allCourses = coursesRes.ok ? await coursesRes.json() : [];
 
-        renderUserOptions("");
+        renderCourseOptions("");
         setStatus("");
-        renderProgress();
       } catch (err) {
         console.error("Помилка завантаження:", err);
-        setStatus("Не вдалося завантажити дані.", true);
+        setStatus("Не вдалося завантажити курси.", true);
       }
     }
 
@@ -457,39 +427,144 @@
       el.classList.toggle("error", Boolean(isError));
     }
 
-    function renderUserOptions(query) {
-      const select = document.getElementById("userSelect");
+    function renderCourseOptions(query) {
+      const select = document.getElementById("courseSelect");
       if (!select) return;
 
       const current = select.value;
       const q = String(query || "").trim().toLowerCase();
-      const filtered = allUsers
-        .filter((user) => {
-          const name = getUserLabel(user).toLowerCase();
-          const email = String(user.email || "").toLowerCase();
-          return !q || name.includes(q) || email.includes(q);
+      const filtered = allCourses
+        .filter((course) => {
+          const title = String(course.courseTitle || "").toLowerCase();
+          return !q || title.includes(q);
         })
-        .sort((a, b) => getUserLabel(a).localeCompare(getUserLabel(b), "uk"));
+        .sort((a, b) => String(a.courseTitle || "").localeCompare(String(b.courseTitle || ""), "uk"));
 
-      select.innerHTML = '<option value="">Оберіть користувача</option>';
-      filtered.forEach((user) => {
+      select.innerHTML = '<option value="">Оберіть курс</option>';
+      filtered.forEach((course) => {
         const option = document.createElement("option");
-        option.value = user._id || user.id || "";
-        option.textContent = `${getUserLabel(user)}${user.email ? " (" + user.email + ")" : ""}`;
+        option.value = course._id || "";
+        option.textContent = course.courseTitle || "Без назви";
         select.appendChild(option);
       });
 
-      if (current && filtered.some((u) => normalizeId(u) === current)) {
+      if (current && filtered.some((c) => String(c._id) === String(current))) {
         select.value = current;
       } else if (!current && filtered.length === 1) {
-        select.value = filtered[0]._id || filtered[0].id || "";
+        select.value = filtered[0]._id || "";
       }
 
-      activeUserId = select.value || null;
+      activeCourseId = select.value || null;
+      if (activeCourseId && String(activeCourse?._id || "") !== String(activeCourseId)) {
+        loadCourseDetails(activeCourseId);
+      }
+    }
+
+    async function loadCourseDetails(courseId) {
+      if (!courseId) return;
+      setStatus("Завантаження курсу...");
+      try {
+        const fetcher = window.adminFetch
+          ? window.adminFetch
+          : (url) => fetch(url, { credentials: "include" });
+        const res = await fetcher(`${API_BASE}/api/courses/${courseId}`);
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || `HTTP ${res.status}`);
+        }
+        activeCourse = await res.json();
+        activeCourseId = activeCourse._id || courseId;
+        const participantsMap = new Map();
+        if (Array.isArray(activeCourse.participants)) {
+          activeCourse.participants.forEach((user) => {
+            const id = normalizeId(user);
+            if (id) participantsMap.set(id, user);
+          });
+        }
+        if (Array.isArray(activeCourse.units)) {
+          activeCourse.units.forEach((unit) => {
+            if (!unit || !Array.isArray(unit.members)) return;
+            unit.members.forEach((member) => {
+              const id = courseProgressNormalizeId(member?.user);
+              if (id && !participantsMap.has(id)) {
+                participantsMap.set(id, id);
+              }
+            });
+          });
+        }
+        courseParticipants = Array.from(participantsMap.values());
+        renderCourseSummary();
+        renderCourseTable();
+        renderParticipantOptions();
+        renderParticipantTable();
+        setStatus("");
+      } catch (err) {
+        console.error("Помилка завантаження курсу:", err);
+        setStatus("Не вдалося завантажити курс.", true);
+        resetCourseUI();
+      }
+    }
+
+    function resetCourseUI() {
+      activeCourse = null;
+      courseParticipants = [];
+      activeUserId = null;
+      lastCourseRows = { base: {}, display: {} };
+      lastUserRows = { base: {}, display: {} };
+
+      const titleEl = document.getElementById("activeCourseTitle");
+      const datesEl = document.getElementById("activeCourseDates");
+      if (titleEl) titleEl.textContent = "—";
+      if (datesEl) datesEl.textContent = "—";
+
+      const courseBody = document.getElementById("courseProgressBody");
+      if (courseBody) {
+        courseBody.innerHTML = '<tr><td colspan="5">Оберіть курс для перегляду.</td></tr>';
+      }
+      const participantBody = document.getElementById("participantProgressBody");
+      if (participantBody) {
+        participantBody.innerHTML = '<tr><td colspan="5">Оберіть учасника для перегляду.</td></tr>';
+      }
+      renderParticipantOptions();
+      updateParticipantSummary(null);
+    }
+
+    function renderCourseSummary() {
+      const titleEl = document.getElementById("activeCourseTitle");
+      const datesEl = document.getElementById("activeCourseDates");
+      if (titleEl) titleEl.textContent = activeCourse?.courseTitle || "—";
+      if (datesEl) datesEl.textContent = formatCoursePeriod(activeCourse);
+    }
+
+    function renderParticipantOptions() {
+      const select = document.getElementById("participantSelect");
+      if (!select) return;
+      select.disabled = !courseParticipants.length;
+      select.innerHTML = '<option value="">Оберіть учасника</option>';
+      courseParticipants
+        .slice()
+        .sort((a, b) => getUserLabel(a).localeCompare(getUserLabel(b), "uk"))
+        .forEach((user) => {
+        const id = normalizeId(user);
+        if (!id) return;
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = getUserLabel(user) || id;
+        select.appendChild(option);
+      });
+      if (activeUserId && courseParticipants.some((u) => normalizeId(u) === activeUserId)) {
+        select.value = activeUserId;
+      } else {
+        activeUserId = "";
+      }
+      updateParticipantSummary(
+        courseParticipants.find((u) => normalizeId(u) === activeUserId) || null
+      );
     }
 
     function getUserLabel(user) {
       if (!user) return "";
+      if (typeof user === "string") return user;
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
       return fullName || user.fullName || user.username || user.email || "";
     }
@@ -629,49 +704,6 @@
       return map[key];
     }
 
-    function getActiveFilters() {
-      const from = courseProgressParseDate(document.getElementById("filterFrom")?.value);
-      const to = courseProgressParseDate(document.getElementById("filterTo")?.value);
-      const category = document.getElementById("categoryFilter")?.value || "";
-      return {
-        from,
-        to,
-        category: category && category.trim() ? category.trim() : null,
-      };
-    }
-
-    function updateFilterSummary(filters) {
-      const summary = document.getElementById("progressFilterSummary");
-      if (!summary) return;
-      const items = [];
-
-      if (filters?.category) {
-        items.push(`Категорія: ${filters.category}`);
-      }
-
-      if (filters?.from || filters?.to) {
-        const fromLabel = filters.from ? courseProgressFormatShortDate(filters.from) : "";
-        const toLabel = filters.to ? courseProgressFormatShortDate(filters.to) : "";
-        let periodText = "";
-        if (fromLabel && toLabel) {
-          periodText = `${fromLabel} — ${toLabel}`;
-        } else if (fromLabel) {
-          periodText = `з ${fromLabel}`;
-        } else if (toLabel) {
-          periodText = `до ${toLabel}`;
-        }
-        if (periodText) items.push(`Період: ${periodText}`);
-      }
-
-      if (!items.length) {
-        summary.innerHTML = "";
-        return;
-      }
-
-      summary.innerHTML = items
-        .map((text) => `<span class="progress-filter-chip">${text}</span>`)
-        .join("");
-    }
 
     function extractPositiveNumber(value) {
       if (value === null || value === undefined || value === "") return null;
@@ -738,7 +770,9 @@
       const modal = document.getElementById("unitEditModal");
       if (!modal) return;
 
-      const course = allCourses.find((c) => String(c._id) === String(courseId));
+      const course =
+        (activeCourse && String(activeCourse._id) === String(courseId) ? activeCourse : null) ||
+        allCourses.find((c) => String(c._id) === String(courseId));
       if (!course) return;
       activeCourseForEdit = course;
 
@@ -750,7 +784,7 @@
       const userHint = document.getElementById("userUnitsHint");
       const clearUser = document.getElementById("clearUserUnits");
 
-      const activeUser = allUsers.find((u) => normalizeId(u) === activeUserId);
+      const activeUser = courseParticipants.find((u) => normalizeId(u) === activeUserId);
       if (titleEl) titleEl.textContent = course.courseTitle || "—";
       if (userNameEl) userNameEl.textContent = activeUser ? getUserLabel(activeUser) : "—";
 
@@ -894,7 +928,11 @@
           allCourses[index].units = Array.isArray(updated.units) ? updated.units : updatedUnits;
         }
         activeCourseForEdit.units = Array.isArray(updated.units) ? updated.units : updatedUnits;
-        renderProgress();
+        if (activeCourse && String(activeCourse._id) === String(activeCourseForEdit._id)) {
+          activeCourse.units = activeCourseForEdit.units;
+        }
+        renderCourseTable();
+        renderParticipantTable();
         closeUnitEditModal();
       } catch (err) {
         console.error("Помилка оновлення юнітів:", err);
@@ -930,18 +968,25 @@
       }
     }
 
-    function openTypeOverrideModal(typeKey) {
+    function openTypeOverrideModal(scope, typeKey) {
       const modal = document.getElementById("typeOverrideModal");
       if (!modal) return;
-      if (!activeUserId) {
-        alert("Оберіть користувача.");
+      if (!activeCourse) {
+        alert("Оберіть курс.");
+        return;
+      }
+      if (scope === "user" && !activeUserId) {
+        alert("Оберіть учасника.");
         return;
       }
 
-      const activeUser = allUsers.find((u) => normalizeId(u) === activeUserId);
-      const overrides = normalizeProgressOverrides(activeUser?.progressOverrides || {});
+      const baseRow =
+        scope === "course" ? lastCourseRows.base[typeKey] : lastUserRows.base[typeKey];
+      const overrides =
+        scope === "course"
+          ? normalizeProgressOverrides(activeCourse?.progressOverrides || {})
+          : normalizeProgressOverrides(activeCourse?.progressUserOverrides?.[activeUserId] || {});
       const override = overrides[typeKey] || {};
-      const baseRow = lastProgressRows.base[typeKey];
 
       const nameEl = document.getElementById("typeOverrideName");
       const computedEl = document.getElementById("typeOverrideComputed");
@@ -967,6 +1012,7 @@
       }
 
       activeTypeForOverride = typeKey;
+      activeOverrideScope = scope;
       modal.style.display = "flex";
     }
 
@@ -975,10 +1021,11 @@
       if (!modal) return;
       modal.style.display = "none";
       activeTypeForOverride = null;
+      activeOverrideScope = null;
     }
 
     async function saveTypeOverride() {
-      if (!activeTypeForOverride || !activeUserId) return;
+      if (!activeTypeForOverride || !activeCourse || !activeOverrideScope) return;
       const taughtInput = document.getElementById("overrideTaughtValue");
       const attendedInput = document.getElementById("overrideAttendedValue");
 
@@ -994,36 +1041,65 @@
         return;
       }
 
-      const activeUserIndex = allUsers.findIndex((u) => normalizeId(u) === activeUserId);
-      if (activeUserIndex < 0) return;
-
-      const overrides = normalizeProgressOverrides(allUsers[activeUserIndex]?.progressOverrides || {});
       const next = {};
       if (taughtInput && taughtInput.value !== "" && taughtValue !== null) next.taught = taughtValue;
       if (attendedInput && attendedInput.value !== "" && attendedValue !== null) next.attended = attendedValue;
-
-      if (Object.keys(next).length) {
-        overrides[activeTypeForOverride] = next;
-      } else {
-        delete overrides[activeTypeForOverride];
-      }
 
       try {
         const fetcher = window.adminFetch
           ? window.adminFetch
           : (url, opts) => fetch(url, Object.assign({ credentials: "include" }, opts));
-        const res = await fetcher(`${API_BASE}/api/users/${activeUserId}`, {
-          method: "PUT",
-          headers: getAuthHeaders(),
-          body: JSON.stringify({ progressOverrides: overrides }),
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.message || `HTTP ${res.status}`);
+
+        if (activeOverrideScope === "course") {
+          const overrides = normalizeProgressOverrides(activeCourse?.progressOverrides || {});
+          if (Object.keys(next).length) {
+            overrides[activeTypeForOverride] = next;
+          } else {
+            delete overrides[activeTypeForOverride];
+          }
+          const res = await fetcher(`${API_BASE}/api/courses/${activeCourseId}`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ progressOverrides: overrides }),
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || `HTTP ${res.status}`);
+          }
+          const updated = await res.json().catch(() => ({}));
+          activeCourse.progressOverrides = updated.progressOverrides || overrides;
+        } else {
+          if (!activeUserId) {
+            alert("Оберіть учасника.");
+            return;
+          }
+          const progressUserOverrides = Object.assign({}, activeCourse?.progressUserOverrides || {});
+          const userOverrides = normalizeProgressOverrides(progressUserOverrides[activeUserId] || {});
+          if (Object.keys(next).length) {
+            userOverrides[activeTypeForOverride] = next;
+          } else {
+            delete userOverrides[activeTypeForOverride];
+          }
+          if (Object.keys(userOverrides).length) {
+            progressUserOverrides[activeUserId] = userOverrides;
+          } else {
+            delete progressUserOverrides[activeUserId];
+          }
+          const res = await fetcher(`${API_BASE}/api/courses/${activeCourseId}`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ progressUserOverrides }),
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || `HTTP ${res.status}`);
+          }
+          const updated = await res.json().catch(() => ({}));
+          activeCourse.progressUserOverrides = updated.progressUserOverrides || progressUserOverrides;
         }
-        const updatedUser = await res.json().catch(() => ({}));
-        allUsers[activeUserIndex].progressOverrides = updatedUser.progressOverrides || overrides;
-        renderProgress();
+
+        renderCourseTable();
+        renderParticipantTable();
         closeTypeOverrideModal();
       } catch (err) {
         console.error("Помилка корекції юнітів:", err);
@@ -1032,32 +1108,63 @@
     }
 
     async function resetTypeOverride() {
-      if (!activeTypeForOverride || !activeUserId) return;
-      const activeUserIndex = allUsers.findIndex((u) => normalizeId(u) === activeUserId);
-      if (activeUserIndex < 0) return;
-      const overrides = normalizeProgressOverrides(allUsers[activeUserIndex]?.progressOverrides || {});
-      if (!overrides[activeTypeForOverride]) {
-        closeTypeOverrideModal();
-        return;
-      }
-      delete overrides[activeTypeForOverride];
+      if (!activeTypeForOverride || !activeCourse || !activeOverrideScope) return;
 
       try {
         const fetcher = window.adminFetch
           ? window.adminFetch
           : (url, opts) => fetch(url, Object.assign({ credentials: "include" }, opts));
-        const res = await fetcher(`${API_BASE}/api/users/${activeUserId}`, {
-          method: "PUT",
-          headers: getAuthHeaders(),
-          body: JSON.stringify({ progressOverrides: overrides }),
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.message || `HTTP ${res.status}`);
+
+        if (activeOverrideScope === "course") {
+          const overrides = normalizeProgressOverrides(activeCourse?.progressOverrides || {});
+          if (!overrides[activeTypeForOverride]) {
+            closeTypeOverrideModal();
+            return;
+          }
+          delete overrides[activeTypeForOverride];
+          const res = await fetcher(`${API_BASE}/api/courses/${activeCourseId}`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ progressOverrides: overrides }),
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || `HTTP ${res.status}`);
+          }
+          const updated = await res.json().catch(() => ({}));
+          activeCourse.progressOverrides = updated.progressOverrides || overrides;
+        } else {
+          if (!activeUserId) {
+            closeTypeOverrideModal();
+            return;
+          }
+          const progressUserOverrides = Object.assign({}, activeCourse?.progressUserOverrides || {});
+          const userOverrides = normalizeProgressOverrides(progressUserOverrides[activeUserId] || {});
+          if (!userOverrides[activeTypeForOverride]) {
+            closeTypeOverrideModal();
+            return;
+          }
+          delete userOverrides[activeTypeForOverride];
+          if (Object.keys(userOverrides).length) {
+            progressUserOverrides[activeUserId] = userOverrides;
+          } else {
+            delete progressUserOverrides[activeUserId];
+          }
+          const res = await fetcher(`${API_BASE}/api/courses/${activeCourseId}`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ progressUserOverrides }),
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || `HTTP ${res.status}`);
+          }
+          const updated = await res.json().catch(() => ({}));
+          activeCourse.progressUserOverrides = updated.progressUserOverrides || progressUserOverrides;
         }
-        const updatedUser = await res.json().catch(() => ({}));
-        allUsers[activeUserIndex].progressOverrides = updatedUser.progressOverrides || overrides;
-        renderProgress();
+
+        renderCourseTable();
+        renderParticipantTable();
         closeTypeOverrideModal();
       } catch (err) {
         console.error("Помилка скидання корекції:", err);
@@ -1088,198 +1195,210 @@
       return start || end || "—";
     }
 
-    function renderProgress() {
-      const user = allUsers.find((u) => normalizeId(u) === activeUserId);
-      updateUserSummary(user);
+    function rowsToMap(rows) {
+      return rows.reduce((acc, row) => {
+        acc[row.key] = row;
+        return acc;
+      }, {});
+    }
 
-      const tableBody = document.getElementById("progressTableBody");
-      const courseBody = document.getElementById("courseDetailsBody");
-      const courseEmpty = document.getElementById("courseEmptyState");
-      if (!tableBody || !courseBody) return;
-
-      if (!user || !activeUserId) {
-        tableBody.innerHTML = '<tr><td colspan="5">Оберіть користувача для перегляду.</td></tr>';
-        courseBody.innerHTML = '<tr><td colspan="7">Оберіть користувача для перегляду.</td></tr>';
-        if (courseEmpty) courseEmpty.style.display = "none";
-        updateFilterSummary(null);
-        lastProgressRows = { base: {}, display: {} };
-        updateTotals();
-        return;
-      }
-
-      const filters = getActiveFilters();
-      updateFilterSummary(filters);
-
-      const stats = {};
-      baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
-      const extraStats = {};
-      const courseRows = [];
-
-      allCourses.forEach((course) => {
-        if (!course || course.status !== "Пройдений") return;
-        if (!courseProgressCourseMatchesFilters(course, filters)) return;
-
-        let courseTaught = 0;
-        let courseAttended = 0;
-
-        if (Array.isArray(course.units)) {
-          course.units.forEach((unit) => {
-            if (!unit || !unit.unitType) return;
-            const member = courseProgressGetUnitMember(unit, activeUserId);
-            if (!member) return;
-            const mode = member.mode;
-            const occurrences = courseProgressGetUnitOccurrences(unit, course);
-            if (!occurrences) return;
-            const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
-            const bucket =
-              stats[unit.unitType] ||
-              courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
-
-            if (mode === "проводив") {
-              bucket.taught += amount;
-              courseTaught += amount;
-            } else {
-              bucket.attended += amount;
-              courseAttended += amount;
-            }
-          });
-        }
-
-        if (course.mainType === "Конференція") {
-          const bucket =
-            stats["Конференція"] ||
-            courseProgressEnsureBucket(extraStats, "Конференція", "Конференція");
-          const isCreator = courseProgressIdsMatch(course.creatorId, activeUserId);
-          const isParticipant = Array.isArray(course.participants)
-            ? course.participants.some((p) => courseProgressIdsMatch(p, activeUserId))
-            : false;
-          const taught = isCreator;
-          const attended = isParticipant;
-
-          if (taught) {
-            bucket.taught += 1;
-            courseTaught += 1;
-          }
-          if (attended) {
-            bucket.attended += 1;
-            courseAttended += 1;
-          }
-        }
-
-        if (courseTaught + courseAttended > 0) {
-          courseRows.push({ course, taught: courseTaught, attended: courseAttended });
-        }
-      });
-
+    function buildRows(stats, extraStats) {
       const baseKeys = baseTypes.map((type) => type.key);
       const extraKeys = Object.keys(extraStats)
         .filter((key) => !baseKeys.includes(key))
         .sort((a, b) => a.localeCompare(b, "uk"));
-      const rows = [
+      return [
         ...baseTypes.map((type) => stats[type.key]),
         ...extraKeys.map((key) => extraStats[key]),
       ];
-      const overrides = normalizeProgressOverrides(user?.progressOverrides || {});
-      const rowsWithOverrides = applyProgressOverrides(rows, overrides);
-      const displayRows = filters.category
-        ? rowsWithOverrides.filter((row) => row.taught + row.attended > 0)
-        : rowsWithOverrides;
+    }
 
-      lastProgressRows = {
-        base: rows.reduce((acc, row) => {
-          acc[row.key] = row;
-          return acc;
-        }, {}),
-        display: displayRows.reduce((acc, row) => {
-          acc[row.key] = row;
-          return acc;
-        }, {}),
-      };
+    function computeCourseBaseRows(course) {
+      const stats = {};
+      const extraStats = {};
+      baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
 
-      tableBody.innerHTML = "";
-      if (!displayRows.length) {
-        tableBody.innerHTML = '<tr><td colspan="5">Немає даних.</td></tr>';
-      } else {
-        displayRows.forEach((row) => {
-          const total = row.taught + row.attended;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.label}</td>
-            <td>${courseProgressFormatValue(total)}</td>
-            <td>${courseProgressFormatValue(row.taught)}</td>
-            <td>${courseProgressFormatValue(row.attended)}</td>
-          `;
-          const actionCell = document.createElement("td");
-          const editBtn = document.createElement("button");
-          editBtn.className = "more-btn progress-edit-btn";
-          editBtn.type = "button";
-          editBtn.textContent = "Коригувати";
-          editBtn.addEventListener("click", () => openTypeOverrideModal(row.key));
-          actionCell.appendChild(editBtn);
-          tr.appendChild(actionCell);
-          tableBody.appendChild(tr);
+      if (Array.isArray(course?.units)) {
+        course.units.forEach((unit) => {
+          if (!unit || !unit.unitType) return;
+          const occurrences = courseProgressGetUnitOccurrences(unit, course);
+          if (!occurrences) return;
+          const amount = courseProgressGetUnitAmount(unit, null) * occurrences;
+          const bucket =
+            stats[unit.unitType] ||
+            courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
+          bucket.taught += amount;
+          bucket.attended += amount;
         });
       }
 
-      courseRows.sort((a, b) => {
-        const aDate = new Date(a.course?.courseDates?.start || 0).getTime();
-        const bDate = new Date(b.course?.courseDates?.start || 0).getTime();
-        return bDate - aDate;
+      if (course?.mainType === "Конференція") {
+        const bucket =
+          stats["Конференція"] ||
+          courseProgressEnsureBucket(extraStats, "Конференція", "Конференція");
+        bucket.taught += 1;
+        bucket.attended += 1;
+      }
+
+      return buildRows(stats, extraStats);
+    }
+
+    function computeParticipantBaseRows(course, userId) {
+      const stats = {};
+      const extraStats = {};
+      baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
+
+      if (Array.isArray(course?.units)) {
+        course.units.forEach((unit) => {
+          if (!unit || !unit.unitType) return;
+          const member = courseProgressGetUnitMember(unit, userId);
+          if (!member) return;
+          const occurrences = courseProgressGetUnitOccurrences(unit, course);
+          if (!occurrences) return;
+          const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
+          const bucket =
+            stats[unit.unitType] ||
+            courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
+
+          if (member.mode === "проводив") {
+            bucket.taught += amount;
+          } else {
+            bucket.attended += amount;
+          }
+        });
+      }
+
+      if (course?.mainType === "Конференція") {
+        const bucket =
+          stats["Конференція"] ||
+          courseProgressEnsureBucket(extraStats, "Конференція", "Конференція");
+        const isCreator = courseProgressIdsMatch(course.creatorId, userId);
+        const isParticipant = Array.isArray(course.participants)
+          ? course.participants.some((p) => courseProgressIdsMatch(p, userId))
+          : false;
+        if (isCreator) bucket.taught += 1;
+        if (isParticipant) bucket.attended += 1;
+      }
+
+      return buildRows(stats, extraStats);
+    }
+
+    function mergeOverrides(baseOverrides, userOverrides) {
+      const result = Object.assign({}, baseOverrides || {});
+      Object.keys(userOverrides || {}).forEach((key) => {
+        const base = result[key] || {};
+        result[key] = Object.assign({}, base, userOverrides[key] || {});
+      });
+      return result;
+    }
+
+    function renderCourseTable() {
+      const body = document.getElementById("courseProgressBody");
+      if (!body) return;
+      if (!activeCourse) {
+        body.innerHTML = '<tr><td colspan="5">Оберіть курс для перегляду.</td></tr>';
+        lastCourseRows = { base: {}, display: {} };
+        return;
+      }
+
+      const baseRows = computeCourseBaseRows(activeCourse);
+      const courseOverrides = normalizeProgressOverrides(activeCourse?.progressOverrides || {});
+      const displayRows = applyProgressOverrides(baseRows, courseOverrides).filter((row) => {
+        if (row.taught + row.attended > 0) return true;
+        return Object.prototype.hasOwnProperty.call(courseOverrides, row.key);
       });
 
-      courseBody.innerHTML = "";
-      if (!courseRows.length) {
-        courseBody.innerHTML = '<tr><td colspan="7">Немає курсів для обраного користувача.</td></tr>';
-        if (courseEmpty) courseEmpty.style.display = "none";
-      } else {
-        courseRows.forEach((row, index) => {
-          const course = row.course || {};
-          const tr = document.createElement("tr");
-          const typeLabel = [course.mainType, course.formatType].filter(Boolean).join(" / ") || "—";
-          const title = course.courseTitle || "—";
-          tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${title}</td>
-            <td>${typeLabel}</td>
-            <td>${formatCoursePeriod(course)}</td>
-            <td>${courseProgressFormatValue(row.taught)}</td>
-            <td>${courseProgressFormatValue(row.attended)}</td>
-            <td>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <a class="more-btn" href="admin-course-details.html?id=${course._id}">Редагувати</a>
-                <button class="more-btn" type="button" style="background:#888;" onclick="openUnitEditModal('${course._id}')">Юніти</button>
-              </div>
-            </td>
-          `;
-          courseBody.appendChild(tr);
-        });
-        if (courseEmpty) courseEmpty.style.display = "none";
+      lastCourseRows = {
+        base: rowsToMap(baseRows),
+        display: rowsToMap(displayRows),
+      };
+
+      body.innerHTML = "";
+      if (!displayRows.length) {
+        body.innerHTML = '<tr><td colspan="5">Немає даних.</td></tr>';
+        return;
+      }
+      displayRows.forEach((row) => {
+        const total = row.taught + row.attended;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.label}</td>
+          <td>${courseProgressFormatValue(total)}</td>
+          <td>${courseProgressFormatValue(row.taught)}</td>
+          <td>${courseProgressFormatValue(row.attended)}</td>
+        `;
+        const actionCell = document.createElement("td");
+        const editBtn = document.createElement("button");
+        editBtn.className = "more-btn progress-edit-btn";
+        editBtn.type = "button";
+        editBtn.textContent = "Коригувати";
+        editBtn.addEventListener("click", () => openTypeOverrideModal("course", row.key));
+        actionCell.appendChild(editBtn);
+        tr.appendChild(actionCell);
+        body.appendChild(tr);
+      });
+    }
+
+    function renderParticipantTable() {
+      const body = document.getElementById("participantProgressBody");
+      if (!body) return;
+      if (!activeCourse || !activeUserId) {
+        body.innerHTML = '<tr><td colspan="5">Оберіть учасника для перегляду.</td></tr>';
+        lastUserRows = { base: {}, display: {} };
+        updateParticipantSummary(null);
+        return;
       }
 
-      updateTotals(displayRows);
+      const baseRows = computeParticipantBaseRows(activeCourse, activeUserId);
+      const courseOverrides = normalizeProgressOverrides(activeCourse?.progressOverrides || {});
+      const userOverrides = normalizeProgressOverrides(
+        activeCourse?.progressUserOverrides?.[activeUserId] || {}
+      );
+      const mergedOverrides = mergeOverrides(courseOverrides, userOverrides);
+      const displayRows = applyProgressOverrides(baseRows, mergedOverrides).filter((row) => {
+        if (row.taught + row.attended > 0) return true;
+        return Object.prototype.hasOwnProperty.call(mergedOverrides, row.key);
+      });
+
+      lastUserRows = {
+        base: rowsToMap(baseRows),
+        display: rowsToMap(displayRows),
+      };
+
+      body.innerHTML = "";
+      if (!displayRows.length) {
+        body.innerHTML = '<tr><td colspan="5">Немає даних.</td></tr>';
+        return;
+      }
+      displayRows.forEach((row) => {
+        const total = row.taught + row.attended;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.label}</td>
+          <td>${courseProgressFormatValue(total)}</td>
+          <td>${courseProgressFormatValue(row.taught)}</td>
+          <td>${courseProgressFormatValue(row.attended)}</td>
+        `;
+        const actionCell = document.createElement("td");
+        const editBtn = document.createElement("button");
+        editBtn.className = "more-btn progress-edit-btn";
+        editBtn.type = "button";
+        editBtn.textContent = "Коригувати";
+        editBtn.addEventListener("click", () => openTypeOverrideModal("user", row.key));
+        actionCell.appendChild(editBtn);
+        tr.appendChild(actionCell);
+        body.appendChild(tr);
+      });
+
+      updateParticipantSummary(
+        courseParticipants.find((u) => normalizeId(u) === activeUserId) || null
+      );
     }
 
-    function updateTotals(rows) {
-      const totalEl = document.getElementById("totalCount");
-      const taughtEl = document.getElementById("taughtCount");
-      const attendedEl = document.getElementById("attendedCount");
-      if (!totalEl || !taughtEl || !attendedEl) return;
-
-      const data = Array.isArray(rows) ? rows : [];
-      const taught = data.reduce((sum, row) => sum + (row.taught || 0), 0);
-      const attended = data.reduce((sum, row) => sum + (row.attended || 0), 0);
-      const total = taught + attended;
-
-      totalEl.textContent = courseProgressFormatValue(total);
-      taughtEl.textContent = courseProgressFormatValue(taught);
-      attendedEl.textContent = courseProgressFormatValue(attended);
-    }
-
-    function updateUserSummary(user) {
-      const nameEl = document.getElementById("activeUserName");
-      const emailEl = document.getElementById("activeUserEmail");
+    function updateParticipantSummary(user) {
+      const nameEl = document.getElementById("participantName");
+      const emailEl = document.getElementById("participantEmail");
       if (!nameEl || !emailEl) return;
-
       if (!user) {
         nameEl.textContent = "—";
         emailEl.textContent = "—";

@@ -1826,6 +1826,15 @@ function courseProgressApplyOverrides(rows, overrides) {
   return updated;
 }
 
+function courseProgressMergeOverrides(baseOverrides, userOverrides) {
+  const result = Object.assign({}, baseOverrides || {});
+  Object.keys(userOverrides || {}).forEach((key) => {
+    const base = result[key] || {};
+    result[key] = Object.assign({}, base, userOverrides[key] || {});
+  });
+  return result;
+}
+
 async function loadCourseProgress() {
   const tableBody = document.getElementById('courseProgressBody');
   if (!tableBody || !document.body.classList.contains('course-progress-page')) return;
@@ -1873,46 +1882,64 @@ async function loadCourseProgress() {
     if (!course || course.status !== 'Пройдений') return;
     if (!courseProgressCourseMatchesFilters(course, filters)) return;
 
-    let courseHasTaught = false;
-    let courseHasAttended = false;
+    const courseStats = {};
+    const ensureCourseBucket = (key, label) => {
+      if (!courseStats[key]) {
+        courseStats[key] = { key, label, taught: 0, attended: 0 };
+      }
+      return courseStats[key];
+    };
+
+    let hasParticipation = false;
 
     if (Array.isArray(course.units)) {
       course.units.forEach((unit) => {
         if (!unit || !unit.unitType) return;
         const member = courseProgressGetUnitMember(unit, user._id);
         if (!member) return;
-        const mode = member.mode;
+        hasParticipation = true;
         const occurrences = courseProgressGetUnitOccurrences(unit, course);
         if (!occurrences) return;
         const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
-        const bucket =
-          stats[unit.unitType] ||
-          courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
+        const bucket = ensureCourseBucket(unit.unitType, unit.unitType);
 
-        if (mode === 'проводив') {
+        if (member.mode === 'проводив') {
           bucket.taught += amount;
-          courseHasTaught = true;
         } else {
           bucket.attended += amount;
-          courseHasAttended = true;
         }
       });
     }
 
     if (course.mainType === 'Конференція') {
-      const bucket =
-        stats['Конференція'] ||
-        courseProgressEnsureBucket(extraStats, 'Конференція', 'Конференція');
       const isCreator = courseProgressIdsMatch(course.creatorId, user._id);
       const isParticipant = Array.isArray(course.participants)
         ? course.participants.some((p) => courseProgressIdsMatch(p, user._id))
         : false;
-      const taught = isCreator || courseHasTaught;
-      const attended = isParticipant || courseHasAttended;
-
-      if (taught) bucket.taught += 1;
-      if (attended) bucket.attended += 1;
+      if (isCreator || isParticipant) {
+        hasParticipation = true;
+        const bucket = ensureCourseBucket('Конференція', 'Конференція');
+        if (isCreator) bucket.taught += 1;
+        if (isParticipant) bucket.attended += 1;
+      }
     }
+
+    if (!hasParticipation) return;
+
+    const courseRows = Object.values(courseStats);
+    const courseOverrides = courseProgressNormalizeOverrides(course?.progressOverrides || {});
+    const userOverrides = courseProgressNormalizeOverrides(
+      course?.progressUserOverrides?.[user._id] || {}
+    );
+    const mergedOverrides = courseProgressMergeOverrides(courseOverrides, userOverrides);
+    const adjustedRows = courseProgressApplyOverrides(courseRows, mergedOverrides);
+
+    adjustedRows.forEach((row) => {
+      const bucket =
+        stats[row.key] || courseProgressEnsureBucket(extraStats, row.key, row.label);
+      bucket.taught += row.taught;
+      bucket.attended += row.attended;
+    });
   });
 
   const baseKeys = baseTypes.map((type) => type.key);

@@ -128,6 +128,10 @@ const courseSchema = new mongoose.Schema({
   // 👇 НОВЕ: масив юнітів (занять / сесій) в рамках курсу
   units: [unitSchema],
 
+  // ручні корекції підрахунків по типах активності
+  progressOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
+  progressUserOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
+
   createdAt: { type: Date, default: Date.now },
 });
 

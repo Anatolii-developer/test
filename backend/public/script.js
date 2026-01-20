@@ -1772,6 +1772,60 @@ function courseProgressEnsureBucket(map, key, label) {
   return map[key];
 }
 
+function courseProgressNormalizeOverrides(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  const normalized = {};
+  Object.keys(raw).forEach((key) => {
+    const entry = raw[key];
+    if (!entry || typeof entry !== 'object') return;
+    const taught = courseProgressParseOverride(entry.taught);
+    const attended = courseProgressParseOverride(entry.attended);
+    if (taught === null && attended === null) return;
+    const next = {};
+    if (taught !== null) next.taught = taught;
+    if (attended !== null) next.attended = attended;
+    if (Object.keys(next).length) normalized[key] = next;
+  });
+  return normalized;
+}
+
+function courseProgressParseOverride(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : null;
+}
+
+function courseProgressApplyOverrides(rows, overrides) {
+  if (!overrides || !Object.keys(overrides).length) return rows;
+  const used = new Set();
+  const updated = rows.map((row) => {
+    const override = overrides[row.key];
+    if (!override) return row;
+    used.add(row.key);
+    const next = Object.assign({}, row);
+    if (Object.prototype.hasOwnProperty.call(override, 'taught')) {
+      next.taught = override.taught;
+    }
+    if (Object.prototype.hasOwnProperty.call(override, 'attended')) {
+      next.attended = override.attended;
+    }
+    return next;
+  });
+
+  Object.keys(overrides).forEach((key) => {
+    if (used.has(key)) return;
+    const override = overrides[key] || {};
+    updated.push({
+      key,
+      label: key,
+      taught: Object.prototype.hasOwnProperty.call(override, 'taught') ? override.taught : 0,
+      attended: Object.prototype.hasOwnProperty.call(override, 'attended') ? override.attended : 0,
+    });
+  });
+
+  return updated;
+}
+
 async function loadCourseProgress() {
   const tableBody = document.getElementById('courseProgressBody');
   if (!tableBody || !document.body.classList.contains('course-progress-page')) return;
@@ -1869,9 +1923,11 @@ async function loadCourseProgress() {
     ...baseTypes.map((type) => stats[type.key]),
     ...extraKeys.map((key) => extraStats[key]),
   ];
+  const overrides = courseProgressNormalizeOverrides(user?.progressOverrides || {});
+  const rowsWithOverrides = courseProgressApplyOverrides(rows, overrides);
   const displayRows = filters.category
-    ? rows.filter((row) => row.taught + row.attended > 0)
-    : rows;
+    ? rowsWithOverrides.filter((row) => row.taught + row.attended > 0)
+    : rowsWithOverrides;
 
   tableBody.innerHTML = '';
   if (!displayRows.length) {

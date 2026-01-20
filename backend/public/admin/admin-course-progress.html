@@ -250,11 +250,12 @@
                 <th>Всього</th>
                 <th>Проведено</th>
                 <th>Пройдено</th>
+                <th>Корекція</th>
               </tr>
             </thead>
             <tbody id="progressTableBody">
               <tr>
-                <td colspan="4">Оберіть користувача для перегляду.</td>
+                <td colspan="5">Оберіть користувача для перегляду.</td>
               </tr>
             </tbody>
           </table>
@@ -321,6 +322,30 @@
     </div>
   </div>
 
+  <div id="typeOverrideModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="modal-close" id="typeOverrideClose" aria-label="Закрити">&times;</span>
+      <h3>Корекція юнітів</h3>
+      <p>Тип активності: <strong id="typeOverrideName">—</strong></p>
+      <p>Розраховано: <strong id="typeOverrideComputed">—</strong></p>
+
+      <label class="unit-modal-field">
+        Проведено
+        <input type="number" id="overrideTaughtValue" min="0" step="0.25" placeholder="Напр. 12" />
+      </label>
+
+      <label class="unit-modal-field">
+        Пройдено
+        <input type="number" id="overrideAttendedValue" min="0" step="0.25" placeholder="Напр. 28" />
+      </label>
+
+      <div class="unit-modal-actions">
+        <button class="top-btn secondary" type="button" id="typeOverrideReset">Скинути корекцію</button>
+        <button class="top-btn" type="button" id="typeOverrideSave">Застосувати</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     window.API_BASE = window.API_BASE || "https://cabinet.mamko-prof-supervision.com";
   </script>
@@ -346,6 +371,8 @@
     let allCourses = [];
     let activeUserId = null;
     let activeCourseForEdit = null;
+    let activeTypeForOverride = null;
+    let lastProgressRows = { base: {}, display: {} };
 
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof renderAdminSidebar === "function") {
@@ -357,6 +384,7 @@
 
       bindFilters();
       bindUnitModalActions();
+      bindTypeOverrideModalActions();
       loadInitialData();
     });
 
@@ -658,6 +686,54 @@
       return null;
     }
 
+    function normalizeProgressOverrides(raw) {
+      if (!raw || typeof raw !== "object") return {};
+      const normalized = {};
+      Object.keys(raw).forEach((key) => {
+        const entry = raw[key];
+        if (!entry || typeof entry !== "object") return;
+        const taught = extractPositiveNumber(entry.taught);
+        const attended = extractPositiveNumber(entry.attended);
+        if (taught === null && attended === null) return;
+        const next = {};
+        if (taught !== null) next.taught = taught;
+        if (attended !== null) next.attended = attended;
+        if (Object.keys(next).length) normalized[key] = next;
+      });
+      return normalized;
+    }
+
+    function applyProgressOverrides(rows, overrides) {
+      if (!overrides || !Object.keys(overrides).length) return rows;
+      const used = new Set();
+      const updated = rows.map((row) => {
+        const override = overrides[row.key];
+        if (!override) return row;
+        used.add(row.key);
+        const next = Object.assign({}, row);
+        if (Object.prototype.hasOwnProperty.call(override, "taught")) {
+          next.taught = override.taught;
+        }
+        if (Object.prototype.hasOwnProperty.call(override, "attended")) {
+          next.attended = override.attended;
+        }
+        return next;
+      });
+
+      Object.keys(overrides).forEach((key) => {
+        if (used.has(key)) return;
+        const override = overrides[key] || {};
+        updated.push({
+          key,
+          label: key,
+          taught: Object.prototype.hasOwnProperty.call(override, "taught") ? override.taught : 0,
+          attended: Object.prototype.hasOwnProperty.call(override, "attended") ? override.attended : 0,
+        });
+      });
+
+      return updated;
+    }
+
     function openUnitEditModal(courseId) {
       const modal = document.getElementById("unitEditModal");
       if (!modal) return;
@@ -854,6 +930,157 @@
       }
     }
 
+    function openTypeOverrideModal(typeKey) {
+      const modal = document.getElementById("typeOverrideModal");
+      if (!modal) return;
+      if (!activeUserId) {
+        alert("Оберіть користувача.");
+        return;
+      }
+
+      const activeUser = allUsers.find((u) => normalizeId(u) === activeUserId);
+      const overrides = normalizeProgressOverrides(activeUser?.progressOverrides || {});
+      const override = overrides[typeKey] || {};
+      const baseRow = lastProgressRows.base[typeKey];
+
+      const nameEl = document.getElementById("typeOverrideName");
+      const computedEl = document.getElementById("typeOverrideComputed");
+      const taughtInput = document.getElementById("overrideTaughtValue");
+      const attendedInput = document.getElementById("overrideAttendedValue");
+
+      const label = baseRow?.label || typeKey || "—";
+      if (nameEl) nameEl.textContent = label;
+      if (computedEl) {
+        const taught = baseRow ? courseProgressFormatValue(baseRow.taught) : "0";
+        const attended = baseRow ? courseProgressFormatValue(baseRow.attended) : "0";
+        const total = baseRow ? courseProgressFormatValue(baseRow.taught + baseRow.attended) : "0";
+        computedEl.textContent = `Всього ${total}, Проведено ${taught}, Пройдено ${attended}`;
+      }
+
+      if (taughtInput) {
+        taughtInput.value =
+          Object.prototype.hasOwnProperty.call(override, "taught") ? override.taught : "";
+      }
+      if (attendedInput) {
+        attendedInput.value =
+          Object.prototype.hasOwnProperty.call(override, "attended") ? override.attended : "";
+      }
+
+      activeTypeForOverride = typeKey;
+      modal.style.display = "flex";
+    }
+
+    function closeTypeOverrideModal() {
+      const modal = document.getElementById("typeOverrideModal");
+      if (!modal) return;
+      modal.style.display = "none";
+      activeTypeForOverride = null;
+    }
+
+    async function saveTypeOverride() {
+      if (!activeTypeForOverride || !activeUserId) return;
+      const taughtInput = document.getElementById("overrideTaughtValue");
+      const attendedInput = document.getElementById("overrideAttendedValue");
+
+      const taughtValue = extractPositiveNumber(taughtInput?.value);
+      const attendedValue = extractPositiveNumber(attendedInput?.value);
+
+      if (taughtInput?.value !== "" && taughtValue === null) {
+        alert("Некоректне значення для 'Проведено'.");
+        return;
+      }
+      if (attendedInput?.value !== "" && attendedValue === null) {
+        alert("Некоректне значення для 'Пройдено'.");
+        return;
+      }
+
+      const activeUserIndex = allUsers.findIndex((u) => normalizeId(u) === activeUserId);
+      if (activeUserIndex < 0) return;
+
+      const overrides = normalizeProgressOverrides(allUsers[activeUserIndex]?.progressOverrides || {});
+      const next = {};
+      if (taughtInput && taughtInput.value !== "" && taughtValue !== null) next.taught = taughtValue;
+      if (attendedInput && attendedInput.value !== "" && attendedValue !== null) next.attended = attendedValue;
+
+      if (Object.keys(next).length) {
+        overrides[activeTypeForOverride] = next;
+      } else {
+        delete overrides[activeTypeForOverride];
+      }
+
+      try {
+        const fetcher = window.adminFetch
+          ? window.adminFetch
+          : (url, opts) => fetch(url, Object.assign({ credentials: "include" }, opts));
+        const res = await fetcher(`${API_BASE}/api/users/${activeUserId}`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ progressOverrides: overrides }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || `HTTP ${res.status}`);
+        }
+        const updatedUser = await res.json().catch(() => ({}));
+        allUsers[activeUserIndex].progressOverrides = updatedUser.progressOverrides || overrides;
+        renderProgress();
+        closeTypeOverrideModal();
+      } catch (err) {
+        console.error("Помилка корекції юнітів:", err);
+        alert(err.message || "Помилка корекції юнітів");
+      }
+    }
+
+    async function resetTypeOverride() {
+      if (!activeTypeForOverride || !activeUserId) return;
+      const activeUserIndex = allUsers.findIndex((u) => normalizeId(u) === activeUserId);
+      if (activeUserIndex < 0) return;
+      const overrides = normalizeProgressOverrides(allUsers[activeUserIndex]?.progressOverrides || {});
+      if (!overrides[activeTypeForOverride]) {
+        closeTypeOverrideModal();
+        return;
+      }
+      delete overrides[activeTypeForOverride];
+
+      try {
+        const fetcher = window.adminFetch
+          ? window.adminFetch
+          : (url, opts) => fetch(url, Object.assign({ credentials: "include" }, opts));
+        const res = await fetcher(`${API_BASE}/api/users/${activeUserId}`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ progressOverrides: overrides }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || `HTTP ${res.status}`);
+        }
+        const updatedUser = await res.json().catch(() => ({}));
+        allUsers[activeUserIndex].progressOverrides = updatedUser.progressOverrides || overrides;
+        renderProgress();
+        closeTypeOverrideModal();
+      } catch (err) {
+        console.error("Помилка скидання корекції:", err);
+        alert(err.message || "Помилка скидання корекції");
+      }
+    }
+
+    function bindTypeOverrideModalActions() {
+      const modal = document.getElementById("typeOverrideModal");
+      const closeBtn = document.getElementById("typeOverrideClose");
+      const saveBtn = document.getElementById("typeOverrideSave");
+      const resetBtn = document.getElementById("typeOverrideReset");
+
+      if (closeBtn) closeBtn.addEventListener("click", closeTypeOverrideModal);
+      if (saveBtn) saveBtn.addEventListener("click", saveTypeOverride);
+      if (resetBtn) resetBtn.addEventListener("click", resetTypeOverride);
+      if (modal) {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeTypeOverrideModal();
+        });
+      }
+    }
+
     function formatCoursePeriod(course) {
       const start = courseProgressFormatShortDate(courseProgressParseDate(course?.courseDates?.start));
       const end = courseProgressFormatShortDate(courseProgressParseDate(course?.courseDates?.end));
@@ -871,10 +1098,11 @@
       if (!tableBody || !courseBody) return;
 
       if (!user || !activeUserId) {
-        tableBody.innerHTML = '<tr><td colspan="4">Оберіть користувача для перегляду.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5">Оберіть користувача для перегляду.</td></tr>';
         courseBody.innerHTML = '<tr><td colspan="7">Оберіть користувача для перегляду.</td></tr>';
         if (courseEmpty) courseEmpty.style.display = "none";
         updateFilterSummary(null);
+        lastProgressRows = { base: {}, display: {} };
         updateTotals();
         return;
       }
@@ -951,13 +1179,26 @@
         ...baseTypes.map((type) => stats[type.key]),
         ...extraKeys.map((key) => extraStats[key]),
       ];
+      const overrides = normalizeProgressOverrides(user?.progressOverrides || {});
+      const rowsWithOverrides = applyProgressOverrides(rows, overrides);
       const displayRows = filters.category
-        ? rows.filter((row) => row.taught + row.attended > 0)
-        : rows;
+        ? rowsWithOverrides.filter((row) => row.taught + row.attended > 0)
+        : rowsWithOverrides;
+
+      lastProgressRows = {
+        base: rows.reduce((acc, row) => {
+          acc[row.key] = row;
+          return acc;
+        }, {}),
+        display: displayRows.reduce((acc, row) => {
+          acc[row.key] = row;
+          return acc;
+        }, {}),
+      };
 
       tableBody.innerHTML = "";
       if (!displayRows.length) {
-        tableBody.innerHTML = '<tr><td colspan="4">Немає даних.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5">Немає даних.</td></tr>';
       } else {
         displayRows.forEach((row) => {
           const total = row.taught + row.attended;
@@ -968,6 +1209,14 @@
             <td>${courseProgressFormatValue(row.taught)}</td>
             <td>${courseProgressFormatValue(row.attended)}</td>
           `;
+          const actionCell = document.createElement("td");
+          const editBtn = document.createElement("button");
+          editBtn.className = "more-btn progress-edit-btn";
+          editBtn.type = "button";
+          editBtn.textContent = "Коригувати";
+          editBtn.addEventListener("click", () => openTypeOverrideModal(row.key));
+          actionCell.appendChild(editBtn);
+          tr.appendChild(actionCell);
           tableBody.appendChild(tr);
         });
       }

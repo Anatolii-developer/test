@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema({
   roles: [{ type: String }],
   status: { type: String, default: "WAIT FOR REVIEW" },
   createdAt: { type: Date, default: Date.now },
+  progressOverrides: { type: mongoose.Schema.Types.Mixed, default: {} },
 forumBlocked: { type: Boolean, default: false },   // полный бан форума
 forumMutedUntil: { type: Date, default: null },    // мут (до даты); null = нет мута
 recoveryCode: { type: String, default: null },

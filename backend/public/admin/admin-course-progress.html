@@ -745,9 +745,33 @@
       return aId && bId && String(aId) === String(bId);
     }
 
+    function courseProgressNormalizeText(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function courseProgressUserMatches(candidate, user) {
+      if (!candidate || !user) return false;
+      if (courseProgressIdsMatch(candidate, user)) return true;
+      const candidateObj = typeof candidate === "object" ? candidate : null;
+      const userObj = typeof user === "object" ? user : null;
+      const candidateEmail = courseProgressNormalizeText(candidateObj?.email);
+      const userEmail = courseProgressNormalizeText(userObj?.email);
+      if (candidateEmail && userEmail && candidateEmail === userEmail) return true;
+      const candidateLabel = courseProgressNormalizeText(
+        typeof candidate === "string" ? candidate : getUserLabel(candidateObj)
+      );
+      const userLabel = courseProgressNormalizeText(getUserLabel(userObj || user));
+      return Boolean(candidateLabel && userLabel && candidateLabel === userLabel);
+    }
+
     function courseProgressGetUnitMember(unit, userId) {
       if (!unit || !Array.isArray(unit.members)) return null;
       return unit.members.find((m) => courseProgressIdsMatch(m.user, userId)) || null;
+    }
+
+    function courseProgressFindMember(unit, user) {
+      if (!unit || !Array.isArray(unit.members)) return null;
+      return unit.members.find((m) => courseProgressUserMatches(m?.user, user)) || null;
     }
 
     function courseProgressGetUnitMode(unit, userId) {
@@ -1474,11 +1498,12 @@
       const stats = {};
       const extraStats = {};
       baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
+      const user = resolveUser(userId);
 
       allCourses.forEach((course) => {
         if (!course) return;
         const isParticipant = Array.isArray(course.participants)
-          ? course.participants.some((p) => courseProgressIdsMatch(p, userId))
+          ? course.participants.some((p) => courseProgressUserMatches(p, user))
           : false;
         const courseStats = {};
         const ensureCourseBucket = (key, label) => {
@@ -1492,7 +1517,7 @@
         if (Array.isArray(course.units)) {
           course.units.forEach((unit) => {
             if (!unit || !unit.unitType) return;
-            const member = courseProgressGetUnitMember(unit, userId);
+            const member = courseProgressFindMember(unit, user);
             const occurrences = courseProgressGetUnitOccurrences(unit, course);
             if (!occurrences) return;
             const bucket = ensureCourseBucket(unit.unitType, unit.unitType);

@@ -271,6 +271,43 @@
           </table>
         </div>
       </div>
+
+      <div class="progress-card">
+        <h2 class="section-title">Усі курси користувача</h2>
+        <div class="filters-grid">
+          <label>
+            Пошук користувача
+            <input type="text" id="globalUserSearch" placeholder="Імʼя користувача" />
+          </label>
+          <label>
+            Користувач
+            <select id="globalUserSelect">
+              <option value="">Оберіть користувача</option>
+            </select>
+          </label>
+        </div>
+        <div class="progress-summary" id="globalUserSummary">
+          <span>Користувач: <strong id="globalUserName">—</strong></span>
+          <span>Email: <strong id="globalUserEmail">—</strong></span>
+        </div>
+        <div class="course-table">
+          <table class="requests-table" aria-label="User progress">
+            <thead>
+              <tr>
+                <th>Тип активності</th>
+                <th>Всього</th>
+                <th>Проведено</th>
+                <th>Пройдено</th>
+              </tr>
+            </thead>
+            <tbody id="globalUserProgressBody">
+              <tr>
+                <td colspan="4">Оберіть користувача для перегляду.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -357,11 +394,13 @@
     let activeCourse = null;
     let courseParticipants = [];
     let activeUserId = null;
+    let activeGlobalUserId = null;
     let activeCourseForEdit = null;
     let activeTypeForOverride = null;
     let activeOverrideScope = null;
     let lastCourseRows = { base: {}, display: {} };
     let lastUserRows = { base: {}, display: {} };
+    let lastGlobalRows = { base: {}, display: {} };
 
     document.addEventListener("DOMContentLoaded", () => {
       if (typeof renderAdminSidebar === "function") {
@@ -373,6 +412,7 @@
 
       bindCourseControls();
       bindParticipantControls();
+      bindGlobalUserControls();
       bindUnitModalActions();
       bindTypeOverrideModalActions();
       loadInitialData();
@@ -414,6 +454,21 @@
       });
     }
 
+    function bindGlobalUserControls() {
+      const search = document.getElementById("globalUserSearch");
+      const select = document.getElementById("globalUserSelect");
+      if (search) {
+        search.addEventListener("input", () => {
+          renderGlobalUserOptions(search.value || "");
+        });
+      }
+      if (!select) return;
+      select.addEventListener("change", () => {
+        activeGlobalUserId = select.value || null;
+        renderGlobalUserTable();
+      });
+    }
+
     async function loadInitialData() {
       setStatus("Завантаження курсів...");
       try {
@@ -432,6 +487,7 @@
         indexUsers(allUsers);
 
         renderCourseOptions("");
+        renderGlobalUserOptions("");
         setStatus("");
       } catch (err) {
         console.error("Помилка завантаження:", err);
@@ -551,6 +607,45 @@
       }
       renderParticipantOptions();
       updateParticipantSummary(null);
+    }
+
+    function renderGlobalUserOptions(query) {
+      const search = document.getElementById("globalUserSearch");
+      const select = document.getElementById("globalUserSelect");
+      if (!select) return;
+      const hasUsers = Boolean(allUsers.length);
+      select.disabled = !hasUsers;
+      if (search) search.disabled = !hasUsers;
+      select.innerHTML = '<option value="">Оберіть користувача</option>';
+      const q = String(query || "").trim().toLowerCase();
+      const filtered = allUsers
+        .slice()
+        .filter((user) => {
+          if (!q) return true;
+          const label = getUserLabel(user).toLowerCase();
+          const email = String(user?.email || "").toLowerCase();
+          return label.includes(q) || email.includes(q);
+        })
+        .sort((a, b) => getUserLabel(a).localeCompare(getUserLabel(b), "uk"));
+
+      filtered.forEach((user) => {
+        const id = normalizeId(user);
+        if (!id) return;
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = getUserLabel(user) || id;
+        select.appendChild(option);
+      });
+
+      if (activeGlobalUserId && filtered.some((u) => normalizeId(u) === activeGlobalUserId)) {
+        select.value = activeGlobalUserId;
+      } else {
+        activeGlobalUserId = "";
+      }
+
+      updateGlobalUserSummary(
+        allUsers.find((u) => normalizeId(u) === activeGlobalUserId) || null
+      );
     }
 
     function renderCourseSummary() {
@@ -1375,6 +1470,78 @@
       return buildRows(stats, extraStats);
     }
 
+    function computeGlobalUserBaseRows(userId) {
+      const stats = {};
+      const extraStats = {};
+      baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
+
+      allCourses.forEach((course) => {
+        if (!course) return;
+        const courseStats = {};
+        const ensureCourseBucket = (key, label) => {
+          if (!courseStats[key]) {
+            courseStats[key] = { key, label, taught: 0, attended: 0 };
+          }
+          return courseStats[key];
+        };
+        let hasParticipation = false;
+
+        if (Array.isArray(course.units)) {
+          course.units.forEach((unit) => {
+            if (!unit || !unit.unitType) return;
+            const member = courseProgressGetUnitMember(unit, userId);
+            if (!member) return;
+            hasParticipation = true;
+            const occurrences = courseProgressGetUnitOccurrences(unit, course);
+            if (!occurrences) return;
+            const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
+            const bucket = ensureCourseBucket(unit.unitType, unit.unitType);
+            if (member.mode === "проводив") {
+              bucket.taught += amount;
+            } else {
+              bucket.attended += amount;
+            }
+          });
+        }
+
+        if (course.mainType === "Конференція") {
+          const isCreator = courseProgressIdsMatch(course.creatorId, userId);
+          const isParticipant = Array.isArray(course.participants)
+            ? course.participants.some((p) => courseProgressIdsMatch(p, userId))
+            : false;
+          if (isCreator || isParticipant) {
+            hasParticipation = true;
+            const bucket = ensureCourseBucket("Конференція", "Конференція");
+            if (isCreator) bucket.taught += 1;
+            if (isParticipant) bucket.attended += 1;
+          }
+        }
+
+        if (!hasParticipation) return;
+
+        const courseRows = Object.values(courseStats);
+        const courseOverrides = normalizeProgressOverrides(course?.progressOverrides || {});
+        const userOverrides = normalizeProgressOverrides(
+          course?.progressUserOverrides?.[userId] || {}
+        );
+        const mergedOverrides = mergeOverrides(courseOverrides, userOverrides);
+        const adjustedRows = applyProgressOverrides(courseRows, mergedOverrides);
+
+        adjustedRows.forEach((row) => {
+          const bucket =
+            stats[row.key] || courseProgressEnsureBucket(extraStats, row.key, row.label);
+          bucket.taught += row.taught;
+          bucket.attended += row.attended;
+        });
+      });
+
+      const baseRows = buildRows(stats, extraStats);
+      const globalOverrides = normalizeProgressOverrides(
+        resolveUser(userId)?.progressOverrides || {}
+      );
+      return applyProgressOverrides(baseRows, globalOverrides);
+    }
+
     function mergeOverrides(baseOverrides, userOverrides) {
       const result = Object.assign({}, baseOverrides || {});
       Object.keys(userOverrides || {}).forEach((key) => {
@@ -1487,9 +1654,62 @@
       );
     }
 
+    function renderGlobalUserTable() {
+      const body = document.getElementById("globalUserProgressBody");
+      if (!body) return;
+      if (!activeGlobalUserId) {
+        body.innerHTML = '<tr><td colspan="4">Оберіть користувача для перегляду.</td></tr>';
+        lastGlobalRows = { base: {}, display: {} };
+        updateGlobalUserSummary(null);
+        return;
+      }
+
+      const baseRows = computeGlobalUserBaseRows(activeGlobalUserId);
+      const displayRows = baseRows.filter((row) => row.taught + row.attended > 0);
+
+      lastGlobalRows = {
+        base: rowsToMap(baseRows),
+        display: rowsToMap(displayRows),
+      };
+
+      body.innerHTML = "";
+      if (!displayRows.length) {
+        body.innerHTML = '<tr><td colspan="4">Немає даних.</td></tr>';
+        return;
+      }
+      displayRows.forEach((row) => {
+        const total = row.taught + row.attended;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.label}</td>
+          <td>${courseProgressFormatValue(total)}</td>
+          <td>${courseProgressFormatValue(row.taught)}</td>
+          <td>${courseProgressFormatValue(row.attended)}</td>
+        `;
+        body.appendChild(tr);
+      });
+
+      updateGlobalUserSummary(
+        allUsers.find((u) => normalizeId(u) === activeGlobalUserId) || null
+      );
+    }
+
     function updateParticipantSummary(user) {
       const nameEl = document.getElementById("participantName");
       const emailEl = document.getElementById("participantEmail");
+      if (!nameEl || !emailEl) return;
+      if (!user) {
+        nameEl.textContent = "—";
+        emailEl.textContent = "—";
+        return;
+      }
+      nameEl.textContent = getUserLabel(user) || "—";
+      emailEl.textContent = user.email || "—";
+    }
+
+    function updateGlobalUserSummary(user) {
+      const nameEl = document.getElementById("globalUserName");
+      const emailEl = document.getElementById("globalUserEmail");
       if (!nameEl || !emailEl) return;
       if (!user) {
         nameEl.textContent = "—";

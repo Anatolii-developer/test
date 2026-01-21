@@ -1477,6 +1477,9 @@
 
       allCourses.forEach((course) => {
         if (!course) return;
+        const isParticipant = Array.isArray(course.participants)
+          ? course.participants.some((p) => courseProgressIdsMatch(p, userId))
+          : false;
         const courseStats = {};
         const ensureCourseBucket = (key, label) => {
           if (!courseStats[key]) {
@@ -1490,15 +1493,24 @@
           course.units.forEach((unit) => {
             if (!unit || !unit.unitType) return;
             const member = courseProgressGetUnitMember(unit, userId);
-            if (!member) return;
-            hasParticipation = true;
             const occurrences = courseProgressGetUnitOccurrences(unit, course);
             if (!occurrences) return;
-            const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
             const bucket = ensureCourseBucket(unit.unitType, unit.unitType);
-            if (member.mode === "проводив") {
-              bucket.taught += amount;
-            } else {
+            if (member) {
+              hasParticipation = true;
+              const amount = courseProgressGetUnitAmount(unit, member) * occurrences;
+              if (member.mode === "проводив") {
+                bucket.taught += amount;
+              } else {
+                bucket.attended += amount;
+              }
+              return;
+            }
+
+            const hasMembers = Array.isArray(unit.members) && unit.members.length > 0;
+            if (!hasMembers && isParticipant) {
+              hasParticipation = true;
+              const amount = occurrences;
               bucket.attended += amount;
             }
           });
@@ -1506,9 +1518,6 @@
 
         if (course.mainType === "Конференція") {
           const isCreator = courseProgressIdsMatch(course.creatorId, userId);
-          const isParticipant = Array.isArray(course.participants)
-            ? course.participants.some((p) => courseProgressIdsMatch(p, userId))
-            : false;
           if (isCreator || isParticipant) {
             hasParticipation = true;
             const bucket = ensureCourseBucket("Конференція", "Конференція");

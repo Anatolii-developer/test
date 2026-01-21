@@ -1507,8 +1507,7 @@
               return;
             }
 
-            const hasMembers = Array.isArray(unit.members) && unit.members.length > 0;
-            if (!hasMembers && isParticipant) {
+            if (isParticipant) {
               hasParticipation = true;
               const amount = occurrences;
               bucket.attended += amount;

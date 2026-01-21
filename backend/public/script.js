@@ -1652,6 +1652,22 @@ function courseProgressGetDateOnly(value) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 }
 
+function courseProgressGetWeekdayIndex(value) {
+  if (!value) return null;
+  const key = String(value).trim().toLowerCase().replace(/’/g, "'");
+  const map = {
+    "понеділок": 1,
+    "вівторок": 2,
+    "середа": 3,
+    "четвер": 4,
+    "п'ятниця": 5,
+    "пятниця": 5,
+    "субота": 6,
+    "неділя": 0,
+  };
+  return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : null;
+}
+
 function courseProgressGetCourseWeeks(course) {
   const startDate = courseProgressGetDateOnly(course?.courseDates?.start);
   const endDate = courseProgressGetDateOnly(course?.courseDates?.end);
@@ -1673,6 +1689,17 @@ function courseProgressGetUnitOccurrences(unit, course) {
     if (startDate && unitDate < startDate) return 0;
     if (endDate && unitDate > endDate) return 0;
     return 1;
+  }
+
+  const weekdayIndex = courseProgressGetWeekdayIndex(unit.dayName || unit.day);
+  if (startDate && endDate && weekdayIndex !== null) {
+    const startDay = startDate.getUTCDay();
+    const offset = (weekdayIndex - startDay + 7) % 7;
+    const first = new Date(startDate.getTime());
+    first.setUTCDate(first.getUTCDate() + offset);
+    if (first > endDate) return 0;
+    const diffDays = Math.floor((endDate - first) / 86400000);
+    return Math.floor(diffDays / 7) + 1;
   }
 
   const weeks = courseProgressGetCourseWeeks(course);

@@ -238,6 +238,10 @@
         <h2 class="section-title">Учасник курсу</h2>
         <div class="filters-grid">
           <label>
+            Пошук учасника
+            <input type="text" id="participantSearch" placeholder="Імʼя або email" />
+          </label>
+          <label>
             Учасник
             <select id="participantSelect">
               <option value="">Оберіть учасника</option>
@@ -394,7 +398,13 @@
     }
 
     function bindParticipantControls() {
+      const search = document.getElementById("participantSearch");
       const select = document.getElementById("participantSelect");
+      if (search) {
+        search.addEventListener("input", () => {
+          renderParticipantOptions(search.value || "");
+        });
+      }
       if (!select) return;
       select.addEventListener("change", () => {
         activeUserId = select.value || null;
@@ -525,6 +535,11 @@
       if (participantBody) {
         participantBody.innerHTML = '<tr><td colspan="5">Оберіть учасника для перегляду.</td></tr>';
       }
+      const search = document.getElementById("participantSearch");
+      if (search) {
+        search.value = "";
+        search.disabled = true;
+      }
       renderParticipantOptions();
       updateParticipantSummary(null);
     }
@@ -536,14 +551,26 @@
       if (datesEl) datesEl.textContent = formatCoursePeriod(activeCourse);
     }
 
-    function renderParticipantOptions() {
+    function renderParticipantOptions(query) {
+      const search = document.getElementById("participantSearch");
       const select = document.getElementById("participantSelect");
       if (!select) return;
-      select.disabled = !courseParticipants.length;
+      const hasParticipants = Boolean(courseParticipants.length);
+      select.disabled = !hasParticipants;
+      if (search) search.disabled = !hasParticipants;
       select.innerHTML = '<option value="">Оберіть учасника</option>';
-      courseParticipants
+      const q = String(query || "").trim().toLowerCase();
+      const filtered = courseParticipants
         .slice()
-        .sort((a, b) => getUserLabel(a).localeCompare(getUserLabel(b), "uk"))
+        .filter((user) => {
+          if (!q) return true;
+          const label = getUserLabel(user).toLowerCase();
+          const email = String(user?.email || "").toLowerCase();
+          return label.includes(q) || email.includes(q);
+        })
+        .sort((a, b) => getUserLabel(a).localeCompare(getUserLabel(b), "uk"));
+
+      filtered
         .forEach((user) => {
         const id = normalizeId(user);
         if (!id) return;
@@ -552,7 +579,7 @@
         option.textContent = getUserLabel(user) || id;
         select.appendChild(option);
       });
-      if (activeUserId && courseParticipants.some((u) => normalizeId(u) === activeUserId)) {
+      if (activeUserId && filtered.some((u) => normalizeId(u) === activeUserId)) {
         select.value = activeUserId;
       } else {
         activeUserId = "";

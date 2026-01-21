@@ -351,6 +351,8 @@
     ];
 
     let allCourses = [];
+    let allUsers = [];
+    let usersById = new Map();
     let activeCourseId = null;
     let activeCourse = null;
     let courseParticipants = [];
@@ -421,6 +423,13 @@
 
         const coursesRes = await fetcher(`${API_BASE}/api/courses`);
         allCourses = coursesRes.ok ? await coursesRes.json() : [];
+        let usersRes = await fetcher(`${API_BASE}/api/users/approved`);
+        if (!usersRes.ok) {
+          usersRes = await fetcher(`${API_BASE}/api/users`);
+        }
+        const usersData = usersRes.ok ? await usersRes.json() : [];
+        allUsers = Array.isArray(usersData) ? usersData : [];
+        indexUsers(allUsers);
 
         renderCourseOptions("");
         setStatus("");
@@ -488,7 +497,7 @@
         if (Array.isArray(activeCourse.participants)) {
           activeCourse.participants.forEach((user) => {
             const id = normalizeId(user);
-            if (id) participantsMap.set(id, user);
+            if (id) participantsMap.set(id, resolveUser(user));
           });
         }
         if (Array.isArray(activeCourse.units)) {
@@ -497,7 +506,7 @@
             unit.members.forEach((member) => {
               const id = courseProgressNormalizeId(member?.user);
               if (id && !participantsMap.has(id)) {
-                participantsMap.set(id, id);
+                participantsMap.set(id, resolveUser(member?.user));
               }
             });
           });
@@ -601,6 +610,20 @@
       if (typeof value === "string") return value;
       if (typeof value === "object") return value._id || value.id || "";
       return "";
+    }
+
+    function indexUsers(users) {
+      usersById = new Map();
+      users.forEach((user) => {
+        const id = normalizeId(user);
+        if (id) usersById.set(String(id), user);
+      });
+    }
+
+    function resolveUser(value) {
+      const id = normalizeId(value);
+      if (!id) return value;
+      return usersById.get(String(id)) || value;
     }
 
     function getAuthHeaders() {

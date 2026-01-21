@@ -1637,11 +1637,6 @@ function courseProgressGetUnitAmount(unit, member) {
     const memberAmount = Number(memberRaw);
     if (Number.isFinite(memberAmount)) return memberAmount;
   }
-  const hoursRaw = unit?.hours;
-  if (hoursRaw !== null && hoursRaw !== undefined && hoursRaw !== '') {
-    const hoursAmount = Number(hoursRaw);
-    if (Number.isFinite(hoursAmount)) return hoursAmount;
-  }
   return 1;
 }
 

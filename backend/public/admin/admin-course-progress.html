@@ -624,6 +624,15 @@
       return 1;
     }
 
+    function courseProgressGetUnitBaseAmount(unit) {
+      const hoursRaw = unit?.hours;
+      if (hoursRaw !== null && hoursRaw !== undefined && hoursRaw !== "") {
+        const hoursAmount = Number(hoursRaw);
+        if (Number.isFinite(hoursAmount)) return hoursAmount;
+      }
+      return 1;
+    }
+
     function courseProgressGetDateOnly(value) {
       if (!value) return null;
       const date = value instanceof Date ? value : new Date(value);
@@ -1223,12 +1232,27 @@
           if (!unit || !unit.unitType) return;
           const occurrences = courseProgressGetUnitOccurrences(unit, course);
           if (!occurrences) return;
-          const amount = courseProgressGetUnitAmount(unit, null) * occurrences;
           const bucket =
             stats[unit.unitType] ||
             courseProgressEnsureBucket(extraStats, unit.unitType, unit.unitType);
-          bucket.taught += amount;
-          bucket.attended += amount;
+
+          const amount = courseProgressGetUnitBaseAmount(unit) * occurrences;
+          const members = Array.isArray(unit.members) ? unit.members : [];
+          let hasTeacher = false;
+          let hasAttendee = false;
+
+          members.forEach((member) => {
+            if (!member || !member.mode) return;
+            if (member.mode === "проводив") {
+              hasTeacher = true;
+            } else {
+              hasAttendee = true;
+            }
+          });
+
+          if (!members.length) hasAttendee = true;
+          if (hasTeacher) bucket.taught += amount;
+          if (hasAttendee) bucket.attended += amount;
         });
       }
 
@@ -1236,8 +1260,9 @@
         const bucket =
           stats["Конференція"] ||
           courseProgressEnsureBucket(extraStats, "Конференція", "Конференція");
-        bucket.taught += 1;
-        bucket.attended += 1;
+        if (course.creatorId) bucket.taught += 1;
+        const participantsCount = Array.isArray(course.participants) ? course.participants.length : 0;
+        if (participantsCount) bucket.attended += participantsCount;
       }
 
       return buildRows(stats, extraStats);

@@ -1543,11 +1543,7 @@
         });
       });
 
-      const baseRows = buildRows(stats, extraStats);
-      const globalOverrides = normalizeProgressOverrides(
-        resolveUser(userId)?.progressOverrides || {}
-      );
-      return applyProgressOverrides(baseRows, globalOverrides);
+      return buildRows(stats, extraStats);
     }
 
     function mergeOverrides(baseOverrides, userOverrides) {

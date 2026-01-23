@@ -2188,7 +2188,7 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       position: relative;
       min-width: 210px;
       padding-bottom: 10px;
-      height: 60px;
+      height: 100px;
       display: flex;
       align-items: flex-end;
       justify-content: flex-end;

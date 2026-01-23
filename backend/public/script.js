@@ -2187,11 +2187,11 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     .extract-signature {
       position: relative;
       min-width: 210px;
-      padding-bottom: 10px;
-      height: 100px;
+      padding-bottom: 14px;
+      height: 150px;
       display: flex;
       align-items: flex-end;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
     .extract-signature-line {
       position: absolute;
@@ -2205,6 +2205,8 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       max-height: 46px;
       object-fit: contain;
       display: block;
+      transform: scale(3);
+      transform-origin: left bottom;
     }
     .extract-sign-name {
       text-align: right;

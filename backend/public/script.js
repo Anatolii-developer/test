@@ -1646,6 +1646,7 @@ function courseProgressCollectIdentityTokens(value) {
   courseProgressAddIdentityToken(tokens, value._id);
   courseProgressAddIdentityToken(tokens, value.id);
   courseProgressAddIdentityToken(tokens, value.email);
+  courseProgressAddIdentityToken(tokens, value.phone);
   courseProgressAddIdentityToken(tokens, value.username);
   courseProgressAddIdentityToken(tokens, value.fullName);
   courseProgressAddIdentityToken(tokens, value.name);
@@ -1679,9 +1680,18 @@ function courseProgressUserMatchesValue(value, user) {
 function courseProgressGetUnitMember(unit, user) {
   if (!unit || !Array.isArray(unit.members)) return null;
   const directMatch =
-    unit.members.find((m) => courseProgressIdsMatch(m.user, user)) || null;
+    unit.members.find((m) => courseProgressIdsMatch(m?.user, user)) || null;
   if (directMatch) return directMatch;
-  return unit.members.find((m) => courseProgressUserMatchesValue(m?.user, user)) || null;
+  const relaxedMatch = unit.members.find((m) => {
+    if (!m) return false;
+    return (
+      courseProgressUserMatchesValue(m?.user, user) ||
+      courseProgressUserMatchesValue(m?.userId, user) ||
+      courseProgressUserMatchesValue(m?.member, user) ||
+      courseProgressUserMatchesValue(m, user)
+    );
+  });
+  return relaxedMatch || null;
 }
 
 function courseProgressGetUnitMode(unit, user) {

@@ -1621,13 +1621,71 @@ function courseProgressIdsMatch(a, b) {
   return aId && bId && String(aId) === String(bId);
 }
 
-function courseProgressGetUnitMember(unit, userId) {
-  if (!unit || !Array.isArray(unit.members)) return null;
-  return unit.members.find((m) => courseProgressIdsMatch(m.user, userId)) || null;
+function courseProgressNormalizeIdentity(value) {
+  if (!value) return null;
+  const text = String(value).trim().toLowerCase().replace(/\s+/g, ' ');
+  return text || null;
 }
 
-function courseProgressGetUnitMode(unit, userId) {
-  const member = courseProgressGetUnitMember(unit, userId);
+function courseProgressAddIdentityToken(set, value) {
+  const token = courseProgressNormalizeIdentity(value);
+  if (token) set.add(token);
+}
+
+function courseProgressCollectIdentityTokens(value) {
+  const tokens = new Set();
+  if (!value) return tokens;
+
+  if (typeof value === 'string') {
+    courseProgressAddIdentityToken(tokens, value);
+    return tokens;
+  }
+
+  if (typeof value !== 'object') return tokens;
+
+  courseProgressAddIdentityToken(tokens, value._id);
+  courseProgressAddIdentityToken(tokens, value.id);
+  courseProgressAddIdentityToken(tokens, value.email);
+  courseProgressAddIdentityToken(tokens, value.username);
+  courseProgressAddIdentityToken(tokens, value.fullName);
+  courseProgressAddIdentityToken(tokens, value.name);
+
+  if (value.user) {
+    courseProgressCollectIdentityTokens(value.user).forEach((token) => tokens.add(token));
+  }
+
+  const firstName = value.firstName || '';
+  const lastName = value.lastName || '';
+  const middleName = value.middleName || '';
+  const nameParts = [lastName, firstName, middleName].filter(Boolean).join(' ');
+  const nameAlt = [firstName, lastName, middleName].filter(Boolean).join(' ');
+  if (nameParts) courseProgressAddIdentityToken(tokens, nameParts);
+  if (nameAlt) courseProgressAddIdentityToken(tokens, nameAlt);
+
+  return tokens;
+}
+
+function courseProgressUserMatchesValue(value, user) {
+  if (courseProgressIdsMatch(value, user)) return true;
+  const userTokens = courseProgressCollectIdentityTokens(user);
+  if (!userTokens.size) return false;
+  const valueTokens = courseProgressCollectIdentityTokens(value);
+  for (const token of valueTokens) {
+    if (userTokens.has(token)) return true;
+  }
+  return false;
+}
+
+function courseProgressGetUnitMember(unit, user) {
+  if (!unit || !Array.isArray(unit.members)) return null;
+  const directMatch =
+    unit.members.find((m) => courseProgressIdsMatch(m.user, user)) || null;
+  if (directMatch) return directMatch;
+  return unit.members.find((m) => courseProgressUserMatchesValue(m?.user, user)) || null;
+}
+
+function courseProgressGetUnitMode(unit, user) {
+  const member = courseProgressGetUnitMember(unit, user);
   return member ? member.mode : null;
 }
 
@@ -1934,7 +1992,7 @@ async function loadCourseProgress() {
       course.units.forEach((unit) => {
         if (!unit || !unit.unitType) return;
         if (filters?.units?.length && !filters.units.includes(unit.unitType)) return;
-        const member = courseProgressGetUnitMember(unit, user._id);
+        const member = courseProgressGetUnitMember(unit, user);
         if (!member) return;
         hasParticipation = true;
         const occurrences = courseProgressGetUnitOccurrences(unit, course);
@@ -1951,9 +2009,9 @@ async function loadCourseProgress() {
     }
 
     if (course.mainType === 'Конференція' && !(filters?.units?.length)) {
-      const isCreator = courseProgressIdsMatch(course.creatorId, user._id);
+      const isCreator = courseProgressUserMatchesValue(course.creatorId, user);
       const isParticipant = Array.isArray(course.participants)
-        ? course.participants.some((p) => courseProgressIdsMatch(p, user._id))
+        ? course.participants.some((p) => courseProgressUserMatchesValue(p, user))
         : false;
       if (isCreator || isParticipant) {
         hasParticipation = true;

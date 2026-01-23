@@ -2051,30 +2051,30 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
   <style>
     :root {
       --accent: #e77718;
-      --text: #1f1f1f;
-      --muted: #5b5b5b;
+      --text: #1c1c1c;
+      --muted: #4d4d4d;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: "Poppins", "Segoe UI", Arial, sans-serif;
-      background: #f0f0f0;
+      background: #f3f3f3;
       color: var(--text);
     }
     .extract-page {
       width: 210mm;
       min-height: 297mm;
-      margin: 20px auto;
+      margin: 24px auto;
       background: #fff;
-      padding: 20mm 18mm 28mm;
+      padding: 18mm 20mm 26mm;
       position: relative;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
     }
     .extract-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
+      align-items: center;
+      gap: 20px;
     }
     .extract-brand {
       display: flex;
@@ -2083,58 +2083,59 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       flex: 1;
     }
     .extract-logo-box {
-      width: 76px;
-      height: 76px;
+      width: 82px;
+      height: 82px;
       background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: 3px;
     }
     .extract-logo-box img {
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       filter: brightness(0) invert(1);
     }
     .extract-brand-text {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       color: var(--accent);
       font-weight: 600;
-      line-height: 1.2;
+      line-height: 1.25;
+      letter-spacing: 0.06em;
     }
     .extract-contact {
       text-align: right;
       font-size: 12px;
-      color: #444;
-      line-height: 1.4;
-      min-width: 220px;
+      color: #1b1b1b;
+      line-height: 1.5;
+      min-width: 260px;
     }
     .extract-contact .ua {
       color: var(--accent);
       font-weight: 600;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: block;
     }
     .extract-title {
       text-align: center;
-      margin: 26px 0 12px;
-      font-size: 24px;
-      letter-spacing: 0.08em;
+      margin: 26px 0 8px;
+      font-size: 22px;
+      letter-spacing: 0.12em;
     }
     .extract-lead {
       text-align: center;
-      color: var(--muted);
+      color: #2d2d2d;
       font-size: 14px;
     }
     .extract-name {
       text-align: center;
-      font-size: 20px;
+      font-size: 19px;
       color: var(--accent);
       font-style: italic;
       font-weight: 600;
-      margin: 10px 0 18px;
+      margin: 10px 0 16px;
     }
     .extract-text {
       font-size: 14px;
@@ -2143,6 +2144,69 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     }
     .extract-text.indent {
       text-indent: 26px;
+    }
+    .extract-date {
+      margin-top: 14px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .extract-sign {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 24px;
+      gap: 24px;
+    }
+    .extract-sign-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 210px;
+    }
+    .extract-role {
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .extract-stamp {
+      width: 110px;
+      height: 110px;
+    }
+    .extract-stamp svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .extract-sign-right {
+      display: flex;
+      align-items: flex-end;
+      gap: 18px;
+      flex: 1;
+      justify-content: flex-end;
+    }
+    .extract-signature {
+      position: relative;
+      min-width: 210px;
+      padding-bottom: 6px;
+    }
+    .extract-signature-line {
+      width: 100%;
+      border-top: 1px solid #222;
+    }
+    .extract-signature-script {
+      position: absolute;
+      right: 12px;
+      top: -22px;
+      font-size: 26px;
+      font-weight: 500;
+      color: #1b1b1b;
+      font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+      transform: rotate(-6deg);
+    }
+    .extract-sign-name {
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
     }
     .extract-footer {
       position: absolute;
@@ -2158,17 +2222,17 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       font-size: 11px;
       letter-spacing: 0.02em;
     }
-    .extract-sign {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-top: 34px;
-      font-size: 13px;
+    .extract-footer-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
     }
-    .extract-signature-line {
-      width: 200px;
-      border-top: 1px solid #222;
-      margin-left: auto;
+    .extract-footer-item svg {
+      width: 14px;
+      height: 14px;
+      fill: #fff;
+      display: block;
     }
     @media print {
       body { background: #fff; }
@@ -2225,14 +2289,47 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     </p>
 
     <div class="extract-sign">
-      <div>${safeDate}</div>
-      <div class="extract-signature-line"></div>
+      <div class="extract-sign-left">
+        <div class="extract-role">Директор IPS,</div>
+        <div class="extract-stamp" aria-hidden="true">
+          <svg viewBox="0 0 120 120" role="img" aria-label="Печатка IPS">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#4f72ff" stroke-width="3" />
+            <circle cx="60" cy="60" r="38" fill="none" stroke="#4f72ff" stroke-width="1.5" stroke-dasharray="3 4" />
+            <text x="60" y="52" text-anchor="middle" fill="#4f72ff" font-size="10" font-weight="600">ІПС</text>
+            <text x="60" y="68" text-anchor="middle" fill="#4f72ff" font-size="6">Київ</text>
+          </svg>
+        </div>
+      </div>
+      <div class="extract-sign-right">
+        <div class="extract-signature">
+          <div class="extract-signature-line"></div>
+          <div class="extract-signature-script">V. Mamko</div>
+        </div>
+        <div class="extract-sign-name">д-р Мамко<br />Володимир Петрович</div>
+      </div>
     </div>
 
+    <div class="extract-date">${safeDate}</div>
+
     <div class="extract-footer">
-      <span>+380502103231</span>
-      <span>mamko.vp@gmail.com</span>
-      <span>IPS, Київ, Україна</span>
+      <span class="extract-footer-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.6 10.2c1.2 2.3 3.2 4.3 5.5 5.5l1.8-1.8c.3-.3.8-.4 1.2-.2 1 .4 2.1.6 3.2.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C9.4 21 3 14.6 3 6c0-.6.4-1 1-1h3.7c.6 0 1 .4 1 1 0 1.1.2 2.2.6 3.2.1.4 0 .9-.2 1.2l-1.5 1.8z" />
+        </svg>
+        +380502103231
+      </span>
+      <span class="extract-footer-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6.5C3 5.7 3.7 5 4.5 5h15c.8 0 1.5.7 1.5 1.5v11c0 .8-.7 1.5-1.5 1.5h-15C3.7 19 3 18.3 3 17.5v-11zm1.8.7 7.2 4.6 7.2-4.6H4.8zm14.4 9.6V9l-6.7 4.3c-.3.2-.7.2-1 0L4.8 9v7.8h14.4z" />
+        </svg>
+        mamko.vp@gmail.com
+      </span>
+      <span class="extract-footer-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2c3.9 0 7 3.1 7 7 0 4.5-5.5 11-7 13-1.5-2-7-8.5-7-13 0-3.9 3.1-7 7-7zm0 9.3c1.3 0 2.3-1 2.3-2.3S13.3 6.7 12 6.7 9.7 7.7 9.7 9s1 2.3 2.3 2.3z" />
+        </svg>
+        IPS, Київ, Україна
+      </span>
     </div>
   </div>
   <script>

@@ -1724,10 +1724,15 @@ function courseProgressGetActiveFilters() {
   const from = courseProgressParseDate(params.get('from'));
   const to = courseProgressParseDate(params.get('to'));
   const category = params.get('category');
+  const units = params
+    .getAll('unit')
+    .map((value) => value.trim())
+    .filter((value) => value && value !== 'Все');
   return {
     from,
     to,
     category: category && category.trim() ? category.trim() : null,
+    units: units.length ? units : null,
   };
 }
 
@@ -1747,6 +1752,13 @@ function courseProgressCourseMatchesFilters(course, filters) {
       endLimit.setHours(23, 59, 59, 999);
       if (dateValue > endLimit) return false;
     }
+  }
+
+  if (filters.units && filters.units.length) {
+    if (!Array.isArray(course?.units)) return false;
+    const unitSet = new Set(filters.units);
+    const hasUnit = course.units.some((unit) => unit && unitSet.has(unit.unitType));
+    if (!hasUnit) return false;
   }
 
   return true;
@@ -1773,6 +1785,10 @@ function courseProgressUpdateFilterSummary(filters) {
       periodText = `до ${toLabel}`;
     }
     if (periodText) items.push(`Період: ${periodText}`);
+  }
+
+  if (filters?.units?.length) {
+    items.push(`Юніти: ${filters.units.join(', ')}`);
   }
 
   if (!items.length) {
@@ -1917,6 +1933,7 @@ async function loadCourseProgress() {
     if (Array.isArray(course.units)) {
       course.units.forEach((unit) => {
         if (!unit || !unit.unitType) return;
+        if (filters?.units?.length && !filters.units.includes(unit.unitType)) return;
         const member = courseProgressGetUnitMember(unit, user._id);
         if (!member) return;
         hasParticipation = true;
@@ -1933,7 +1950,7 @@ async function loadCourseProgress() {
       });
     }
 
-    if (course.mainType === 'Конференція') {
+    if (course.mainType === 'Конференція' && !(filters?.units?.length)) {
       const isCreator = courseProgressIdsMatch(course.creatorId, user._id);
       const isParticipant = Array.isArray(course.participants)
         ? course.participants.some((p) => courseProgressIdsMatch(p, user._id))
@@ -1974,9 +1991,13 @@ async function loadCourseProgress() {
   ];
   const overrides = courseProgressNormalizeOverrides(user?.progressOverrides || {});
   const rowsWithOverrides = courseProgressApplyOverrides(rows, overrides);
-  const displayRows = filters.category
-    ? rowsWithOverrides.filter((row) => row.taught + row.attended > 0)
-    : rowsWithOverrides;
+  let displayRows = rowsWithOverrides;
+  if (filters?.units?.length) {
+    const unitSet = new Set(filters.units);
+    displayRows = rowsWithOverrides.filter((row) => unitSet.has(row.key));
+  } else if (filters?.category) {
+    displayRows = rowsWithOverrides.filter((row) => row.taught + row.attended > 0);
+  }
 
   tableBody.innerHTML = '';
   if (!displayRows.length) {
@@ -2385,11 +2406,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const from = document.querySelector('input[name="from"]')?.value || '';
       const to = document.querySelector('input[name="to"]')?.value || '';
       const category = document.querySelector('input[name="courseCategory"]:checked')?.value || '';
+      const unitInputs = Array.from(
+        document.querySelectorAll('input[name="courseUnit"]:checked')
+      );
+      const units = unitInputs
+        .map((input) => (input?.value || '').trim())
+        .filter(Boolean);
+      const hasAllUnits = units.includes('Все');
 
       const params = new URLSearchParams();
       if (from) params.set('from', from);
       if (to) params.set('to', to);
       if (category) params.set('category', category);
+      if (!hasAllUnits) {
+        units.forEach((unit) => params.append('unit', unit));
+      }
 
       const target = `course-progress.html${params.toString() ? `?${params.toString()}` : ''}`;
       window.location.href = target;

@@ -1910,10 +1910,10 @@ function courseProgressApplyOverrides(rows, overrides) {
     used.add(row.key);
     const next = Object.assign({}, row);
     if (Object.prototype.hasOwnProperty.call(override, 'taught')) {
-      next.taught = override.taught;
+      next.taught = Math.max(next.taught || 0, override.taught);
     }
     if (Object.prototype.hasOwnProperty.call(override, 'attended')) {
-      next.attended = override.attended;
+      next.attended = Math.max(next.attended || 0, override.attended);
     }
     return next;
   });

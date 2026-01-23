@@ -2187,8 +2187,7 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     .extract-signature {
       position: relative;
       min-width: 210px;
-      padding-bottom: 14px;
-      height: 150px;
+      height: 200px;
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;

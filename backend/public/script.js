@@ -2171,9 +2171,10 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       width: 110px;
       height: 110px;
     }
-    .extract-stamp svg {
+    .extract-stamp img {
       width: 100%;
       height: 100%;
+      object-fit: contain;
       display: block;
     }
     .extract-sign-right {
@@ -2186,21 +2187,24 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     .extract-signature {
       position: relative;
       min-width: 210px;
-      padding-bottom: 6px;
+      padding-bottom: 10px;
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
     }
     .extract-signature-line {
+      position: absolute;
+      left: 0;
+      bottom: 0;
       width: 100%;
       border-top: 1px solid #222;
     }
-    .extract-signature-script {
-      position: absolute;
-      right: 12px;
-      top: -22px;
-      font-size: 26px;
-      font-weight: 500;
-      color: #1b1b1b;
-      font-family: "Poppins", "Segoe UI", Arial, sans-serif;
-      transform: rotate(-6deg);
+    .extract-signature-img {
+      max-width: 180px;
+      max-height: 46px;
+      object-fit: contain;
+      display: block;
     }
     .extract-sign-name {
       text-align: right;
@@ -2291,19 +2295,14 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     <div class="extract-sign">
       <div class="extract-sign-left">
         <div class="extract-role">Директор IPS,</div>
-        <div class="extract-stamp" aria-hidden="true">
-          <svg viewBox="0 0 120 120" role="img" aria-label="Печатка IPS">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="#4f72ff" stroke-width="3" />
-            <circle cx="60" cy="60" r="38" fill="none" stroke="#4f72ff" stroke-width="1.5" stroke-dasharray="3 4" />
-            <text x="60" y="52" text-anchor="middle" fill="#4f72ff" font-size="10" font-weight="600">ІПС</text>
-            <text x="60" y="68" text-anchor="middle" fill="#4f72ff" font-size="6">Київ</text>
-          </svg>
+        <div class="extract-stamp">
+          <img src="assets/stamp.png" alt="Печатка IPS" />
         </div>
       </div>
       <div class="extract-sign-right">
         <div class="extract-signature">
           <div class="extract-signature-line"></div>
-          <div class="extract-signature-script">V. Mamko</div>
+          <img class="extract-signature-img" src="assets/initials.png" alt="Підпис" />
         </div>
         <div class="extract-sign-name">д-р Мамко<br />Володимир Петрович</div>
       </div>

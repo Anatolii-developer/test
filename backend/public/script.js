@@ -2242,7 +2242,7 @@ function courseProgressBuildExtractHtml({
       min-height: 297mm;
       margin: 0 auto;
       background: #fff;
-      padding: 20mm 18mm 26mm;
+      padding: 0 18mm 26mm;
       position: relative;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     }

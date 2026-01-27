@@ -2394,9 +2394,9 @@ function courseProgressBuildExtractHtml({
     }
     .extract-sign-center {
       display: flex;
-      justify-content: center;
+      justify-content: flex-end;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 20px 0 8px;
     }
     .extract-sign-right {
       display: flex;

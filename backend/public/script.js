@@ -2397,6 +2397,7 @@ function courseProgressBuildExtractHtml({
       display: flex;
       align-items: flex-end;
       justify-content: flex-end;
+      gap: 14px;
     }
     .extract-signature {
       position: relative;
@@ -2406,12 +2407,11 @@ function courseProgressBuildExtractHtml({
       align-items: flex-end;
       justify-content: center;
     }
-    .extract-signature-line {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      border-top: 1px solid #2a2a2a;
+    .extract-name-line {
+      width: 120px;
+      height: 1px;
+      background: #2a2a2a;
+      align-self: center;
     }
     .extract-signature-img {
       max-width: 170px;
@@ -2536,11 +2536,11 @@ function courseProgressBuildExtractHtml({
       </div>
       <div class="extract-sign-center">
         <div class="extract-signature">
-          <div class="extract-signature-line"></div>
           <img class="extract-signature-img" src="assets/initials.png" alt="Підпис" />
         </div>
       </div>
       <div class="extract-sign-right">
+        <div class="extract-name-line"></div>
         <div class="extract-sign-name">д-р Мамко<br />Володимир Петрович</div>
       </div>
     </div>

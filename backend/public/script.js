@@ -2419,8 +2419,8 @@ function courseProgressBuildExtractHtml({
       align-self: center;
     }
     .extract-signature-img {
-      max-width: 200px;
-      max-height: 200px;
+      max-width: 100px;
+      max-height: 100px;
       object-fit: contain;
       display: block;
       transform: scale(2.2);

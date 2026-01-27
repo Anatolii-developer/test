@@ -2259,7 +2259,7 @@ function courseProgressBuildExtractHtml({
       flex: 1 1 auto;
     }
     .extract-logo-box {
-      width: 700px;
+      width: 70px;
       height: 200px;
       background: var(--accent);
       display: flex;

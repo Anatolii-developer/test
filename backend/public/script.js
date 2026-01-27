@@ -2396,7 +2396,7 @@ function courseProgressBuildExtractHtml({
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding: 0 60px 0 8px;
+      padding: 0 0 0 8px;
     }
     .extract-sign-right {
       display: flex;
@@ -2533,7 +2533,7 @@ function courseProgressBuildExtractHtml({
     <div class="extract-sign">
       <div class="extract-sign-left">
         <div class="extract-sign-left-text">
-          <div class="extract-role">Директор ІПС,</div>
+          <div class="extract-role">Директор ІПС</div>
           <div class="extract-role">кандидат</div>
           <div class="extract-role">психологічних наук</div>
         </div>
@@ -2547,7 +2547,7 @@ function courseProgressBuildExtractHtml({
         </div>
       </div>
       <div class="extract-sign-right">
-        <div class="extract-sign-name">д-р Мамко<br />Володимир Петрович</div>
+        <div class="extract-sign-name">В.П. Мамко</div>
       </div>
     </div>
 

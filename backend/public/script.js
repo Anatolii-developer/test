@@ -2338,13 +2338,13 @@ function courseProgressBuildExtractHtml({
     .extract-text {
       font-size: 13.5px;
       line-height: 1.72;
-      margin: 0 0 9px;
+      margin: 0;
       letter-spacing: 0.01em;
       text-align: justify;
       text-justify: inter-word;
     }
     .extract-text.indent {
-      text-indent: 30px;
+      text-indent: 0;
     }
     .extract-date {
       margin-top: 16px;

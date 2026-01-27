@@ -2273,6 +2273,7 @@ function courseProgressBuildExtractHtml({
       width: 50px;
       height: 50px;
       object-fit: contain;
+      margin-top: 100px
     }
     .extract-brand-words {
       display: flex;

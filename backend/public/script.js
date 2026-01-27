@@ -2220,7 +2220,7 @@ function courseProgressBuildExtractHtml({
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --accent: #e77718;
+      --accent: #E37009;
       --text: #1c1c1c;
       --muted: #4d4d4d;
       --hl-verb: #fff36a;
@@ -2257,8 +2257,8 @@ function courseProgressBuildExtractHtml({
       flex: 1 1 auto;
     }
     .extract-logo-box {
-      width: 92px;
-      height: 122px;
+      width: 272px;
+      height: 416px;
       background: var(--accent);
       display: flex;
       align-items: center;
@@ -2267,18 +2267,19 @@ function courseProgressBuildExtractHtml({
       flex-shrink: 0;
     }
     .extract-logo-box img {
-      width: 58px;
-      height: 58px;
-      filter: brightness(0) invert(1);
+      width: 190px;
+      height: 190px;
+      object-fit: contain;
     }
-    .extract-brand-text {
-      font-size: 10.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-      line-height: 1.3;
-      letter-spacing: 0.04em;
-      margin-top: 10px;
+    .extract-brand-words {
+      display: flex;
+      align-items: center;
+      margin-top: 18px;
+    }
+    .extract-brand-words img {
+      width: 210px;
+      height: auto;
+      display: block;
     }
     .extract-contact {
       text-align: center;
@@ -2417,25 +2418,27 @@ function courseProgressBuildExtractHtml({
       left: 0;
       bottom: 0;
       width: 100%;
+      height: 177px;
       background: var(--accent);
       color: #fff;
       display: flex;
       justify-content: space-between;
-      gap: 16px;
-      padding: 9px 18mm 8px;
-      font-size: 10.5px;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18mm;
+      font-size: 12px;
       letter-spacing: 0.01em;
     }
     .extract-footer-item {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       white-space: nowrap;
     }
-    .extract-footer-item svg {
-      width: 13px;
-      height: 13px;
-      fill: #fff;
+    .extract-footer-item img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
       display: block;
     }
     @media print {
@@ -2453,15 +2456,15 @@ function courseProgressBuildExtractHtml({
     <div class="extract-header">
       <div class="extract-brand">
         <div class="extract-logo-box">
-          <img src="assets/emblem.svg" alt="IPS" />
+          <img src="assets/practice-records/emblem.png" alt="IPS" />
         </div>
-        <div class="extract-brand-text">
-          INSTITUTE OF<br />PROFESSIONAL<br />SUPERVISION
+        <div class="extract-brand-words">
+          <img src="assets/practice-records/words.png" alt="Institute of Professional Supervision" />
         </div>
       </div>
       <div class="extract-contact">
         <span class="ua">ІНСТИТУТ ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ</span>
-        +380502103231, mamko.vp@gmail.com<br />
+       +380956401316, mamko.supervision@gmail.com<br />
         mamko-prof-supervision.com
       </div>
     </div>
@@ -2516,21 +2519,15 @@ function courseProgressBuildExtractHtml({
 
     <div class="extract-footer">
       <span class="extract-footer-item">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6.6 10.2c1.2 2.3 3.2 4.3 5.5 5.5l1.8-1.8c.3-.3.8-.4 1.2-.2 1 .4 2.1.6 3.2.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C9.4 21 3 14.6 3 6c0-.6.4-1 1-1h3.7c.6 0 1 .4 1 1 0 1.1.2 2.2.6 3.2.1.4 0 .9-.2 1.2l-1.5 1.8z" />
-        </svg>
-        +380502103231
+        <img src="assets/practice-records/phone.png" alt="" />
+        +380956401316
       </span>
       <span class="extract-footer-item">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 6.5C3 5.7 3.7 5 4.5 5h15c.8 0 1.5.7 1.5 1.5v11c0 .8-.7 1.5-1.5 1.5h-15C3.7 19 3 18.3 3 17.5v-11zm1.8.7 7.2 4.6 7.2-4.6H4.8zm14.4 9.6V9l-6.7 4.3c-.3.2-.7.2-1 0L4.8 9v7.8h14.4z" />
-        </svg>
-        mamko.vp@gmail.com
+        <img src="assets/practice-records/mail.png" alt="" />
+        mamko.supervision@gmail.com
       </span>
       <span class="extract-footer-item">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 2c3.9 0 7 3.1 7 7 0 4.5-5.5 11-7 13-1.5-2-7-8.5-7-13 0-3.9 3.1-7 7-7zm0 9.3c1.3 0 2.3-1 2.3-2.3S13.3 6.7 12 6.7 9.7 7.7 9.7 9s1 2.3 2.3 2.3z" />
-        </svg>
+        <img src="assets/practice-records/phone.png" alt="" style="opacity:0;" />
         IPS, Київ, Україна
       </span>
     </div>

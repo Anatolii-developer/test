@@ -2368,9 +2368,14 @@ function courseProgressBuildExtractHtml({
     }
     .extract-sign-left {
       display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 180px;
+    }
+    .extract-sign-left-text {
+      display: flex;
       flex-direction: column;
       gap: 6px;
-      min-width: 180px;
     }
     .extract-role {
       font-size: 12px;
@@ -2401,8 +2406,8 @@ function courseProgressBuildExtractHtml({
     }
     .extract-signature {
       position: relative;
-      width: 240px;
-      height: 90px;
+      width: 200px;
+      height: 200px;
       display: flex;
       align-items: flex-end;
       justify-content: center;
@@ -2414,8 +2419,8 @@ function courseProgressBuildExtractHtml({
       align-self: center;
     }
     .extract-signature-img {
-      max-width: 170px;
-      max-height: 50px;
+      max-width: 200px;
+      max-height: 200px;
       object-fit: contain;
       display: block;
       transform: scale(2.2);
@@ -2527,9 +2532,11 @@ function courseProgressBuildExtractHtml({
 
     <div class="extract-sign">
       <div class="extract-sign-left">
-        <div class="extract-role">Директор ІПС,</div>
-        <div class="extract-role">кандидат</div>
-        <div class="extract-role">психологічних наук</div>
+        <div class="extract-sign-left-text">
+          <div class="extract-role">Директор ІПС,</div>
+          <div class="extract-role">кандидат</div>
+          <div class="extract-role">психологічних наук</div>
+        </div>
         <div class="extract-stamp">
           <img src="assets/stamp.png" alt="Печатка IPS" />
         </div>

@@ -1941,30 +1941,8 @@ function courseProgressMergeOverrides(baseOverrides, userOverrides) {
   return result;
 }
 
-async function loadCourseProgress() {
-  const tableBody = document.getElementById('courseProgressBody');
-  if (!tableBody || !document.body.classList.contains('course-progress-page')) return;
-
-  tableBody.innerHTML = '<tr><td colspan="4">Завантаження...</td></tr>';
-
-  const user = typeof getFreshUserSafe === 'function' ? await getFreshUserSafe() : null;
-  if (!user || !user._id) {
-    tableBody.innerHTML = '<tr><td colspan="4">Увійдіть, щоб побачити прогрес</td></tr>';
-    return;
-  }
-
-  let courses = [];
-  try {
-    const res = await fetch(`${API_BASE}/api/courses`, { credentials: 'include' });
-    const data = await res.json();
-    courses = Array.isArray(data) ? data : [];
-  } catch (err) {
-    console.error('Помилка при завантаженні курсів:', err);
-    tableBody.innerHTML = '<tr><td colspan="4">Не вдалося завантажити дані</td></tr>';
-    return;
-  }
-
-  const baseTypes = [
+function courseProgressGetBaseTypes() {
+  return [
     { key: 'Особистий аналіз', label: 'Особистий аналіз' },
     { key: 'Індивідуальна супервізія', label: 'Індивідуальна супервізія' },
     { key: 'Групова супервізія', label: 'Групова супервізія' },
@@ -1977,14 +1955,15 @@ async function loadCourseProgress() {
     { key: 'Лекторій', label: 'Лекторій' },
     { key: 'Конференція', label: 'Конференція' },
   ];
+}
 
+function courseProgressComputeDisplayRows({ courses, user, filters }) {
+  const baseTypes = courseProgressGetBaseTypes();
   const stats = {};
   baseTypes.forEach((type) => courseProgressEnsureBucket(stats, type.key, type.label));
   const extraStats = {};
-  const filters = courseProgressGetActiveFilters();
-  courseProgressUpdateFilterSummary(filters);
 
-  courses.forEach((course) => {
+  (Array.isArray(courses) ? courses : []).forEach((course) => {
     if (!course || course.status !== 'Пройдений') return;
     if (!courseProgressCourseMatchesFilters(course, filters)) return;
 
@@ -2059,6 +2038,7 @@ async function loadCourseProgress() {
   ];
   const overrides = courseProgressNormalizeOverrides(user?.progressOverrides || {});
   const rowsWithOverrides = courseProgressApplyOverrides(rows, overrides);
+
   let displayRows = rowsWithOverrides;
   if (filters?.units?.length) {
     const unitSet = new Set(filters.units);
@@ -2066,6 +2046,47 @@ async function loadCourseProgress() {
   } else if (filters?.category) {
     displayRows = rowsWithOverrides.filter((row) => row.taught + row.attended > 0);
   }
+
+  const unitRows = displayRows.filter((row) => row.key !== 'Конференція');
+  const unitLabels = unitRows
+    .filter((row) => row.taught + row.attended > 0)
+    .map((row) => row.label);
+  const uniqueUnitLabels = Array.from(new Set(unitLabels));
+  const totalUnits = unitRows.reduce((sum, row) => sum + row.taught + row.attended, 0);
+
+  return {
+    displayRows,
+    unitLabels: uniqueUnitLabels,
+    totalUnits,
+  };
+}
+
+async function loadCourseProgress() {
+  const tableBody = document.getElementById('courseProgressBody');
+  if (!tableBody || !document.body.classList.contains('course-progress-page')) return;
+
+  tableBody.innerHTML = '<tr><td colspan="4">Завантаження...</td></tr>';
+
+  const user = typeof getFreshUserSafe === 'function' ? await getFreshUserSafe() : null;
+  if (!user || !user._id) {
+    tableBody.innerHTML = '<tr><td colspan="4">Увійдіть, щоб побачити прогрес</td></tr>';
+    return;
+  }
+
+  let courses = [];
+  try {
+    const res = await fetch(`${API_BASE}/api/courses`, { credentials: 'include' });
+    const data = await res.json();
+    courses = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error('Помилка при завантаженні курсів:', err);
+    tableBody.innerHTML = '<tr><td colspan="4">Не вдалося завантажити дані</td></tr>';
+    return;
+  }
+
+  const filters = courseProgressGetActiveFilters();
+  courseProgressUpdateFilterSummary(filters);
+  const { displayRows } = courseProgressComputeDisplayRows({ courses, user, filters });
 
   tableBody.innerHTML = '';
   if (!displayRows.length) {
@@ -2124,10 +2145,46 @@ function courseProgressFormatDateUA(value) {
   return `«${day}» ${month} ${year}р.`;
 }
 
-function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
+function courseProgressGetPassedVerb(user) {
+  const gender = String(user?.gender || '').toLowerCase().trim();
+  if (gender === 'female' || gender === 'жінка') return 'пройшла';
+  if (gender === 'male' || gender === 'чоловік') return 'пройшов';
+  return 'пройшов(ла)';
+}
+
+function courseProgressJoinWithAnd(items) {
+  const list = (Array.isArray(items) ? items : [])
+    .map((v) => String(v || '').trim())
+    .filter(Boolean);
+  if (!list.length) return '';
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return `${list[0]} та ${list[1]}`;
+  return `${list.slice(0, -1).join(', ')} та ${list[list.length - 1]}`;
+}
+
+function courseProgressBuildUnitsText({ unitLabels, filters }) {
+  const labels = Array.isArray(unitLabels) && unitLabels.length
+    ? unitLabels
+    : Array.isArray(filters?.units) && filters.units.length
+      ? filters.units
+      : ['супервізії клінічної практики'];
+  return courseProgressJoinWithAnd(labels);
+}
+
+function courseProgressBuildExtractHtml({
+  fullName,
+  dateText,
+  baseHref,
+  verbText,
+  unitsText,
+  unitsCountText,
+}) {
   const safeName = String(fullName || '').replace(/[<>]/g, '');
   const safeDate = String(dateText || '').replace(/[<>]/g, '');
   const safeBase = String(baseHref || '').replace(/"/g, '&quot;');
+  const safeVerb = String(verbText || '').replace(/[<>]/g, '');
+  const safeUnits = String(unitsText || '').replace(/[<>]/g, '');
+  const safeCount = String(unitsCountText || '').replace(/[<>]/g, '');
 
   return `<!DOCTYPE html>
 <html lang="uk">
@@ -2142,6 +2199,10 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       --accent: #e77718;
       --text: #1c1c1c;
       --muted: #4d4d4d;
+      --hl-verb: #fff36a;
+      --hl-units: #49f05b;
+      --hl-count: #5ee8ff;
+      --hl-name: #ffb347;
     }
     * { box-sizing: border-box; }
     body {
@@ -2226,6 +2287,16 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       font-weight: 600;
       margin: 10px 0 16px;
     }
+    .hl {
+      padding: 0 4px;
+      border-radius: 3px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .hl-verb { background: var(--hl-verb); }
+    .hl-units { background: var(--hl-units); }
+    .hl-count { background: var(--hl-count); }
+    .hl-name { background: var(--hl-name); }
     .extract-text {
       font-size: 14px;
       line-height: 1.65;
@@ -2361,9 +2432,11 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
     <div class="extract-name">${safeName}</div>
 
     <p class="extract-text">
-      проходить супервізії клінічної практики під моїм керівництвом в ІНСТИТУТІ
+      <span class="hl hl-verb">${safeVerb}</span>
+      <span class="hl hl-units">${safeUnits}</span>
+      в обсязі <span class="hl hl-count">${safeCount}</span> під моїм керівництвом в ІНСТИТУТІ
       ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
-      супервізійної роботи ${safeName} демонструє високий рівень професійної
+      супервізійної роботи <span class="hl hl-name">${safeName}</span> демонструє високий рівень професійної
       рефлексії, здатність до глибокого аналізу терапевтичного процесу та
       розуміння динаміки переносу й контрпереносу.
     </p>
@@ -2378,7 +2451,7 @@ function courseProgressBuildExtractHtml({ fullName, dateText, baseHref }) {
       відкрита до зворотного зв’язку та саморозвитку.
     </p>
     <p class="extract-text indent">
-      Рекомендую ${safeName} як уважного, професійного й зрілого спеціаліста,
+      Рекомендую <span class="hl hl-name">${safeName}</span> як уважного, професійного й зрілого спеціаліста,
       який розвивається в межах психоаналітичного підходу.
     </p>
 
@@ -2445,7 +2518,30 @@ async function downloadCourseExtract() {
   const fullName = courseProgressGetFullName(user);
   const dateText = courseProgressFormatDateUA(new Date());
   const baseHref = new URL('.', window.location.href).href;
-  const html = courseProgressBuildExtractHtml({ fullName, dateText, baseHref });
+  const filters = courseProgressGetActiveFilters();
+
+  let courses = [];
+  try {
+    const res = await fetch(`${API_BASE}/api/courses`, { credentials: 'include' });
+    const data = await res.json();
+    courses = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error('Помилка при завантаженні курсів для витягу:', err);
+  }
+
+  const { unitLabels, totalUnits } = courseProgressComputeDisplayRows({ courses, user, filters });
+  const verbText = courseProgressGetPassedVerb(user);
+  const unitsText = courseProgressBuildUnitsText({ unitLabels, filters });
+  const unitsCountText = courseProgressFormatValue(totalUnits);
+
+  const html = courseProgressBuildExtractHtml({
+    fullName,
+    dateText,
+    baseHref,
+    verbText,
+    unitsText,
+    unitsCountText,
+  });
 
   const extractWindow = window.open('', '_blank');
   if (!extractWindow) {

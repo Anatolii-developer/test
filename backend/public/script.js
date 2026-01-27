@@ -2152,6 +2152,26 @@ function courseProgressGetPassedVerb(user) {
   return 'пройшов(ла)';
 }
 
+function courseProgressGetGenderForms(user) {
+  const gender = String(user?.gender || '').toLowerCase().trim();
+  if (gender === 'female' || gender === 'жінка') {
+    return {
+      pronoun: 'Вона',
+      openAdj: 'відкрита',
+    };
+  }
+  if (gender === 'male' || gender === 'чоловік') {
+    return {
+      pronoun: 'Він',
+      openAdj: 'відкритий',
+    };
+  }
+  return {
+    pronoun: 'Він/Вона',
+    openAdj: 'відкритий(а)',
+  };
+}
+
 function courseProgressJoinWithAnd(items) {
   const list = (Array.isArray(items) ? items : [])
     .map((v) => String(v || '').trim())
@@ -2178,6 +2198,8 @@ function courseProgressBuildExtractHtml({
   verbText,
   unitsText,
   unitsCountText,
+  pronounText,
+  openAdjText,
 }) {
   const safeName = String(fullName || '').replace(/[<>]/g, '');
   const safeDate = String(dateText || '').replace(/[<>]/g, '');
@@ -2185,6 +2207,8 @@ function courseProgressBuildExtractHtml({
   const safeVerb = String(verbText || '').replace(/[<>]/g, '');
   const safeUnits = String(unitsText || '').replace(/[<>]/g, '');
   const safeCount = String(unitsCountText || '').replace(/[<>]/g, '');
+  const safePronoun = String(pronounText || '').replace(/[<>]/g, '');
+  const safeOpenAdj = String(openAdjText || '').replace(/[<>]/g, '');
 
   return `<!DOCTYPE html>
 <html lang="uk">
@@ -2441,14 +2465,14 @@ function courseProgressBuildExtractHtml({
       розуміння динаміки переносу й контрпереносу.
     </p>
     <p class="extract-text indent">
-      Вона уважно ставиться до проявів власних емоційних реакцій у взаємодії з
+      ${safePronoun} уважно ставиться до проявів власних емоційних реакцій у взаємодії з
       клієнтом, вміє їх усвідомлювати, аналізувати й використовувати як
       інструмент для глибшого розуміння клієнтського матеріалу.
     </p>
     <p class="extract-text indent">
       У роботі характеризується етичністю, відповідальністю, емпатією та
       стабільністю професійної позиції. Активно включається в процес супервізії,
-      відкрита до зворотного зв’язку та саморозвитку.
+      ${safeOpenAdj} до зворотного зв’язку та саморозвитку.
     </p>
     <p class="extract-text indent">
       Рекомендую <span class="hl hl-name">${safeName}</span> як уважного, професійного й зрілого спеціаліста,
@@ -2531,6 +2555,7 @@ async function downloadCourseExtract() {
 
   const { unitLabels, totalUnits } = courseProgressComputeDisplayRows({ courses, user, filters });
   const verbText = courseProgressGetPassedVerb(user);
+  const genderForms = courseProgressGetGenderForms(user);
   const unitsText = courseProgressBuildUnitsText({ unitLabels, filters });
   const unitsCountText = courseProgressFormatValue(totalUnits);
 
@@ -2541,6 +2566,8 @@ async function downloadCourseExtract() {
     verbText,
     unitsText,
     unitsCountText,
+    pronounText: genderForms.pronoun,
+    openAdjText: genderForms.openAdj,
   });
 
   const extractWindow = window.open('', '_blank');

@@ -2195,7 +2195,7 @@ function courseProgressBuildUnitsBreakdown({ displayRows, filters }) {
     const label = labelByKey.get(key) || key;
     const total = totalsByKey.has(key) ? totalsByKey.get(key) : 0;
     const formatted = courseProgressFormatValue(total || 0);
-    return `${label} в обсязі ${formatted} сесій`;
+    return `(${label}): ${formatted}`;
   });
 
   return parts.join(', ');

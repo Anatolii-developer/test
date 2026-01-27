@@ -2259,8 +2259,8 @@ function courseProgressBuildExtractHtml({
       flex: 1 1 auto;
     }
     .extract-logo-box {
-      width: 180px;
-      height: 180px;
+      width: 70px;
+      height: 100px;
       background: var(--accent);
       display: flex;
       align-items: center;
@@ -2270,8 +2270,8 @@ function courseProgressBuildExtractHtml({
       margin-top: -20mm;
     }
     .extract-logo-box img {
-      width: 180px;
-      height: 180px;
+      width: 50px;
+      height: 50px;
       object-fit: contain;
     }
     .extract-brand-words {
@@ -2280,8 +2280,8 @@ function courseProgressBuildExtractHtml({
       margin-top: 0;
     }
     .extract-brand-words img {
-      width: 400px;
-      height: 180px;
+      width: 100px;
+      height: 50psx;
       object-fit: contain;
       display: block;
     }

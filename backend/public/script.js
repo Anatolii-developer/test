@@ -2448,6 +2448,12 @@ function courseProgressBuildExtractHtml({
       object-fit: contain;
       display: block;
     }
+    .extract-footer-separator {
+      width: 1px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.75);
+      display: inline-block;
+    }
     @media print {
       body {
         background: #fff;
@@ -2533,10 +2539,12 @@ function courseProgressBuildExtractHtml({
     <div class="extract-footer">
       <span class="extract-footer-item">
         <img src="assets/practice-records/phone.png" alt="" />
+        <span class="extract-footer-separator"></span>
         +380956401316
       </span>
       <span class="extract-footer-item">
         <img src="assets/practice-records/mail.png" alt="" />
+        <span class="extract-footer-separator"></span>
         mamko.supervision@gmail.com
       </span>
       <span class="extract-footer-item">

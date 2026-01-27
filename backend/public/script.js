@@ -2396,7 +2396,7 @@ function courseProgressBuildExtractHtml({
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding: 0 20px 0 8px;
+      padding: 0 40px 0 8px;
     }
     .extract-sign-right {
       display: flex;
@@ -2508,8 +2508,8 @@ function courseProgressBuildExtractHtml({
     <div class="extract-name">${safeName}</div>
 
     <p class="extract-text">
-      <span class="hl hl-verb">${safeVerb}:</span>
-      <span class="hl hl-units">${safeUnits}</span>, під моїм керівництвом в ІНСТИТУТІ
+      <span class="hl hl-verb">${safeVerb}</span>
+      <span class="hl hl-units">(${safeUnits}):</span>, під моїм керівництвом в ІНСТИТУТІ
       ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
       супервізійної роботи <span class="hl hl-name">${safeName}</span> демонструє високий рівень професійної
       рефлексії, здатність до глибокого аналізу терапевтичного процесу та

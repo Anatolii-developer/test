@@ -2406,8 +2406,8 @@ function courseProgressBuildExtractHtml({
     }
     .extract-signature {
       position: relative;
-      width: 200px;
-      height: 200px;
+      width: 100px;
+      height: 100px;
       display: flex;
       align-items: flex-end;
       justify-content: center;

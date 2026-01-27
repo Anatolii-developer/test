@@ -2362,7 +2362,7 @@ function courseProgressBuildExtractHtml({
     .extract-sign {
       display: grid;
       grid-template-columns: 1fr 1.2fr 1fr;
-      align-items: end;
+      align-items: center;
       margin-top: 28px;
       gap: 16px;
     }
@@ -2503,7 +2503,7 @@ function courseProgressBuildExtractHtml({
     <div class="extract-name">${safeName}</div>
 
     <p class="extract-text">
-      <span class="hl hl-verb">${safeVerb}</span>
+      <span class="hl hl-verb">${safeVerb}:</span>
       <span class="hl hl-units">${safeUnits}</span>, під моїм керівництвом в ІНСТИТУТІ
       ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
       супервізійної роботи <span class="hl hl-name">${safeName}</span> демонструє високий рівень професійної
@@ -2540,7 +2540,6 @@ function courseProgressBuildExtractHtml({
         </div>
       </div>
       <div class="extract-sign-right">
-        <div class="extract-name-line"></div>
         <div class="extract-sign-name">д-р Мамко<br />Володимир Петрович</div>
       </div>
     </div>

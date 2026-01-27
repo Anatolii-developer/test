@@ -2382,13 +2382,13 @@ function courseProgressBuildExtractHtml({
       font-weight: 600;
     }
     .extract-stamp {
-      width: 240px;
-      height: 240px;
+      width: 260px;
+      height: 260px;
       margin-top: 6px;
     }
     .extract-stamp img {
-      width: 100%;
-      height: 100%;
+      width: 260px !important;
+      height: 260px !important;
       object-fit: contain;
       display: block;
     }

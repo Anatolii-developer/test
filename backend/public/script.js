@@ -2527,7 +2527,9 @@ function courseProgressBuildExtractHtml({
 
     <div class="extract-sign">
       <div class="extract-sign-left">
-        <div class="extract-role">Директор IPS,</div>
+        <div class="extract-role">Директор ІПС,</div>
+        <div class="extract-role">кандидат</div>
+        <div class="extract-role">психологічних наук</div>
         <div class="extract-stamp">
           <img src="assets/stamp.png" alt="Печатка IPS" />
         </div>

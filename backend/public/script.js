@@ -2232,128 +2232,138 @@ function courseProgressBuildExtractHtml({
     body {
       margin: 0;
       font-family: "Poppins", "Segoe UI", Arial, sans-serif;
-      background: #f3f3f3;
+      background: #ffffff;
       color: var(--text);
     }
     .extract-page {
       width: 210mm;
       min-height: 297mm;
-      margin: 24px auto;
+      margin: 0 auto;
       background: #fff;
-      padding: 18mm 20mm 26mm;
+      padding: 20mm 18mm 26mm;
       position: relative;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     }
     .extract-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 20px;
+      align-items: flex-start;
+      gap: 24px;
     }
     .extract-brand {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      flex: 1;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1 1 auto;
     }
     .extract-logo-box {
-      width: 82px;
-      height: 82px;
+      width: 92px;
+      height: 122px;
       background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 3px;
+      border-radius: 0;
+      flex-shrink: 0;
     }
     .extract-logo-box img {
-      width: 50px;
-      height: 50px;
+      width: 58px;
+      height: 58px;
       filter: brightness(0) invert(1);
     }
     .extract-brand-text {
-      font-size: 11px;
+      font-size: 10.5px;
       text-transform: uppercase;
       color: var(--accent);
       font-weight: 600;
-      line-height: 1.25;
-      letter-spacing: 0.06em;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      margin-top: 10px;
     }
     .extract-contact {
-      text-align: right;
+      text-align: center;
       font-size: 12px;
       color: #1b1b1b;
-      line-height: 1.5;
-      min-width: 260px;
+      line-height: 1.55;
+      min-width: 280px;
+      margin-top: 4px;
     }
     .extract-contact .ua {
       color: var(--accent);
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       display: block;
+      letter-spacing: 0.03em;
     }
     .extract-title {
       text-align: center;
-      margin: 26px 0 8px;
-      font-size: 22px;
-      letter-spacing: 0.12em;
+      margin: 30px 0 10px;
+      font-size: 24px;
+      letter-spacing: 0.06em;
     }
     .extract-lead {
       text-align: center;
       color: #2d2d2d;
       font-size: 14px;
+      margin-bottom: 2px;
     }
     .extract-name {
       text-align: center;
-      font-size: 19px;
+      font-size: 22px;
       color: var(--accent);
       font-style: italic;
       font-weight: 600;
-      margin: 10px 0 16px;
+      margin: 8px 0 18px;
     }
     .hl {
-      padding: 0 4px;
-      border-radius: 3px;
-      box-decoration-break: clone;
-      -webkit-box-decoration-break: clone;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
     }
-    .hl-verb { background: var(--hl-verb); }
-    .hl-units { background: var(--hl-units); }
-    .hl-count { background: var(--hl-count); }
-    .hl-name { background: var(--hl-name); }
+    .hl-verb { color: inherit; }
+    .hl-units { color: inherit; }
+    .hl-count { color: inherit; }
+    .hl-name {
+      color: var(--accent);
+      font-style: italic;
+      font-weight: 600;
+    }
     .extract-text {
-      font-size: 14px;
-      line-height: 1.65;
-      margin: 0 0 10px;
+      font-size: 13.5px;
+      line-height: 1.72;
+      margin: 0 0 9px;
+      letter-spacing: 0.01em;
     }
     .extract-text.indent {
-      text-indent: 26px;
+      text-indent: 30px;
     }
     .extract-date {
-      margin-top: 14px;
+      margin-top: 16px;
       font-size: 12px;
       font-weight: 600;
     }
     .extract-sign {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-top: 24px;
-      gap: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      align-items: end;
+      margin-top: 28px;
+      gap: 16px;
     }
     .extract-sign-left {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      min-width: 210px;
+      gap: 6px;
+      min-width: 180px;
     }
     .extract-role {
       font-size: 12px;
       font-weight: 600;
     }
     .extract-stamp {
-      width: 110px;
-      height: 110px;
+      width: 118px;
+      height: 118px;
+      margin-top: 6px;
     }
     .extract-stamp img {
       width: 100%;
@@ -2361,35 +2371,40 @@ function courseProgressBuildExtractHtml({
       object-fit: contain;
       display: block;
     }
+    .extract-sign-center {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 0 8px;
+    }
     .extract-sign-right {
       display: flex;
       align-items: flex-end;
-      gap: 18px;
-      flex: 1;
       justify-content: flex-end;
     }
     .extract-signature {
       position: relative;
-      min-width: 210px;
-      height: 200px;
+      width: 240px;
+      height: 90px;
       display: flex;
       align-items: flex-end;
-      justify-content: flex-start;
+      justify-content: center;
     }
     .extract-signature-line {
       position: absolute;
       left: 0;
       bottom: 0;
       width: 100%;
-      border-top: 1px solid #222;
+      border-top: 1px solid #2a2a2a;
     }
     .extract-signature-img {
-      max-width: 180px;
-      max-height: 46px;
+      max-width: 170px;
+      max-height: 50px;
       object-fit: contain;
       display: block;
-      transform: scale(3);
-      transform-origin: left bottom;
+      transform: scale(2.2);
+      transform-origin: center bottom;
+      margin-bottom: 10px;
     }
     .extract-sign-name {
       text-align: right;
@@ -2407,9 +2422,9 @@ function courseProgressBuildExtractHtml({
       display: flex;
       justify-content: space-between;
       gap: 16px;
-      padding: 10px 18mm;
-      font-size: 11px;
-      letter-spacing: 0.02em;
+      padding: 9px 18mm 8px;
+      font-size: 10.5px;
+      letter-spacing: 0.01em;
     }
     .extract-footer-item {
       display: inline-flex;
@@ -2418,8 +2433,8 @@ function courseProgressBuildExtractHtml({
       white-space: nowrap;
     }
     .extract-footer-item svg {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       fill: #fff;
       display: block;
     }
@@ -2486,11 +2501,13 @@ function courseProgressBuildExtractHtml({
           <img src="assets/stamp.png" alt="Печатка IPS" />
         </div>
       </div>
-      <div class="extract-sign-right">
+      <div class="extract-sign-center">
         <div class="extract-signature">
           <div class="extract-signature-line"></div>
           <img class="extract-signature-img" src="assets/initials.png" alt="Підпис" />
         </div>
+      </div>
+      <div class="extract-sign-right">
         <div class="extract-sign-name">д-р Мамко<br />Володимир Петрович</div>
       </div>
     </div>

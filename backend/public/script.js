@@ -2451,7 +2451,7 @@ function courseProgressBuildExtractHtml({
     .extract-footer-separator {
       width: 1px;
       height: 14px;
-      background: rgba(255, 255, 255, 0.75);
+      background: #ffffff;
       display: inline-block;
     }
     @media print {

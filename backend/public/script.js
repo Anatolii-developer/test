@@ -2382,8 +2382,8 @@ function courseProgressBuildExtractHtml({
       font-weight: 600;
     }
     .extract-stamp {
-      width: 150px;
-      height: 150px;
+      width: 200px;
+      height: 200px;
       margin-top: 6px;
     }
     .extract-stamp img {

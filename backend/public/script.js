@@ -2421,7 +2421,7 @@ function courseProgressBuildExtractHtml({
       left: 0;
       bottom: 0;
       width: 100%;
-      height: 177px;
+      height: 70px;
       background: var(--accent);
       color: #fff;
       display: flex;

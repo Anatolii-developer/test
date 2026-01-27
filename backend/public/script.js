@@ -2195,10 +2195,10 @@ function courseProgressBuildUnitsBreakdown({ displayRows, filters }) {
     const label = labelByKey.get(key) || key;
     const total = totalsByKey.has(key) ? totalsByKey.get(key) : 0;
     const formatted = courseProgressFormatValue(total || 0);
-    return `(${label}): в обсязі ${formatted} сесій`;
+    return `${label} в обсязі ${formatted} сесій`;
   });
 
-  return parts.join(', ');
+  return `(тип активності): ${parts.join(', ')}`;
 }
 
 function courseProgressBuildExtractHtml({
@@ -2509,7 +2509,7 @@ function courseProgressBuildExtractHtml({
 
     <p class="extract-text">
       <span class="hl hl-verb">${safeVerb}</span>
-      <span class="hl hl-units">(${safeUnits}):</span>, під моїм керівництвом в ІНСТИТУТІ
+      <span class="hl hl-units">${safeUnits}:</span>, під моїм керівництвом в ІНСТИТУТІ
       ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
       супервізійної роботи <span class="hl hl-name">${safeName}</span> демонструє високий рівень професійної
       рефлексії, здатність до глибокого аналізу терапевтичного процесу та

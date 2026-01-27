@@ -2234,6 +2234,8 @@ function courseProgressBuildExtractHtml({
       font-family: "Poppins", "Segoe UI", Arial, sans-serif;
       background: #ffffff;
       color: var(--text);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     .extract-page {
       width: 210mm;
@@ -2257,8 +2259,8 @@ function courseProgressBuildExtractHtml({
       flex: 1 1 auto;
     }
     .extract-logo-box {
-      width: 272px;
-      height: 416px;
+      width: 220px;
+      height: 220px;
       background: var(--accent);
       display: flex;
       align-items: center;
@@ -2267,18 +2269,19 @@ function courseProgressBuildExtractHtml({
       flex-shrink: 0;
     }
     .extract-logo-box img {
-      width: 190px;
-      height: 190px;
+      width: 180px;
+      height: 180px;
       object-fit: contain;
     }
     .extract-brand-words {
       display: flex;
       align-items: center;
-      margin-top: 18px;
+      margin-top: 16px;
     }
     .extract-brand-words img {
-      width: 210px;
-      height: auto;
+      width: 400px;
+      height: 180px;
+      object-fit: contain;
       display: block;
     }
     .extract-contact {
@@ -2428,6 +2431,8 @@ function courseProgressBuildExtractHtml({
       padding: 0 18mm;
       font-size: 12px;
       letter-spacing: 0.01em;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     .extract-footer-item {
       display: inline-flex;
@@ -2442,10 +2447,16 @@ function courseProgressBuildExtractHtml({
       display: block;
     }
     @media print {
-      body { background: #fff; }
+      body {
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
       .extract-page {
         margin: 0;
         box-shadow: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
     }
     @page { size: A4; margin: 0; }
@@ -2476,7 +2487,7 @@ function courseProgressBuildExtractHtml({
     <p class="extract-text">
       <span class="hl hl-verb">${safeVerb}</span>
       <span class="hl hl-units">${safeUnits}</span>
-      в обсязі <span class="hl hl-count">${safeCount}</span> під моїм керівництвом в ІНСТИТУТІ
+      в обсязі <span class="hl hl-count">${safeCount}</span> сесій, під моїм керівництвом в ІНСТИТУТІ
       ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
       супервізійної роботи <span class="hl hl-name">${safeName}</span> демонструє високий рівень професійної
       рефлексії, здатність до глибокого аналізу терапевтичного процесу та
@@ -2533,10 +2544,35 @@ function courseProgressBuildExtractHtml({
     </div>
   </div>
   <script>
+    function waitForImages() {
+      const images = Array.from(document.images || []);
+      if (!images.length) return Promise.resolve();
+      return Promise.all(
+        images.map((img) => {
+          if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+          return new Promise((resolve) => {
+            const done = () => resolve();
+            img.addEventListener('load', done, { once: true });
+            img.addEventListener('error', done, { once: true });
+            setTimeout(done, 1500);
+          });
+        })
+      );
+    }
+
+    function waitForFonts() {
+      if (document.fonts && document.fonts.ready) {
+        return document.fonts.ready.catch(() => {});
+      }
+      return Promise.resolve();
+    }
+
     window.onload = () => {
-      setTimeout(() => {
-        window.print();
-      }, 300);
+      Promise.all([waitForImages(), waitForFonts()]).finally(() => {
+        setTimeout(() => {
+          window.print();
+        }, 200);
+      });
     };
     window.onafterprint = () => {
       window.close();

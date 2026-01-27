@@ -2395,12 +2395,12 @@ function courseProgressBuildExtractHtml({
     .extract-sign-center {
       display: flex;
       justify-content: center;
-      align-items: flex-end;
+      align-items: center;
       padding: 0 8px;
     }
     .extract-sign-right {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: flex-end;
       gap: 14px;
     }
@@ -2409,7 +2409,7 @@ function courseProgressBuildExtractHtml({
       width: 100px;
       height: 100px;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
     }
     .extract-name-line {
@@ -2424,12 +2424,12 @@ function courseProgressBuildExtractHtml({
       object-fit: contain;
       display: block;
       transform: scale(2.2);
-      transform-origin: center bottom;
-      margin-bottom: 10px;
+      transform-origin: center center;
+      margin-bottom: 0;
     }
     .extract-sign-name {
       text-align: right;
-      font-size: 12px;
+      font-size: 20px;
       font-weight: 600;
       line-height: 1.3;
     }

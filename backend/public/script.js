@@ -2340,6 +2340,8 @@ function courseProgressBuildExtractHtml({
       line-height: 1.72;
       margin: 0 0 9px;
       letter-spacing: 0.01em;
+      text-align: justify;
+      text-justify: inter-word;
     }
     .extract-text.indent {
       text-indent: 30px;

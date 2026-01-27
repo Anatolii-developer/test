@@ -2260,7 +2260,7 @@ function courseProgressBuildExtractHtml({
     }
     .extract-logo-box {
       width: 70px;
-      height: 100px;
+      height: 150px;
       background: var(--accent);
       display: flex;
       align-items: center;

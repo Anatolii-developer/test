@@ -2172,23 +2172,33 @@ function courseProgressGetGenderForms(user) {
   };
 }
 
-function courseProgressJoinWithAnd(items) {
-  const list = (Array.isArray(items) ? items : [])
-    .map((v) => String(v || '').trim())
-    .filter(Boolean);
-  if (!list.length) return '';
-  if (list.length === 1) return list[0];
-  if (list.length === 2) return `${list[0]} та ${list[1]}`;
-  return `${list.slice(0, -1).join(', ')} та ${list[list.length - 1]}`;
-}
+function courseProgressBuildUnitsBreakdown({ displayRows, filters }) {
+  const rows = Array.isArray(displayRows) ? displayRows : [];
+  const totalsByKey = new Map(rows.map((row) => [row.key, row.taught + row.attended]));
+  const labelByKey = new Map(rows.map((row) => [row.key, row.label || row.key]));
 
-function courseProgressBuildUnitsText({ unitLabels, filters }) {
-  const labels = Array.isArray(unitLabels) && unitLabels.length
-    ? unitLabels
-    : Array.isArray(filters?.units) && filters.units.length
-      ? filters.units
-      : ['супервізії клінічної практики'];
-  return courseProgressJoinWithAnd(labels);
+  let unitKeys = [];
+  if (filters?.units?.length) {
+    unitKeys = filters.units.slice();
+  } else {
+    unitKeys = rows
+      .filter((row) => row.key !== 'Конференція')
+      .filter((row) => row.taught + row.attended > 0)
+      .map((row) => row.key);
+  }
+
+  if (!unitKeys.length) {
+    return 'супервізії клінічної практики в обсязі 0 сесій';
+  }
+
+  const parts = unitKeys.map((key) => {
+    const label = labelByKey.get(key) || key;
+    const total = totalsByKey.has(key) ? totalsByKey.get(key) : 0;
+    const formatted = courseProgressFormatValue(total || 0);
+    return `${label} в обсязі ${formatted} сесій`;
+  });
+
+  return parts.join(', ');
 }
 
 function courseProgressBuildExtractHtml({
@@ -2197,7 +2207,6 @@ function courseProgressBuildExtractHtml({
   baseHref,
   verbText,
   unitsText,
-  unitsCountText,
   pronounText,
   openAdjText,
 }) {
@@ -2206,7 +2215,6 @@ function courseProgressBuildExtractHtml({
   const safeBase = String(baseHref || '').replace(/"/g, '&quot;');
   const safeVerb = String(verbText || '').replace(/[<>]/g, '');
   const safeUnits = String(unitsText || '').replace(/[<>]/g, '');
-  const safeCount = String(unitsCountText || '').replace(/[<>]/g, '');
   const safePronoun = String(pronounText || '').replace(/[<>]/g, '');
   const safeOpenAdj = String(openAdjText || '').replace(/[<>]/g, '');
 
@@ -2496,8 +2504,7 @@ function courseProgressBuildExtractHtml({
 
     <p class="extract-text">
       <span class="hl hl-verb">${safeVerb}</span>
-      <span class="hl hl-units">${safeUnits}</span>
-      в обсязі <span class="hl hl-count">${safeCount}</span> сесій, під моїм керівництвом в ІНСТИТУТІ
+      <span class="hl hl-units">${safeUnits}</span>, під моїм керівництвом в ІНСТИТУТІ
       ПРОФЕСІЙНОЇ СУПЕРВІЗІЇ ТА EYRA PSYCHOSOCIAL ASSISTANCE, INC. Під час
       супервізійної роботи <span class="hl hl-name">${safeName}</span> демонструє високий рівень професійної
       рефлексії, здатність до глибокого аналізу терапевтичного процесу та
@@ -2615,11 +2622,10 @@ async function downloadCourseExtract() {
     console.error('Помилка при завантаженні курсів для витягу:', err);
   }
 
-  const { unitLabels, totalUnits } = courseProgressComputeDisplayRows({ courses, user, filters });
+  const { displayRows } = courseProgressComputeDisplayRows({ courses, user, filters });
   const verbText = courseProgressGetPassedVerb(user);
   const genderForms = courseProgressGetGenderForms(user);
-  const unitsText = courseProgressBuildUnitsText({ unitLabels, filters });
-  const unitsCountText = courseProgressFormatValue(totalUnits);
+  const unitsText = courseProgressBuildUnitsBreakdown({ displayRows, filters });
 
   const html = courseProgressBuildExtractHtml({
     fullName,
@@ -2627,7 +2633,6 @@ async function downloadCourseExtract() {
     baseHref,
     verbText,
     unitsText,
-    unitsCountText,
     pronounText: genderForms.pronoun,
     openAdjText: genderForms.openAdj,
   });

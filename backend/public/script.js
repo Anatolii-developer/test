@@ -2055,6 +2055,7 @@ function courseProgressComputeDisplayRows({ courses, user, filters }) {
   const totalUnits = unitRows.reduce((sum, row) => sum + row.taught + row.attended, 0);
 
   return {
+    allRows: rowsWithOverrides,
     displayRows,
     unitLabels: uniqueUnitLabels,
     totalUnits,
@@ -2172,16 +2173,16 @@ function courseProgressGetGenderForms(user) {
   };
 }
 
-function courseProgressBuildUnitsBreakdown({ displayRows, filters }) {
-  const rows = Array.isArray(displayRows) ? displayRows : [];
-  const totalsByKey = new Map(rows.map((row) => [row.key, row.taught + row.attended]));
-  const labelByKey = new Map(rows.map((row) => [row.key, row.label || row.key]));
+function courseProgressBuildUnitsBreakdown({ rows, filters }) {
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const totalsByKey = new Map(safeRows.map((row) => [row.key, row.taught + row.attended]));
+  const labelByKey = new Map(safeRows.map((row) => [row.key, row.label || row.key]));
 
   let unitKeys = [];
   if (filters?.units?.length) {
     unitKeys = filters.units.slice();
   } else {
-    unitKeys = rows
+    unitKeys = safeRows
       .filter((row) => row.key !== 'Конференція')
       .filter((row) => row.taught + row.attended > 0)
       .map((row) => row.key);
@@ -2632,10 +2633,10 @@ async function downloadCourseExtract() {
     console.error('Помилка при завантаженні курсів для витягу:', err);
   }
 
-  const { displayRows } = courseProgressComputeDisplayRows({ courses, user, filters });
+  const { allRows } = courseProgressComputeDisplayRows({ courses, user, filters });
   const verbText = courseProgressGetPassedVerb(user);
   const genderForms = courseProgressGetGenderForms(user);
-  const unitsText = courseProgressBuildUnitsBreakdown({ displayRows, filters });
+  const unitsText = courseProgressBuildUnitsBreakdown({ rows: allRows, filters });
 
   const html = courseProgressBuildExtractHtml({
     fullName,

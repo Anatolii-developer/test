@@ -187,12 +187,129 @@ window.addEventListener("DOMContentLoaded", async () => {
       ["profileTherapyGroups", "therapyGroups"],
       ["profileCrisisGroups", "crisisGroups"],
       ["profilePsychoanalyticDramaGroups", "psychoanalyticDramaGroups"],
+      ["profileCurrentPsychoanalysis", "currentPsychoanalysis"],
+      ["profileCurrentGroupAnalysis", "currentGroupAnalysis"],
+      ["profileCurrentAdler", "currentAdler"],
+      ["profileCurrentJung", "currentJung"],
+      ["profileCurrentClientCentered", "currentClientCentered"],
+      ["profileCurrentLogotherapy", "currentLogotherapy"],
+      ["profileCurrentReciprocalInhibition", "currentReciprocalInhibition"],
+      ["profileCurrentGroupPsychotherapy", "currentGroupPsychotherapy"],
+      ["profileCurrentGestalt", "currentGestalt"],
+      ["profileCurrentCBT", "currentCBT"],
+      ["profileCurrentOther", "currentOther"],
+      ["profilePastPsychoanalysis", "pastPsychoanalysis"],
+      ["profilePastGroupAnalysis", "pastGroupAnalysis"],
+      ["profilePastAdler", "pastAdler"],
+      ["profilePastJung", "pastJung"],
+      ["profilePastClientCentered", "pastClientCentered"],
+      ["profilePastLogotherapy", "pastLogotherapy"],
+      ["profilePastReciprocalInhibition", "pastReciprocalInhibition"],
+      ["profilePastGroupPsychotherapy", "pastGroupPsychotherapy"],
+      ["profilePastGestalt", "pastGestalt"],
+      ["profilePastCBT", "pastCBT"],
+      ["profilePastOther", "pastOther"],
+      ["profileCrisisIndividualConsultations", "crisisIndividualConsultations"],
+      ["profileCrisisGroupWork", "crisisGroupWork"],
+      ["profileCrisisSupervision", "crisisSupervision"],
+      ["profileEducationIndividualConsultations", "educationIndividualConsultations"],
+      ["profileEducationGroupWork", "educationGroupWork"],
+      ["profileEducationCrisisSupervision", "educationCrisisSupervision"],
+      ["profileCrisisWorkStateInstitutions", "crisisWorkStateInstitutions"],
+      ["profileCrisisWorkVolunteering", "crisisWorkVolunteering"],
+      ["profileCrisisWorkPrivate", "crisisWorkPrivate"],
+      ["profileSupervisionPsychoanalysis", "supervisionPsychoanalysis"],
+      ["profileSupervisionPsychotherapy", "supervisionPsychotherapy"],
+      ["profileSupervisionClinicalPsychology", "supervisionClinicalPsychology"],
+      ["profileSupervisionCrisisPsychology", "supervisionCrisisPsychology"],
+      ["profileSupervisionPedagogy", "supervisionPedagogy"],
+      ["profileSupervisionCoach", "supervisionCoach"],
+      ["profileSupervisionManagement", "supervisionManagement"],
+      ["profileSupervisionSupervision", "supervisionSupervision"],
+      ["profileSupervisionPatientsClientsAnalysands", "supervisionPatientsClientsAnalysands"],
+      ["profileSupervisionGroup", "supervisionGroup"],
     ];
 
     step3Fields.forEach(([id, key]) => {
       const el = document.getElementById(id);
       if (el) el.textContent = user[key] || "";
     });
+
+    const crisisHelpTextarea = document.getElementById("profileCrisisHelpTextarea");
+    if (crisisHelpTextarea) {
+      crisisHelpTextarea.value = user.crisisHelp || "";
+      if (typeof autoResize === "function") autoResize(crisisHelpTextarea);
+    }
+
+    const saveCrisisHelpBtn = document.getElementById("saveCrisisHelpBtn");
+    if (saveCrisisHelpBtn && crisisHelpTextarea) {
+      saveCrisisHelpBtn.addEventListener("click", async () => {
+        const newValue = (crisisHelpTextarea.value || "").trim();
+        try {
+          const upd = await fetch(`${API_BASE}/api/users/${user._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ crisisHelp: newValue }),
+          });
+          const result = await upd.json().catch(() => ({}));
+          if (upd.ok) {
+            if (window.currentUser) window.currentUser.crisisHelp = newValue;
+            try {
+              const stored = JSON.parse(localStorage.getItem("user") || "null");
+              if (stored) {
+                stored.crisisHelp = newValue;
+                localStorage.setItem("user", JSON.stringify(stored));
+              }
+            } catch (_) {}
+            alert("Збережено!");
+          } else {
+            alert("Помилка при збереженні: " + (result.message || "невідома"));
+          }
+        } catch (err) {
+          console.error("❌ Error:", err);
+          alert("Серверна помилка.");
+        }
+      });
+    }
+
+    const setupRatingGroup = (containerId, key) => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const current = String(user[key] || "");
+      container.querySelectorAll(".rating-circle").forEach((btn) => {
+        if (btn.dataset.value === current) btn.classList.add("active");
+        btn.addEventListener("click", async () => {
+          const value = btn.dataset.value;
+          container.querySelectorAll(".rating-circle").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          try {
+            const upd = await fetch(`${API_BASE}/api/users/${user._id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ [key]: value }),
+            });
+            if (upd.ok) {
+              if (window.currentUser) window.currentUser[key] = value;
+              try {
+                const stored = JSON.parse(localStorage.getItem("user") || "null");
+                if (stored) {
+                  stored[key] = value;
+                  localStorage.setItem("user", JSON.stringify(stored));
+                }
+              } catch (_) {}
+            }
+          } catch (err) {
+            console.error("❌ Error:", err);
+          }
+        });
+      });
+    };
+
+    setupRatingGroup("ratingVictim", "crisisRatingVictim");
+    setupRatingGroup("ratingSupervisor", "crisisRatingSupervisor");
+    setupRatingGroup("ratingSelf", "crisisRatingSelf");
 
     window.currentUser = user;
 

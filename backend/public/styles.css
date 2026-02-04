@@ -614,6 +614,7 @@ main {
 .profile-background {
   position: relative;
   z-index: 1;
+  background: #FFFDF7;
 }
 
 
@@ -1262,8 +1263,8 @@ body.success-page .nav-btn:hover {
   width: 1110px;
   border-radius: 24px;
   padding: 48px 60px;
-  background-color: transparent;
-  box-shadow: none;
+  background-color: #FFFFFF;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -1348,6 +1349,51 @@ body.success-page .nav-btn:hover {
 
 #step3 .table-edit-icon:hover {
   opacity: 1;
+}
+
+.rating-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rating-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-label {
+  color: #6B6B6B;
+  font-size: 16px;
+}
+
+.rating-circles {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rating-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #E37009;
+  background: transparent;
+  color: #E37009;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.rating-circle.active,
+.rating-circle:hover {
+  background: #E37009;
+  color: #fff;
 }
 
 .profile-step span {

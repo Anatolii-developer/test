@@ -1262,8 +1262,8 @@ body.success-page .nav-btn:hover {
   width: 1110px;
   border-radius: 24px;
   padding: 48px 60px;
-  background-color: transparent;
-  box-shadow: none;
+  background-color: #FFFFFF;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -1281,11 +1281,25 @@ body.success-page .nav-btn:hover {
   gap: 16px;
 }
 
+#step3 .profile-table-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 #step3 .profile-table-title {
   margin: 0;
   font-size: 18px;
   font-weight: 500;
   color: #8A8A8A;
+}
+
+#step3 .header-edit-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  margin-top: 2px;
 }
 
 #step3 .profile-table {
@@ -1322,35 +1336,6 @@ body.success-page .nav-btn:hover {
 
 #step3 .profile-table td:last-child {
   width: 55%;
-}
-
-#step3 .profile-table-section td {
-  border-left: none;
-  border-top: 2px solid #E37009;
-  text-align: left;
-  font-weight: 500;
-  color: #8A8A8A;
-  background: #FFFFFF;
-}
-
-#step3 .profile-table-section:first-child td {
-  border-top: none;
-}
-
-#step3 .profile-table-full .profile-table-label {
-  text-align: center;
-}
-
-#step3 .profile-table-full .profile-table-value {
-  text-align: center;
-}
-
-#step3 .profile-table-full .profile-table-value .textarea-wrapper {
-  margin-top: 6px;
-}
-
-#step3 .profile-table-full .save-btn-wrapper {
-  margin-top: 12px;
 }
 
 #step3 .profile-value-box {

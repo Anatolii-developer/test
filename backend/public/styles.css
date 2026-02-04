@@ -1324,6 +1324,35 @@ body.success-page .nav-btn:hover {
   width: 55%;
 }
 
+#step3 .profile-table-section td {
+  border-left: none;
+  border-top: 2px solid #E37009;
+  text-align: left;
+  font-weight: 500;
+  color: #8A8A8A;
+  background: #FFFFFF;
+}
+
+#step3 .profile-table-section:first-child td {
+  border-top: none;
+}
+
+#step3 .profile-table-full .profile-table-label {
+  text-align: center;
+}
+
+#step3 .profile-table-full .profile-table-value {
+  text-align: center;
+}
+
+#step3 .profile-table-full .profile-table-value .textarea-wrapper {
+  margin-top: 6px;
+}
+
+#step3 .profile-table-full .save-btn-wrapper {
+  margin-top: 12px;
+}
+
 #step3 .profile-value-box {
   display: flex;
   align-items: center;

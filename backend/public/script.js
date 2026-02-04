@@ -168,6 +168,32 @@ window.addEventListener("DOMContentLoaded", async () => {
       formatTextarea.value = user.format || "";
     }
 
+    // Step 3 fields
+    const step3Fields = [
+      ["profileLectures", "lectures"],
+      ["profileSeminars", "seminars"],
+      ["profileColloquiums", "colloquiums"],
+      ["profileGroupExperience", "groupExperience"],
+      ["profilePersonalTherapy", "personalTherapy"],
+      ["profilePersonalAnalysis", "personalAnalysis"],
+      ["profileIndividualSupervision", "individualSupervision"],
+      ["profileMentoring", "mentoring"],
+      ["profileGroupSupervision", "groupSupervision"],
+      ["profilePsychoanalyticPsychodrama", "psychoanalyticPsychodrama"],
+      ["profileTeachingSchool", "teachingSchool"],
+      ["profileTeachingUniversity", "teachingUniversity"],
+      ["profileProfessionalInstitutes", "professionalInstitutes"],
+      ["profileCommunityOrganizations", "communityOrganizations"],
+      ["profileTherapyGroups", "therapyGroups"],
+      ["profileCrisisGroups", "crisisGroups"],
+      ["profilePsychoanalyticDramaGroups", "psychoanalyticDramaGroups"],
+    ];
+
+    step3Fields.forEach(([id, key]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = user[key] || "";
+    });
+
     window.currentUser = user;
 
     // ✅ Ініціалізація textarea "Курси"
@@ -274,6 +300,7 @@ let updatedProfileData = {};
 
 function enableEdit(fieldId, mongoKey) {
   const span = document.getElementById(fieldId);
+  if (!span) return;
   const currentValue = span.textContent.trim();
 
   // Удаляем предыдущий контейнер, если есть
@@ -304,6 +331,7 @@ function enableEdit(fieldId, mongoKey) {
     input.setAttribute("pattern", "\\d*");
     input.setAttribute("placeholder", "Напр.: 5");
   }
+  updatedProfileData[mongoKey] = input.value.trim();
 
   // Кнопка сохранить
   const checkIcon = document.createElement("img");
@@ -317,9 +345,14 @@ function enableEdit(fieldId, mongoKey) {
   container.appendChild(input);
   container.appendChild(checkIcon);
 
-  // Вставляем container после <p>
-  const parentP = span.closest("p");
-  parentP.insertAdjacentElement("afterend", container);
+  // Вставляем container в релевантном месте
+  const host =
+    span.closest(".profile-value-box") ||
+    span.closest(".profile-value-wrapper") ||
+    span.parentElement;
+  if (host) {
+    host.insertAdjacentElement("afterend", container);
+  }
 
   input.addEventListener("input", () => {
     if (mongoKey === "experience") {
@@ -336,7 +369,8 @@ function enableEdit(fieldId, mongoKey) {
     }
 
     try {
-      const payload = { [mongoKey]: updatedProfileData[mongoKey] };
+      const nextValue = input.value.trim();
+      const payload = { [mongoKey]: nextValue };
      const res = await fetch(`${API_BASE}/api/users/${storedUser._id}`, {
   method: "PUT",
   headers: { "Content-Type": "application/json" },
@@ -346,17 +380,16 @@ function enableEdit(fieldId, mongoKey) {
 
       const result = await res.json();
       if (res.ok) {
-        const newSpan = document.createElement("span");
-        newSpan.id = fieldId;
-        newSpan.textContent = updatedProfileData[mongoKey];
-        newSpan.style.display = "block";
-        newSpan.style.whiteSpace = "pre-wrap";
-        newSpan.style.wordBreak = "break-word";
-        newSpan.style.marginTop = "8px";
-
-        parentP.appendChild(newSpan); // ✅ Добавляем в <p>
-        span.remove();               // ❌ Удаляем старый span
-        container.remove();          // ❌ Удаляем textarea
+        span.textContent = nextValue;
+        if (window.currentUser) window.currentUser[mongoKey] = nextValue;
+        try {
+          const stored = JSON.parse(localStorage.getItem("user") || "null");
+          if (stored) {
+            stored[mongoKey] = nextValue;
+            localStorage.setItem("user", JSON.stringify(stored));
+          }
+        } catch (_) {}
+        container.remove();
         updatedProfileData = {};
         alert("Зміни збережено!");
       } else {

@@ -457,87 +457,175 @@
   <div class="profile-card">
     <div class="profile-step-three">
 
-      <div class="editable-field">
-        <label>Ваша освіта і навчання з психології (в годинах):</label>
-
-        <p>Лекції: 
-          <span id="profileLectures"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileLectures', 'lectures')" />
-        </p>
-        <p>Семінари: 
-          <span id="profileSeminars"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileSeminars', 'seminars')" />
-        </p>
-        <p>Колоквіуми: 
-          <span id="profileColloquiums"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileColloquiums', 'colloquiums')" />
-        </p>
+      <div class="profile-table-block">
+        <p class="profile-table-title">Ваша освіта і навчання з психології (в годинах):</p>
+        <table class="profile-table">
+          <tr>
+            <td class="profile-table-label">Лекції</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileLectures" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileLectures', 'lectures')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Семінари</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileSeminars" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileSeminars', 'seminars')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Колоквіуми</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileColloquiums" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileColloquiums', 'colloquiums')" />
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
 
-      <div class="editable-field">
-        <label>Ваша освіта і навчання з психології, яку ви мали переважно (в годинах):</label>
-
-        <p>Особистий досвід в групі: 
-          <span id="profileGroupExperience"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileGroupExperience', 'groupExperience')" />
-        </p>
-        <p>Особиста терапія: 
-          <span id="profilePersonalTherapy"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profilePersonalTherapy', 'personalTherapy')" />
-        </p>
-        <p>Особистий психоаналіз: 
-          <span id="profilePersonalAnalysis"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profilePersonalAnalysis', 'personalAnalysis')" />
-        </p>
-        <p>Індивідуальні супервізії: 
-          <span id="profileIndividualSupervision"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileIndividualSupervision', 'individualSupervision')" />
-        </p>
-        <p>Менторський супровід: 
-          <span id="profileMentoring"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileMentoring', 'mentoring')" />
-        </p>
-        <p>Групові супервізії: 
-          <span id="profileGroupSupervision"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileGroupSupervision', 'groupSupervision')" />
-        </p>
-        <p>Психоаналітична психодрама: 
-          <span id="profilePsychoanalyticPsychodrama"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profilePsychoanalyticPsychodrama', 'psychoanalyticPsychodrama')" />
-        </p>
+      <div class="profile-table-block">
+        <p class="profile-table-title">Ваша освіта і навчання з психології, яку ви мали переважно (в годинах):</p>
+        <table class="profile-table">
+          <tr>
+            <td class="profile-table-label">Особистий досвід в групі</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileGroupExperience" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileGroupExperience', 'groupExperience')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Особиста терапія</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profilePersonalTherapy" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profilePersonalTherapy', 'personalTherapy')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Особистий психоаналіз</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profilePersonalAnalysis" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profilePersonalAnalysis', 'personalAnalysis')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Індивідуальні супервізії</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileIndividualSupervision" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileIndividualSupervision', 'individualSupervision')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Менторський супровід</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileMentoring" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileMentoring', 'mentoring')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Групові супервізії</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileGroupSupervision" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileGroupSupervision', 'groupSupervision')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Психоаналітична психодрама</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profilePsychoanalyticPsychodrama" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profilePsychoanalyticPsychodrama', 'psychoanalyticPsychodrama')" />
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
 
-      <div class="editable-field">
-        <label>Чи маєте ви досвід викладання, проведення тренінгів, надання супервізій. Скільки годин:</label>
-
-        <p>Викладання в школі: 
-          <span id="profileTeachingSchool"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileTeachingSchool', 'teachingSchool')" />
-        </p>
-        <p>Викладання у виші: 
-          <span id="profileTeachingUniversity"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileTeachingUniversity', 'teachingUniversity')" />
-        </p>
-        <p>Інститути професійних асоціацій: 
-          <span id="profileProfessionalInstitutes"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileProfessionalInstitutes', 'professionalInstitutes')" />
-        </p>
-        <p>Суспільні об'єднання: 
-          <span id="profileCommunityOrganizations"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileCommunityOrganizations', 'communityOrganizations')" />
-        </p>
-        <p>Ведення терапевтичних груп: 
-          <span id="profileTherapyGroups"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileTherapyGroups', 'therapyGroups')" />
-        </p>
-        <p>Кризові групи: 
-          <span id="profileCrisisGroups"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileCrisisGroups', 'crisisGroups')" />
-        </p>
-        <p>Групи психоаналітичної психодрами: 
-          <span id="profilePsychoanalyticDramaGroups"></span>
-          <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profilePsychoanalyticDramaGroups', 'psychoanalyticDramaGroups')" />
-        </p>
+      <div class="profile-table-block">
+        <p class="profile-table-title">Чи маєте ви досвід викладання, проведення тренінгів, надання супервізій. Скільки годин:</p>
+        <table class="profile-table">
+          <tr>
+            <td class="profile-table-label">Викладання в школі</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileTeachingSchool" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileTeachingSchool', 'teachingSchool')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Викладання у виші</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileTeachingUniversity" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileTeachingUniversity', 'teachingUniversity')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Інститути професійних асоціацій</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileProfessionalInstitutes" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileProfessionalInstitutes', 'professionalInstitutes')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Суспільні об'єднання</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileCommunityOrganizations" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileCommunityOrganizations', 'communityOrganizations')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Ведення терапевтичних груп</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileTherapyGroups" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileTherapyGroups', 'therapyGroups')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Кризові групи</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profileCrisisGroups" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profileCrisisGroups', 'crisisGroups')" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="profile-table-label">Групи психоаналітичної психодрами</td>
+            <td class="profile-table-value">
+              <div class="profile-value-box">
+                <span id="profilePsychoanalyticDramaGroups" class="profile-table-text"></span>
+                <img src="assets/edit-icon.svg" class="edit-icon table-edit-icon" onclick="enableEdit('profilePsychoanalyticDramaGroups', 'psychoanalyticDramaGroups')" />
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
 
     </div>

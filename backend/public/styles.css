@@ -2118,8 +2118,8 @@ body.success-page .nav-btn:hover {
 }
 
 .my-courses-hero-img {
-  width: 800px;
-  max-width: none;
+  width: 100%;
+  max-width: 1110px;
   height: auto;
   display: block;
   margin: 0 auto 20px;
@@ -2130,7 +2130,7 @@ body.success-page .nav-btn:hover {
   font-size: 64px;
   font-weight: 600;
   color: white;
-  padding: 100px;
+  padding: 16px 0 0;
 }
 
 .course-card {

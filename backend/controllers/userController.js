@@ -238,6 +238,16 @@ async function updateUser(req, res) {
   }
 }
 
+async function deleteUser(req, res) {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ message: "User deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 async function sendRecoveryCode(req, res) {
   const { email } = req.body;
 
@@ -294,6 +304,7 @@ module.exports = {
   updateUserStatus,
   loginUser,
   updateUser,
+  deleteUser,
   sendRecoveryCode,
   uploadUserPhoto,
   adminLogin,

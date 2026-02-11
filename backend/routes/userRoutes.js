@@ -177,4 +177,5 @@ router.get("/", userCtrl.getAllUsers);
 router.get("/:id", userCtrl.getUserById);
 router.put("/:id/status", userCtrl.updateUserStatus);
 router.put("/:id", userCtrl.updateUser);
+router.delete("/:id", auth, adminOnly, userCtrl.deleteUser);
 module.exports = router;

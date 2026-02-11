@@ -149,6 +149,10 @@
   margin-top: 24px;
 }
 
+.submit-btn.danger {
+  background-color: #A31D1D;
+}
+
     .top-block {
   display: flex;
   justify-content: space-between;
@@ -161,6 +165,12 @@
   justify-content: center;
   gap: 40px;
   margin-top: 32px;
+}
+
+.delete-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
 }
 
 .input-with-select {
@@ -274,11 +284,15 @@
    
   </div>
 
-  <div class="action-buttons">
+<div class="action-buttons">
   <button class="submit-btn" id="submitDecision">Submit</button>
   <button type="button" class="submit-btn" onclick="window.location.href='/admin/admin-requests.html'">Назад</button>
 
 </div>
+
+  <div class="delete-section">
+    <button type="button" class="submit-btn danger" id="deleteProfileBtn">Видалити профіль</button>
+  </div>
 </div>
 
 
@@ -460,7 +474,7 @@ if (status === "APPROVED") {
     loadUser();
 loadRoles();
 
-    document.getElementById("submitDecision").addEventListener("click", async () => {
+document.getElementById("submitDecision").addEventListener("click", async () => {
   const status = document.getElementById("decisionSelect").value;
   const selectedRoles = Array.from(document.querySelectorAll('.dropdown-options input:checked')).map(cb => cb.value);
 
@@ -488,6 +502,37 @@ loadRoles();
   alert("Серверна помилка.");
 }
 });
+
+    const deleteBtn = document.getElementById("deleteProfileBtn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", async () => {
+        if (!userId) {
+          alert("Не вдалося визначити користувача.");
+          return;
+        }
+
+        const ok = confirm("Ви впевнені, що хочете видалити профіль? Цю дію неможливо скасувати.");
+        if (!ok) return;
+
+        try {
+          const res = await fetch(`${API_URL}/api/users/${userId}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+
+          if (res.ok) {
+            alert("Профіль видалено.");
+            window.location.href = "/admin/admin-requests.html";
+          } else {
+            const data = await res.json().catch(() => ({}));
+            alert(data.message || "Помилка при видаленні профілю.");
+          }
+        } catch (err) {
+          console.error("Delete profile error:", err);
+          alert("Серверна помилка.");
+        }
+      });
+    }
 
 
 

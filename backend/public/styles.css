@@ -608,6 +608,26 @@ main {
   z-index: -1;
 }
 
+body.certificates-page .background-top {
+  background-image: url('assets/certificates/certificate-main.png');
+}
+
+body.my-courses-page .background-top {
+  background-image: url('assets/library/my-courses.png');
+}
+
+body.library-page .background-top {
+  background-image: url('assets/library/library-hero.png');
+}
+
+body.career-faq-page-body .background-top {
+  background-image: url('assets/library/career-img.png');
+}
+
+body.practice-page .background-top {
+  background-image: url('assets/practise-records.png');
+}
+
 
 
 

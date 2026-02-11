@@ -4304,6 +4304,17 @@ textarea {
   }
 }
 
+@media (min-width: 769px) {
+  body.profile-page .site-header,
+  body.my-courses-page .site-header,
+  body.practice-page .site-header,
+  body.library-page .site-header,
+  body.career-faq-page-body .site-header,
+  body.certificates-page .site-header {
+    display: grid !important;
+  }
+}
+
   /* ===== LIBRARY (mobile spec) ===== */
   @media (max-width: 480px) {
     /* Hero illustration width exactly 376px on phone */

@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="background-top"></div>
   <header class="site-header">
     <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
       <img src="assets/sidebar/burger.svg" alt="" />
@@ -47,13 +48,11 @@
   </aside>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-  <main id="mainContent">
+  <main id="mainContent" class="profile-background">
+    <section class="profile-hero">
+      <h1 class="about-me-title">MY COURSES</h1>
+    </section>
     <section class="my-courses-section">
-      <div class="my-courses-hero">
-        <img src="assets/library/my-courses.png" alt="Hero" class="my-courses-hero-img" />
-        <h1 class="my-courses-title">MY COURSES</h1>
-      </div>
-
       <div class="course-card">
         <div class="course-info">
           <h3>Пройдені курси</h3>

@@ -20,41 +20,8 @@
       flex-direction: column;
       align-items: center;
       gap: 32px;
-      padding: 32px 16px 80px;
+      padding: 0 16px 80px;
       box-sizing: border-box;
-    }
-
-    .hero {
-      width: 100%;
-      max-width: 1110px;
-      min-height: clamp(300px, 50vh, 560px);
-      background: url('./assets/library/career-img.png') no-repeat center top/cover;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 24px 32px 8px;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: none;
-      filter: none;
-      margin-top: 12px;
-    }
-
-    .hero::after {
-      content: none;
-    }
-
-    .hero-title {
-      position: relative;
-      color: #FFFFFF;
-      font-weight: 600;
-      font-size: clamp(36px, 6vw, 64px);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-align: center;
-      text-shadow: none;
-      margin-bottom: 0;
     }
 
     .faq-section {
@@ -184,26 +151,10 @@
       flex-shrink: 0;
     }
 
-    @media (max-width: 1100px) {
-      .hero {
-        max-width: 100%;
-      }
-    }
-
     @media (max-width: 768px) {
       main.career-faq-page {
         gap: 20px;
-        padding: 20px 12px 60px;
-      }
-
-      .hero {
-        min-height: 280px;
-        padding: 20px 24px 8px;
-        border-radius: 20px;
-      }
-
-      .hero-title {
-        font-size: clamp(28px, 8vw, 40px);
+        padding: 0 12px 60px;
       }
 
       .faq-section {
@@ -239,6 +190,7 @@
   </style>
 </head>
 <body>
+  <div class="background-top"></div>
   <header class="site-header">
     <button class="burger" id="burgerBtn" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar">
       <img src="assets/sidebar/burger.svg" alt="" />
@@ -278,9 +230,9 @@
   </aside>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-  <main class="career-faq-page" id="mainContent">
-    <section class="hero">
-      <div class="hero-title">CAREER PLANNING</div>
+  <main class="career-faq-page profile-background" id="mainContent">
+    <section class="profile-hero">
+      <h1 class="about-me-title">CAREER PLANNING</h1>
     </section>
 
     <section class="faq-section">

@@ -104,6 +104,7 @@
   </style>
 </head>
 <body>
+  <div class="background-top"></div>
   <header class="site-header">
     <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
       <img src="assets/sidebar/burger.svg" alt="" />
@@ -117,7 +118,6 @@
       UA ▼
     </button>
   </header>
-  <div class="library-background-top"></div>
   <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />
@@ -145,15 +145,9 @@
   <!-- Backdrop for mobile sidebar -->
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-  <main class="library-background" id="mainContent">
-        <section class="library-hero">
-  <picture>
-    <!-- Мобильная картинка 376×812 -->
-    <source media="(max-width: 480px)" srcset="assets/library-hero-mobile.svg" />
-    <!-- Десктоп по умолчанию -->
-    <img src="assets/library/library-hero.png" alt="Library Hero" class="hero-img" width="1110" height="auto" />
-  </picture>
-  <h1 class="hero-title">LIBRARY</h1>
+  <main class="library-background profile-background" id="mainContent">
+        <section class="profile-hero">
+  <h1 class="about-me-title">LIBRARY</h1>
 </section>
           
 

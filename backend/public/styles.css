@@ -613,7 +613,7 @@ body.certificates-page .background-top {
 }
 
 body.my-courses-page .background-top {
-  background-image: url('assets/library/my-courses.png');
+  background-image: url('assets/mycourses-hero.png');
   background-size: 1110px auto;
   background-position: center top;
 }
@@ -627,7 +627,7 @@ body.career-faq-page-body .background-top {
 }
 
 body.practice-page .background-top {
-  background-image: url('assets/practise-records.png');
+  background-image: url('assets/practice-hero.png');
   background-size: 1110px auto;
   background-position: center top;
 }

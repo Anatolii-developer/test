@@ -81,19 +81,41 @@ body {
   height: 24px;
 }
 
-.site-header .lang-switch {
-  width: 40px;
-  height: 40px;
+.lang-fab {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  background: #fff;
+  background: #ffffff;
+  border: 0;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2000;
 }
 
-.site-header .lang-switch img {
+.lang-fab img {
   width: 24px;
   height: 24px;
   display: block;
+}
+
+@media (max-width: 480px) {
+  .lang-fab {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+  }
+  .lang-fab img {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 .drawer-backdrop {
@@ -4304,15 +4326,13 @@ textarea {
   }
 }
 
-@media (min-width: 769px) {
-  body.profile-page .site-header,
-  body.my-courses-page .site-header,
-  body.practice-page .site-header,
-  body.library-page .site-header,
-  body.career-faq-page-body .site-header,
-  body.certificates-page .site-header {
-    display: grid !important;
-  }
+body.profile-page .site-header,
+body.my-courses-page .site-header,
+body.practice-page .site-header,
+body.library-page .site-header,
+body.career-faq-page-body .site-header,
+body.certificates-page .site-header {
+  display: none !important;
 }
 
   /* ===== LIBRARY (mobile spec) ===== */

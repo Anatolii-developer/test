@@ -85,13 +85,13 @@ body {
   position: fixed;
   top: 16px;
   right: 16px;
-  width: 44px;
-  height: 44px;
+  width: 64px;
+  height: 64px;
   padding: 0;
-  background: #ffffff;
+  background: transparent;
   border: 0;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  box-shadow: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -100,8 +100,8 @@ body {
 }
 
 .lang-fab img {
-  width: 24px;
-  height: 24px;
+  width: 56px;
+  height: 56px;
   display: block;
 }
 
@@ -109,12 +109,12 @@ body {
   .lang-fab {
     top: 10px;
     right: 10px;
-    width: 40px;
-    height: 40px;
+    width: 56px;
+    height: 56px;
   }
   .lang-fab img {
-    width: 22px;
-    height: 22px;
+    width: 50px;
+    height: 50px;
   }
 }
 

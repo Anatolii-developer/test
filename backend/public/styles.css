@@ -5539,7 +5539,7 @@ body.course-progress-filter-page .progress-filter-submit {
 
 /* Фон страницы (специфичный зеленый цвет со скриншота) */
 body.practice-page {
-    background-color: #9ABCA0; /* Шалфейно-зеленый */
+    background-color: #96C194; /* Шалфейно-зеленый */
     background-image: none; /* Убираем фоновую картинку других страниц, если она есть */
 }
 

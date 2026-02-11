@@ -81,6 +81,12 @@ body {
   height: 24px;
 }
 
+.lang-switch img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
 .drawer-backdrop {
   position: fixed;
   inset: 0;

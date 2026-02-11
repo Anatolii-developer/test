@@ -81,9 +81,15 @@ body {
   height: 24px;
 }
 
-.lang-switch img {
-  width: 24px;
-  height: 24px;
+.site-header .lang-switch {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.site-header .lang-switch img {
+  width: 40px;
+  height: 40px;
   display: block;
 }
 

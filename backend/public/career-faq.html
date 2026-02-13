@@ -362,6 +362,11 @@
       heroTitle: "ПЛАНУВАННЯ КАРʼЄРИ",
       faqTitle: "FAQ",
       empty: "Запитання наразі відсутні.",
+      buttons: {
+        apply: "Подати заявку",
+        mentor: "Менторство",
+        supervisor: "Супервізори",
+      },
       items: [
         {
           q: "Що таке менторство у психотерапевтичному середовищі?",
@@ -417,6 +422,11 @@
       heroTitle: "ПЛАНИРОВАНИЕ КАРЬЕРЫ",
       faqTitle: "FAQ",
       empty: "Вопросы пока отсутствуют.",
+      buttons: {
+        apply: "Подать заявку",
+        mentor: "Менторство",
+        supervisor: "Супервизоры",
+      },
       items: [
         {
           q: "Что такое менторство в психотерапевтической среде?",
@@ -472,6 +482,11 @@
       heroTitle: "CAREER PLANNING",
       faqTitle: "FAQ",
       empty: "No questions available yet.",
+      buttons: {
+        apply: "Apply",
+        mentor: "Mentorship",
+        supervisor: "Supervision",
+      },
       items: [
         {
           q: "What is mentorship in the psychotherapy field?",
@@ -613,6 +628,14 @@
     const faqTitle = document.querySelector('.faq-section h2');
     if (heroTitle) heroTitle.textContent = copy.heroTitle;
     if (faqTitle) faqTitle.textContent = copy.faqTitle;
+    if (copy.buttons) {
+      const applyText = document.querySelector('.cta-stack .apply-button .apply-text');
+      const mentorText = document.querySelector('#mentorButton .apply-text');
+      const supervisorText = document.querySelector('#supervisorButton .apply-text');
+      if (applyText) applyText.textContent = copy.buttons.apply;
+      if (mentorText) mentorText.textContent = copy.buttons.mentor;
+      if (supervisorText) supervisorText.textContent = copy.buttons.supervisor;
+    }
 
     if (normalized === 'ua') {
       const apiItems = await fetchApiFaq();

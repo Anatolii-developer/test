@@ -2846,3 +2846,122 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// ===== Sidebar language switch (UA/RU/EN) =====
+(() => {
+  const LANG_KEY = 'uiLang';
+  const LANG_ORDER = ['ua', 'ru', 'en'];
+  const LANG_ATTR = { ua: 'uk', ru: 'ru', en: 'en' };
+  const SIDEBAR_I18N = {
+    ua: {
+      about: "Про Мене",
+      certs: "Мої Сертифікати",
+      career: "Планування Карʼєри",
+      library: "Бібліотека",
+      courses: "Мої Курси",
+      practice: "Облік Практики",
+      forum: "Форум",
+      logout: "Вийти з аккаунту",
+    },
+    ru: {
+      about: "Обо мне",
+      certs: "Мои сертификаты",
+      career: "Планирование карьеры",
+      library: "Библиотека",
+      courses: "Мои курсы",
+      practice: "Учёт практики",
+      forum: "Форум",
+      logout: "Выйти из аккаунта",
+    },
+    en: {
+      about: "About Me",
+      certs: "My Certificates",
+      career: "Career Planning",
+      library: "Library",
+      courses: "My Courses",
+      practice: "Practice Records",
+      forum: "Forum",
+      logout: "Log Out",
+    },
+  };
+
+  function normalizeLang(value) {
+    const v = String(value || '').toLowerCase().trim();
+    if (v.startsWith('uk') || v === 'ua') return 'ua';
+    if (v.startsWith('ru')) return 'ru';
+    if (v.startsWith('en')) return 'en';
+    return 'ua';
+  }
+
+  function getStoredLang() {
+    try {
+      const stored = localStorage.getItem(LANG_KEY);
+      if (stored) return normalizeLang(stored);
+    } catch (_) {}
+    return normalizeLang(document.documentElement.lang);
+  }
+
+  function setHtmlLang(lang) {
+    const htmlLang = LANG_ATTR[lang] || 'uk';
+    document.documentElement.setAttribute('lang', htmlLang);
+  }
+
+  function updateSidebarText(lang) {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    const t = SIDEBAR_I18N[lang] || SIDEBAR_I18N.ua;
+    const setText = (selector, text) => {
+      const el = sidebar.querySelector(selector);
+      if (el) el.textContent = text;
+    };
+    setText('nav a[href="profile.html"] span', t.about);
+    setText('nav a[href="mycertificates.html"] span', t.certs);
+    setText('nav a[href="career-faq.html"] span', t.career);
+    setText('nav a[href="library.html"] span', t.library);
+    setText('nav a[href="my-courses.html"] span', t.courses);
+    setText('nav a[href="practice-records.html"] span', t.practice);
+    setText('nav a[href="forum/index.html"] span', t.forum);
+    setText('.logout span', t.logout);
+
+    const forumImg = sidebar.querySelector('nav a[href="forum/index.html"] img');
+    if (forumImg) forumImg.alt = t.forum;
+  }
+
+  function updateLangButton(lang) {
+    const btn = document.getElementById('langBtn');
+    if (!btn) return;
+    const label = lang.toUpperCase();
+    const isIconOnly = btn.classList.contains('lang-fab');
+    if (!isIconOnly) {
+      btn.textContent = `${label} ▼`;
+    }
+    btn.setAttribute('aria-label', `Language: ${label}`);
+    btn.setAttribute('title', label);
+    btn.dataset.lang = lang;
+  }
+
+  function applyLang(lang, persist = true) {
+    const normalized = normalizeLang(lang);
+    updateSidebarText(normalized);
+    updateLangButton(normalized);
+    setHtmlLang(normalized);
+    if (persist) {
+      try { localStorage.setItem(LANG_KEY, normalized); } catch (_) {}
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const initial = getStoredLang();
+    applyLang(initial, false);
+
+    const btn = document.getElementById('langBtn');
+    if (!btn) return;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const current = normalizeLang(btn.dataset.lang || getStoredLang());
+      const idx = Math.max(0, LANG_ORDER.indexOf(current));
+      const next = LANG_ORDER[(idx + 1) % LANG_ORDER.length];
+      applyLang(next, true);
+    });
+  });
+})();

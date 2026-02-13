@@ -105,6 +105,45 @@ body {
   display: block;
 }
 
+.lang-menu {
+  position: fixed;
+  z-index: 2200;
+  display: none;
+  min-width: 180px;
+  background: #1f4f27;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+.lang-menu.open {
+  display: block;
+}
+
+.lang-option {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  padding: 10px 12px;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.lang-option:hover,
+.lang-option:focus {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+.lang-option.active {
+  background: rgba(255, 255, 255, 0.22);
+}
+
 @media (max-width: 480px) {
   .lang-fab {
     top: 10px;

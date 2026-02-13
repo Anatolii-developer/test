@@ -2847,11 +2847,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ===== Sidebar language switch (UA/RU/EN) =====
+// ===== Sidebar language switch (dropdown) =====
 (() => {
   const LANG_KEY = 'uiLang';
-  const LANG_ORDER = ['ua', 'ru', 'en'];
   const LANG_ATTR = { ua: 'uk', ru: 'ru', en: 'en' };
+  const MENU_ORDER = ['en', 'ua', 'ru'];
+  const LANG_LABELS = {
+    en: 'English',
+    ua: 'Українська',
+    ru: 'Русский',
+  };
   const SIDEBAR_I18N = {
     ua: {
       about: "Про Мене",
@@ -2950,18 +2955,102 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function buildMenu(btn) {
+    const menu = document.createElement('div');
+    menu.className = 'lang-menu';
+    menu.setAttribute('role', 'listbox');
+    menu.setAttribute('aria-label', 'Language');
+    menu.hidden = true;
+    MENU_ORDER.forEach((code) => {
+      const opt = document.createElement('button');
+      opt.type = 'button';
+      opt.className = 'lang-option';
+      opt.dataset.lang = code;
+      opt.setAttribute('role', 'option');
+      opt.textContent = LANG_LABELS[code] || code.toUpperCase();
+      menu.appendChild(opt);
+    });
+    btn.insertAdjacentElement('afterend', menu);
+    return menu;
+  }
+
+  function positionMenu(btn, menu) {
+    const gap = 8;
+    const rect = btn.getBoundingClientRect();
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    const menuRect = menu.getBoundingClientRect();
+    let left = rect.left;
+    if (left + menuRect.width > window.innerWidth - gap) {
+      left = window.innerWidth - menuRect.width - gap;
+    }
+    if (left < gap) left = gap;
+    let top = rect.bottom + gap;
+    if (top + menuRect.height > window.innerHeight - gap) {
+      top = rect.top - menuRect.height - gap;
+    }
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.visibility = 'visible';
+  }
+
+  function openMenu(btn, menu) {
+    const current = normalizeLang(btn.dataset.lang || getStoredLang());
+    menu.hidden = false;
+    menu.classList.add('open');
+    positionMenu(btn, menu);
+    btn.setAttribute('aria-expanded', 'true');
+    menu.querySelectorAll('.lang-option').forEach((opt) => {
+      opt.classList.toggle('active', opt.dataset.lang === current);
+    });
+  }
+
+  function closeMenu(btn, menu) {
+    menu.classList.remove('open');
+    menu.hidden = true;
+    menu.style.display = 'none';
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const initial = getStoredLang();
     applyLang(initial, false);
 
     const btn = document.getElementById('langBtn');
     if (!btn) return;
+    const menu = buildMenu(btn);
+
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const current = normalizeLang(btn.dataset.lang || getStoredLang());
-      const idx = Math.max(0, LANG_ORDER.indexOf(current));
-      const next = LANG_ORDER[(idx + 1) % LANG_ORDER.length];
-      applyLang(next, true);
+      if (menu.classList.contains('open')) {
+        closeMenu(btn, menu);
+      } else {
+        openMenu(btn, menu);
+      }
+    });
+
+    menu.addEventListener('click', (e) => {
+      const opt = e.target.closest('.lang-option');
+      if (!opt) return;
+      applyLang(opt.dataset.lang, true);
+      closeMenu(btn, menu);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (btn.contains(e.target) || menu.contains(e.target)) return;
+      if (menu.classList.contains('open')) closeMenu(btn, menu);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) {
+        closeMenu(btn, menu);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (menu.classList.contains('open')) {
+        positionMenu(btn, menu);
+      }
     });
   });
 })();

@@ -350,13 +350,181 @@
 
 
 <script>
-/* ---------- FAQ: загрузка и рендер ---------- */
+/* ---------- FAQ: i18n + рендер ---------- */
 (function () {
   const FAQ_API = '/api/career-faq'; // публичный список (isActive=true)
-  let didRender = false;
   let toggleBound = false;
+  let apiCache = null;
+  let apiTried = false;
 
-  // Экранирование и переносы
+  const CAREER_FAQ_COPY = {
+    ua: {
+      heroTitle: "CAREER PLANNING",
+      faqTitle: "FAQ",
+      empty: "Запитання наразі відсутні.",
+      items: [
+        {
+          q: "Що таке менторство у психотерапевтичному середовищі?",
+          a: "Менторство — це форма професійної підтримки, коли досвідчений спеціаліст (ментор) супроводжує колегу на певному етапі його професійного становлення. Це може стосуватися як етичних і професійних питань, так і особистісного розвитку в ролі психотерапевта.",
+        },
+        {
+          q: "Чим менторство відрізняється від супервізії?",
+          a: "Супервізія зосереджена на роботі з клієнтськими випадками й етичними межами терапії. Менторство — це більш широка взаємодія: розвиток професійної ідентичності, підтримка у виборі подальшого навчання, професійного шляху, балансі між особистим і професійним.",
+        },
+        {
+          q: "Чи буде в мене план дій із професійного розвитку під час роботи з ментором?",
+          a: "Так, ментор допоможе структурувати запити та розробити реалістичний план: як у навчанні, так і в кар’єрному русі. План може включати рекомендації щодо програм, публікацій, супервізій чи участі в професійних спільнотах.",
+        },
+        {
+          q: "Як виглядає робота з ментором?",
+          a: "Це регулярні зустрічі (онлайн або офлайн), у яких ви обговорюєте запити, виклики, сумніви, цілі. Формат може бути як структурованим (за попереднім планом), так і відкритим — за потребою. Ментор не «вчить», а радше підтримує, спрямовує й ділиться досвідом.",
+        },
+        {
+          q: "Хто може бути ментором?",
+          a: "Ментором зазвичай стає досвідчений фахівець, який має не лише глибоку експертизу, а й етичну чутливість та бажання підтримувати розвиток інших. У нашій спільноті ментори проходять спеціальну підготовку й відбираються з урахуванням запиту ментората.",
+        },
+        {
+          q: "Скільки триває менторство?",
+          a: "Тривалість менторства визначається індивідуально — залежно від запиту, рівня підготовки та професійних цілей. Найчастіше процес триває від 3 до 6 місяців, проте можливі й довготривалі формати співпраці — до року і більше. Для досягнення відчутних змін у карʼєрі зазвичай потрібен час, тому менторство розглядається як процес, а не одноразова зустріч.",
+        },
+        {
+          q: "Чи є теми, які не входять у менторство?",
+          a: "Так. Менторство не замінює особисту терапію, супервізію або консультування з юридичних питань. У разі потреби ментор може порекомендувати відповідного спеціаліста.",
+        },
+        {
+          q: "Чи є різниця між менторством і наставництвом?",
+          a: "У нашому контексті ці терміни часто вживаються як синоніми. Проте «наставництво» іноді акцентує на передаванні досвіду, тоді як «менторство» більше про партнерство і рефлексивну підтримку.",
+        },
+        {
+          q: "Як відбувається добір ментора?",
+          a: "Менторат заповнює анкету із запитами, після чого координатор проєкту пропонує кандидата, який відповідає тематиці запиту, стилю роботи та етапу розвитку ментората.",
+        },
+        {
+          q: "Що мені дасть менторство?",
+          a: "Підтримку, зменшення почуття ізольованості, можливість ставити «незручні» питання, переосмислювати професійну ідентичність і отримувати зворотний зв’язок від колеги, який вже пройшов подібний шлях. Це безпека та розвиток одночасно.",
+        },
+        {
+          q: "Як враховується робота з ментором в загальному обліку проходження супервізії?",
+          a: "Години роботи з ментором зараховуються до супервізійної практики та будуть відображатися в особистому кабінеті в “Обліку практики”.",
+        },
+        {
+          q: "Який смисл та значення має менторство для формування високопрофесійного спеціаліста в області ментального здоров’я та психологічної підтримки?",
+          a: "Справжній професіонал з психологічного консультування в ідеалі мав би володіти наступними вміннями та поєднувати їх в своїй особистості:\nвміння і навички працювати в консультативній роботі (психотерапевтична, психоаналітична, кризова і т.д.);\nотримувати та надавати супервізію;\nоволодіти мистецтвом менторства, тобто бути спроможним здійснювати управління власною карʼєрою і визначати свою професійну долю і навчати цьому учнів, початківців і колег.",
+        },
+      ],
+    },
+    ru: {
+      heroTitle: "Планирование Карьеры",
+      faqTitle: "FAQ: Менторство по планированию карьеры (в личном кабинете)",
+      empty: "Вопросы пока отсутствуют.",
+      items: [
+        {
+          q: "Что такое менторство в психотерапевтической среде?",
+          a: "Менторство — это форма профессиональной поддержки, при которой более опытный специалист (ментор) сопровождает коллегу на определённом этапе его профессионального развития. Это может включать этические и профессиональные вопросы, а также личностное развитие в роли психотерапевта.",
+        },
+        {
+          q: "Чем менторство отличается от супервизии?",
+          a: "Супервизия фокусируется на работе с клиентскими случаями и профессионально-этическими аспектами терапии. Менторство имеет более широкий фокус — развитие профессиональной идентичности, поддержка в выборе обучения, карьерного пути и баланса между личной и профессиональной жизнью.",
+        },
+        {
+          q: "Будет ли у меня план профессионального развития при работе с ментором?",
+          a: "Да. Ментор поможет прояснить ваши цели и разработать реалистичный план развития, включающий рекомендации по обучению, публикациям, супервизии и участию в профессиональных сообществах.",
+        },
+        {
+          q: "Как проходит работа с ментором?",
+          a: "Это регулярные встречи (онлайн или офлайн), на которых обсуждаются ваши вопросы, профессиональные вызовы, сомнения и цели. Формат может быть структурированным или более гибким. Ментор не обучает в директивном смысле, а поддерживает, направляет и делится опытом.",
+        },
+        {
+          q: "Кто может быть ментором?",
+          a: "Ментором является опытный специалист с высокой профессиональной квалификацией, развитой этической чувствительностью и готовностью поддерживать развитие коллег. В нашем сообществе менторы проходят специальную подготовку и отбираются с учётом запроса менти.",
+        },
+        {
+          q: "Какова продолжительность менторства?",
+          a: "Продолжительность определяется индивидуально и зависит от запроса и целей. Чаще всего процесс длится от 3 до 6 месяцев, но возможны и более длительные форматы — до года и более. Менторство рассматривается как процесс, а не разовая консультация.",
+        },
+        {
+          q: "Есть ли темы, которые не входят в менторство?",
+          a: "Да. Менторство не заменяет личную терапию, супервизию или юридическую консультацию. При необходимости ментор может порекомендовать соответствующего специалиста.",
+        },
+        {
+          q: "Есть ли разница между менторством и наставничеством?",
+          a: "В нашем контексте эти термины используются как синонимы. Однако «наставничество» чаще подразумевает передачу опыта, тогда как «менторство» больше ориентировано на партнёрство и рефлексивную поддержку.",
+        },
+        {
+          q: "Как происходит подбор ментора?",
+          a: "Вы заполняете анкету, после чего координатор проекта подбирает ментора, соответствующего вашему запросу, профессиональному этапу и стилю работы.",
+        },
+        {
+          q: "Что даст мне менторство?",
+          a: "Профессиональную поддержку, снижение чувства изоляции, возможность обсуждать сложные вопросы, развитие профессиональной идентичности и получение обратной связи от более опытного коллеги.",
+        },
+        {
+          q: "Как учитываются часы менторства?",
+          a: "Часы менторства засчитываются как часть супервизионной практики и отображаются в личном кабинете в разделе «Учёт практики».",
+        },
+        {
+          q: "Какова роль менторства в формировании профессионала?",
+          a: "Высококвалифицированный специалист в сфере психического здоровья сочетает:\nклинические навыки консультирования и психотерапии\nспособность получать и предоставлять супервизию\nспособность управлять собственной карьерой и поддерживать развитие других специалистов",
+        },
+      ],
+    },
+    en: {
+      heroTitle: "Career Planning",
+      faqTitle: "FAQ: Career Mentorship (available in your personal account)",
+      empty: "No questions available yet.",
+      items: [
+        {
+          q: "What is mentorship in the psychotherapy field?",
+          a: "Mentorship is a form of professional support in which an experienced practitioner (mentor) accompanies a colleague at a particular stage of their professional development. It may include ethical and clinical considerations as well as personal and professional growth as a therapist.",
+        },
+        {
+          q: "How does mentorship differ from supervision?",
+          a: "Supervision focuses on clinical cases and professional-ethical aspects of therapeutic work. Mentorship has a broader scope — supporting professional identity development, career direction, educational planning, and work-life balance.",
+        },
+        {
+          q: "Will I receive a professional development plan?",
+          a: "Yes. Your mentor will help clarify your goals and develop a realistic professional development plan, including recommendations for training programs, supervision, publications, and professional engagement.",
+        },
+        {
+          q: "What does the mentorship process look like?",
+          a: "Mentorship involves regular meetings (online or in person) where you discuss your goals, questions, challenges, and professional direction. The process may be structured or flexible. The mentor’s role is not to instruct, but to support, guide, and share experience.",
+        },
+        {
+          q: "Who can be a mentor?",
+          a: "Mentors are experienced professionals with advanced clinical expertise, ethical awareness, and a commitment to supporting the development of colleagues. Mentors in our community undergo specialized preparation and are matched based on mentee needs.",
+        },
+        {
+          q: "How long does mentorship last?",
+          a: "The duration is individualized and depends on your goals and professional stage. Typically, mentorship lasts 3–6 months, though longer engagements (up to a year or more) are possible. Mentorship is understood as a developmental process, not a one-time consultation.",
+        },
+        {
+          q: "Are there topics outside the scope of mentorship?",
+          a: "Yes. Mentorship does not replace personal therapy, clinical supervision, or legal consultation. When appropriate, mentors may recommend additional professional resources.",
+        },
+        {
+          q: "Is mentorship different from coaching or advising?",
+          a: "In our context, mentorship emphasizes professional partnership, reflective dialogue, and developmental support rather than directive instruction.",
+        },
+        {
+          q: "How are mentors assigned?",
+          a: "You complete an application form. The program coordinator then matches you with a mentor based on your goals, professional stage, and areas of interest.",
+        },
+        {
+          q: "What are the benefits of mentorship?",
+          a: "Mentorship provides professional support, reduces isolation, helps clarify professional identity, and offers valuable feedback from a more experienced colleague.",
+        },
+        {
+          q: "Are mentorship hours counted toward supervision requirements?",
+          a: "Yes. Mentorship hours are recorded as part of your supervision practice and are documented in your Practice Log.",
+        },
+        {
+          q: "Why is mentorship important for professional development?",
+          a: "Highly qualified mental health professionals typically integrate:\nclinical and therapeutic competence\nthe ability to receive and provide supervision\nthe ability to manage their own career and support the development of others",
+        },
+      ],
+    },
+  };
+
   const escapeHtml = (s='') =>
     s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const nl2br = (s='') => s.replace(/\n/g, '<br/>');
@@ -376,29 +544,28 @@
     });
   }
 
-  async function loadFaq() {
-    bindFaqToggle(getFaqContainer());
-
-    try {
-      const res = await fetch(FAQ_API, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to load FAQ');
-      const items = await res.json();
-      renderFaq(Array.isArray(items) ? items : []);
-    } catch (err) {
-      console.error('FAQ load error:', err);
-    }
+  function normalizeLang(value) {
+    const v = String(value || '').toLowerCase().trim();
+    if (v.startsWith('uk') || v === 'ua') return 'ua';
+    if (v.startsWith('ru')) return 'ru';
+    if (v.startsWith('en')) return 'en';
+    return 'ua';
   }
 
-  function renderFaq(items) {
-    if (didRender) return; // защита от двойного рендера
-    didRender = true;
+  function getStoredLang() {
+    try {
+      const stored = localStorage.getItem('uiLang');
+      if (stored) return normalizeLang(stored);
+    } catch (_) {}
+    return normalizeLang(document.documentElement.lang);
+  }
 
+  function renderFaq(items, emptyText) {
     const container = getFaqContainer();
     if (!container) return;
 
     bindFaqToggle(container);
 
-    // Удалим старые .faq-item (если были размечены статически)
     container.querySelectorAll('.faq-item').forEach(n => n.remove());
     container.querySelectorAll('.faq-empty').forEach(n => n.remove());
 
@@ -406,7 +573,7 @@
     if (!list.length) {
       const empty = document.createElement('div');
       empty.className = 'faq-empty';
-      empty.textContent = 'Запитання наразі відсутні.';
+      empty.textContent = emptyText || 'Запитання наразі відсутні.';
       container.appendChild(empty);
       return;
     }
@@ -415,14 +582,55 @@
       const wrap = document.createElement('div');
       wrap.className = 'faq-item';
       wrap.innerHTML = `
-        ${escapeHtml(it.question || '')}
-        <div class="faq-answer">${nl2br(escapeHtml(it.answer || ''))}</div>
+        ${escapeHtml(it.question || it.q || '')}
+        <div class="faq-answer">${nl2br(escapeHtml(it.answer || it.a || ''))}</div>
       `;
       container.appendChild(wrap);
     });
   }
 
-  document.addEventListener('DOMContentLoaded', loadFaq);
+  async function fetchApiFaq() {
+    if (apiCache || apiTried) return apiCache;
+    apiTried = true;
+    try {
+      const res = await fetch(FAQ_API, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to load FAQ');
+      const items = await res.json();
+      apiCache = Array.isArray(items) ? items : [];
+      return apiCache;
+    } catch (err) {
+      console.error('FAQ load error:', err);
+      apiCache = null;
+      return null;
+    }
+  }
+
+  async function renderForLang(lang) {
+    const normalized = normalizeLang(lang);
+    const copy = CAREER_FAQ_COPY[normalized] || CAREER_FAQ_COPY.ua;
+
+    const heroTitle = document.querySelector('.profile-hero .about-me-title');
+    const faqTitle = document.querySelector('.faq-section h2');
+    if (heroTitle) heroTitle.textContent = copy.heroTitle;
+    if (faqTitle) faqTitle.textContent = copy.faqTitle;
+
+    if (normalized === 'ua') {
+      const apiItems = await fetchApiFaq();
+      if (apiItems && apiItems.length) {
+        renderFaq(apiItems, copy.empty);
+        return;
+      }
+    }
+    renderFaq(copy.items, copy.empty);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    void renderForLang(getStoredLang());
+  });
+
+  window.addEventListener('uiLangChange', (e) => {
+    void renderForLang(e.detail?.lang);
+  });
 })();
 
 // ---------- Helpers: extract roles from various payload shapes ----------

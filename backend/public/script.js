@@ -2950,6 +2950,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSidebarText(normalized);
     updateLangButton(normalized);
     setHtmlLang(normalized);
+    try {
+      window.dispatchEvent(new CustomEvent('uiLangChange', { detail: { lang: normalized } }));
+    } catch (_) {}
     if (persist) {
       try { localStorage.setItem(LANG_KEY, normalized); } catch (_) {}
     }

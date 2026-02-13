@@ -422,6 +422,150 @@
     <script>
       const API = "/api/career-applications?mine=1";
 
+      const CAREER_REQUESTS_I18N = {
+        ua: {
+          title: "Подати заявку",
+          applyTitle: "Подати заявку",
+          backHome: "Головна",
+          empty: "Поки що немає заявок.",
+          emptyLogin: "Щоб переглянути заявки — увійдіть у систему.",
+          emptyLoginMine: "Щоб переглянути власні заявки — увійдіть у систему.",
+          sessionExpired: "Сеанс закінчився. Будь ласка, увійдіть ще раз.",
+          loginBtn: "Увійти",
+          learnMore: "Дізнатись більше",
+          viewApplicationAria: "Відкрити заявку детально",
+          modalTitle: "Заявка",
+          modalTitleWithName: "Заявка — {fio}",
+          metaSubmitted: "Дата подання: {date}",
+          qName: "Імʼя",
+          qSurname: "Прізвище",
+          qSubmittedAt: "Дата подання заявки",
+          qExperience: "Скільки років у вас практики",
+          qAge: "До якої вікової категорії Ви відноситесь",
+          qRequest: "Ваш запит до ментора",
+          qAbout: "Про себе / деталі ситуації",
+          qDefault: "Питання",
+          close: "Закрити",
+          noName: "Без імені",
+          loadError: "Не вдалося завантажити заявки.",
+          tagSupervisor: "С",
+          tagMentor: "М",
+        },
+        ru: {
+          title: "Подать заявку",
+          applyTitle: "Подать заявку",
+          backHome: "На Главную",
+          empty: "Пока что нет заявок.",
+          emptyLogin: "Чтобы просмотреть заявки — войдите в систему.",
+          emptyLoginMine: "Чтобы просмотреть свои заявки — войдите в систему.",
+          sessionExpired: "Сеанс закончился. Пожалуйста, войдите ещё раз.",
+          loginBtn: "Войти",
+          learnMore: "Узнать больше",
+          viewApplicationAria: "Просмотреть заявку",
+          modalTitle: "Заявка",
+          modalTitleWithName: "Заявка — {fio}",
+          metaSubmitted: "Дата подачи: {date}",
+          qName: "Имя",
+          qSurname: "Фамилия",
+          qSubmittedAt: "Дата подачи заявки",
+          qExperience: "Сколько лет у вас практики",
+          qAge: "Ваш возраст",
+          qRequest: "Ваш запрос к ментору",
+          qAbout: "О себе / детали ситуации",
+          qDefault: "Вопрос",
+          close: "Закрыть",
+          noName: "Без имени",
+          loadError: "Не удалось загрузить заявки.",
+          tagSupervisor: "С",
+          tagMentor: "М",
+        },
+        en: {
+          title: "Apply",
+          applyTitle: "Apply",
+          backHome: "Home",
+          empty: "No applications yet.",
+          emptyLogin: "To view applications, please log in.",
+          emptyLoginMine: "To view your applications, please log in.",
+          sessionExpired: "Session expired. Please log in again.",
+          loginBtn: "Log in",
+          learnMore: "Learn more",
+          viewApplicationAria: "View application details",
+          modalTitle: "Application",
+          modalTitleWithName: "Application — {fio}",
+          metaSubmitted: "Submitted: {date}",
+          qName: "First name",
+          qSurname: "Last name",
+          qSubmittedAt: "Application date",
+          qExperience: "Years of practice",
+          qAge: "Age group",
+          qRequest: "Request to the mentor",
+          qAbout: "About you / details",
+          qDefault: "Question",
+          close: "Close",
+          noName: "No name",
+          loadError: "Failed to load applications.",
+          tagSupervisor: "S",
+          tagMentor: "M",
+        },
+      };
+
+      let currentLang = "ua";
+      const normalizeLang = (value) => {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      };
+      const getStoredLang = () => {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      };
+      const t = (key) => {
+        const copy = CAREER_REQUESTS_I18N[currentLang] || CAREER_REQUESTS_I18N.ua;
+        return copy[key] || "";
+      };
+      const template = (str, vars = {}) =>
+        String(str || "").replace(/\{(\w+)\}/g, (_, k) =>
+          vars[k] !== undefined ? vars[k] : ""
+        );
+
+      function setButtonTextWithIcon(el, text) {
+        if (!el) return;
+        const textNode = Array.from(el.childNodes).find(
+          (n) => n.nodeType === Node.TEXT_NODE
+        );
+        if (textNode) {
+          textNode.textContent = ` ${text}`;
+        } else {
+          el.appendChild(document.createTextNode(` ${text}`));
+        }
+      }
+
+      function applyLang(lang) {
+        currentLang = normalizeLang(lang);
+        const copy = CAREER_REQUESTS_I18N[currentLang] || CAREER_REQUESTS_I18N.ua;
+        document.title = copy.title;
+        const applyTitle = document.querySelector(".apply-title");
+        if (applyTitle) applyTitle.textContent = copy.applyTitle;
+        const backBtn = document.querySelector(".back-button");
+        setButtonTextWithIcon(backBtn, copy.backHome);
+        const modalTitle = document.getElementById("reqModalTitle");
+        if (modalTitle) modalTitle.textContent = copy.modalTitle;
+        const closeBtn = document.getElementById("reqCloseBtn");
+        if (closeBtn) closeBtn.textContent = copy.close;
+        const emptyEl = document.getElementById("empty");
+        if (emptyEl && emptyEl.style.display !== "none" && emptyEl.textContent) {
+          emptyEl.textContent = copy.empty;
+        }
+        document.querySelectorAll(".btn-more .btn-label").forEach((el) => {
+          el.textContent = copy.learnMore;
+        });
+      }
+
       // Get token from various possible keys
       function getAuthToken() {
         const direct =
@@ -470,7 +614,7 @@
           empty.id = "empty";
           empty.className = "empty";
           empty.style.display = "none";
-          empty.textContent = "Поки що немає заявок.";
+          empty.textContent = t("empty");
           form.appendChild(empty);
         }
         return { listEl: list, emptyEl: empty };
@@ -479,13 +623,12 @@
       // Friendly notice instead of redirect loop
       function showLoginNotice(msg) {
         const { emptyEl, listEl } = ensureContainers();
-        emptyEl.textContent =
-          msg || "Щоб переглянути заявки — увійдіть у систему.";
+        emptyEl.textContent = msg || t("emptyLogin");
         emptyEl.style.display = "block";
         if (listEl) listEl.innerHTML = "";
         const btn = document.createElement("a");
         btn.href = "index.html";
-        btn.textContent = "Увійти";
+        btn.textContent = t("loginBtn");
         btn.style.cssText =
           "display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;";
         emptyEl.appendChild(btn);
@@ -529,7 +672,7 @@
             }`.trim()) ||
           (item.fullName && item.fullName.trim()) ||
           (item.email || "").trim() ||
-          "Без імені";
+          t("noName");
 
         const created = item.createdAt
           ? formatDate(item.createdAt)
@@ -538,11 +681,13 @@
           : "";
 
         // НОВОЕ: определяем адресата (бэкенд присылает target или targetType)
-        const t = (item.target || item.targetType || "")
+        const targetCode = (item.target || item.targetType || "")
           .toString()
           .toLowerCase();
         // Буква: С — супервізор, М — ментор (кириллица)
-        const tagLetter = t.startsWith("sup") ? "С" : "М";
+        const tagLetter = targetCode.startsWith("sup")
+          ? t("tagSupervisor")
+          : t("tagMentor");
 
         const row = document.createElement("div");
         row.className = "req-row";
@@ -571,8 +716,9 @@
 
         const more = document.createElement("button");
         more.className = "btn-more";
+        more.setAttribute("aria-label", t("viewApplicationAria"));
         more.innerHTML = `
-          <span class="btn-label">Дізнатись більше</span>
+          <span class="btn-label">${t("learnMore")}</span>
           <img src="./assets/library/arrow.png" alt="Arrow" class="btn-arrow" />
         `;
         more.addEventListener("click", () => openReqModal(item));
@@ -587,9 +733,7 @@
         try {
           const user = await ensureAuth();
           if (!user) {
-            showLoginNotice(
-              "Щоб переглянути власні заявки — увійдіть у систему."
-            );
+            showLoginNotice(t("emptyLoginMine"));
             return;
           }
 
@@ -615,7 +759,7 @@
               data.ok === false &&
               /unauthorized/i.test(data.message || ""))
           ) {
-            showLoginNotice("Сеанс закінчився. Будь ласка, увійдіть ще раз.");
+            showLoginNotice(t("sessionExpired"));
             return;
           }
 
@@ -635,7 +779,7 @@
 
           if (!items.length) {
             emptyEl.style.display = "block";
-            emptyEl.textContent = "Поки що немає заявок.";
+            emptyEl.textContent = t("empty");
             return;
           }
 
@@ -651,13 +795,21 @@
         } catch (err) {
           console.error("Career applications load failed:", err);
           const { emptyEl } = ensureContainers();
-          emptyEl.textContent = "Не вдалося завантажити заявки.";
+          emptyEl.textContent = t("loadError");
           emptyEl.style.display = "block";
         }
       }
 
       // Run after DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        applyLang(getStoredLang());
+      });
       document.addEventListener("DOMContentLoaded", load);
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyLang(e.detail?.lang);
+        load();
+      });
 
       function esc(s = "") {
         return String(s).replace(
@@ -679,7 +831,7 @@
         const last = u.lastName || item.lastName || "";
         return first || last
           ? `${first} ${last}`.trim()
-          : item.fullName || item.email || "Без імені";
+          : item.fullName || item.email || t("noName");
       }
 
       function getReqEls() {
@@ -716,43 +868,45 @@
         const fio = fullNameFrom(item);
         const when = item.createdAt || item.created_at || item.created || null;
         const whenStr = when ? formatDate(when) : "";
-        title.textContent = `Заявка — ${fio}`;
-        meta.textContent = whenStr ? `Дата подання: ${whenStr}` : "";
+        title.textContent = template(t("modalTitleWithName"), { fio });
+        meta.textContent = whenStr
+          ? template(t("metaSubmitted"), { date: whenStr })
+          : "";
 
         // Q&A блок
         qa.innerHTML = "";
 
         const rows = [
           {
-            q: "Імʼя",
+            q: t("qName"),
             a: (item.user?.firstName || item.firstName || "").trim(),
           },
           {
-            q: "Прізвище",
+            q: t("qSurname"),
             a: (item.user?.lastName || item.lastName || "").trim(),
           },
-          { q: "Дата подання заявки", a: whenStr },
+          { q: t("qSubmittedAt"), a: whenStr },
           {
-            q: "Скільки років у вас практики",
+            q: t("qExperience"),
             a: item.experience || item.exp || "",
           },
           {
-            q: "До якої вікової категорії Ви відноситесь",
+            q: t("qAge"),
             a: item.ageGroup || item.age || "",
           },
           {
-            q: "Ваш запит до ментора",
+            q: t("qRequest"),
             a: item.requestText || item.request || "",
           },
           {
-            q: "Про себе / деталі ситуації",
+            q: t("qAbout"),
             a: item.aboutText || item.about || "",
           },
         ];
 
         if (Array.isArray(item.answers)) {
           item.answers.forEach((x) => {
-            rows.push({ q: x.question || "Питання", a: x.answer || "" });
+            rows.push({ q: x.question || t("qDefault"), a: x.answer || "" });
           });
         }
 

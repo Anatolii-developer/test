@@ -322,6 +322,118 @@
     </main>
 
     <script>
+      const SUPERVISOR_REQUESTS_I18N = {
+        ua: {
+          title: "Супервізор — Заявки всіх учасників",
+          applyTitle: "Супервізор — Заявки всіх учасників",
+          backHome: "Головна",
+          mentorRequests: "Менторські заявки",
+          pageSubtitle: "Заявки всіх учасників",
+          empty: "Поки що немає заявок учасників.",
+          loginNotice: "Щоб переглянути заявки — увійдіть у систему.",
+          loginBtn: "Увійти",
+          learnMore: "Дізнатись більше",
+          ariaOpen: "Відкрити заявку детально",
+          noName: "Без імені",
+          accessDenied: "Доступ лише для супервізорів.",
+          loadError: "Не вдалося завантажити заявки.",
+        },
+        ru: {
+          title: "Супервизор — Заявки всех участников",
+          applyTitle: "Супервизор — Заявки всех участников",
+          backHome: "На Главную",
+          mentorRequests: "Менторские заявки",
+          pageSubtitle: "Заявки всех участников",
+          empty: "Пока что нет заявок участников.",
+          loginNotice: "Чтобы просмотреть заявки — войдите в систему.",
+          loginBtn: "Войти",
+          learnMore: "Узнать больше",
+          ariaOpen: "Просмотреть заявку",
+          noName: "Без имени",
+          accessDenied: "Доступ только для супервизоров.",
+          loadError: "Не удалось загрузить заявки.",
+        },
+        en: {
+          title: "Supervisor — All Participants' Requests",
+          applyTitle: "Supervisor — All Participants' Requests",
+          backHome: "Home",
+          mentorRequests: "Mentor requests",
+          pageSubtitle: "All participants' requests",
+          empty: "No participant requests yet.",
+          loginNotice: "To view applications, please log in.",
+          loginBtn: "Log in",
+          learnMore: "Learn more",
+          ariaOpen: "View application details",
+          noName: "No name",
+          accessDenied: "Supervisors only.",
+          loadError: "Failed to load applications.",
+        },
+      };
+      let currentLang = "ua";
+      const normalizeLang = (value) => {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      };
+      const getStoredLang = () => {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      };
+      const t = (key) => {
+        const copy =
+          SUPERVISOR_REQUESTS_I18N[currentLang] || SUPERVISOR_REQUESTS_I18N.ua;
+        return copy[key] || "";
+      };
+
+      function setButtonTextWithIcon(el, text) {
+        if (!el) return;
+        const textNode = Array.from(el.childNodes).find(
+          (n) => n.nodeType === Node.TEXT_NODE
+        );
+        if (textNode) {
+          textNode.textContent = ` ${text}`;
+        } else {
+          el.appendChild(document.createTextNode(` ${text}`));
+        }
+      }
+
+      function applyLang(lang) {
+        currentLang = normalizeLang(lang);
+        const copy =
+          SUPERVISOR_REQUESTS_I18N[currentLang] || SUPERVISOR_REQUESTS_I18N.ua;
+        document.title = copy.title;
+        const applyTitle = document.querySelector(".apply-title");
+        if (applyTitle) applyTitle.textContent = copy.applyTitle;
+        const backBtn = document.querySelector(".back-button");
+        setButtonTextWithIcon(backBtn, copy.backHome);
+        const mentorBtn = document.querySelector(
+          '.toolbar a[href="career-mentor-requests.html"]'
+        );
+        if (mentorBtn) mentorBtn.textContent = copy.mentorRequests;
+        const subtitle = document.querySelector(".page-subtitle");
+        if (subtitle) subtitle.textContent = copy.pageSubtitle;
+        const emptyEl = document.getElementById("empty");
+        if (emptyEl && emptyEl.style.display !== "none") {
+          emptyEl.textContent = copy.empty;
+        }
+        document.querySelectorAll(".btn-more .btn-label").forEach((el) => {
+          el.textContent = copy.learnMore;
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyLang(getStoredLang());
+      });
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyLang(e.detail?.lang);
+        if (typeof load === "function") load();
+      });
       const pad = (n) => String(n).padStart(2, "0");
       function formatDate(iso) {
         const d = new Date(iso);
@@ -336,7 +448,7 @@
         const last = u.lastName || item.lastName || "";
         return first || last
           ? `${first} ${last}`.trim()
-          : item.fullName || item.email || "Без імені";
+          : item.fullName || item.email || t("noName");
       }
       function ensureContainers() {
         const form = document.querySelector(".apply-form") || document.body;
@@ -352,20 +464,19 @@
           empty.id = "empty";
           empty.className = "empty";
           empty.style.display = "none";
-          empty.textContent = "Поки що немає заявок учасників.";
+          empty.textContent = t("empty");
           form.appendChild(empty);
         }
         return { listEl: list, emptyEl: empty };
       }
       function showLoginNotice(msg) {
         const { emptyEl, listEl } = ensureContainers();
-        emptyEl.textContent =
-          msg || "Щоб переглянути заявки — увійдіть у систему.";
+        emptyEl.textContent = msg || t("loginNotice");
         emptyEl.style.display = "block";
         if (listEl) listEl.innerHTML = "";
         const btn = document.createElement("a");
         btn.href = "index.html";
-        btn.textContent = "Увійти";
+        btn.textContent = t("loginBtn");
         btn.style.cssText =
           "display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;";
         emptyEl.appendChild(btn);
@@ -401,9 +512,9 @@
         more.href = `career-supervisor-request.html?id=${encodeURIComponent(
           id
         )}`;
-        more.setAttribute("aria-label", "Відкрити заявку детально");
+        more.setAttribute("aria-label", t("ariaOpen"));
         more.innerHTML = `
-          <span class="btn-label">Дізнатись більше</span>
+          <span class="btn-label">${t("learnMore")}</span>
           <img src="./assets/library/arrow.png" alt="Arrow" class="btn-arrow" />
         `;
         row.append(left, more);
@@ -478,7 +589,7 @@
         const { listEl, emptyEl } = ensureContainers();
         const user = await ensureSupervisor();
         if (!user) {
-          showLoginNotice("Доступ лише для супервізорів.");
+          showLoginNotice(t("accessDenied"));
           return;
         }
         try {
@@ -486,7 +597,7 @@
           listEl.innerHTML = "";
           if (!items.length) {
             emptyEl.style.display = "block";
-            emptyEl.textContent = "Поки що немає заявок учасників.";
+            emptyEl.textContent = t("empty");
             return;
           }
           emptyEl.style.display = "none";
@@ -499,7 +610,7 @@
             .forEach((it, idx) => listEl.appendChild(rowTemplate(idx + 1, it)));
         } catch (err) {
           console.error(err);
-          emptyEl.textContent = "Не вдалося завантажити заявки.";
+          emptyEl.textContent = t("loadError");
           emptyEl.style.display = "block";
         }
       }

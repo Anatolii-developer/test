@@ -433,6 +433,208 @@
     <script>
       const API = "http://157.230.121.24:5050/api/career-applications";
 
+      const APPLY_I18N = {
+        ua: {
+          title: "Подати заявку",
+          applyTitle: "Подати заявку",
+          backHome: "Головна",
+          mentorBtn: "Менторство",
+          mentorMine: "Менторство (мої заявки)",
+          targetQuestion: "До кого Ви звертаєтесь?",
+          targetSupervisor: "Супервізора",
+          targetMentor: "Ментора",
+          expQuestion: "Скільки років у вас практики:",
+          exp0: "зовсім початківець/студент або практикуючий до 7 років",
+          exp1: "практикуючий від 7 до 15 років",
+          exp2: "від 15 і більше років практики",
+          ageQuestion: "До якої категорії людей за віком Ви відноситесь:",
+          age0: "до 32 років",
+          age1: "від 32 до 42 років",
+          age2: "від 42 до 52 років",
+          age3: "від 52 до 65 років",
+          age4: "за 65 років",
+          requestLabel: "Напишіть, будь ласка, Ваш запит, з яким Ви звертаєтесь до ментора:",
+          requestPlaceholder: "Ваш запит...",
+          aboutLabel:
+            "Напишіть про себе те, що вважаєте за потрібним знати ментору про себе та ситуацію:",
+          aboutPlaceholder: "Інформація про себе...",
+          submit: "Подати заявку",
+          viewSubmitted: "Переглянути подані заявки",
+        },
+        ru: {
+          title: "Подать заявку",
+          applyTitle: "Подать заявку",
+          backHome: "На Главную",
+          mentorBtn: "Менторство",
+          mentorMine: "Менторство (мои заявки)",
+          targetQuestion: "К кому Вы обращаетесь?",
+          targetSupervisor: "Супервизору",
+          targetMentor: "Ментору",
+          expQuestion: "Сколько лет у вас практики:",
+          exp0: "начинающий / студент или до 7 лет практики",
+          exp1: "7–15 лет практики",
+          exp2: "более 15 лет практики",
+          ageQuestion: "Ваш возраст:",
+          age0: "до 32 лет",
+          age1: "32–42",
+          age2: "42–52",
+          age3: "52–65",
+          age4: "старше 65",
+          requestLabel: "Опишите ваш запрос к ментору:",
+          requestPlaceholder: "Ваш запрос...",
+          aboutLabel: "Расскажите о себе (важная информация для ментора):",
+          aboutPlaceholder: "Информация о себе...",
+          submit: "Подать заявку",
+          viewSubmitted: "Просмотреть анкеты",
+        },
+        en: {
+          title: "Apply",
+          applyTitle: "Apply",
+          backHome: "Home",
+          mentorBtn: "Mentorship",
+          mentorMine: "Mentorship (my requests)",
+          targetQuestion: "Who are you contacting?",
+          targetSupervisor: "Supervisor",
+          targetMentor: "Mentor",
+          expQuestion: "How many years of practice do you have?",
+          exp0: "Beginner / student or up to 7 years of practice",
+          exp1: "7–15 years of practice",
+          exp2: "More than 15 years of practice",
+          ageQuestion: "Your age:",
+          age0: "Up to 32",
+          age1: "32–42",
+          age2: "42–52",
+          age3: "52–65",
+          age4: "Over 65",
+          requestLabel: "Describe your request to the mentor:",
+          requestPlaceholder: "Your request...",
+          aboutLabel: "Tell us about yourself (important information for the mentor):",
+          aboutPlaceholder: "About you...",
+          submit: "Apply",
+          viewSubmitted: "View forms",
+        },
+      };
+      let currentLang = "ua";
+
+      function normalizeLang(value) {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      }
+
+      function getStoredLang() {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      }
+
+      function setLabelText(label, text) {
+        if (!label) return;
+        const nodes = Array.from(label.childNodes).filter(
+          (n) => n.nodeType === Node.TEXT_NODE
+        );
+        if (nodes.length) {
+          nodes[nodes.length - 1].textContent = ` ${text}`;
+          return;
+        }
+        label.appendChild(document.createTextNode(` ${text}`));
+      }
+
+      function setButtonTextWithIcon(el, text) {
+        if (!el) return;
+        const textNode = Array.from(el.childNodes).find(
+          (n) => n.nodeType === Node.TEXT_NODE
+        );
+        if (textNode) {
+          textNode.textContent = ` ${text}`;
+        } else {
+          el.appendChild(document.createTextNode(` ${text}`));
+        }
+      }
+
+      function applyLang(lang) {
+        currentLang = normalizeLang(lang);
+        const copy = APPLY_I18N[currentLang] || APPLY_I18N.ua;
+
+        document.title = copy.title;
+
+        const applyTitle = document.querySelector(".apply-title");
+        if (applyTitle) applyTitle.textContent = copy.applyTitle;
+
+        const backBtn = document.querySelector(".back-button");
+        setButtonTextWithIcon(backBtn, copy.backHome);
+
+        const applyBtn = document.getElementById("applyBtn");
+        if (applyBtn) applyBtn.textContent = copy.mentorBtn;
+        const mentorViewBtn = document.getElementById("mentorViewBtn");
+        if (
+          mentorViewBtn &&
+          new URLSearchParams(location.search).get("view") === "all"
+        ) {
+          mentorViewBtn.textContent = copy.mentorMine;
+        }
+
+        const submitBtn = document.getElementById("submitBtn");
+        if (submitBtn) submitBtn.textContent = copy.submit;
+
+        const viewSubmitted = document.querySelector(
+          ".secondary-actions .view-requests-button"
+        );
+        if (viewSubmitted) viewSubmitted.textContent = copy.viewSubmitted;
+
+        const groups = document.querySelectorAll(".apply-form .form-group");
+        if (groups[0]) {
+          const p = groups[0].querySelector("p");
+          if (p) p.textContent = copy.targetQuestion;
+          const labels = groups[0].querySelectorAll("label");
+          setLabelText(labels[0], copy.targetSupervisor);
+          setLabelText(labels[1], copy.targetMentor);
+        }
+        if (groups[1]) {
+          const p = groups[1].querySelector("p");
+          if (p) p.textContent = copy.expQuestion;
+          const labels = groups[1].querySelectorAll("label");
+          setLabelText(labels[0], copy.exp0);
+          setLabelText(labels[1], copy.exp1);
+          setLabelText(labels[2], copy.exp2);
+        }
+        if (groups[2]) {
+          const p = groups[2].querySelector("p");
+          if (p) p.textContent = copy.ageQuestion;
+          const labels = groups[2].querySelectorAll("label");
+          setLabelText(labels[0], copy.age0);
+          setLabelText(labels[1], copy.age1);
+          setLabelText(labels[2], copy.age2);
+          setLabelText(labels[3], copy.age3);
+          setLabelText(labels[4], copy.age4);
+        }
+        if (groups[3]) {
+          const p = groups[3].querySelector("p");
+          if (p) p.textContent = copy.requestLabel;
+        }
+        if (groups[4]) {
+          const p = groups[4].querySelector("p");
+          if (p) p.textContent = copy.aboutLabel;
+        }
+
+        const requestInput = document.getElementById("requestText");
+        if (requestInput) requestInput.placeholder = copy.requestPlaceholder;
+        const aboutInput = document.getElementById("aboutText");
+        if (aboutInput) aboutInput.placeholder = copy.aboutPlaceholder;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyLang(getStoredLang());
+      });
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyLang(e.detail?.lang);
+      });
+
       document
         .getElementById("submitBtn")
         .addEventListener("click", async () => {
@@ -511,7 +713,8 @@
                 if (
                   new URLSearchParams(location.search).get("view") === "all"
                 ) {
-                  mentorBtn.textContent = "Менторство (мої заявки)";
+                  const copy = APPLY_I18N[currentLang] || APPLY_I18N.ua;
+                  mentorBtn.textContent = copy.mentorMine;
                   mentorBtn.href = "career-requests.html?view=mine";
                 }
               }

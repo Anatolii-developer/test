@@ -422,6 +422,138 @@
     </main>
 
     <script>
+      const MENTOR_REQUEST_I18N = {
+        ua: {
+          title: "Ментор — Заявка",
+          guardAccess: "Доступ лише для менторів.",
+          guardBack: "Повернутися",
+          tabBack: "Повернутися",
+          tabSettingsHtml: "Налаштування <br /> ментора",
+          contact: "Звʼязатися",
+          labels: {
+            lastName: "Прізвище",
+            firstName: "Імʼя",
+            middleName: "По-батькові",
+            submittedAt: "Дата подання заявки",
+            experience: "Скільки років у вас практики",
+            age: "Категорія за віком",
+            request: "Запит до ментора",
+            about: "Про себе / ситуація",
+            education: "Психологічна освіта",
+            directions: "Напрямок роботи",
+          },
+          errorNoId: "Не передано id заявки.",
+          errorLoad: "Помилка завантаження заявки.",
+        },
+        ru: {
+          title: "Ментор — Заявка",
+          guardAccess: "Доступ только для менторов.",
+          guardBack: "Вернуться",
+          tabBack: "Вернуться",
+          tabSettingsHtml: "Настройки <br /> ментора",
+          contact: "Связаться",
+          labels: {
+            lastName: "Фамилия",
+            firstName: "Имя",
+            middleName: "Отчество",
+            submittedAt: "Дата подачи заявки",
+            experience: "Сколько лет у вас практики",
+            age: "Возрастная категория",
+            request: "Запрос к ментору",
+            about: "О себе / ситуация",
+            education: "Психологическое образование",
+            directions: "Направление работы",
+          },
+          errorNoId: "Не передано id заявки.",
+          errorLoad: "Ошибка загрузки заявки.",
+        },
+        en: {
+          title: "Mentor — Application",
+          guardAccess: "Mentors only.",
+          guardBack: "Back",
+          tabBack: "Back",
+          tabSettingsHtml: "Mentor <br /> settings",
+          contact: "Contact",
+          labels: {
+            lastName: "Last name",
+            firstName: "First name",
+            middleName: "Middle name",
+            submittedAt: "Application date",
+            experience: "Years of practice",
+            age: "Age group",
+            request: "Request to the mentor",
+            about: "About you / situation",
+            education: "Psychological education",
+            directions: "Areas of work",
+          },
+          errorNoId: "Application id is missing.",
+          errorLoad: "Failed to load application.",
+        },
+      };
+
+      let currentLang = "ua";
+      const normalizeLang = (value) => {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      };
+      const getStoredLang = () => {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      };
+      const t = (key) => {
+        const copy = MENTOR_REQUEST_I18N[currentLang] || MENTOR_REQUEST_I18N.ua;
+        return copy[key] || "";
+      };
+
+      function applyLang(lang) {
+        currentLang = normalizeLang(lang);
+        const copy = MENTOR_REQUEST_I18N[currentLang] || MENTOR_REQUEST_I18N.ua;
+        document.title = copy.title;
+        const guard = document.getElementById("guard");
+        if (guard) {
+          const textNode = Array.from(guard.childNodes).find(
+            (n) => n.nodeType === Node.TEXT_NODE
+          );
+          if (textNode) textNode.textContent = ` ${copy.guardAccess} `;
+          const link = guard.querySelector("a");
+          if (link) link.textContent = copy.guardBack;
+        }
+        const tabBack = document.querySelector(".tab.light");
+        if (tabBack) tabBack.textContent = copy.tabBack;
+        const tabSettings = document.querySelector(".tab.dark");
+        if (tabSettings) tabSettings.innerHTML = copy.tabSettingsHtml;
+        const contactBtn = document.querySelector(".contact-btn");
+        if (contactBtn) contactBtn.textContent = copy.contact;
+
+        const nameLabels = document.querySelectorAll(".grid-names .field label");
+        if (nameLabels[0]) nameLabels[0].textContent = copy.labels.lastName;
+        if (nameLabels[1]) nameLabels[1].textContent = copy.labels.firstName;
+        if (nameLabels[2]) nameLabels[2].textContent = copy.labels.middleName;
+
+        const infoLabels = document.querySelectorAll(".info-grid .field label");
+        if (infoLabels[0]) infoLabels[0].textContent = copy.labels.submittedAt;
+        if (infoLabels[1]) infoLabels[1].textContent = copy.labels.experience;
+        if (infoLabels[2]) infoLabels[2].textContent = copy.labels.age;
+        if (infoLabels[3]) infoLabels[3].textContent = copy.labels.request;
+        if (infoLabels[4]) infoLabels[4].textContent = copy.labels.about;
+        if (infoLabels[5]) infoLabels[5].textContent = copy.labels.education;
+        if (infoLabels[6]) infoLabels[6].textContent = copy.labels.directions;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyLang(getStoredLang());
+      });
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyLang(e.detail?.lang);
+      });
+
       // --- helpers ---
       const qs = (s) => document.querySelector(s);
       const pad = (n) => String(n).padStart(2, "0");
@@ -497,7 +629,7 @@
       async function loadApplication() {
         if (!ID) {
           qs("#guard").style.display = "block";
-          qs("#guard").textContent = "Не передано id заявки.";
+          qs("#guard").textContent = t("errorNoId");
           return;
         }
         const r = await fetch(`/api/career-applications/${ID}`, {
@@ -511,7 +643,7 @@
         if (!okFlag) {
           qs("#guard").style.display = "block";
           qs("#guard").textContent =
-            body?.message || "Помилка завантаження заявки.";
+            body?.message || t("errorLoad");
           return;
         }
 

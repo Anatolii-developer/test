@@ -415,6 +415,117 @@
   window.API_BASE = "https://cabinet.mamko-prof-supervision.com";
 </script>
     <script>
+      const MENTOR_REQUESTS_I18N = {
+        ua: {
+          title: "Менторство",
+          applyTitle: "Менторство",
+          backHome: "Головна",
+          viewSubmitted: "Подані заявки",
+          pageSubtitle: "Заявки учасників",
+          empty: "Поки що немає заявок учасників.",
+          loginNotice: "Щоб переглянути заявки — увійдіть у систему.",
+          loginBtn: "Увійти",
+          learnMore: "Дізнатись більше",
+          ariaOpen: "Відкрити заявку детально",
+          noName: "Без імені",
+          accessDenied: "Доступ лише для менторів.",
+          loadError: "Не вдалося завантажити заявки.",
+        },
+        ru: {
+          title: "Менторство",
+          applyTitle: "Менторство",
+          backHome: "На Главную",
+          viewSubmitted: "Просмотреть анкеты",
+          pageSubtitle: "Заявки участников",
+          empty: "Пока что нет заявок участников.",
+          loginNotice: "Чтобы просмотреть заявки — войдите в систему.",
+          loginBtn: "Войти",
+          learnMore: "Узнать больше",
+          ariaOpen: "Просмотреть заявку",
+          noName: "Без имени",
+          accessDenied: "Доступ только для менторов.",
+          loadError: "Не удалось загрузить заявки.",
+        },
+        en: {
+          title: "Mentorship",
+          applyTitle: "Mentorship",
+          backHome: "Home",
+          viewSubmitted: "View forms",
+          pageSubtitle: "Participant requests",
+          empty: "No participant requests yet.",
+          loginNotice: "To view applications, please log in.",
+          loginBtn: "Log in",
+          learnMore: "Learn more",
+          ariaOpen: "View application details",
+          noName: "No name",
+          accessDenied: "Mentors only.",
+          loadError: "Failed to load applications.",
+        },
+      };
+      let currentLang = "ua";
+      const normalizeLang = (value) => {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      };
+      const getStoredLang = () => {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      };
+      const t = (key) => {
+        const copy =
+          MENTOR_REQUESTS_I18N[currentLang] || MENTOR_REQUESTS_I18N.ua;
+        return copy[key] || "";
+      };
+
+      function setButtonTextWithIcon(el, text) {
+        if (!el) return;
+        const textNode = Array.from(el.childNodes).find(
+          (n) => n.nodeType === Node.TEXT_NODE
+        );
+        if (textNode) {
+          textNode.textContent = ` ${text}`;
+        } else {
+          el.appendChild(document.createTextNode(` ${text}`));
+        }
+      }
+
+      function applyLang(lang) {
+        currentLang = normalizeLang(lang);
+        const copy =
+          MENTOR_REQUESTS_I18N[currentLang] || MENTOR_REQUESTS_I18N.ua;
+        document.title = copy.title;
+        const applyTitle = document.querySelector(".apply-title");
+        if (applyTitle) applyTitle.textContent = copy.applyTitle;
+        const backBtn = document.querySelector(".back-button");
+        setButtonTextWithIcon(backBtn, copy.backHome);
+        const viewBtn = document.querySelector(".view-requests-button");
+        if (viewBtn) viewBtn.textContent = copy.viewSubmitted;
+        const subtitle = document.querySelector(".page-subtitle");
+        if (subtitle) subtitle.textContent = copy.pageSubtitle;
+        const emptyEl = document.getElementById("empty");
+        if (emptyEl && emptyEl.style.display !== "none") {
+          emptyEl.textContent = copy.empty;
+        }
+        document.querySelectorAll(".btn-more .btn-label").forEach((el) => {
+          el.textContent = copy.learnMore;
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyLang(getStoredLang());
+      });
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyLang(e.detail?.lang);
+        if (typeof load === "function") load();
+      });
+
       // ===== Helpers =====
       function debugLog(prefix, res, body) {
         try {
@@ -453,7 +564,7 @@
         const last = u.lastName || item.lastName || "";
         return first || last
           ? `${first} ${last}`.trim()
-          : item.fullName || item.email || "Без імені";
+          : item.fullName || item.email || t("noName");
       }
 
 
@@ -471,7 +582,7 @@
           empty.id = "empty";
           empty.className = "empty";
           empty.style.display = "none";
-          empty.textContent = "Поки що немає заявок учасників.";
+          empty.textContent = t("empty");
           form.appendChild(empty);
         }
         return { listEl: list, emptyEl: empty };
@@ -479,13 +590,12 @@
 
       function showLoginNotice(msg) {
         const { emptyEl, listEl } = ensureContainers();
-        emptyEl.textContent =
-          msg || "Щоб переглянути заявки — увійдіть у систему.";
+        emptyEl.textContent = msg || t("loginNotice");
         emptyEl.style.display = "block";
         if (listEl) listEl.innerHTML = "";
         const btn = document.createElement("a");
         btn.href = "index.html";
-        btn.textContent = "Увійти";
+        btn.textContent = t("loginBtn");
         btn.style.cssText =
           "display:inline-block;margin-top:8px;background:#275D2B;color:#fff;padding:8px 16px;border-radius:12px;text-decoration:none;";
         emptyEl.appendChild(btn);
@@ -531,7 +641,7 @@
             }`.trim()) ||
           (item.fullName && item.fullName.trim()) ||
           (item.email || "").trim() ||
-          "Без імені";
+          t("noName");
         const created = item.createdAt
           ? formatDate(item.createdAt)
           : item.created_at
@@ -555,9 +665,9 @@
         const more = document.createElement("a");
         more.className = "btn-more";
         more.href = `career-mentor-request.html?id=${encodeURIComponent(id)}`;
-        more.setAttribute("aria-label", "Відкрити заявку детально");
+        more.setAttribute("aria-label", t("ariaOpen"));
         more.innerHTML = `
-          <span class="btn-label">Дізнатись більше</span>
+          <span class="btn-label">${t("learnMore")}</span>
           <img src="./assets/library/arrow.png" alt="Arrow" class="btn-arrow" />
         `;
         row.append(left, more);
@@ -601,7 +711,7 @@
         const { listEl, emptyEl } = ensureContainers();
         const user = await ensureMentor();
         if (!user) {
-          showLoginNotice('Доступ лише для менторів.');
+          showLoginNotice(t("accessDenied"));
           return;
         }
 
@@ -612,7 +722,7 @@
           listEl.innerHTML = '';
           if (!items.length) {
             emptyEl.style.display = 'block';
-            emptyEl.textContent = 'Поки що немає заявок учасників.';
+            emptyEl.textContent = t("empty");
             return;
           }
 
@@ -623,7 +733,7 @@
         } catch (err) {
           console.error('Career applications load failed:', err);
           const { emptyEl } = ensureContainers();
-          emptyEl.textContent = 'Не вдалося завантажити заявки.';
+          emptyEl.textContent = t("loadError");
           emptyEl.style.display = 'block';
         }
       }

@@ -72,8 +72,9 @@ body{
   </a>
 
   <div class="nav-buttons">
-    <a href="http://157.230.121.24:5050/index.html" class="nav-btn">Повернутися назад</a>
-    <a href="https://mamko-prof-supervision.com/" class="nav-btn">На головну</a>
+    <a href="http://157.230.121.24:5050/index.html" class="nav-btn" id="regSuccessBackBtn">Повернутися назад</a>
+    <a href="https://mamko-prof-supervision.com/" class="nav-btn" id="regSuccessHomeBtn">На головну</a>
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">UA ▼</button>
   </div>
 </header>
 
@@ -82,5 +83,61 @@ body{
   <main class="success-container">
     <img src="assets/registration-success.png" alt="Registration Success" class="success-image" />
   </main>
+  <script src="script.js"></script>
+  <script>
+    (function () {
+      const I18N = {
+        ua: {
+          title: "Успішна реєстрація",
+          back: "Повернутися назад",
+          home: "На головну",
+        },
+        ru: {
+          title: "Успешная регистрация",
+          back: "Вернуться назад",
+          home: "На главную",
+        },
+        en: {
+          title: "Registration success",
+          back: "Go back",
+          home: "Go to home page",
+        },
+      };
+
+      function normalizeLang(value) {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      }
+
+      function currentLang() {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      }
+
+      function applyTranslations(langRaw) {
+        const lang = normalizeLang(langRaw || currentLang());
+        const t = I18N[lang] || I18N.ua;
+        document.title = t.title;
+        const back = document.getElementById("regSuccessBackBtn");
+        const home = document.getElementById("regSuccessHomeBtn");
+        if (back) back.textContent = t.back;
+        if (home) home.textContent = t.home;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyTranslations(currentLang());
+      });
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyTranslations(e.detail && e.detail.lang);
+      });
+    })();
+  </script>
 </body>
 </html>

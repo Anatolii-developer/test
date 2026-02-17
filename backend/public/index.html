@@ -12,22 +12,22 @@
       <a href="https://mamko-prof-supervision.com/" target="_blank" rel="noopener noreferrer">
         <img class="logo" src="assets/emblem.svg" alt="Institute Logo" />
       </a>      
-      <div class="language-select">UA ▼</div>
+      <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">UA ▼</button>
     </header>
 
     <main>
       <div class="login-card">
-        <h1 class="h1" style="color: #E37009; text-align: center;">Login</h1>
+        <h1 class="h1" id="loginTitle" style="color: #E37009; text-align: center;">Login</h1>
 
         <!-- Username Field -->
-        <label for="username" class="s1">Username</label>
+        <label for="username" class="s1" id="loginUsernameLabel">Username</label>
         <div class="input-wrapper">
           <img src="assets/icon-user.svg" class="input-icon" alt="user icon" />
           <input type="text" id="username" placeholder="Enter your username" required />
         </div>
 
         <!-- Password Field -->
-        <label for="password" class="s1">Password</label>
+        <label for="password" class="s1" id="loginPasswordLabel">Password</label>
         <div class="input-wrapper">
   <img src="assets/icon-lock.svg" class="input-icon" alt="lock icon" />
   <input type="password" id="password" placeholder="Enter your password" required />
@@ -35,18 +35,111 @@
 </div>
 
         <div class="actions">
-          <a href="recovery.html" class="text-medium">Forgot password?</a>
+          <a href="recovery.html" class="text-medium" id="loginForgotPassword">Forgot password?</a>
         </div>
 
-        <button type="button" onclick="login()">Sign in</button>
+        <button type="button" onclick="login()" id="loginSubmitBtn">Sign in</button>
 
         <p class="register text-regular">
-          Don't have an account?
-          <a href="create-credentials.html" class="text-medium">Register here</a>
+          <span id="loginNoAccountText">Don't have an account?</span>
+          <a href="create-credentials.html" class="text-medium" id="loginRegisterLink">Register here</a>
         </p>
       </div>
     </main>
 
     <script src="script.js"></script>
+    <script>
+      (function () {
+        const LOGIN_I18N = {
+          ua: {
+            pageTitle: "Вхід - Psychologist Platform",
+            title: "Вхід",
+            usernameLabel: "Ім’я користувача",
+            usernamePlaceholder: "Введіть ім’я користувача",
+            passwordLabel: "Пароль",
+            passwordPlaceholder: "Введіть пароль",
+            forgotPassword: "Забули пароль?",
+            signIn: "Увійти",
+            noAccount: "Немає облікового запису?",
+            registerHere: "Зареєструватися тут",
+          },
+          ru: {
+            pageTitle: "Вход - Psychologist Platform",
+            title: "Вход",
+            usernameLabel: "Username - Имя пользователя",
+            usernamePlaceholder: "Введите имя пользователя",
+            passwordLabel: "Пароль",
+            passwordPlaceholder: "Введите пароль",
+            forgotPassword: "Забыли пароль?",
+            signIn: "Войти",
+            noAccount: "Нет аккаунта? -",
+            registerHere: "Зарегистрироваться здесь",
+          },
+          en: {
+            pageTitle: "Login - Psychologist Platform",
+            title: "Login",
+            usernameLabel: "Username",
+            usernamePlaceholder: "Enter your username",
+            passwordLabel: "Password",
+            passwordPlaceholder: "Enter your password",
+            forgotPassword: "Forgot password?",
+            signIn: "Sign in",
+            noAccount: "Don't have an account? -",
+            registerHere: "Register here",
+          },
+        };
+
+        function normalizeLang(value) {
+          const v = String(value || "").toLowerCase().trim();
+          if (v.startsWith("uk") || v === "ua") return "ua";
+          if (v.startsWith("ru")) return "ru";
+          if (v.startsWith("en")) return "en";
+          return "ua";
+        }
+
+        function getCurrentLang() {
+          try {
+            const stored = localStorage.getItem("uiLang");
+            if (stored) return normalizeLang(stored);
+          } catch (_) {}
+          return normalizeLang(document.documentElement.lang);
+        }
+
+        function applyLoginTranslations(langRaw) {
+          const lang = normalizeLang(langRaw || getCurrentLang());
+          const t = LOGIN_I18N[lang] || LOGIN_I18N.ua;
+
+          document.title = t.pageTitle;
+
+          const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+          };
+          const setPlaceholder = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.placeholder = value;
+          };
+
+          setText("loginTitle", t.title);
+          setText("loginUsernameLabel", t.usernameLabel);
+          setText("loginPasswordLabel", t.passwordLabel);
+          setText("loginForgotPassword", t.forgotPassword);
+          setText("loginSubmitBtn", t.signIn);
+          setText("loginNoAccountText", t.noAccount);
+          setText("loginRegisterLink", t.registerHere);
+
+          setPlaceholder("username", t.usernamePlaceholder);
+          setPlaceholder("password", t.passwordPlaceholder);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          applyLoginTranslations(getCurrentLang());
+        });
+
+        window.addEventListener("uiLangChange", (e) => {
+          applyLoginTranslations(e.detail && e.detail.lang);
+        });
+      })();
+    </script>
   </body>
 </html>

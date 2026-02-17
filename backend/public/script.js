@@ -970,19 +970,40 @@ if (saveChangesBtn) {
 
 const saveBtn = document.getElementById("saveBtn");
 if (saveBtn) {
+  const getRegistrationLang = () => {
+    try {
+      const v = String(localStorage.getItem("uiLang") || "").toLowerCase().trim();
+      if (v.startsWith("ru")) return "ru";
+      if (v.startsWith("en")) return "en";
+    } catch (_) {}
+    return "ua";
+  };
+
+  const getRegAlert = (key) => {
+    const lang = getRegistrationLang();
+    const map = {
+      missingOther: {
+        ua: 'Будь ласка, заповніть поле "Інше" або зніміть вибір.',
+        ru: 'Пожалуйста, заполните поле "Другое" или снимите выбор.',
+        en: 'Please fill in the "Other" field or uncheck it.',
+      },
+    };
+    return (map[key] && map[key][lang]) || map[key]?.ua || "";
+  };
+
   saveBtn.addEventListener("click", async () => {
     // Work directions: if "Інше" checked, save ONLY textarea text
     const otherDirCheckbox = document.getElementById('directionOtherCheckbox');
 const otherDirText = (document.getElementById('directionOther')?.value || '').trim();
 
 if (otherDirCheckbox && otherDirCheckbox.checked && !otherDirText) {
-  alert('Будь ласка, заповніть поле "Інше" або зніміть вибір.');
+  alert(getRegAlert('missingOther'));
   return;
 }
 
 let directions = [...document.querySelectorAll('.work-direction input[type="checkbox"]:checked')]
-  .map(c => c.parentElement.textContent.trim())
-  .filter(v => v !== 'Інше');
+  .filter(c => c.id !== 'directionOtherCheckbox')
+  .map(c => c.parentElement.textContent.trim());
 
 if (otherDirCheckbox && otherDirCheckbox.checked) {
   directions = otherDirText ? [otherDirText] : []; // <-- зберігаємо саме текст з textarea
@@ -1036,6 +1057,7 @@ function toggleCheckboxes() {
   const extra = document.getElementById("extra-checkboxes");
   const trigger = document.querySelector(".toggle-btn");
   const checkbox = document.getElementById("extra-checkbox");
+  if (!extra || !trigger || !checkbox) return;
 
   const isHidden = extra.style.display === "none";
 
@@ -1043,7 +1065,9 @@ function toggleCheckboxes() {
   extra.style.display = isHidden ? "block" : "none";
 
   // Update button text
-  trigger.textContent = isHidden ? "Приховати" : "Показати ще";
+  const moreText = trigger.dataset.moreText || "Показати ще";
+  const lessText = trigger.dataset.lessText || "Приховати";
+  trigger.textContent = isHidden ? lessText : moreText;
 
   // Enable/disable the main checkbox
   checkbox.disabled = !isHidden;
@@ -1154,8 +1178,8 @@ function handleSubmit() {
   const _otherDirCheckbox = document.getElementById('directionOtherCheckbox');
   const _otherDirText = (document.getElementById('directionOther')?.value || '').trim();
   let _directions = Array.from(document.querySelectorAll('.work-direction input[type="checkbox"]:checked'))
-    .map(cb => cb.parentElement.textContent.trim())
-    .filter(v => v !== 'Інше');
+    .filter(cb => cb.id !== 'directionOtherCheckbox')
+    .map(cb => cb.parentElement.textContent.trim());
   if (_otherDirCheckbox && _otherDirCheckbox.checked) {
     _directions = _otherDirText ? [_otherDirText] : [];
   }

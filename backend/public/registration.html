@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Реєстрація</title>
+  <title>Реєстрація — Psychologist Platform</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,45 +13,45 @@
     <a href="https://mamko-prof-supervision.com/" target="_blank" rel="noopener noreferrer">
       <img class="logo" src="assets/logo.png" alt="Institute Logo" />
     </a> 
-    <div class="language-select">UA ▼</div>
+    <button class="lang-switch" id="langBtn" aria-haspopup="listbox" aria-expanded="false">UA ▼</button>
   </header>
 
   <main>
     <div class="registration-card">
-      <h1 class="h1">Реєстрація</h1>
+      <h1 class="h1" id="regTitle">Реєстрація</h1>
       <!-- TOP ROW -->
       <div class="form-section">
         <div class="form-left">
           
           
           <div class="form-group">
-            <label class="s1" for="firstName">Ім’я</label>
+            <label class="s1" for="firstName" id="regLabelFirstName">Ім’я</label>
             <input type="text" id="firstName" placeholder="Введіть Ваше ім’я" />
           </div>
   
           <div class="form-group">
-            <label class="s1" for="lastName">Прізвище</label>
+            <label class="s1" for="lastName" id="regLabelLastName">Прізвище</label>
             <input type="text" id="lastName" placeholder="Введіть Ваше прізвище" />
           </div>
   
           <div class="form-group">
-            <label class="s1" for="middleName">По-батькові</label>
+            <label class="s1" for="middleName" id="regLabelMiddleName">По-батькові</label>
             <input type="text" id="middleName" placeholder="Введіть Ваше по-батькові" />
           </div>
 
           <div class="form-group">
-            <label class="s1" for="dateOfBirth">Дата народження</label>
+            <label class="s1" for="dateOfBirth" id="regLabelDateOfBirth">Дата народження</label>
             <input type="date" id="dateOfBirth" />
           </div>
           
   
           <div class="form-group">
-            <label class="s1" for="email">Email Address</label>
+            <label class="s1" for="email" id="regLabelEmail">Email Address</label>
             <input type="email" id="email" placeholder="Введіть Вашу пошту" />
           </div>
   
          <div class="form-group">
-  <label class="s1" for="phone">Номер Телефону</label>
+  <label class="s1" for="phone" id="regLabelPhone">Номер Телефону</label>
   <div class="phone-input-wrapper">
     <select id="countryCode" class="country-code-select">
       <option value="+380" selected>🇺🇦 +380</option>
@@ -67,11 +67,11 @@
 </div>
   
           <div class="form-group">
-            <label class="s1">Стать, або як до Вас звертатись</label>
+            <label class="s1" id="regLabelGender">Стать, або як до Вас звертатись</label>
             <div class="radio-group">
-              <label><input type="radio" name="gender" value="male" /> Чоловік</label>
-              <label><input type="radio" name="gender" value="female" /> Жінка</label>
-              <label><input type="radio" name="gender" value="other" /> Інше</label>
+              <label><input type="radio" name="gender" value="male" /> <span id="regGenderMale">Чоловік</span></label>
+              <label><input type="radio" name="gender" value="female" /> <span id="regGenderFemale">Жінка</span></label>
+              <label><input type="radio" name="gender" value="other" /> <span id="regGenderOther">Інше</span></label>
             </div>
           </div>
         </div>
@@ -84,12 +84,12 @@
       <!-- BOTTOM ROW (FULL WIDTH) -->
       <div class="bottom-row">
         <div class="form-group">
-          <label class="s1" for="experience">Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими.</label>
+          <label class="s1" for="experience" id="regLabelExperience">Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими.</label>
           <textarea id="experience" placeholder="Розкажіть про Ваш досвід..."></textarea>
         </div>
   
         <div class="form-group">
-          <label class="s1" for="education">Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування.</label>
+          <label class="s1" for="education" id="regLabelEducation">Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування.</label>
           <textarea id="education" placeholder="Розкажіть про Вашу освіту..."></textarea>
         </div>
       </div>
@@ -98,70 +98,70 @@
           
          <div class="checkbox-section">
             <div class="form-group">
-                <label class="s1">Ваш напрямок роботи (обрати з переліченого):</label>
+                <label class="s1" id="regLabelDirections">Ваш напрямок роботи (обрати з переліченого):</label>
              <div class="checkbox-group work-direction">
-                    <label><input type="checkbox" /> Психоаналіз</label>
-                    <label><input type="checkbox" /> Групаналіз</label>
-                    <label><input type="checkbox" /> Індивідуальна психологія (Адлер)</label>
-                    <label><input type="checkbox" /> Аналітична психологія (Юнг)</label>
-                    <label><input type="checkbox" /> Клієнт-центрованa терапія (К. Роджерс)</label>
-                    <label><input type="checkbox" /> Інтерперсональний підхід (Г. Салліван)</label>
-                    <label><input type="checkbox" /> Логотерапія (В. Франкл)</label>
-                    <label><input type="checkbox" /> EMDR – Десенсибілізація та Репроцесуалізація</label>
-                    <label><input type="checkbox" /> Групова психотерапія і психодрама</label>
-                    <label><input type="checkbox" /> Гештальт-терапія</label>
-                    <label><input type="checkbox" /> Когнітивно-поведінкова терапія</label>
-                    <label><input type="checkbox" /> Гіпнотерапія</label>
-                    <label>
+                    <label data-dir-index="0"><input type="checkbox" /> Психоаналіз</label>
+                    <label data-dir-index="1"><input type="checkbox" /> Групаналіз</label>
+                    <label data-dir-index="2"><input type="checkbox" /> Індивідуальна психологія (Адлер)</label>
+                    <label data-dir-index="3"><input type="checkbox" /> Аналітична психологія (Юнг)</label>
+                    <label data-dir-index="4"><input type="checkbox" /> Клієнт-центрованa терапія (К. Роджерс)</label>
+                    <label data-dir-index="5"><input type="checkbox" /> Інтерперсональний підхід (Г. Салліван)</label>
+                    <label data-dir-index="6"><input type="checkbox" /> Логотерапія (В. Франкл)</label>
+                    <label data-dir-index="7"><input type="checkbox" /> EMDR – Десенсибілізація та Репроцесуалізація</label>
+                    <label data-dir-index="8"><input type="checkbox" /> Групова психотерапія і психодрама</label>
+                    <label data-dir-index="9"><input type="checkbox" /> Гештальт-терапія</label>
+                    <label data-dir-index="10"><input type="checkbox" /> Когнітивно-поведінкова терапія</label>
+                    <label data-dir-index="11"><input type="checkbox" /> Гіпнотерапія</label>
+                    <label id="regDirectionOtherLabel" data-dir-index="12">
   <input type="checkbox" id="directionOtherCheckbox" /> Інше
 </label>
 <textarea id="directionOther" placeholder="Інше..." style="display:none"></textarea>
                 </div>
-                <textarea placeholder="Інше..."></textarea>
+                <textarea id="directionOtherFallback" placeholder="Інше..."></textarea>
             </div>
   
            <!-- ISSUES WORKED WITH -->
 <div class="form-group">
-    <label class="s1">З чим працюєте? (обрати з переліченого):</label>
+    <label class="s1" id="regLabelTopics">З чим працюєте? (обрати з переліченого):</label>
     <div class="checkbox-group work-topics">
       <!-- Always visible -->
-      <label><input type="checkbox" /> Стосунки з собою</label>
-      <label><input type="checkbox"  /> Дратівливість</label>
-      <label><input type="checkbox" /> Панічні атаки</label>
-      <label><input type="checkbox" /> Самотність</label>
-      <label><input type="checkbox" /> Спроби самогубства</label>
-      <label><input type="checkbox"  /> Депресивні стани</label>
-      <label><input type="checkbox" id="extra-checkbox" disabled /> Тривожні стани</label>
+      <label data-topic-index="0"><input type="checkbox" /> Стосунки з собою</label>
+      <label data-topic-index="1"><input type="checkbox"  /> Дратівливість</label>
+      <label data-topic-index="2"><input type="checkbox" /> Панічні атаки</label>
+      <label data-topic-index="3"><input type="checkbox" /> Самотність</label>
+      <label data-topic-index="4"><input type="checkbox" /> Спроби самогубства</label>
+      <label data-topic-index="5"><input type="checkbox"  /> Депресивні стани</label>
+      <label data-topic-index="6"><input type="checkbox" id="extra-checkbox" disabled /> Тривожні стани</label>
   
       <!-- Hidden section -->
       <div id="extra-checkboxes" style="display: none; margin-top: 20px;">
-        <label><input type="checkbox" /> Втома</label>
-        <label><input type="checkbox" /> Самооцінка та самоцінність</label>
-        <label><input type="checkbox" /> Нав’язливі думки та ритуали</label>
-        <label><input type="checkbox" /> Хімічні залежності</label>
-        <label><input type="checkbox" /> Психосоматика</label>
-        <label><input type="checkbox" /> Ставлення до їжі</label>
-        <label><input type="checkbox" /> Стосунки з іншими</label>
-        <label><input type="checkbox" /> Сімейні стосунки</label>
-        <label><input type="checkbox" /> Інтимність та сексуальність</label>
-        <label><input type="checkbox" /> Романтичні стосунки</label>
-        <label><input type="checkbox" /> Співзалежність</label>
-        <label><input type="checkbox" /> Аб’юз, емоційне насилля</label>
-        <label><input type="checkbox" /> Діяльність</label>
-        <label><input type="checkbox" /> Емоційне вигорання</label>
-        <label><input type="checkbox" /> Самовизначення та самоідентифікація</label>
-        <label><input type="checkbox" /> Ставлення до грошей</label>
-        <label><input type="checkbox" /> Прокрастинація</label>
-        <label><input type="checkbox" /> Нові умови життя</label>
-        <label><input type="checkbox" /> Втрата та горе</label>
-        <label><input type="checkbox" /> Адаптація, еміграція</label>
-        <label><input type="checkbox" /> Народження дитини</label>
-        <label><input type="checkbox" /> ПТСР</label>
-        <label><input type="checkbox" /> Кризи та травми</label>
+        <label data-topic-index="7"><input type="checkbox" /> Втома</label>
+        <label data-topic-index="8"><input type="checkbox" /> Самооцінка та самоцінність</label>
+        <label data-topic-index="9"><input type="checkbox" /> Нав’язливі думки та ритуали</label>
+        <label data-topic-index="10"><input type="checkbox" /> Хімічні залежності</label>
+        <label data-topic-index="11"><input type="checkbox" /> Психосоматика</label>
+        <label data-topic-index="12"><input type="checkbox" /> Ставлення до їжі</label>
+        <label data-topic-index="13"><input type="checkbox" /> Стосунки з іншими</label>
+        <label data-topic-index="14"><input type="checkbox" /> Сімейні стосунки</label>
+        <label data-topic-index="15"><input type="checkbox" /> Інтимність та сексуальність</label>
+        <label data-topic-index="16"><input type="checkbox" /> Романтичні стосунки</label>
+        <label data-topic-index="17"><input type="checkbox" /> Співзалежність</label>
+        <label data-topic-index="18"><input type="checkbox" /> Аб’юз, емоційне насилля</label>
+        <label data-topic-index="19"><input type="checkbox" /> Діяльність</label>
+        <label data-topic-index="20"><input type="checkbox" /> Емоційне вигорання</label>
+        <label data-topic-index="21"><input type="checkbox" /> Самовизначення та самоідентифікація</label>
+        <label data-topic-index="22"><input type="checkbox" /> Ставлення до грошей</label>
+        <label data-topic-index="23"><input type="checkbox" /> Прокрастинація</label>
+        <label data-topic-index="24"><input type="checkbox" /> Нові умови життя</label>
+        <label data-topic-index="25"><input type="checkbox" /> Втрата та горе</label>
+        <label data-topic-index="26"><input type="checkbox" /> Адаптація, еміграція</label>
+        <label data-topic-index="27"><input type="checkbox" /> Народження дитини</label>
+        <label data-topic-index="28"><input type="checkbox" /> ПТСР</label>
+        <label data-topic-index="29"><input type="checkbox" /> Кризи та травми</label>
       </div>
   
       <!-- Button -->
-      <button type="button" class="toggle-btn" onclick="toggleCheckboxes()">Показати ще</button>
+      <button type="button" id="regToggleBtn" class="toggle-btn" onclick="toggleCheckboxes()">Показати ще</button>
     </div>
     </div>
 
@@ -179,6 +179,337 @@
   </main>
   
   <script src="script.js"></script>
+  <script>
+    (function () {
+      const REG_I18N = {
+        ua: {
+          pageTitle: "Реєстрація — Psychologist Platform",
+          title: "Реєстрація",
+          firstName: "Ім’я",
+          firstNamePlaceholder: "Введіть Ваше ім’я",
+          lastName: "Прізвище",
+          lastNamePlaceholder: "Введіть Ваше прізвище",
+          middleName: "По-батькові",
+          middleNamePlaceholder: "Введіть Ваше по-батькові",
+          dateOfBirth: "Дата народження",
+          email: "Email Address",
+          emailPlaceholder: "Введіть Вашу пошту",
+          phone: "Номер Телефону",
+          gender: "Стать, або як до Вас звертатись",
+          genderMale: "Чоловік",
+          genderFemale: "Жінка",
+          genderOther: "Інше",
+          experience:
+            "Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими (вкажіть кількість років, числом)",
+          experiencePlaceholder: "Розкажіть про Ваш досвід...",
+          education:
+            "Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування.",
+          educationPlaceholder: "Розкажіть про Вашу освіту...",
+          directions: "Ваш напрямок роботи (обрати з переліченого):",
+          topics: "З чим працюєте? (обрати з переліченого):",
+          directionOtherPlaceholder: "Інше...",
+          showMore: "Показати ще",
+          hideMore: "Приховати",
+          save: "Зберегти",
+          directionsList: [
+            "Психоаналіз",
+            "Групаналіз",
+            "Індивідуальна психологія (Адлер)",
+            "Аналітична психологія (Юнг)",
+            "Клієнт-центрованa терапія (К. Роджерс)",
+            "Інтерперсональний підхід (Г. Салліван)",
+            "Логотерапія (В. Франкл)",
+            "EMDR – Десенсибілізація та Репроцесуалізація",
+            "Групова психотерапія і психодрама",
+            "Гештальт-терапія",
+            "Когнітивно-поведінкова терапія",
+            "Гіпнотерапія",
+            "Інше",
+          ],
+          topicsList: [
+            "Стосунки з собою",
+            "Дратівливість",
+            "Панічні атаки",
+            "Самотність",
+            "Спроби самогубства",
+            "Депресивні стани",
+            "Тривожні стани",
+            "Втома",
+            "Самооцінка та самоцінність",
+            "Нав’язливі думки та ритуали",
+            "Хімічні залежності",
+            "Психосоматика",
+            "Ставлення до їжі",
+            "Стосунки з іншими",
+            "Сімейні стосунки",
+            "Інтимність та сексуальність",
+            "Романтичні стосунки",
+            "Співзалежність",
+            "Аб’юз, емоційне насилля",
+            "Діяльність",
+            "Емоційне вигорання",
+            "Самовизначення та самоідентифікація",
+            "Ставлення до грошей",
+            "Прокрастинація",
+            "Нові умови життя",
+            "Втрата та горе",
+            "Адаптація, еміграція",
+            "Народження дитини",
+            "ПТСР",
+            "Кризи та травми",
+          ],
+        },
+        ru: {
+          pageTitle: "Регистрация — Psychologist Platform",
+          title: "Регистрация",
+          firstName: "Имя",
+          firstNamePlaceholder: "Введите имя",
+          lastName: "Фамилия",
+          lastNamePlaceholder: "Введите фамилию",
+          middleName: "Отчество",
+          middleNamePlaceholder: "Введите отчество",
+          dateOfBirth: "Дата рождения:",
+          email: "Email Address",
+          emailPlaceholder: "Введите email",
+          phone: "Номер телефона",
+          gender: "Пол:",
+          genderMale: "Мужчина",
+          genderFemale: "Женщина",
+          genderOther: "Другое",
+          experience:
+            "Ваш совокупный опыт клинической работы с клиентами, пациентами, пострадавшими (укажите количество лет, числом)",
+          experiencePlaceholder: "Опишите ваш опыт...",
+          education:
+            "Психологическое образование (включая образование без государственной лицензии). Название учреждения, местоположение.",
+          educationPlaceholder: "Расскажите о вашем образовании...",
+          directions: "Ваш профессиональный подход (выберите из списка):",
+          topics: "С какими запросами вы работаете? (выберите из списка):",
+          directionOtherPlaceholder: "Другое...",
+          showMore: "Показать еще",
+          hideMore: "Скрыть",
+          save: "Сохранить",
+          directionsList: [
+            "Психоанализ",
+            "Групповой анализ",
+            "Индивидуальная психология (Адлер)",
+            "Аналитическая психология (Юнг)",
+            "Клиент-центрированная терапия (К. Роджерс)",
+            "Интерперсональный подход (Г. Салливан)",
+            "Логотерапия (В. Франкл)",
+            "EMDR (Десенсибилизация и переработка движением глаз)",
+            "Групповая психотерапия и психодрама",
+            "Гештальт-терапия",
+            "Когнитивно-поведенческая терапия",
+            "Гипнотерапия",
+            "Другое _______________________",
+          ],
+          topicsList: [
+            "Отношения с собой",
+            "Раздражительность",
+            "Панические атаки",
+            "Одиночество",
+            "Суицидальные мысли или попытки",
+            "Депрессивные состояния",
+            "Тревожные состояния",
+            "Усталость",
+            "Самооценка и самоценность",
+            "Навязчивые мысли и компульсивные действия",
+            "Химические зависимости",
+            "Психосоматические симптомы",
+            "Пищевое поведение",
+            "Отношения с другими",
+            "Семейные отношения",
+            "Интимность и сексуальность",
+            "Романтические отношения",
+            "Созависимость",
+            "Абьюз и эмоциональное насилие",
+            "Профессиональная деятельность",
+            "Эмоциональное выгорание",
+            "Самоопределение и идентичность",
+            "Отношение к деньгам",
+            "Прокрастинация",
+            "Жизненные изменения",
+            "Утрата и горе",
+            "Адаптация, эмиграция",
+            "Рождение ребенка",
+            "ПТСР",
+            "Кризисы и травмы",
+          ],
+        },
+        en: {
+          pageTitle: "Registration — Psychologist Platform",
+          title: "Registration",
+          firstName: "First Name",
+          firstNamePlaceholder: "Enter first name",
+          lastName: "Last Name",
+          lastNamePlaceholder: "Enter last name",
+          middleName: "Middle Name / Patronymic",
+          middleNamePlaceholder: "Enter middle name",
+          dateOfBirth: "Date of birth",
+          email: "Email Address",
+          emailPlaceholder: "Enter email",
+          phone: "Phone Number",
+          gender: "Gender:",
+          genderMale: "male",
+          genderFemale: "female",
+          genderOther: "other",
+          experience:
+            "Total clinical experience working with clients, patients, or trauma survivors (please indicate number of years)",
+          experiencePlaceholder: "Describe your experience...",
+          education:
+            "Psychological education (including training without state licensure). Institution name and location.",
+          educationPlaceholder: "Describe your education...",
+          directions: "Your primary therapeutic orientation (select from the list):",
+          topics: "Areas you work with (select from the list):",
+          directionOtherPlaceholder: "Other...",
+          showMore: "Show more",
+          hideMore: "Hide",
+          save: "Save",
+          directionsList: [
+            "Psychoanalysis",
+            "Group Analysis",
+            "Individual Psychology (Adlerian)",
+            "Analytical Psychology (Jungian)",
+            "Person-Centered Therapy (Carl Rogers)",
+            "Interpersonal Therapy (Harry Stack Sullivan)",
+            "Logotherapy (Viktor Frankl)",
+            "EMDR (Eye Movement Desensitization and Reprocessing)",
+            "Group Psychotherapy and Psychodrama",
+            "Gestalt Therapy",
+            "Cognitive Behavioral Therapy (CBT)",
+            "Hypnotherapy",
+            "Other _______________________",
+          ],
+          topicsList: [
+            "Relationship with self",
+            "Irritability",
+            "Panic attacks",
+            "Loneliness",
+            "Suicidal ideation or attempts",
+            "Depression",
+            "Anxiety",
+            "Fatigue",
+            "Self-esteem and self-worth",
+            "Obsessive thoughts and compulsive behaviors",
+            "Substance addiction",
+            "Psychosomatic symptoms",
+            "Eating-related issues",
+            "Relationships with others",
+            "Family relationships",
+            "Intimacy and sexuality",
+            "Romantic relationships",
+            "Codependency",
+            "Abuse and emotional violence",
+            "Professional and work-related issues",
+            "Burnout",
+            "Identity and self-definition",
+            "Relationship with money",
+            "Procrastination",
+            "Life transitions",
+            "Loss and grief",
+            "Adaptation and immigration",
+            "Childbirth / becoming a parent",
+            "PTSD",
+            "Crises and trauma",
+          ],
+        },
+      };
+
+      function normalizeLang(value) {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("uk") || v === "ua") return "ua";
+        if (v.startsWith("ru")) return "ru";
+        if (v.startsWith("en")) return "en";
+        return "ua";
+      }
+
+      function getCurrentLang() {
+        try {
+          const stored = localStorage.getItem("uiLang");
+          if (stored) return normalizeLang(stored);
+        } catch (_) {}
+        return normalizeLang(document.documentElement.lang);
+      }
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      }
+
+      function setPlaceholder(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.placeholder = value;
+      }
+
+      function applyRegistrationTranslations(langRaw) {
+        const lang = normalizeLang(langRaw || getCurrentLang());
+        const t = REG_I18N[lang] || REG_I18N.ua;
+
+        document.documentElement.lang = lang === "ua" ? "uk" : lang;
+        document.title = t.pageTitle;
+
+        setText("regTitle", t.title);
+        setText("regLabelFirstName", t.firstName);
+        setPlaceholder("firstName", t.firstNamePlaceholder);
+        setText("regLabelLastName", t.lastName);
+        setPlaceholder("lastName", t.lastNamePlaceholder);
+        setText("regLabelMiddleName", t.middleName);
+        setPlaceholder("middleName", t.middleNamePlaceholder);
+        setText("regLabelDateOfBirth", t.dateOfBirth);
+        setText("regLabelEmail", t.email);
+        setPlaceholder("email", t.emailPlaceholder);
+        setText("regLabelPhone", t.phone);
+        setText("regLabelGender", t.gender);
+        setText("regGenderMale", t.genderMale);
+        setText("regGenderFemale", t.genderFemale);
+        setText("regGenderOther", t.genderOther);
+        setText("regLabelExperience", t.experience);
+        setPlaceholder("experience", t.experiencePlaceholder);
+        setText("regLabelEducation", t.education);
+        setPlaceholder("education", t.educationPlaceholder);
+        setText("regLabelDirections", t.directions);
+        setText("regLabelTopics", t.topics);
+        setText("saveBtn", t.save);
+
+        setPlaceholder("directionOther", t.directionOtherPlaceholder);
+        setPlaceholder("directionOtherFallback", t.directionOtherPlaceholder);
+
+        document.querySelectorAll("[data-dir-index]").forEach((label) => {
+          const idx = Number(label.getAttribute("data-dir-index"));
+          const input = label.querySelector("input");
+          if (!input || !t.directionsList[idx]) return;
+          label.innerHTML = "";
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(" " + t.directionsList[idx]));
+        });
+
+        document.querySelectorAll("[data-topic-index]").forEach((label) => {
+          const idx = Number(label.getAttribute("data-topic-index"));
+          const input = label.querySelector("input");
+          if (!input || !t.topicsList[idx]) return;
+          label.innerHTML = "";
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(" " + t.topicsList[idx]));
+        });
+
+        const toggleBtn = document.getElementById("regToggleBtn");
+        if (toggleBtn) {
+          toggleBtn.dataset.moreText = t.showMore;
+          toggleBtn.dataset.lessText = t.hideMore;
+          const extra = document.getElementById("extra-checkboxes");
+          toggleBtn.textContent =
+            extra && extra.style.display === "none" ? t.showMore : t.hideMore;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        applyRegistrationTranslations(getCurrentLang());
+      });
+
+      window.addEventListener("uiLangChange", (e) => {
+        applyRegistrationTranslations(e.detail && e.detail.lang);
+      });
+    })();
+  </script>
 </body>
 </html>
-

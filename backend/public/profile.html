@@ -275,7 +275,7 @@
      <div class="field-block">
 
 <div class="profile-row">
-  <span class="profile-label">Username:</span>
+  <span class="profile-label" id="profileLabelUsername">Username:</span>
   <div class="profile-value-wrapper">
     <span id="profileUsername" class="profile-value">test</span>
   </div>
@@ -283,7 +283,7 @@
 
 
 <div class="profile-row">
-  <span class="profile-label">Ім’я:</span>
+  <span class="profile-label" id="profileLabelFirstName">Ім’я:</span>
   <div class="profile-value-wrapper">
     <span id="profileFirstName" class="profile-value">test</span>
     <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileFirstName')" />
@@ -292,7 +292,7 @@
 
 
 <div class="profile-row">
-  <span class="profile-label">Прізвище:</span>
+  <span class="profile-label" id="profileLabelLastName">Прізвище:</span>
   <div class="profile-value-wrapper">
     <span id="profileLastName" class="profile-value">test</span>
     <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileLastName')" />
@@ -300,7 +300,7 @@
 </div>
 
 <div class="profile-row">
-  <span class="profile-label">По-батькові:</span>
+  <span class="profile-label" id="profileLabelMiddleName">По-батькові:</span>
   <div class="profile-value-wrapper">
     <span id="profileMiddleName" class="profile-value">test</span>
     <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileMiddleName')" />
@@ -308,7 +308,7 @@
 </div>
 
 <div class="profile-row">
-  <span class="profile-label">Email Address:</span>
+  <span class="profile-label" id="profileLabelEmail">Email Address:</span>
   <div class="profile-value-wrapper">
     <span id="profileEmail" class="profile-value">test@example.com</span>
     <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileEmail')" />
@@ -316,7 +316,7 @@
 </div>
 
 <div class="profile-row">
-  <span class="profile-label">Номер телефону:</span>
+  <span class="profile-label" id="profileLabelPhone">Номер телефону:</span>
   <div class="profile-value-wrapper">
     <span id="profilePhone" class="profile-value">+380123456789</span>
     <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profilePhone')" />
@@ -324,35 +324,35 @@
 </div>
 
 <div class="profile-row">
-  <span class="profile-label">Стать:</span>
+  <span class="profile-label" id="profileLabelGender">Стать:</span>
   <div class="profile-value-wrapper">
     <span id="profileGender" class="profile-value">test</span>
     <img src="assets/edit-icon.svg" class="edit-icon" onclick="editField('profileGender')" />
   </div>
 </div>
 
-      <p style="margin-top: 20px; opacity: 0.6;">
+      <p id="profileLabelExperience" style="margin-top: 20px; opacity: 0.6;">
         Сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими (вкажіть кількість років, числом):
         <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileExperience', 'experience')" />
       </p>
       <p><span id="profileExperience"></span></p>
 
-      <p style="margin-top: 20px; opacity: 0.6;">
+      <p id="profileLabelEducation" style="margin-top: 20px; opacity: 0.6;">
         Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування:
         <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableEdit('profileEducation', 'education')" />
       </p>
       <p><span id="profileEducation"></span></p>
 
-      <p style="margin-top: 20px; opacity: 0.6;">
+      <p id="profileLabelDirections" style="margin-top: 20px; opacity: 0.6;">
   Ваш напрямок роботи:
-  <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableCheckboxEdit('profileDirections', 'directions', directionsOptions)" />
+  <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableCheckboxEdit('profileDirections', 'directions', getLocalizedDirectionsOptions(), getLocalizedOtherLabel())" />
 </p>
 <p><span id="profileDirections"></span></p>
 
 <div class="checkbox-group directions-group">
-<p style="margin-top: 20px; opacity: 0.6;">
+<p id="profileLabelTopics" style="margin-top: 20px; opacity: 0.6;">
   З чим працюєте:
-  <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableCheckboxEdit('profileTopics', 'topics', topicsOptions)" />
+  <img src="assets/edit-icon.svg" class="edit-icon" onclick="enableCheckboxEdit('profileTopics', 'topics', getLocalizedTopicsOptions(), getLocalizedOtherLabel())" />
 </p>
 </div>
 <div class="checkbox-group topics-group">
@@ -376,14 +376,14 @@
       </div>
 
       <!-- Editable Fields -->
-     <p class="label-with-textarea">Про мене:</p>
+     <p class="label-with-textarea" id="profileStep2LabelAbout">Про мене:</p>
 <div class="textarea-wrapper">
   <textarea id="profileAboutTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
   <img src="assets/check-icon.svg" class="check-icon" id="aboutCheckIcon" style="display: none;" />
 </div>
 
 
-   <p class="label-with-textarea">Курси, які були пройдені в IPS:</p>
+   <p class="label-with-textarea" id="profileStep2LabelCourses">Курси, які були пройдені в IPS:</p>
 <div class="textarea-wrapper">
   <textarea id="profileCoursesTextarea"
             class="edit-textarea locked"
@@ -394,7 +394,7 @@
 </div>
 
 <!-- Роль (незмінне) -->
-<p class="label-with-textarea">Роль в компанії:</p>
+<p class="label-with-textarea" id="profileStep2LabelRole">Роль в компанії:</p>
 <div class="textarea-wrapper">
   <textarea id="profileRoleTextarea"
             class="edit-textarea locked"
@@ -404,44 +404,44 @@
 </div>
 
 
-     <p class="label-with-textarea">Вартість роботи:</p>
+     <p class="label-with-textarea" id="profileStep2LabelCost">Вартість роботи:</p>
 <div class="textarea-wrapper">
   <textarea id="profileCostTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
   <img src="assets/check-icon.svg" class="check-icon" id="costCheckIcon" style="display: none;" />
 </div>
 
-     <p class="label-with-textarea">Відеозвернення:</p>
+     <p class="label-with-textarea" id="profileStep2LabelVideo">Відеозвернення:</p>
 <div class="textarea-wrapper">
   <textarea id="profileVideoTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
   <img src="assets/check-icon.svg" class="check-icon" id="videoCheckIcon" style="display: none;" />
 </div>
  
-     <p class="label-with-textarea">Кваліфікаційні курси:</p>
+     <p class="label-with-textarea" id="profileStep2LabelQualifications">Кваліфікаційні курси:</p>
 <div class="textarea-wrapper">
   <textarea id="profileQualificationsTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
   <img src="assets/check-icon.svg" class="check-icon" id="qualificationsCheckIcon" style="display: none;" />
 </div>
       
-     <p class="label-with-textarea">Інший релевантний досвід:</p>
+     <p class="label-with-textarea" id="profileStep2LabelExperienceExtra">Інший релевантний досвід:</p>
 <div class="textarea-wrapper">
   <textarea id="profileExperienceExtraTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
   <img src="assets/check-icon.svg" class="check-icon" id="experienceExtraCheckIcon" style="display: none;" />
 </div>
       
-     <p class="label-with-textarea">Мова надання сесії:</p>
+     <p class="label-with-textarea" id="profileStep2LabelLanguage">Мова надання сесії:</p>
 <div class="textarea-wrapper">
   <textarea id="profileLanguageTextarea" class="edit-textarea" placeholder="Введіть інформацію..."></textarea>
   <img src="assets/check-icon.svg" class="check-icon" id="languageCheckIcon" style="display: none;" />
 </div>
 
       
-    <p class="label-with-textarea">Формат проведення:</p>
+    <p class="label-with-textarea" id="profileStep2LabelFormat">Формат проведення:</p>
 <div class="textarea-wrapper">
-  <label>
-    <input type="checkbox" id="formatOnline" /> Онлайн
+  <label for="formatOnline">
+    <input type="checkbox" id="formatOnline" /> <span id="profileStep2TextOnline">Онлайн</span>
   </label>
-  <label>
-    <input type="checkbox" id="formatOffline" onchange="toggleCityField()" /> Офлайн
+  <label for="formatOffline">
+    <input type="checkbox" id="formatOffline" onchange="toggleCityField()" /> <span id="profileStep2TextOffline">Офлайн</span>
   </label>
   <input type="text" id="offlineCity" placeholder="Місто проведення" style="display:none; margin-top:8px;" />
   <button type="button" id="saveFormatBtn" class="small-button" style="margin-top:8px;">Зберегти формат</button>
@@ -644,6 +644,723 @@
 
   <script src="script.js"></script>
   <script>
+  const PROFILE_STEP1_I18N = {
+    ua: {
+      title: "Про Мене",
+      username: "Username:",
+      firstName: "Ім'я:",
+      lastName: "Прізвище:",
+      middleName: "По батькові:",
+      email: "Email Address:",
+      phone: "Номер телефону:",
+      gender: "Стать:",
+      experience:
+        "Ваш сукупний досвід клінічної роботи з клієнтами, пацієнтами, постраждалими (вкажіть кількість років, числом):",
+      education:
+        "Психологічна освіта. Психологічна освіта без підтвердження державною ліцензією. Назва закладу, місце розташування.",
+      directions: "Ваш напрямок роботи (обрати з переліченого):",
+      topics: "З чим працюєте? (обрати з переліченого):",
+      other: "Інше",
+    },
+    ru: {
+      title: "Обо Мне",
+      username: "Username:",
+      firstName: "Имя:",
+      lastName: "Фамилия:",
+      middleName: "Отчество:",
+      email: "Email Address:",
+      phone: "Номер телефона:",
+      gender: "Пол:",
+      experience:
+        "Ваш совокупный опыт клинической работы с клиентами, пациентами, пострадавшими (укажите количество лет, числом):",
+      education:
+        "Психологическое образование (включая образование без государственной лицензии). Название учреждения, местоположение.",
+      directions: "Ваш профессиональный подход (выберите из списка):",
+      topics: "С какими запросами вы работаете? (выберите из списка):",
+      other: "Другое",
+    },
+    en: {
+      title: "About Me",
+      username: "Username:",
+      firstName: "First Name:",
+      lastName: "Last Name:",
+      middleName: "Middle Name / Patronymic:",
+      email: "Email Address:",
+      phone: "Phone Number:",
+      gender: "Gender:",
+      experience:
+        "Total clinical experience working with clients, patients, or trauma survivors (please indicate number of years):",
+      education:
+        "Psychological education (including training without state licensure). Institution name and location.",
+      directions: "Your primary therapeutic orientation (select from the list):",
+      topics: "Areas you work with (select from the list):",
+      other: "Other",
+    },
+  };
+
+  const PROFILE_STEP2_I18N = {
+    ua: {
+      about: "Про мене:",
+      courses: "Курси, які були пройдені в IPS:",
+      role: "Роль в компанії:",
+      cost: "Вартість роботи:",
+      video: "Відеозвернення:",
+      qualifications: "Кваліфікаційні курси:",
+      experienceExtra: "Інший релевантний досвід:",
+      language: "Мова надання сесії:",
+      format: "Формат проведення:",
+      online: "Онлайн",
+      offline: "Офлайн",
+      saveFormat: "Зберегти формат",
+      placeholder: "Введіть інформацію…",
+      cityPlaceholder: "Місто проведення",
+    },
+    ru: {
+      about: "Обо мне:",
+      courses: "Курсы, пройденные в IPS:",
+      role: "Роль в компании:",
+      cost: "Стоимость услуг:",
+      video: "Видеообращение:",
+      qualifications: "Квалификационные курсы:",
+      experienceExtra: "Иной релевантный опыт:",
+      language: "Язык проведения сессии:",
+      format: "Формат проведения:",
+      online: "Онлайн",
+      offline: "Офлайн",
+      saveFormat: "Сохранить формат",
+      placeholder: "Введите информацию…",
+      cityPlaceholder: "Город проведения",
+    },
+    en: {
+      about: "About Me:",
+      courses: "Courses completed at IPS:",
+      role: "Role in the Organization:",
+      cost: "Session Fee:",
+      video: "Video Introduction:",
+      qualifications: "Professional Development Courses:",
+      experienceExtra: "Other Relevant Experience:",
+      language: "Session Language:",
+      format: "Session Format:",
+      online: "Online",
+      offline: "In-person",
+      saveFormat: "Save Format",
+      placeholder: "Enter information…",
+      cityPlaceholder: "City",
+    },
+  };
+
+  const PROFILE_STEP3_I18N = {
+    ua: {
+      titles: [
+        "Ваша освіта і навчання з психології (в годинах):",
+        "Ваша освіта і навчання з психології, яку ви мали переважно (в годинах):",
+        "Чи маєте ви досвід викладання, проведення тренінгів, надання супервізій. Скільки годин:",
+        "Які терапевтичні підходи ви застосовуєте в своїй клінічній практиці наразі. Як довго?",
+        "Які терапевтичні підходи ви застосовували раніше – в минулому. Як довго?",
+        "Ваш досвід клінічної роботи в кризовому консультуванні. Скільки годин:",
+        "Ваш досвід клінічної роботи в кризовому консультуванні. Скільки годин:",
+        "Ваш досвід клінічної роботи в кризовому консультуванні.",
+        "Ваш досвід проведення супервізій. Скільки годин:",
+        "Як ви оцінюєте якість своєї роботи і її результатів в кризовому консультуванні (шкала від 1 до 5):",
+        "Чого потребує кризова допомога як вид професійного втручання і специфічний вид психологічної діяльності? Чим ви задоволені більше чи менше? Вільна відповідь.",
+      ],
+      labels: [
+        "Лекції",
+        "Семінари і колоквіуми",
+        "Тренінги",
+        "Особистий досвід в групі",
+        "Особиста терапія",
+        "Особистий психоаналіз",
+        "Індивідуальні супервізії",
+        "Менторський супровід",
+        "Групові супервізії",
+        "Психоаналітична психодрама",
+        "Викладання в школі",
+        "Викладання у вузі",
+        "Викладання в інститутах професійних асоціацій",
+        "Викладання в рамках суспільних і неформалізованих об’єднань",
+        "Ведення терапевтичних груп",
+        "Ведення кризових груп",
+        "Ведення груп психоаналітичної психодрами",
+        "Психоаналіз",
+        "Групаналіз",
+        "Індивідуальна психологія (Адлер)",
+        "Аналітична психологія (Юнг)",
+        "Клієнт-центрована терапія (К. Роджерс)",
+        "Логотерапія (В. Франкл)",
+        "Психотерапія реципрокного гальмування (EMDR – Десенсибілізація та Репроцесуалізація (опрацювання) Рухом Очей)",
+        "Групова психотерапія і психодрама",
+        "Гештальт-терапія",
+        "Когнітивно-поведінкова терапія",
+        "Інше",
+        "Психоаналіз",
+        "Групаналіз",
+        "Індивідуальна психологія (Адлер)",
+        "Аналітична психологія (Юнг)",
+        "Клієнт-центрована терапія (К. Роджерс)",
+        "Логотерапія (В. Франкл)",
+        "Психотерапія реципрокного гальмування (EMDR – Десенсибілізація та Репроцесуалізація (опрацювання) Рухом Очей)",
+        "Групова психотерапія і психодрама",
+        "Гештальт-терапія",
+        "Когнітивно-поведінкова терапія",
+        "Інше",
+        "Індивідуальні консультації",
+        "Групова робота",
+        "Кризова супервізія",
+        "Індивідуальні консультації",
+        "Групова робота",
+        "Кризова супервізія",
+        "В державних чи армійських установах",
+        "В волонтерських проектах",
+        "Приватно",
+        "Індивідуальна супервізія ( психоаналіз)",
+        "Індивідуальна супервізія (психотерапія)",
+        "Індивідуальна супервізія (клінічна психологія)",
+        "Індивідуальна супервізія (кризова психологія)",
+        "Індивідуальна супервізія (педагогіка)",
+        "Індивідуальна супервізія (коуч)",
+        "Індивідуальна супервізія (управленческая)",
+        "Індивідуальна супервізія (супервізії)",
+        "Індивідуальна супервізія (пацієнтів, клієнтів, аналізантів)",
+        "Групова супервізія",
+      ],
+      ratingLabels: [
+        "Оцінка з боку постраждалого або його близьких:",
+        "Оцінка з боку супервізора:",
+        "Ваша власна оцінка:",
+      ],
+      answerPlaceholder: "Ваша відповідь…",
+      saveButton: "Зберегти",
+    },
+    ru: {
+      titles: [
+        "Ваше образование и обучение в области психологии (в часах):",
+        "Ваше образование и обучение в области психологии, которое вы проходили преимущественно (в часах):",
+        "Есть ли у вас опыт преподавания, проведения тренингов или предоставления супервизии? Укажите количество часов:",
+        "Какие терапевтические подходы вы применяете в своей клинической практике в настоящее время? Как долго?",
+        "Какие терапевтические подходы вы применяли ранее? Как долго?",
+        "Ваш опыт клинической работы в кризисном консультировании. Укажите количество часов:",
+        "Ваш опыт клинической работы в кризисном консультировании. Укажите количество часов:",
+        "Ваш опыт клинической работы в кризисном консультировании.",
+        "Ваш опыт проведения супервизий. Укажите количество часов:",
+        "Как вы оцениваете качество своей работы и её результаты в кризисном консультировании (по шкале от 1 до 5):",
+        "Что, по вашему мнению, необходимо для эффективной кризисной помощи как профессионального вмешательства и специфического вида психологической деятельности? Чем вы довольны в своей работе больше или меньше? Свободный ответ:",
+      ],
+      labels: [
+        "Лекции",
+        "Семинары и коллоквиумы",
+        "Тренинги",
+        "Личный опыт участия в группе",
+        "Личная терапия",
+        "Личный психоанализ",
+        "Индивидуальные супервизии",
+        "Менторское сопровождение",
+        "Групповые супервизии",
+        "Психоаналитическая психодрама",
+        "Преподавание в школе",
+        "Преподавание в вузе",
+        "Преподавание в институтах профессиональных ассоциаций",
+        "Преподавание в рамках общественных и неформальных объединений",
+        "Ведение терапевтических групп",
+        "Ведение кризисных групп",
+        "Ведение групп психоаналитической психодрамы",
+        "Психоанализ",
+        "Групповой анализ",
+        "Индивидуальная психология (Адлер)",
+        "Аналитическая психология (Юнг)",
+        "Клиент-центрированная терапия (К. Роджерс)",
+        "Логотерапия (В. Франкл)",
+        "EMDR (Десенсибилизация и переработка движением глаз)",
+        "Групповая психотерапия и психодрама",
+        "Гештальт-терапия",
+        "Когнитивно-поведенческая терапия",
+        "Другое",
+        "Психоанализ",
+        "Групповой анализ",
+        "Индивидуальная психология (Адлер)",
+        "Аналитическая психология (Юнг)",
+        "Клиент-центрированная терапия (К. Роджерс)",
+        "Логотерапия (В. Франкл)",
+        "EMDR (Десенсибилизация и переработка движением глаз)",
+        "Групповая психотерапия и психодрама",
+        "Гештальт-терапия",
+        "Когнитивно-поведенческая терапия",
+        "Другое",
+        "Индивидуальные консультации",
+        "Групповая работа",
+        "Кризисная супервизия",
+        "Индивидуальные консультации",
+        "Групповая работа",
+        "Кризисная супервизия",
+        "В государственных или военных учреждениях",
+        "В волонтёрских проектах",
+        "Частная практика",
+        "Индивидуальная супервизия (психоанализ)",
+        "Индивидуальная супервизия (психотерапия)",
+        "Индивидуальная супервизия (клиническая психология)",
+        "Индивидуальная супервизия (кризисная психология)",
+        "Индивидуальная супервизия (педагогика)",
+        "Индивидуальная супервизия (коучинг)",
+        "Индивидуальная супервизия (управленческая)",
+        "Индивидуальная супервизия (профессиональная)",
+        "Индивидуальная супервизия (пациентов, клиентов, анализантов)",
+        "Групповая супервизия",
+      ],
+      ratingLabels: [
+        "Оценка со стороны пострадавшего или его близких:",
+        "Оценка со стороны супервизора:",
+        "Ваша собственная оценка:",
+      ],
+      answerPlaceholder: "Ваш ответ…",
+      saveButton: "Сохранить",
+    },
+    en: {
+      titles: [
+        "Your education and training in psychology (in hours):",
+        "Your primary psychological education and experiential training (in hours):",
+        "Do you have experience in teaching, conducting trainings, or providing supervision? Please indicate number of hours:",
+        "Which therapeutic approaches do you currently use in your clinical practice? For how long?",
+        "Which therapeutic approaches have you used in the past? For how long?",
+        "Your clinical experience in crisis counseling (in hours):",
+        "Your clinical experience in crisis counseling (in hours):",
+        "Your clinical experience in crisis counseling.",
+        "Your experience providing supervision (in hours):",
+        "How would you evaluate the quality and outcomes of your work in crisis counseling (scale from 1 to 5):",
+        "In your opinion, what is essential for effective crisis intervention as a professional practice and specialized form of psychological work? What aspects of your work are you more or less satisfied with? Open response:",
+      ],
+      labels: [
+        "Lectures",
+        "Seminars and colloquia",
+        "Workshops and trainings",
+        "Personal group experience",
+        "Personal therapy",
+        "Personal psychoanalysis",
+        "Individual supervision",
+        "Mentorship",
+        "Group supervision",
+        "Psychoanalytic psychodrama",
+        "Teaching in school settings",
+        "Teaching at universities",
+        "Teaching within professional associations or institutes",
+        "Teaching within community or informal organizations",
+        "Facilitating therapy groups",
+        "Facilitating crisis intervention groups",
+        "Facilitating psychoanalytic psychodrama groups",
+        "Psychoanalysis",
+        "Group Analysis",
+        "Individual Psychology (Adlerian)",
+        "Analytical Psychology (Jungian)",
+        "Person-Centered Therapy (Carl Rogers)",
+        "Logotherapy (Viktor Frankl)",
+        "EMDR (Eye Movement Desensitization and Reprocessing)",
+        "Group Psychotherapy and Psychodrama",
+        "Gestalt Therapy",
+        "Cognitive Behavioral Therapy (CBT)",
+        "Other",
+        "Psychoanalysis",
+        "Group Analysis",
+        "Individual Psychology (Adlerian)",
+        "Analytical Psychology (Jungian)",
+        "Person-Centered Therapy (Carl Rogers)",
+        "Logotherapy (Viktor Frankl)",
+        "EMDR (Eye Movement Desensitization and Reprocessing)",
+        "Group Psychotherapy and Psychodrama",
+        "Gestalt Therapy",
+        "Cognitive Behavioral Therapy (CBT)",
+        "Other",
+        "Individual counseling",
+        "Group work",
+        "Crisis supervision",
+        "Individual counseling",
+        "Group work",
+        "Crisis supervision",
+        "Work in governmental or military institutions",
+        "Work in volunteer settings",
+        "Private practice",
+        "Individual supervision (psychoanalysis)",
+        "Individual supervision (psychotherapy)",
+        "Individual supervision (clinical psychology)",
+        "Individual supervision (crisis psychology)",
+        "Individual supervision (education / pedagogy)",
+        "Individual supervision (coaching)",
+        "Individual supervision (organizational / managerial)",
+        "Individual professional supervision",
+        "Individual supervision of patients, clients, or analysands",
+        "Group supervision",
+      ],
+      ratingLabels: [
+        "Evaluation by the client or their relatives:",
+        "Evaluation by your supervisor:",
+        "Your self-evaluation:",
+      ],
+      answerPlaceholder: "Your answer…",
+      saveButton: "Save",
+    },
+  };
+
+  const PROFILE_DIRECTIONS = {
+    ua: [
+      "Психоаналіз",
+      "Групаналіз",
+      "Індивідуальна психологія (Адлер)",
+      "Аналітична психологія (Юнг)",
+      "Клієнт-центрована терапія (К. Роджерс)",
+      "Інтерперсональний підход (Г. Салліван)",
+      "Логотерапія (В. Франкл)",
+      "Психотерапія реципрокного гальмування (EMDR – Десенсибілізація та Репроцесуалізація (опрацювання) Рухом Очей)",
+      "Групова психотерапія і психодрама",
+      "Гештальт-терапія",
+      "Когнітивно-поведігкова терапія",
+      "Гіпнотерапія",
+      "Інше",
+    ],
+    ru: [
+      "Психоанализ",
+      "Групповой анализ",
+      "Индивидуальная психология (Адлер)",
+      "Аналитическая психология (Юнг)",
+      "Клиент-центрированная терапия (К. Роджерс)",
+      "Интерперсональный подход (Г. Салливан)",
+      "Логотерапия (В. Франкл)",
+      "EMDR (Десенсибилизация и переработка движением глаз)",
+      "Групповая психотерапия и психодрама",
+      "Гештальт-терапия",
+      "Когнитивно-поведенческая терапия",
+      "Гипнотерапия",
+      "Другое",
+    ],
+    en: [
+      "Psychoanalysis",
+      "Group Analysis",
+      "Individual Psychology (Adlerian)",
+      "Analytical Psychology (Jungian)",
+      "Person-Centered Therapy (Carl Rogers)",
+      "Interpersonal Therapy (Harry Stack Sullivan)",
+      "Logotherapy (Viktor Frankl)",
+      "EMDR (Eye Movement Desensitization and Reprocessing)",
+      "Group Psychotherapy and Psychodrama",
+      "Gestalt Therapy",
+      "Cognitive Behavioral Therapy (CBT)",
+      "Hypnotherapy",
+      "Other",
+    ],
+  };
+
+  const PROFILE_TOPICS = {
+    ua: [
+      "Стосунки з собою",
+      "Дратівливість",
+      "Панічні атаки",
+      "Самотність",
+      "Спроби самогубства",
+      "Депресивні стани",
+      "Тривожні стани",
+      "Втома",
+      "Самооцінка та самоцінність",
+      "Навʼязливі думки та ритуали",
+      "Хімічні залежності",
+      "Психосоматика",
+      "Ставлення до їжі",
+      "Стосунки з іншими",
+      "Сімейні стосунки",
+      "Інтимність та сексуальність",
+      "Романтичні стосунки",
+      "Співзалежність",
+      "Абʼюз, емоційне насилля",
+      "Діяльність",
+      "Емоційне вигорання",
+      "Самовизначення та самоідентифікація",
+      "Ставлення до грошей",
+      "Прокрастинація",
+      "Нові умови життя",
+      "Втрата та горе",
+      "Адаптація, еміграція",
+      "Народження дитини",
+      "ПТСР",
+      "Кризи і травми",
+    ],
+    ru: [
+      "Отношения с собой",
+      "Раздражительность",
+      "Панические атаки",
+      "Одиночество",
+      "Суицидальные мысли или попытки",
+      "Депрессивные состояния",
+      "Тревожные состояния",
+      "Усталость",
+      "Самооценка и самоценность",
+      "Навязчивые мысли и компульсивные действия",
+      "Химические зависимости",
+      "Психосоматические симптомы",
+      "Пищевое поведение",
+      "Отношения с другими",
+      "Семейные отношения",
+      "Интимность и сексуальность",
+      "Романтические отношения",
+      "Созависимость",
+      "Абьюз и эмоциональное насилие",
+      "Профессиональная деятельность",
+      "Эмоциональное выгорание",
+      "Самоопределение и идентичность",
+      "Отношение к деньгам",
+      "Прокрастинация",
+      "Жизненные изменения",
+      "Утрата и горе",
+      "Адаптация, эмиграция",
+      "Рождение ребенка",
+      "ПТСР",
+      "Кризисы и травмы",
+    ],
+    en: [
+      "Relationship with self",
+      "Irritability",
+      "Panic attacks",
+      "Loneliness",
+      "Suicidal ideation or attempts",
+      "Depression",
+      "Anxiety",
+      "Fatigue",
+      "Self-esteem and self-worth",
+      "Obsessive thoughts and compulsive behaviors",
+      "Substance addiction",
+      "Psychosomatic symptoms",
+      "Eating-related issues",
+      "Relationships with others",
+      "Family relationships",
+      "Intimacy and sexuality",
+      "Romantic relationships",
+      "Codependency",
+      "Abuse and emotional violence",
+      "Professional and work-related issues",
+      "Burnout",
+      "Identity and self-definition",
+      "Relationship with money",
+      "Procrastination",
+      "Life transitions",
+      "Loss and grief",
+      "Adaptation and immigration",
+      "Childbirth / becoming a parent",
+      "PTSD",
+      "Crises and trauma",
+    ],
+  };
+
+  function normalizeProfileLang(value) {
+    const v = String(value || "").toLowerCase().trim();
+    if (v.startsWith("uk") || v === "ua") return "ua";
+    if (v.startsWith("ru")) return "ru";
+    if (v.startsWith("en")) return "en";
+    return "ua";
+  }
+
+  function getProfileLang() {
+    try {
+      const stored = localStorage.getItem("uiLang");
+      if (stored) return normalizeProfileLang(stored);
+    } catch (_) {}
+    return normalizeProfileLang(document.documentElement.lang);
+  }
+
+  function normalizeProfileText(v) {
+    return String(v || "")
+      .toLowerCase()
+      .replace(/[’ʼ`]/g, "'")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function buildCanonicalMap(groups) {
+    const map = new Map();
+    const langs = Object.keys(groups);
+    const base = groups.ua || [];
+    base.forEach((_, idx) => {
+      const key = `k_${idx}`;
+      langs.forEach((lang) => {
+        const label = groups[lang]?.[idx];
+        if (label) map.set(normalizeProfileText(label), key);
+      });
+    });
+    return map;
+  }
+
+  const profileDirectionsCanonical = buildCanonicalMap(PROFILE_DIRECTIONS);
+  const profileTopicsCanonical = buildCanonicalMap(PROFILE_TOPICS);
+
+  function mapProfileOptionValue(value, canonicalMap, labelsByLang, lang) {
+    const norm = normalizeProfileText(value);
+    const key = canonicalMap.get(norm);
+    if (!key) return value;
+    const idx = Number(String(key).replace("k_", ""));
+    return labelsByLang?.[lang]?.[idx] || value;
+  }
+
+  function localizeProfileList(values, canonicalMap, labelsByLang, lang) {
+    if (!Array.isArray(values)) return "";
+    return values
+      .map((v) => mapProfileOptionValue(v, canonicalMap, labelsByLang, lang))
+      .join(", ");
+  }
+
+  function setProfileStep1Text(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function setProfileStep2Text(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function setProfilePlaceholder(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = value;
+  }
+
+  window.getLocalizedDirectionsOptions = function getLocalizedDirectionsOptions() {
+    const lang = getProfileLang();
+    return PROFILE_DIRECTIONS[lang] || PROFILE_DIRECTIONS.ua;
+  };
+
+  window.getLocalizedTopicsOptions = function getLocalizedTopicsOptions() {
+    const lang = getProfileLang();
+    return PROFILE_TOPICS[lang] || PROFILE_TOPICS.ua;
+  };
+
+  window.getLocalizedOtherLabel = function getLocalizedOtherLabel() {
+    const lang = getProfileLang();
+    return (PROFILE_STEP1_I18N[lang] || PROFILE_STEP1_I18N.ua).other;
+  };
+
+  function applyProfileStep1Translations(langRaw) {
+    const lang = normalizeProfileLang(langRaw || getProfileLang());
+    const t = PROFILE_STEP1_I18N[lang] || PROFILE_STEP1_I18N.ua;
+
+    const title = document.querySelector(".about-me-title");
+    if (title) title.textContent = t.title;
+
+    setProfileStep1Text("profileLabelUsername", t.username);
+    setProfileStep1Text("profileLabelFirstName", t.firstName);
+    setProfileStep1Text("profileLabelLastName", t.lastName);
+    setProfileStep1Text("profileLabelMiddleName", t.middleName);
+    setProfileStep1Text("profileLabelEmail", t.email);
+    setProfileStep1Text("profileLabelPhone", t.phone);
+    setProfileStep1Text("profileLabelGender", t.gender);
+    setProfileStep1Text("profileLabelExperience", t.experience);
+    setProfileStep1Text("profileLabelEducation", t.education);
+    setProfileStep1Text("profileLabelDirections", t.directions);
+    setProfileStep1Text("profileLabelTopics", t.topics);
+
+    const me = window.currentUser || (function() {
+      try { return JSON.parse(localStorage.getItem("user") || "null"); } catch (_) { return null; }
+    })();
+
+    const dirSpan = document.getElementById("profileDirections");
+    if (dirSpan && Array.isArray(me?.directions)) {
+      dirSpan.textContent = localizeProfileList(
+        me.directions,
+        profileDirectionsCanonical,
+        PROFILE_DIRECTIONS,
+        lang
+      );
+    }
+
+    const topicsSpan = document.getElementById("profileTopics");
+    if (topicsSpan && Array.isArray(me?.topics)) {
+      topicsSpan.textContent = localizeProfileList(
+        me.topics,
+        profileTopicsCanonical,
+        PROFILE_TOPICS,
+        lang
+      );
+    }
+  }
+
+  function applyProfileStep2Translations(langRaw) {
+    const lang = normalizeProfileLang(langRaw || getProfileLang());
+    const t = PROFILE_STEP2_I18N[lang] || PROFILE_STEP2_I18N.ua;
+
+    setProfileStep2Text("profileStep2LabelAbout", t.about);
+    setProfileStep2Text("profileStep2LabelCourses", t.courses);
+    setProfileStep2Text("profileStep2LabelRole", t.role);
+    setProfileStep2Text("profileStep2LabelCost", t.cost);
+    setProfileStep2Text("profileStep2LabelVideo", t.video);
+    setProfileStep2Text("profileStep2LabelQualifications", t.qualifications);
+    setProfileStep2Text("profileStep2LabelExperienceExtra", t.experienceExtra);
+    setProfileStep2Text("profileStep2LabelLanguage", t.language);
+    setProfileStep2Text("profileStep2LabelFormat", t.format);
+    setProfileStep2Text("profileStep2TextOnline", t.online);
+    setProfileStep2Text("profileStep2TextOffline", t.offline);
+    setProfileStep2Text("saveFormatBtn", t.saveFormat);
+
+    setProfilePlaceholder("profileAboutTextarea", t.placeholder);
+    setProfilePlaceholder("profileCoursesTextarea", t.placeholder);
+    setProfilePlaceholder("profileRoleTextarea", t.placeholder);
+    setProfilePlaceholder("profileCostTextarea", t.placeholder);
+    setProfilePlaceholder("profileVideoTextarea", t.placeholder);
+    setProfilePlaceholder("profileQualificationsTextarea", t.placeholder);
+    setProfilePlaceholder("profileExperienceExtraTextarea", t.placeholder);
+    setProfilePlaceholder("profileLanguageTextarea", t.placeholder);
+    setProfilePlaceholder("offlineCity", t.cityPlaceholder);
+  }
+
+  function applyProfileStep3Translations(langRaw) {
+    const lang = normalizeProfileLang(langRaw || getProfileLang());
+    const t = PROFILE_STEP3_I18N[lang] || PROFILE_STEP3_I18N.ua;
+    const step3 = document.getElementById("step3");
+    if (!step3) return;
+
+    const titleEls = step3.querySelectorAll(".profile-table-title");
+    titleEls.forEach((el, idx) => {
+      if (t.titles[idx]) el.textContent = t.titles[idx];
+    });
+
+    const labelEls = step3.querySelectorAll(".profile-table-label");
+    labelEls.forEach((el, idx) => {
+      if (t.labels[idx]) el.textContent = t.labels[idx];
+    });
+
+    const ratingEls = step3.querySelectorAll(".rating-label");
+    ratingEls.forEach((el, idx) => {
+      if (t.ratingLabels[idx]) el.textContent = t.ratingLabels[idx];
+    });
+
+    setProfilePlaceholder("profileCrisisHelpTextarea", t.answerPlaceholder);
+    setProfileStep2Text("saveCrisisHelpBtn", t.saveButton);
+  }
+
+  window.renderLocalizedProfileStep1Lists = function renderLocalizedProfileStep1Lists(directions, topics) {
+    const lang = getProfileLang();
+    const dirSpan = document.getElementById("profileDirections");
+    if (dirSpan && Array.isArray(directions)) {
+      dirSpan.textContent = localizeProfileList(
+        directions,
+        profileDirectionsCanonical,
+        PROFILE_DIRECTIONS,
+        lang
+      );
+    }
+    const topicsSpan = document.getElementById("profileTopics");
+    if (topicsSpan && Array.isArray(topics)) {
+      topicsSpan.textContent = localizeProfileList(
+        topics,
+        profileTopicsCanonical,
+        PROFILE_TOPICS,
+        lang
+      );
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    applyProfileStep1Translations(getProfileLang());
+    applyProfileStep2Translations(getProfileLang());
+    applyProfileStep3Translations(getProfileLang());
+  });
+
+  window.addEventListener("uiLangChange", (e) => {
+    applyProfileStep1Translations(e.detail?.lang);
+    applyProfileStep2Translations(e.detail?.lang);
+    applyProfileStep3Translations(e.detail?.lang);
+  });
 
   function resolvePhotoUrl(url) {
   if (!url) return '';
@@ -812,10 +1529,12 @@ function populateFormat(freshUser) {
       fillSpan('profileEducation', freshUser.education);
 
       // Directions & topics (arrays) to spans if present
-      const dirSpan = document.getElementById('profileDirections');
-      if (dirSpan && Array.isArray(freshUser.directions)) dirSpan.textContent = freshUser.directions.join(', ');
-      const topicsSpan = document.getElementById('profileTopics');
-      if (topicsSpan && Array.isArray(freshUser.topics)) topicsSpan.textContent = freshUser.topics.join(', ');
+      if (typeof window.renderLocalizedProfileStep1Lists === 'function') {
+        window.renderLocalizedProfileStep1Lists(freshUser.directions, freshUser.topics);
+      }
+      if (typeof applyProfileStep1Translations === 'function') {
+        applyProfileStep1Translations();
+      }
     }
 
     async function populateCompletedCoursesTextarea() {

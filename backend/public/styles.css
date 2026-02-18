@@ -3365,6 +3365,7 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #000;
 }
 
 .switch {

@@ -1558,17 +1558,16 @@ position: relative;  }
 /* ===== Forum index mobile sizing ===== */
 @media (max-width: 767px) {
   .wrap .forum-hero {
-    width: 300px;
+    width: 376px;
     max-width: 100%;
-    height: 500px;
+    height: auto;
     margin: 16px auto;
   }
 
   .wrap .forum-hero img {
-    width: 376px;
-    max-width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
     display: block;
   }
 

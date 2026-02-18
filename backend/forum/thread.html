@@ -11,6 +11,19 @@
     />
   </head>
   <body class="with-sidebar">
+    <header class="site-header">
+      <button class="burger" id="burgerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <img src="/assets/sidebar/burger.svg" alt="" />
+      </button>
+      <a href="/" class="header-logo" aria-label="Homepage">
+        <img src="/assets/emblem.svg" alt="Company" />
+      </a>
+    </header>
+    <button class="lang-fab" id="langBtn" aria-label="Language">
+      <img src="/assets/language.png" alt="Language" />
+    </button>
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
     <aside class="sidebar collapsed" id="sidebar">
     <div class="toggle-button" onclick="toggleSidebar()">
       <img src="/assets/sidebar/arrow.svg" alt="Toggle" id="toggleArrow" />

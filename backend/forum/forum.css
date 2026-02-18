@@ -1696,3 +1696,242 @@ position: relative;  }
     justify-content: flex-end;
   }
 }
+
+/* ===== Thread page mobile (thread.html) ===== */
+@media (max-width: 767px) {
+  .thread-card {
+    width: 344px;
+    max-width: 100%;
+    min-height: 146px;
+    margin: 12px auto;
+    padding: 16px;
+    border-radius: 12px;
+    display: block;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .thread-card__left {
+    display: block;
+  }
+
+  .thread-card .thread-title {
+    max-width: 100%;
+    font-size: 28px;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+
+  .thread-card .thread-avatar {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
+
+  .thread-card .thread-author-name {
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  .thread-card .thread-author-meta {
+    font-size: 14px;
+    line-height: 1.15;
+  }
+
+  .thread-card .thread-author {
+    padding-right: 112px;
+  }
+
+  .thread-card .thread-answers,
+  #tAnswers {
+    width: auto;
+    height: auto;
+    font-size: 14px;
+    line-height: 1.15;
+    position: absolute;
+    right: 16px;
+    bottom: 24px;
+    justify-content: flex-end;
+    color: #7B7B7B;
+  }
+
+  .mod-actions {
+    width: 344px;
+    max-width: 100%;
+    margin: 8px auto 14px;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .mod-actions .mod-btn {
+    width: auto;
+    min-width: 96px;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .mod-actions .mod-btn img.mod-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  #posts {
+    width: 344px;
+    max-width: 100%;
+    margin: 0 auto;
+    gap: 12px;
+  }
+
+  #posts .post:first-child {
+    width: 344px;
+    max-width: 100%;
+    min-height: auto;
+    padding: 12px;
+    border-width: 1px;
+    border-radius: 12px;
+    margin: 0 auto 12px;
+    padding-bottom: 52px;
+  }
+
+  #posts .post:first-child .post-author .avatar {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+
+  #posts .post:first-child .post-author-name {
+    font-size: 20px;
+  }
+
+  #posts .post:first-child .post-author-meta {
+    font-size: 12px;
+  }
+
+  #posts .post:first-child .post-content {
+    font-size: 18px;
+    line-height: 1.45;
+  }
+
+  .post .actions {
+    gap: 10px;
+  }
+
+  .post .actions .js-reply {
+    width: 82px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 0 8px;
+  }
+
+  .post .actions .js-reply::before {
+    width: 16px;
+    height: 16px;
+  }
+
+  .post .actions .js-like {
+    width: 32px;
+    height: 32px;
+  }
+
+  .post .actions .js-like::before {
+    width: 18px;
+    height: 18px;
+  }
+
+  .post .actions .js-like .js-like-count {
+    left: calc(100% + 8px);
+    font-size: 14px;
+  }
+
+  #posts .post:first-child .post-footer {
+    right: 12px;
+    bottom: 10px;
+    gap: 10px;
+  }
+
+  #posts .post:first-child .post-footer .show-more {
+    width: auto;
+    min-width: 82px;
+    height: 24px;
+    font-size: 10px;
+    padding: 0 10px;
+  }
+
+  #posts .post:first-child .post-footer .answers-count {
+    font-size: 14px;
+  }
+
+  #posts .post:first-child .replies-list .post {
+    padding: 10px 0;
+  }
+
+  #posts .post:first-child .replies-list .avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  #posts .post:first-child .replies-list .post-author-name {
+    font-size: 18px;
+  }
+
+  #posts .post:first-child .replies-list .post-author-meta {
+    font-size: 12px;
+  }
+
+  #composer {
+    width: 344px;
+    max-width: 100%;
+    margin: 12px auto 20px;
+  }
+
+  .reply-context {
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .reply-context .label,
+  .reply-context .quote {
+    font-size: 16px;
+  }
+
+  #replyText {
+    height: 96px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .composer-actions {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .attach-btn {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .attach-btn img {
+    width: 14px;
+    height: 14px;
+  }
+
+  .btn-send {
+    width: 120px;
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 14px;
+  }
+
+  #lockHint {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+  }
+}

@@ -1570,6 +1570,9 @@ position: relative;  }
 @media (max-width: 767px) {
   .forum-page-title {
     display: block;
+    margin: -220px 0 170px;
+    position: relative;
+    z-index: 2;
   }
 
   .wrap .forum-hero {

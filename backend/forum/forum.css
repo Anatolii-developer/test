@@ -1560,14 +1560,14 @@ position: relative;  }
   .wrap .forum-hero {
     width: 376px;
     max-width: 100%;
-    height: auto;
+    height: 700px;
     margin: 16px auto;
   }
 
   .wrap .forum-hero img {
     width: 100%;
-    height: auto;
-    object-fit: contain;
+    height: 700px;
+    object-fit: fill;
     display: block;
   }
 

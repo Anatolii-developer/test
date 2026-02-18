@@ -5764,3 +5764,13 @@ body.practice-page {
         height: 100px;
     }
 }
+
+/* Keep mobile top navbar visible across pages with sidebar */
+@media (max-width: 768px) {
+  .site-header {
+    display: grid !important;
+    position: sticky;
+    top: 0;
+    z-index: 1002;
+  }
+}

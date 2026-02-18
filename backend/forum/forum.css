@@ -198,6 +198,16 @@ body {
     display: block;
 }
 
+.forum-page-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 1.1;
+    text-align: center;
+    color: #FFFFFF;
+    margin: 20px 0 28px;
+}
+
 /* ========= Action bar (search + publish) ========= */
 .action-bar{
   width: 1110px;

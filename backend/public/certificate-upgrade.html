@@ -83,21 +83,21 @@
 
     <main class="cert-page">
       <div class="main-header">
-        <h2>Підвищення кваліфікації</h2>
+        <h2 id="certPageTitle">Підвищення кваліфікації</h2>
         <img src="assets/certificates/certificate1.png" alt="Main Image" />
       </div>
 
       <div class="cert-nav">
-        <a href="./mycertificates.html" class="cert-btn back"
-          ><span>&larr;</span> Головна</a
+        <a href="./mycertificates.html" class="cert-btn back" id="certNavHome"
+          ><span>&larr;</span> На головну</a
         >
-        <a href="./certificate-upgrade.html" class="cert-btn active"
+        <a href="./certificate-upgrade.html" class="cert-btn active" id="certNavUpgrade"
           >Підвищення кваліфікації</a
         >
-        <a href="./certificate-completing.html" class="cert-btn"
+        <a href="./certificate-completing.html" class="cert-btn" id="certNavCourses"
           >Проходження курсів</a
         >
-        <a href="./certificate-conference.html" class="cert-btn"
+        <a href="./certificate-conference.html" class="cert-btn" id="certNavConferences"
           >Проходження конференцій</a
         >
       </div>
@@ -109,14 +109,110 @@
 </script>
     <script src="script.js"></script>
     <script>
+      const MAIN_TYPE = "Підвищення кваліфікації";
+      const CERT_PAGE_I18N = {
+        ua: {
+          pageTitle: "Підвищення кваліфікації",
+          home: "На головну",
+          upgrade: "Підвищення кваліфікації",
+          courses: "Проходження курсів",
+          conferences: "Проходження конференцій",
+          view: "Переглянути",
+          noCertificate: "Немає сертифікату",
+          noCertificateYet: "Сертифікат ще не додано",
+          untitled: "Без назви",
+          loginRequired: "Щоб переглянути сертифікати, увійдіть у систему.",
+          empty: "Поки що немає доданих сертифікатів за цією категорією.",
+          loadError: "Сталася помилка під час завантаження сертифікатів.",
+          loadErrorLog: "Помилка завантаження сертифікатів:",
+        },
+        ru: {
+          pageTitle: "Повышение квалификации",
+          home: "На главную",
+          upgrade: "Повышение квалификации",
+          courses: "Прохождение курсов",
+          conferences: "Прохождение конференций",
+          view: "Просмотреть",
+          noCertificate: "Нет сертификата",
+          noCertificateYet: "Сертификат еще не добавлен",
+          untitled: "Без названия",
+          loginRequired: "Чтобы просмотреть сертификаты, войдите в систему.",
+          empty: "Пока нет добавленных сертификатов по этой категории.",
+          loadError: "Произошла ошибка при загрузке сертификатов.",
+          loadErrorLog: "Ошибка загрузки сертификатов:",
+        },
+        en: {
+          pageTitle: "Professional development",
+          home: "Home",
+          upgrade: "Professional development",
+          courses: "Completed courses",
+          conferences: "Conferences attended",
+          view: "View",
+          noCertificate: "No certificate",
+          noCertificateYet: "Certificate is not added yet",
+          untitled: "Untitled",
+          loginRequired: "Log in to view certificates.",
+          empty: "No certificates added in this category yet.",
+          loadError: "An error occurred while loading certificates.",
+          loadErrorLog: "Certificate loading error:",
+        },
+      };
+
+      function normalizeLang(value) {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("en")) return "en";
+        if (v.startsWith("ru")) return "ru";
+        return "ua";
+      }
+
+      function getUiLang() {
+        try {
+          return normalizeLang(localStorage.getItem("uiLang") || document.documentElement.lang);
+        } catch (_) {
+          return normalizeLang(document.documentElement.lang);
+        }
+      }
+
+      function getCopy() {
+        return CERT_PAGE_I18N[getUiLang()] || CERT_PAGE_I18N.ua;
+      }
+
+      function getDateLocale() {
+        const lang = getUiLang();
+        if (lang === "ru") return "ru-RU";
+        if (lang === "en") return "en-US";
+        return "uk-UA";
+      }
+
+      function refreshUiTexts() {
+        const t = getCopy();
+        document.title = t.pageTitle;
+        const setText = (id, text) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = text;
+        };
+        setText("certPageTitle", t.pageTitle);
+        setText("certNavUpgrade", t.upgrade);
+        setText("certNavCourses", t.courses);
+        setText("certNavConferences", t.conferences);
+        const home = document.getElementById("certNavHome");
+        if (home) home.innerHTML = `<span>&larr;</span> ${t.home}`;
+      }
 
       document.addEventListener("DOMContentLoaded", () => {
-        loadUserCertificatesByMainType("Підвищення кваліфікації");
+        refreshUiTexts();
+        loadUserCertificatesByMainType(MAIN_TYPE);
+      });
+
+      window.addEventListener("uiLangChange", () => {
+        refreshUiTexts();
+        loadUserCertificatesByMainType(MAIN_TYPE);
       });
 
       function renderPreview(url, id) {
+        const t = getCopy();
         if (!url)
-          return `<div class="cert-placeholder" id="cert-preview-${id}" style="display:flex;align-items:center;justify-content:center;min-height:220px;border:1px dashed #ccc;border-radius:12px;">Сертифікат ще не додано</div>`;
+          return `<div class="cert-placeholder" id="cert-preview-${id}" style="display:flex;align-items:center;justify-content:center;min-height:220px;border:1px dashed #ccc;border-radius:12px;">${t.noCertificateYet}</div>`;
         const isPdf = /\.pdf(\?|$)/i.test(url);
         return isPdf
           ? `<embed src="${url}" type="application/pdf" class="cert-embed" id="cert-preview-${id}" style="width:100%;height:260px;border-radius:12px;" />`
@@ -124,6 +220,8 @@
       }
 
       function renderCertCard({ course, uaUrl, engUrl }) {
+        const t = getCopy();
+        const dateLocale = getDateLocale();
         const hasUA = !!uaUrl,
           hasEN = !!engUrl;
         const initialUrl = uaUrl || engUrl || null;
@@ -132,17 +230,17 @@
           <div class="cert-preview" id="cert-preview-wrap-${course._id}">
             ${renderPreview(initialUrl, course._id)}
           </div>
-          <h3 class="cert-title">${course.courseTitle || "Без назви"}</h3>
+          <h3 class="cert-title">${course.courseTitle || t.untitled}</h3>
           <p class="cert-dates">
             ${
               course.courseDates?.start
-                ? new Date(course.courseDates.start).toLocaleDateString("uk-UA")
+                ? new Date(course.courseDates.start).toLocaleDateString(dateLocale)
                 : ""
             }
             ${
               course.courseDates?.end
                 ? " – " +
-                  new Date(course.courseDates.end).toLocaleDateString("uk-UA")
+                  new Date(course.courseDates.end).toLocaleDateString(dateLocale)
                 : ""
             }
           </p>
@@ -161,8 +259,8 @@
             </div>
             ${
               initialUrl
-                ? `<a href="${initialUrl}" target="_blank" class="view-btn" id="view-btn-${course._id}">Переглянути</a>`
-                : `<span class="view-btn" style="pointer-events:none;opacity:.6">Немає сертифікату</span>`
+                ? `<a href="${initialUrl}" target="_blank" class="view-btn" id="view-btn-${course._id}">${t.view}</a>`
+                : `<span class="view-btn" style="pointer-events:none;opacity:.6">${t.noCertificate}</span>`
             }
           </div>
         </div>`;
@@ -187,14 +285,14 @@
       }
 
       async function loadUserCertificatesByMainType(MAIN_TYPE) {
+        const t = getCopy();
         const grid =
           document.getElementById("certGrid") ||
           document.querySelector(".cert-grid");
         if (!grid) return;
         const rawUser = localStorage.getItem("user");
         if (!rawUser) {
-          grid.innerHTML =
-            "<p>Щоб переглянути сертифікати, увійдіть у систему.</p>";
+          grid.innerHTML = `<p>${t.loginRequired}</p>`;
           return;
         }
         const user = JSON.parse(rawUser);
@@ -217,11 +315,10 @@
           });
           grid.innerHTML = cards.length
             ? cards.join("")
-            : "<p>Поки що немає доданих сертифікатів за цією категорією.</p>";
+            : `<p>${t.empty}</p>`;
         } catch (e) {
-          console.error("Помилка завантаження сертифікатів:", e);
-          grid.innerHTML =
-            "<p>Сталася помилка під час завантаження сертифікатів.</p>";
+          console.error(t.loadErrorLog, e);
+          grid.innerHTML = `<p>${t.loadError}</p>`;
         }
       }
     </script>

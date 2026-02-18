@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Certificates</title>
+  <title>Мої Сертифікати</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -50,12 +50,12 @@
 
   <main id="mainContent" class="profile-background">
     <section class="profile-hero">
-      <h1 class="about-me-title">MY CERTIFICATES</h1>
+      <h1 class="about-me-title" id="certMainTitle">Мої Сертифікати</h1>
     </section>
     <section class="my-courses-section">
       <div class="course-card">
   <div class="course-info">
-    <h3>Підвищення кваліфікації</h3>
+    <h3 id="certCatUpgrade">Підвищення кваліфікації</h3>
   </div>
   <img src="assets/certificates/certificate1.png" alt="Certificate 1" class="course-illustration" />
   <a href="./certificate-upgrade.html" class="arrow-btn">
@@ -65,7 +65,7 @@
 
 <div class="course-card">
   <div class="course-info">
-    <h3>Проходження курсів</h3>
+    <h3 id="certCatCourses">Проходження курсів</h3>
   </div>
   <img src="assets/certificates/certificate2.png" alt="Certificate 2" class="course-illustration" />
   <a href="./certificate-completing.html" class="arrow-btn">
@@ -75,7 +75,7 @@
 
 <div class="course-card">
   <div class="course-info">
-    <h3>Проходження конференцій</h3>
+    <h3 id="certCatConferences">Проходження конференцій</h3>
   </div>
   <img src="assets/certificates/certificate3.png" alt="Certificate 3" class="course-illustration" />
   <a href="./certificate-conference.html" class="arrow-btn">
@@ -86,5 +86,68 @@
   </main>
 
   <script src="script.js"></script>
+  <script>
+    (function () {
+      const COPY = {
+        ua: {
+          title: "Мої Сертифікати",
+          upgrade: "Підвищення кваліфікації",
+          courses: "Проходження курсів",
+          conferences: "Проходження конференцій",
+        },
+        ru: {
+          title: "Мои Сертификаты",
+          upgrade: "Повышение квалификации",
+          courses: "Прохождение курсов",
+          conferences: "Прохождение конференций",
+        },
+        en: {
+          title: "My Certificates",
+          upgrade: "Professional development",
+          courses: "Completed courses",
+          conferences: "Conferences attended",
+        },
+      };
+
+      function normalizeLang(value) {
+        const v = String(value || "").toLowerCase().trim();
+        if (v.startsWith("en")) return "en";
+        if (v.startsWith("ru")) return "ru";
+        return "ua";
+      }
+
+      function getLang() {
+        try {
+          return normalizeLang(localStorage.getItem("uiLang") || document.documentElement.lang);
+        } catch (_) {
+          return normalizeLang(document.documentElement.lang);
+        }
+      }
+
+      function apply(langRaw) {
+        const lang = normalizeLang(langRaw);
+        const t = COPY[lang] || COPY.ua;
+        document.title = t.title;
+        const setText = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = value;
+        };
+        setText("certMainTitle", t.title);
+        setText("certCatUpgrade", t.upgrade);
+        setText("certCatCourses", t.courses);
+        setText("certCatConferences", t.conferences);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => apply(getLang()));
+      } else {
+        apply(getLang());
+      }
+
+      window.addEventListener("uiLangChange", (e) => {
+        apply(e.detail?.lang || getLang());
+      });
+    })();
+  </script>
 </body>
 </html>

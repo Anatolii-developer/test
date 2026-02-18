@@ -814,39 +814,47 @@ async function forumApplyAvatars() {
 }
 
 const contactBtn = document.getElementById("btnContactAdmin");
+const modal = document.getElementById("adminMsgModal");
+const sendAdminMsgBtn = document.getElementById("sendAdminMsg");
+const adminMsgText = document.getElementById("adminMsgText");
+
 if (contactBtn) {
   contactBtn.addEventListener("click", () => {
-    document.getElementById("adminMsgModal").style.display = "flex";
+    if (modal) modal.style.display = "flex";
   });
 }
 
-const modal = document.getElementById("adminMsgModal");
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.style.display = "none";
-  }
-});
-document.getElementById("sendAdminMsg").addEventListener("click", async () => {
-  const text = document.getElementById("adminMsgText").value.trim();
-  if (!text) return alert("Введіть текст повідомлення");
+if (modal) {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+}
 
-  try {
-    const res = await fetch(`${API_BASE}/api/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ text }),
-    });
+if (sendAdminMsgBtn && adminMsgText) {
+  sendAdminMsgBtn.addEventListener("click", async () => {
+    const text = adminMsgText.value.trim();
+    if (!text) return alert("Введіть текст повідомлення");
 
-    if (!res.ok) throw new Error("Помилка");
+    try {
+      const res = await fetch(`${API_BASE}/api/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      });
 
-    alert("Повідомлення надіслано!");
-    document.getElementById("adminMsgText").value = "";
-    document.getElementById("adminMsgModal").style.display = "none";
-  } catch (e) {
-    alert("Не вдалося відправити повідомлення");
-  }
-});
+      if (!res.ok) throw new Error("Помилка");
+
+      alert("Повідомлення надіслано!");
+      adminMsgText.value = "";
+      if (modal) modal.style.display = "none";
+    } catch (e) {
+      alert("Не вдалося відправити повідомлення");
+    }
+  });
+}
 
 
   return {

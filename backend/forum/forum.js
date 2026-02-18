@@ -224,6 +224,186 @@ window.toggleSidebar = toggleSidebar;
       logout: 'Log Out',
     },
   };
+  const FORUM_MAIN_I18N = {
+    ua: {
+      title: 'ФОРУМ',
+      inputPlaceholder: 'Введіть текст',
+      publish: 'Опублікувати',
+      loggedAs: 'Ви увійшли як',
+      loggedOut: 'Ви не авторизовані',
+      noTopics: 'Поки що немає тем.',
+      unknownUser: 'Користувач',
+      replies: { one: 'відповідь', few: 'відповіді', many: 'відповідей' },
+      days: { one: 'день тому', few: 'дні тому', many: 'днів тому' },
+      today: 'сьогодні',
+      yesterday: 'вчора',
+      thread: {
+        pin: 'Закріпити',
+        directMessages: 'Особисті повідомлення',
+        delete: 'Видалити',
+        close: 'Закрити',
+        invite: 'Запросити',
+        reply: 'Відповісти',
+        showMore: 'Показати більше',
+        showLess: 'Згорнути',
+        replyTo: 'Відповідь на:',
+        typeMessage: 'Напишіть Ваше повідомлення...',
+        attachFile: 'Прикріпити файл',
+        send: 'Надіслати',
+        lockHint: 'Тема закрита для нових відповідей',
+        createdBy: 'Створив',
+        pinnedState: 'Закріплено',
+        lockedState: 'Закрито',
+        privateState: 'Приватна',
+        cancel: 'Скасувати',
+        fileLabel: 'Файл',
+        errorGeneric: 'Помилка',
+        deleteThreadConfirm: 'Видалити тему?',
+        invitePrompt: 'Введіть ID користувача, якого запросити:',
+        inviteSuccess: 'Користувача додано до приватної теми',
+        deletePostConfirm: 'Видалити повідомлення?',
+      },
+    },
+    ru: {
+      title: 'ФОРУМ',
+      inputPlaceholder: 'Введите текст',
+      publish: 'Опубликовать',
+      loggedAs: 'Вы вошли как',
+      loggedOut: 'Вы не авторизованы',
+      noTopics: 'Пока нет тем.',
+      unknownUser: 'Пользователь',
+      replies: { one: 'ответ', few: 'ответа', many: 'ответов' },
+      days: { one: 'день назад', few: 'дня назад', many: 'дней назад' },
+      today: 'сегодня',
+      yesterday: 'вчера',
+      thread: {
+        pin: 'Закрепить',
+        directMessages: 'Личные сообщения',
+        delete: 'Удалить',
+        close: 'Закрыть',
+        invite: 'Пригласить',
+        reply: 'Ответить',
+        showMore: 'Показать больше',
+        showLess: 'Свернуть',
+        replyTo: 'Ответ на:',
+        typeMessage: 'Напишите Ваше сообщение...',
+        attachFile: 'Прикрепить файл',
+        send: 'Отправить',
+        lockHint: 'Тема закрыта для новых ответов',
+        createdBy: 'Создал',
+        pinnedState: 'Закреплено',
+        lockedState: 'Закрыто',
+        privateState: 'Личная',
+        cancel: 'Отменить',
+        fileLabel: 'Файл',
+        errorGeneric: 'Ошибка',
+        deleteThreadConfirm: 'Удалить тему?',
+        invitePrompt: 'Введите ID пользователя, которого пригласить:',
+        inviteSuccess: 'Пользователь добавлен в личную тему',
+        deletePostConfirm: 'Удалить сообщение?',
+      },
+    },
+    en: {
+      title: 'FORUM',
+      inputPlaceholder: 'Enter text',
+      publish: 'Post',
+      loggedAs: 'You are logged in as',
+      loggedOut: 'You are not logged in',
+      noTopics: 'No topics yet.',
+      unknownUser: 'User',
+      replies: { one: 'reply', few: 'replies', many: 'replies' },
+      days: { one: 'day ago', few: 'days ago', many: 'days ago' },
+      today: 'today',
+      yesterday: 'yesterday',
+      thread: {
+        pin: 'Pin',
+        directMessages: 'Direct messages',
+        delete: 'Delete',
+        close: 'Close',
+        invite: 'Invite',
+        reply: 'Reply',
+        showMore: 'Show more',
+        showLess: 'Show less',
+        replyTo: 'Reply to:',
+        typeMessage: 'Type your message',
+        attachFile: 'Attach file',
+        send: 'Send',
+        lockHint: 'Thread is closed for new replies',
+        createdBy: 'Created by',
+        pinnedState: 'Pinned',
+        lockedState: 'Closed',
+        privateState: 'Private',
+        cancel: 'Cancel',
+        fileLabel: 'File',
+        errorGeneric: 'Error',
+        deleteThreadConfirm: 'Delete thread?',
+        invitePrompt: 'Enter user ID to invite:',
+        inviteSuccess: 'User was added to the private thread',
+        deletePostConfirm: 'Delete message?',
+      },
+    },
+  };
+
+  function slavicPlural(count, forms) {
+    const n = Math.abs(Number(count) || 0);
+    const n100 = n % 100;
+    const n10 = n % 10;
+    if (n100 >= 11 && n100 <= 14) return forms.many;
+    if (n10 === 1) return forms.one;
+    if (n10 >= 2 && n10 <= 4) return forms.few;
+    return forms.many;
+  }
+
+  function forumMainCopy(langRaw) {
+    const lang = normalizeLang(langRaw || getStoredLang());
+    return FORUM_MAIN_I18N[lang] || FORUM_MAIN_I18N.ua;
+  }
+
+  function formatForumReplies(count, langRaw) {
+    const lang = normalizeLang(langRaw || getStoredLang());
+    const copy = forumMainCopy(lang);
+    if (lang === 'en') {
+      const noun = Number(count) === 1 ? copy.replies.one : copy.replies.many;
+      return `${count} ${noun}`;
+    }
+    return `${count} ${slavicPlural(count, copy.replies)}`;
+  }
+
+  function formatForumRelativeDate(input, langRaw) {
+    const lang = normalizeLang(langRaw || getStoredLang());
+    const copy = forumMainCopy(lang);
+    const d = new Date(input);
+    if (Number.isNaN(d.getTime())) return '';
+
+    const diffMs = Date.now() - d.getTime();
+    const days = Math.floor(diffMs / 86400000);
+    if (days <= 0) return copy.today;
+    if (days === 1) return copy.yesterday;
+    if (lang === 'en') return `${days} ${copy.days.many}`;
+    return `${days} ${slavicPlural(days, copy.days)}`;
+  }
+
+  function updateForumMainText(langRaw) {
+    const lang = normalizeLang(langRaw || getStoredLang());
+    const copy = forumMainCopy(lang);
+
+    const title = document.getElementById('forumPageTitle');
+    const queryInput = document.getElementById('q');
+    const publish = document.getElementById('publishBtnText');
+    const loginPrefix = document.getElementById('loginHintPrefix');
+    const empty = document.getElementById('empty');
+
+    if (title) title.textContent = copy.title;
+    if (queryInput) queryInput.placeholder = copy.inputPlaceholder;
+    if (publish) publish.textContent = copy.publish;
+    if (loginPrefix) loginPrefix.textContent = copy.loggedAs;
+    if (empty) empty.textContent = copy.noTopics;
+  }
+
+  window.getForumLang = () => window.__forumLang || getStoredLang();
+  window.getForumMainCopy = (langRaw) => forumMainCopy(langRaw || window.__forumLang || getStoredLang());
+  window.formatForumReplies = (count, langRaw) => formatForumReplies(count, langRaw || window.__forumLang || getStoredLang());
+  window.formatForumRelativeDate = (input, langRaw) => formatForumRelativeDate(input, langRaw || window.__forumLang || getStoredLang());
 
   function normalizeLang(value) {
     const v = String(value || '').toLowerCase().trim();
@@ -275,8 +455,13 @@ window.toggleSidebar = toggleSidebar;
   function applyLang(lang, persist = true) {
     const normalized = normalizeLang(lang);
     updateSidebarText(normalized);
+    updateForumMainText(normalized);
     updateLangButton(normalized);
     setHtmlLang(normalized);
+    window.__forumLang = normalized;
+    try {
+      window.dispatchEvent(new CustomEvent('uiLangChange', { detail: { lang: normalized } }));
+    } catch (_) {}
     if (persist) {
       try { localStorage.setItem(LANG_KEY, normalized); } catch (_) {}
     }
@@ -479,7 +664,10 @@ function getDisplayName(){
   const combo = [first, last].filter(Boolean).join(' ').trim();
   if (combo) return combo;
   // fallback to username/email
-  return u.username || u.email || 'Користувач';
+  const fallback = typeof window.getForumMainCopy === 'function'
+    ? window.getForumMainCopy().unknownUser
+    : 'Користувач';
+  return u.username || u.email || fallback;
 }
 
 function getDisplayRoles(){
@@ -587,6 +775,9 @@ function getDisplayRoles(){
   const $root = document.querySelector(sel);
   if (!$root) return;
   $root.innerHTML = '';
+  const lang = typeof window.getForumLang === 'function' ? window.getForumLang() : getStoredLang();
+  const copy = forumMainCopy(lang);
+  const threadCopy = copy.thread || {};
 
   (posts || []).forEach(p => {
     const canDel = Forum.can('moderate:posts') || (currentUser && String(currentUser._id) === String(p.author?._id));
@@ -613,7 +804,7 @@ const when       = fmtDate(p.createdAt);
               <img class="post-img" src="${a.url}" alt="${escapeHtml(a.name||'image')}" />
             </a>`;
         }
-        return `<div class="post-attachment"><a href="${a.url}" target="_blank" rel="noopener">${escapeHtml(a.name || 'Файл')}</a></div>`;
+        return `<div class="post-attachment"><a href="${a.url}" target="_blank" rel="noopener">${escapeHtml(a.name || threadCopy.fileLabel || 'File')}</a></div>`;
       });
       attsHTML = `<div class="post-attachments">${parts.join('')}</div>`;
     }
@@ -637,7 +828,7 @@ el.innerHTML = `
         class="btn btn-ghost js-reply"
         data-id="${p._id}"
         data-snippet="${escapeHtml(snippet80).replace(/"/g, '&quot;')}"
-      >Reply</button>
+      >${escapeHtml(threadCopy.reply || 'Reply')}</button>
       <button class="btn btn-ghost js-like" data-id="${p._id}" data-liked="${liked ? '1' : '0'}">
         <span class="js-like-count">${likes}</span>
       </button>
@@ -669,7 +860,7 @@ el.innerHTML = `
   // delete
   $root.querySelectorAll('.js-del').forEach(btn => {
     btn.addEventListener('click', async () => {
-      if (!confirm('Видалити повідомлення?')) return;
+      if (!confirm(threadCopy.deletePostConfirm || 'Delete message?')) return;
       await Forum.api.deletePost(btn.dataset.id);
       btn.closest('.post')?.remove();
     });
@@ -704,9 +895,12 @@ $root.querySelectorAll('.js-reply').forEach(btn => {
     if (!el) return;
     const name  = getDisplayName();
     const roles = getDisplayRoles();
+    const copy = typeof window.getForumMainCopy === 'function'
+      ? window.getForumMainCopy()
+      : forumMainCopy(getStoredLang());
     el.textContent = currentUser
-      ? `Ви увійшли як ${name} (${roles.length ? roles.join(', ') : '—'})`
-      : 'Ви не авторизовані';
+      ? `${copy.loggedAs} ${name} (${roles.length ? roles.join(', ') : '—'})`
+      : copy.loggedOut;
   }
 
   function renderThreadList(sel, items, emptySel) {
@@ -722,11 +916,17 @@ $root.querySelectorAll('.js-reply').forEach(btn => {
   if ($empty) $empty.style.display = 'none';
 
   items.forEach(t => {
+    const lang = typeof window.getForumLang === 'function' ? window.getForumLang() : 'ua';
     const title   = escapeHtml(t.title || '');
     const name    = escapeHtml(t.author?.fullName || t.author?.username || t.author?.email || '—');
     const avatar  = t.author?.photoUrl || '/assets/profile-photo.png';
-    const when    = fmtDate(t.createdAt);               // можно заменить на "3 дні тому", если есть функция relative
+    const when    = typeof window.formatForumRelativeDate === 'function'
+      ? window.formatForumRelativeDate(t.createdAt, lang)
+      : fmtDate(t.createdAt);
     const replies = Number(t.postsCount || 0);
+    const repliesText = typeof window.formatForumReplies === 'function'
+      ? window.formatForumReplies(replies, lang)
+      : `${replies} відповідей`;
 
     const a = document.createElement('a');
     a.href = `./thread.html?id=${t._id}`;
@@ -742,7 +942,7 @@ $root.querySelectorAll('.js-reply').forEach(btn => {
           </div>
         </div>
       </div>
-      <div class="thread-answers">${replies} відповідей</div>
+      <div class="thread-answers">${repliesText}</div>
     `;
     $list.appendChild(a);
   });
@@ -751,8 +951,20 @@ $root.querySelectorAll('.js-reply').forEach(btn => {
   function renderThreadHead(thread, selTitle, selMeta, selActions) {
     const $t = document.querySelector(selTitle);
     const $m = document.querySelector(selMeta);
+    const lang = typeof window.getForumLang === 'function' ? window.getForumLang() : getStoredLang();
+    const copy = forumMainCopy(lang);
+    const threadCopy = copy.thread || {};
     if ($t) $t.textContent = thread.title;
-    if ($m) $m.textContent = `Створив: ${thread.author?.username || thread.author?.email || '-'} • ${fmtDate(thread.createdAt)} ${thread.pinned ? '• 📌 Закріплено' : ''} ${thread.locked ? '• 🔒 Закрито' : ''}`;
+    if ($m) {
+      const parts = [
+        `${threadCopy.createdBy || 'Created by'}: ${thread.author?.username || thread.author?.email || '-'}`,
+        fmtDate(thread.createdAt),
+      ];
+      if (thread.pinned) parts.push(`📌 ${threadCopy.pinnedState || 'Pinned'}`);
+      if (thread.locked) parts.push(`🔒 ${threadCopy.lockedState || 'Closed'}`);
+      if (thread.isPrivate) parts.push(`🔐 ${threadCopy.privateState || 'Private'}`);
+      $m.textContent = parts.filter(Boolean).join(' • ');
+    }
     if (selActions && can('moderate:threads')) {
       const $a = document.querySelector(selActions);
       if ($a) $a.style.display = 'flex';

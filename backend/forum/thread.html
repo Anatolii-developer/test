@@ -66,23 +66,23 @@
   <div id="tModActions" class="mod-actions" style="display:none">
     <button class="mod-btn" id="btnPin">
       <img src="/assets/forum/attach.svg" alt="" class="mod-icon"/>
-      <span>Закріпити</span>
+      <span id="btnPinText">Закріпити</span>
     </button>
     <button class="mod-btn" id="btnPrivacy">
       <img src="/assets/forum/lock.svg" alt="" class="mod-icon"/>
-      <span>Приватна</span>
+      <span id="btnPrivacyText">Особисті повідомлення</span>
     </button>
     <button class="mod-btn" id="btnDelThread">
       <img src="/assets/forum/trash.svg" alt="" class="mod-icon"/>
-      <span>Видалити</span>
+      <span id="btnDelThreadText">Видалити</span>
     </button>
     <button class="mod-btn" id="btnLock">
       <img src="/assets/forum/lock.svg" alt="" class="mod-icon"/>
-      <span>Закрити</span>
+      <span id="btnLockText">Закрити</span>
     </button>
     <button class="mod-btn" id="btnInvite">
       <img src="/assets/forum/add-icon.svg" alt="" class="mod-icon"/>
-      <span>Запросити</span>
+      <span id="btnInviteText">Запросити</span>
     </button>
   </div>
 
@@ -92,7 +92,7 @@
   <!-- ЕДИНАЯ КАРТОЧКА: верх — чип, низ — textarea -->
   <div class="composer-card">
     <div id="replyCtx" class="reply-context" style="display:none">
-      <span class="label">Відповідь на:</span>
+      <span class="label" id="replyCtxLabel">Відповідь на:</span>
       <span class="quote" id="replyToWho"></span>
       <button id="replyCancel" class="close" title="Скасувати">×</button>
     </div>
@@ -106,10 +106,10 @@
     <input id="replyFiles" type="file" multiple hidden />
     <label for="replyFiles" class="attach-btn">
       <img src="/assets/forum/attach.svg" alt="" />
-      <span>Додати файл</span>
+      <span id="attachBtnText">Прикріпити файл</span>
     </label>
 
-    <button class="btn btn-send" id="btnReply">Надіслати</button>
+    <button class="btn btn-send" id="btnReply"><span id="btnReplyText">Надіслати</span></button>
     <span class="meta" id="lockHint" style="display:none">Тема закрита для нових відповідей</span>
   </div>
 
@@ -124,259 +124,346 @@
         if (typeof renderAdminSidebar === "function")
           renderAdminSidebar("forum/index.html");
         await Forum.init();
-        // Ensure avatars (sidebar, action bar) reflect current user
         if (Forum.applyAvatars) {
           await Forum.applyAvatars();
         }
 
         const id = new URLSearchParams(location.search).get("id");
+        if (!id) return (location.href = "./index.html");
+
         const $files = document.getElementById("replyFiles");
         const $preview = document.getElementById("preview");
         const $text = document.getElementById("replyText");
-
-        // ---- reply-to (threaded) state ----
+        const $btnReply = document.getElementById("btnReply");
         let currentParentId = null;
+        let threadData = null;
+        let postsData = [];
 
-        // Chip elements
-        const $replyCtx = document.getElementById("replyCtx");
-        const $replyToWho = document.getElementById("replyToWho");
-        const $replyCancel = document.getElementById("replyCancel");
+        function getLang() {
+          if (typeof window.getForumLang === "function") return window.getForumLang();
+          return "ua";
+        }
+
+        function getCopy() {
+          const fallback = {
+            pin: "Закріпити",
+            directMessages: "Особисті повідомлення",
+            delete: "Видалити",
+            close: "Закрити",
+            invite: "Запросити",
+            reply: "Відповісти",
+            showMore: "Показати більше",
+            showLess: "Згорнути",
+            replyTo: "Відповідь на:",
+            typeMessage: "Напишіть Ваше повідомлення...",
+            attachFile: "Прикріпити файл",
+            send: "Надіслати",
+            lockHint: "Тема закрита для нових відповідей",
+            createdBy: "Створив",
+            pinnedState: "Закріплено",
+            lockedState: "Закрито",
+            privateState: "Приватна",
+            cancel: "Скасувати",
+            fileLabel: "Файл",
+            errorGeneric: "Помилка",
+            deleteThreadConfirm: "Видалити тему?",
+            invitePrompt: "Введіть ID користувача, якого запросити:",
+            inviteSuccess: "Користувача додано до приватної теми",
+          };
+          if (typeof window.getForumMainCopy !== "function") return fallback;
+          return window.getForumMainCopy(getLang()).thread || fallback;
+        }
+
+        function localeForLang(lang) {
+          if (lang === "ru") return "ru-RU";
+          if (lang === "en") return "en-US";
+          return "uk-UA";
+        }
+
+        function formatReplies(count) {
+          if (typeof window.formatForumReplies === "function") {
+            return window.formatForumReplies(count, getLang());
+          }
+          return `${count} replies`;
+        }
+
+        function formatThreadDate(value) {
+          try {
+            return new Date(value).toLocaleString(localeForLang(getLang()));
+          } catch (_) {
+            return "";
+          }
+        }
+
+        function applyThreadText() {
+          const t = getCopy();
+          const setText = (id, value) => {
+            const node = document.getElementById(id);
+            if (node) node.textContent = value;
+          };
+
+          setText("btnPinText", t.pin);
+          setText("btnPrivacyText", t.directMessages);
+          setText("btnDelThreadText", t.delete);
+          setText("btnLockText", t.close);
+          setText("btnInviteText", t.invite);
+          setText("replyCtxLabel", t.replyTo);
+          setText("attachBtnText", t.attachFile);
+          setText("btnReplyText", t.send);
+          setText("lockHint", t.lockHint);
+
+          const $cancel = document.getElementById("replyCancel");
+          if ($cancel) $cancel.title = t.cancel;
+          if ($text) $text.placeholder = t.typeMessage;
+        }
+
+        function renderThreadHeader(thread, posts) {
+          const t = getCopy();
+          const $titleEl = document.getElementById("tTitle");
+          const $authorEl = document.getElementById("tAuthor");
+          const $metaEl = document.getElementById("tMeta");
+          const $answersEl = document.getElementById("tAnswers");
+
+          if ($titleEl) $titleEl.textContent = thread.title || "";
+          if ($authorEl) {
+            $authorEl.textContent =
+              thread.author?.fullName ||
+              thread.author?.username ||
+              thread.author?.email ||
+              "—";
+          }
+
+          const createdBy = thread.author?.username || thread.author?.email || "—";
+          const createdAt = formatThreadDate(thread.createdAt);
+          const metaParts = [`${t.createdBy}: ${createdBy}`, createdAt];
+          if (thread.pinned) metaParts.push(`📌 ${t.pinnedState}`);
+          if (thread.locked) metaParts.push(`🔒 ${t.lockedState}`);
+          if (thread.isPrivate) metaParts.push(`🔐 ${t.privateState}`);
+          if ($metaEl) $metaEl.textContent = metaParts.filter(Boolean).join(" • ");
+
+          const answers = Array.isArray(posts) ? posts.length : Number(thread.postsCount || 0);
+          if ($answersEl) $answersEl.textContent = formatReplies(answers);
+        }
 
         function showReplyCtx({ snippet = "" } = {}) {
-  const $ctx = document.getElementById("replyCtx");
-  const $quote = document.getElementById("replyToWho");
-  if (!$ctx || !$quote) return;
-  const text = String(snippet || "").trim();
-  $quote.textContent = text ? `“${text}”` : "";
-  $ctx.style.display = text ? "inline-flex" : "none";
-}
+          const $ctx = document.getElementById("replyCtx");
+          const $quote = document.getElementById("replyToWho");
+          if (!$ctx || !$quote) return;
+          const text = String(snippet || "").trim();
+          $quote.textContent = text ? `“${text}”` : "";
+          $ctx.style.display = text ? "inline-flex" : "none";
+        }
 
-function clearReplyCtx() {
-  const $ctx = document.getElementById("replyCtx");
-  const $quote = document.getElementById("replyToWho");
-  if ($quote) $quote.textContent = "";
-  if ($ctx) $ctx.style.display = "none";
-  currentParentId = null;
-}
-        // Allow Forum.renderPosts() to call this
+        function clearReplyCtx() {
+          const $ctx = document.getElementById("replyCtx");
+          const $quote = document.getElementById("replyToWho");
+          if ($quote) $quote.textContent = "";
+          if ($ctx) $ctx.style.display = "none";
+          currentParentId = null;
+        }
+
+        function renderThreadPage() {
+          if (!threadData) return;
+          applyThreadText();
+          renderThreadHeader(threadData, postsData);
+          Forum.renderPosts("#posts", postsData, { thread: threadData });
+          initRepliesToggle(postsData, threadData);
+
+          const lockHint = document.getElementById("lockHint");
+          const locked = !!threadData.locked;
+          if (lockHint) lockHint.style.display = locked ? "inline" : "none";
+          if ($text) $text.disabled = locked;
+          if ($btnReply) $btnReply.disabled = locked;
+        }
+
         window.setReplyParent = function (postId, opts = {}) {
           currentParentId = postId;
           showReplyCtx({
-            author: (opts.author || "").toString(),
             snippet: (opts.snippet || "").toString().slice(0, 80)
           });
-          // Focus composer
           $text?.focus();
         };
-        // Also support custom event if Forum.renderPosts dispatches it
+
         document.addEventListener("forum:set-reply-parent", (e) => {
           const { postId, author, snippet } = e.detail || {};
           if (!postId) return;
           window.setReplyParent(postId, { author, snippet });
         });
-        // Cancel button
-        $replyCancel?.addEventListener("click", clearReplyCtx);
+        document.getElementById("replyCancel")?.addEventListener("click", clearReplyCtx);
 
-       $files.addEventListener("change", () => {
-  $preview.innerHTML = "";
-  const list = [...$files.files];
+        $files.addEventListener("change", () => {
+          const t = getCopy();
+          $preview.innerHTML = "";
+          const list = [...$files.files];
 
-  list.forEach((f, idx) => {
-    if (f.type.startsWith("image/")) {
-      const url = URL.createObjectURL(f);
-      const box = document.createElement("div");
-      box.className = "thumb";
+          list.forEach((f, idx) => {
+            if (f.type.startsWith("image/")) {
+              const url = URL.createObjectURL(f);
+              const box = document.createElement("div");
+              box.className = "thumb";
 
-      const img = document.createElement("img");
-      img.src = url;
-      img.onload = () => URL.revokeObjectURL(url);
+              const img = document.createElement("img");
+              img.src = url;
+              img.onload = () => URL.revokeObjectURL(url);
 
-      const rm = document.createElement("button");
-      rm.className = "rm";
-      rm.textContent = "×";
-      rm.title = "Видалити";
-      rm.onclick = (e) => {
-        e.preventDefault();
-        // удалить из FileList нельзя напрямую — создаём новый список
-        const dt = new DataTransfer();
-        [...$files.files].forEach((file, i) => { if (i !== idx) dt.items.add(file); });
-        $files.files = dt.files;
-        box.remove();
-      };
+              const rm = document.createElement("button");
+              rm.className = "rm";
+              rm.textContent = "×";
+              rm.title = t.delete;
+              rm.onclick = (e) => {
+                e.preventDefault();
+                const dt = new DataTransfer();
+                [...$files.files].forEach((file, i) => { if (i !== idx) dt.items.add(file); });
+                $files.files = dt.files;
+                box.remove();
+              };
 
-      box.appendChild(img);
-      box.appendChild(rm);
-      $preview.appendChild(box);
-    } else {
-      const div = document.createElement("div");
-      div.className = "meta";
-      div.textContent = `Файл: ${f.name} (${Math.round(f.size/1024)} KB)`;
-      $preview.appendChild(div);
-    }
-  });
-});
-
-document.getElementById("btnReply").addEventListener("click", async () => {
-  const content = $text.value.trim();
-  const hasFiles = $files.files && $files.files.length > 0;
-
-  if (!content && !hasFiles) return;
-
-    try {
-      if (hasFiles) {
-        const form = new FormData();
-        form.append("content", content);
-        if (currentParentId) form.append("parentId", currentParentId);
-        [...$files.files].forEach(f => form.append("files", f));
-
-        const res = await fetch(`/api/forum/threads/${id}/posts-with-files`, {
-          method: "POST",
-          body: form,
-          credentials: "include"
+              box.appendChild(img);
+              box.appendChild(rm);
+              $preview.appendChild(box);
+            } else {
+              const div = document.createElement("div");
+              div.className = "meta";
+              div.textContent = `${t.fileLabel}: ${f.name} (${Math.round(f.size / 1024)} KB)`;
+              $preview.appendChild(div);
+            }
+          });
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Помилка");
-      } else {
-        // JSON path — передаем parentId
-        await Forum.api.addPost(id, { content, parentId: currentParentId || undefined });
-      }
 
-      // очистка и перерисовка
-      $text.value = "";
-      $files.value = "";
-      $preview.innerHTML = "";
-      clearReplyCtx();
+        $btnReply.addEventListener("click", async () => {
+          const content = $text.value.trim();
+          const hasFiles = $files.files && $files.files.length > 0;
+          const t = getCopy();
 
-      const data = await Forum.api.getThread(id);
-      Forum.renderPosts("#posts", data.posts, { thread: data.thread });
-      initRepliesToggle(data.posts, data.thread);
-    } catch (e) {
-      alert(e.message || e);
-    }
-});
+          if (!content && !hasFiles) return;
 
-        if (!id) return (location.href = "./index.html");
+          try {
+            if (hasFiles) {
+              const form = new FormData();
+              form.append("content", content);
+              if (currentParentId) form.append("parentId", currentParentId);
+              [...$files.files].forEach((f) => form.append("files", f));
 
-        const { thread, posts } = await Forum.api.getThread(id);
-        // Set thread header avatar to the author's photo
+              const res = await fetch(`/api/forum/threads/${id}/posts-with-files`, {
+                method: "POST",
+                body: form,
+                credentials: "include"
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.message || t.errorGeneric);
+            } else {
+              await Forum.api.addPost(id, { content, parentId: currentParentId || undefined });
+            }
+
+            $text.value = "";
+            $files.value = "";
+            $preview.innerHTML = "";
+            clearReplyCtx();
+
+            const data = await Forum.api.getThread(id);
+            threadData = data.thread;
+            postsData = data.posts || [];
+            renderThreadPage();
+          } catch (e) {
+            alert(e.message || e);
+          }
+        });
+
+        const data = await Forum.api.getThread(id);
+        threadData = data.thread;
+        postsData = data.posts || [];
+
         (function () {
           try {
-            const $headerAvatar = document.querySelector('.thread-card .thread-avatar');
+            const $headerAvatar = document.querySelector(".thread-card .thread-avatar");
             if ($headerAvatar) {
-              const authorName = (thread.author?.fullName || thread.author?.username || thread.author?.email || '—');
-              const src = thread.author?.photoUrl || '/assets/profile-photo.png';
+              const authorName = (
+                threadData.author?.fullName ||
+                threadData.author?.username ||
+                threadData.author?.email ||
+                "—"
+              );
+              const src = threadData.author?.photoUrl || "/assets/profile-photo.png";
               $headerAvatar.src = src;
               $headerAvatar.alt = authorName;
-              $headerAvatar.onerror = () => { $headerAvatar.src = '/assets/profile-photo.png'; };
+              $headerAvatar.onerror = () => { $headerAvatar.src = "/assets/profile-photo.png"; };
             }
           } catch (_) {}
         })();
 
-// ==== Fill title card (header) ====
-const $titleEl   = document.getElementById('tTitle');
-const $authorEl  = document.getElementById('tAuthor');
-const $metaEl    = document.getElementById('tMeta');
-const $answersEl = document.getElementById('tAnswers');
+        function initRepliesToggle(posts, thread) {
+          const root = document.querySelector("#posts");
+          if (!root) return;
+          const replies = [...root.querySelectorAll(".post")].slice(1);
+          if (!replies.length) return;
 
-if ($titleEl)  $titleEl.textContent  = thread.title || '';
-if ($authorEl) $authorEl.textContent = (thread.author?.fullName || thread.author?.username || thread.author?.email || '—');
+          let store = root.querySelector("#hiddenReplies");
+          if (!store) {
+            store = document.createElement("div");
+            store.id = "hiddenReplies";
+            store.style.display = "none";
+            root.appendChild(store);
+          }
+          replies.forEach((n) => store.appendChild(n));
 
-// Compose meta like: "Створив: NAME • DATE • (📌 Закріплено) (🔒 Закрито) (🔐 Приватна)"
-const createdBy  = (thread.author?.username || thread.author?.email || '—');
-const createdAt  = (()=>{ try { return new Date(thread.createdAt).toLocaleString('uk-UA'); } catch { return '';} })();
-let metaParts = [ `Створив: ${createdBy}`, createdAt ];
-if (thread.pinned) metaParts.push('📌 Закріплено');
-if (thread.locked) metaParts.push('🔒 Закрито');
-if (thread.isPrivate) metaParts.push('🔐 Приватна');
-if ($metaEl) $metaEl.textContent = metaParts.filter(Boolean).join(' • ');
+          const first = root.querySelector(".post:first-child");
+          if (!first) return;
 
-// Answers count (prefer posts.length, fallback to thread.postsCount)
-const answers = Array.isArray(posts) ? posts.length : (thread.postsCount || 0);
-if ($answersEl) $answersEl.textContent = `${answers} відповідей`;
+          const t = getCopy();
+          let footer = first.querySelector(".post-footer");
+          if (!footer) {
+            footer = document.createElement("div");
+            footer.className = "post-footer";
+            footer.innerHTML = `
+              <button class="show-more" type="button"></button>
+              <span class="answers-count" id="postAnswersCount"></span>
+            `;
+            first.appendChild(footer);
+          }
 
-// Render posts below
-Forum.renderPosts('#posts', posts, { thread });
-initRepliesToggle(posts, thread);
-// единый блок управления показом ответов
-function initRepliesToggle(posts, thread){
-  const root = document.querySelector('#posts');
-  if (!root) return;
+          const total = Math.max((Array.isArray(posts) ? posts.length : (thread?.postsCount || 0)) - 1, 0);
+          const cntEl = footer.querySelector("#postAnswersCount");
+          if (cntEl) cntEl.textContent = formatReplies(total);
 
-  // собрать ответы, начиная со 2-го поста, и спрятать
-  const replies = [...root.querySelectorAll('.post')].slice(1);
-  if (!replies.length) return;
+          let repliesBlock = first.querySelector(".replies-block");
+          if (!repliesBlock) {
+            repliesBlock = document.createElement("div");
+            repliesBlock.className = "replies-block";
+            repliesBlock.style.display = "none";
+            first.appendChild(repliesBlock);
+          }
 
-  let store = root.querySelector('#hiddenReplies');
-  if (!store){
-    store = document.createElement('div');
-    store.id = 'hiddenReplies';
-    store.style.display = 'none';
-    root.appendChild(store);
-  }
-  replies.forEach(n => store.appendChild(n));
+          const btn = footer.querySelector(".show-more");
+          if (btn) btn.textContent = t.showMore;
+          let open = false;
 
-  // футер с кнопкой и счётчиком в первом посте
-  const first = root.querySelector('.post:first-child');
-  if (!first) return;
+          const sep = document.createElement("div");
+          sep.className = "replies-separator";
+          const list = document.createElement("div");
+          list.className = "replies-list";
 
-  let footer = first.querySelector('.post-footer');
-  if (!footer){
-    footer = document.createElement('div');
-    footer.className = 'post-footer';
-    footer.innerHTML = `
-      <button class="show-more" type="button">Показати більше</button>
-      <span class="answers-count" id="postAnswersCount"></span>
-    `;
-    first.appendChild(footer);
-  }
+          btn?.addEventListener("click", () => {
+            open = !open;
+            if (open) {
+              repliesBlock.innerHTML = "";
+              repliesBlock.appendChild(sep);
+              repliesBlock.appendChild(list);
+              while (store.firstChild) list.appendChild(store.firstChild);
+              repliesBlock.style.display = "block";
+              btn.textContent = t.showLess;
+            } else {
+              while (list.firstChild) store.appendChild(list.firstChild);
+              repliesBlock.style.display = "none";
+              btn.textContent = t.showMore;
+            }
+          });
+        }
 
-  const total = Math.max((Array.isArray(posts) ? posts.length : (thread?.postsCount || 0)) - 1, 0);
-  const cntEl = footer.querySelector('#postAnswersCount');
-  if (cntEl) cntEl.textContent = `${total} відповідей`;
+        renderThreadPage();
 
-  // блок, в котором будет ОДНА линия и список ответов — внутри первого поста
-  let repliesBlock = first.querySelector('.replies-block');
-  if (!repliesBlock){
-    repliesBlock = document.createElement('div');
-    repliesBlock.className = 'replies-block';
-    repliesBlock.style.display = 'none';
-    first.appendChild(repliesBlock);
-  }
+        const me = (() => { try { return JSON.parse(localStorage.getItem("user") || "null"); } catch { return null; } })();
+        const canModThis = Forum.can("moderate:threads") || (me && threadData.author && String(me._id) === String(threadData.author._id));
 
-  const btn = footer.querySelector('.show-more');
-  let open = false;
-
-  // заранее создаём разделитель и контейнер списка, чтобы не дублировать
-  const sep = document.createElement('div');
-  sep.className = 'replies-separator';
-  const list = document.createElement('div');
-  list.className = 'replies-list';
-
-  btn?.addEventListener('click', () => {
-    open = !open;
-    if (open){
-      // порядок: кнопка → линия → ответы
-      repliesBlock.innerHTML = '';
-      repliesBlock.appendChild(sep);
-      repliesBlock.appendChild(list);
-
-      while (store.firstChild) list.appendChild(store.firstChild);
-
-      repliesBlock.style.display = 'block';
-      btn.textContent = 'Приховати';
-    } else {
-      while (list.firstChild) store.appendChild(list.firstChild);
-      repliesBlock.style.display = 'none';
-      btn.textContent = 'Показати більше';
-    }
-  });
-}
-       document.querySelectorAll('#posts .js-reply').forEach(btn => { btn.textContent = 'Reply'; });
-        // хто може бачити мод-кнопки: модератор або автор теми
-        const me = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();
-        const canModThis = Forum.can("moderate:threads") || (me && thread.author && String(me._id) === String(thread.author._id));
-
-        // mod/owner buttons
         if (canModThis) {
           const $actions = document.getElementById("tModActions");
           if ($actions) $actions.style.display = "flex";
@@ -390,59 +477,35 @@ function initRepliesToggle(posts, thread){
           $btnPin && ($btnPin.onclick = async () => { await Forum.api.togglePin(id); location.reload(); });
           $btnLock && ($btnLock.onclick = async () => { await Forum.api.toggleLock(id); location.reload(); });
           $btnDel && ($btnDel.onclick = async () => {
-            if (!confirm("Видалити тему?")) return;
+            const t = getCopy();
+            if (!confirm(t.deleteThreadConfirm)) return;
             await Forum.api.deleteThread(id);
             location.href = "./index.html";
           });
 
-          // приватність
           $btnPrivacy && ($btnPrivacy.onclick = async () => {
-            const next = !thread.isPrivate;
+            const next = !threadData.isPrivate;
             await Forum.api.togglePrivate(id, next);
             location.reload();
           });
 
-          // запрошення
           $btnInvite && ($btnInvite.onclick = async () => {
-            const userId = prompt("Введіть ID користувача, якого запросити:");
+            const t = getCopy();
+            const userId = prompt(t.invitePrompt);
             if (!userId) return;
             try {
               await Forum.api.addParticipant(id, userId.trim());
-              alert("Користувача додано до приватної теми");
+              alert(t.inviteSuccess);
             } catch (e) {
               alert(e.message || e);
             }
           });
         }
-    
+
+        window.addEventListener("uiLangChange", () => {
+          renderThreadPage();
+        });
       });
-
-      // Update renderThreadHead to support new header placeholders while keeping backward compatibility
-      function renderThreadHead(thread, selTitle, selMeta, selActions) {
-        // Back-compat: still fill passed selectors
-        const $t = selTitle ? document.querySelector(selTitle) : null;
-        const $m = selMeta ? document.querySelector(selMeta) : null;
-        if ($t) $t.textContent = thread.title || '';
-        if ($m) {
-          const createdBy  = (thread.author?.username || thread.author?.email || '—');
-          const createdAt  = fmtDate(thread.createdAt);
-          const parts = [ `Створив: ${createdBy}`, createdAt ];
-          if (thread.pinned) parts.push('📌 Закріплено');
-          if (thread.locked) parts.push('🔒 Закрито');
-          if (thread.isPrivate) parts.push('🔐 Приватна');
-          $m.textContent = parts.filter(Boolean).join(' • ');
-        }
-        // New header placeholders (if present on page)
-        const $authorEl  = document.getElementById('tAuthor');
-        const $answersEl = document.getElementById('tAnswers');
-        if ($authorEl) $authorEl.textContent = (thread.author?.fullName || thread.author?.username || thread.author?.email || '—');
-        if ($answersEl && Number.isFinite(thread.postsCount)) $answersEl.textContent = `${thread.postsCount} відповідей`;
-
-        if (selActions && can('moderate:threads')) {
-          const $a = document.querySelector(selActions);
-          if ($a) $a.style.display = 'flex';
-        }
-      }
     </script>
   </body>
 </html>

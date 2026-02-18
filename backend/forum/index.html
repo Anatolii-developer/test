@@ -118,7 +118,7 @@
           <img src="/assets/forum/main-img.jpg" alt="Forum hero" />
         </picture>
       </div>
-      <h1 class="forum-page-title">FORUM</h1>
+      <h1 class="forum-page-title" id="forumPageTitle">ФОРУМ</h1>
 
       <div class="action-bar">
   <!-- верхній рядок: аватар + поле + кнопка -->
@@ -130,7 +130,7 @@
       type="text"
       placeholder="Уведіть текст"
     />
-    <button class="publish-btn" id="btnNewThread"><span>Публікувати</span></button>
+    <button class="publish-btn" id="btnNewThread"><span id="publishBtnText">Публікувати</span></button>
   </div>
 
   <!-- нижній рядок: іконка + хто увійшов -->
@@ -143,7 +143,7 @@
   height="37"
 />
     <div class="login-hint">
-      Ви увійшли як
+      <span id="loginHintPrefix">Ви увійшли як</span>
       <span id="loginName" class="login-name">—</span>
       (<span id="loginRole">—</span>)
     </div>
@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const name = Forum.getDisplayName();
   const roles = Forum.getDisplayRoles();
 
-  document.getElementById('loginName').textContent = name || me.email || 'Користувач';
+  document.getElementById('loginName').textContent = name || me.email || '—';
   document.getElementById('loginRole').textContent = (roles.length ? roles.join(', ') : '—');
 
   Forum.renderRoleHint("#roleHint");
@@ -230,6 +230,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Initial load
   await load();
+
+  window.addEventListener("uiLangChange", async () => {
+    const meLang   = Forum.getUser() || {};
+    const nameLang = Forum.getDisplayName();
+    const rolesLang = Forum.getDisplayRoles();
+    document.getElementById('loginName').textContent = nameLang || meLang.email || '—';
+    document.getElementById('loginRole').textContent = (rolesLang.length ? rolesLang.join(', ') : '—');
+    await load();
+  });
 
   // Contact Admin modal
   const modal = document.getElementById("adminMsgModal");

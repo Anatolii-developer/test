@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const me = Forum.getUser() || {};
   document.getElementById("loginName").textContent =
-    Forum.getDisplayName() || me.email || "Користувач";
+    Forum.getDisplayName() || me.email || "—";
   document.getElementById("loginRole").textContent =
     Forum.getDisplayRoles().join(", ") || "—";
 

@@ -1675,7 +1675,7 @@ position: relative;  }
 
   .thread-item .thread-title {
     max-width: 100%;
-    font-size: 20px;
+    font-size: 25px;
     line-height: 24px;
     display: -webkit-box;
     -webkit-line-clamp: 2;

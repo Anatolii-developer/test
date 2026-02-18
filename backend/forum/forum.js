@@ -185,6 +185,193 @@ window.addEventListener('resize', () => {
 });
 window.toggleSidebar = toggleSidebar;
 
+// ===== Language switch (same behavior as public pages) =====
+(() => {
+  const LANG_KEY = 'uiLang';
+  const LANG_ATTR = { ua: 'uk', ru: 'ru', en: 'en' };
+  const MENU_ORDER = ['en', 'ua', 'ru'];
+  const LANG_LABELS = {
+    en: 'English',
+    ua: 'Українська',
+    ru: 'Русский',
+  };
+  const SIDEBAR_I18N = {
+    ua: {
+      about: 'Про Мене',
+      certs: 'Мої Сертифікати',
+      career: "Планування Кар'єри",
+      library: 'Бібліотека',
+      courses: 'Мої Курси',
+      forum: 'Форум',
+      logout: 'Вийти з акаунту',
+    },
+    ru: {
+      about: 'Обо мне',
+      certs: 'Мои сертификаты',
+      career: 'Планирование карьеры',
+      library: 'Библиотека',
+      courses: 'Мои курсы',
+      forum: 'Форум',
+      logout: 'Выйти из аккаунта',
+    },
+    en: {
+      about: 'About Me',
+      certs: 'My Certificates',
+      career: 'Career Planning',
+      library: 'Library',
+      courses: 'My Courses',
+      forum: 'Forum',
+      logout: 'Log Out',
+    },
+  };
+
+  function normalizeLang(value) {
+    const v = String(value || '').toLowerCase().trim();
+    if (v.startsWith('uk') || v === 'ua') return 'ua';
+    if (v.startsWith('ru')) return 'ru';
+    if (v.startsWith('en')) return 'en';
+    return 'ua';
+  }
+
+  function getStoredLang() {
+    try {
+      const stored = localStorage.getItem(LANG_KEY);
+      if (stored) return normalizeLang(stored);
+    } catch (_) {}
+    return normalizeLang(document.documentElement.lang);
+  }
+
+  function setHtmlLang(lang) {
+    document.documentElement.setAttribute('lang', LANG_ATTR[lang] || 'uk');
+  }
+
+  function updateSidebarText(lang) {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    const t = SIDEBAR_I18N[lang] || SIDEBAR_I18N.ua;
+    const setText = (selector, text) => {
+      const el = sidebar.querySelector(selector);
+      if (el) el.textContent = text;
+    };
+
+    setText('nav a[href="/profile.html"] span', t.about);
+    setText('nav a[href="/mycertificates.html"] span', t.certs);
+    setText('nav a[href="/career-faq.html"] span', t.career);
+    setText('nav a[href="/library.html"] span', t.library);
+    setText('nav a[href="/my-courses.html"] span', t.courses);
+    setText('nav a[href="/forum/index.html"] span', t.forum);
+    setText('.logout span', t.logout);
+  }
+
+  function updateLangButton(lang) {
+    const btn = document.getElementById('langBtn');
+    if (!btn) return;
+    const label = lang.toUpperCase();
+    btn.setAttribute('aria-label', `Language: ${label}`);
+    btn.setAttribute('title', label);
+    btn.dataset.lang = lang;
+  }
+
+  function applyLang(lang, persist = true) {
+    const normalized = normalizeLang(lang);
+    updateSidebarText(normalized);
+    updateLangButton(normalized);
+    setHtmlLang(normalized);
+    if (persist) {
+      try { localStorage.setItem(LANG_KEY, normalized); } catch (_) {}
+    }
+  }
+
+  function buildMenu(btn) {
+    const menu = document.createElement('div');
+    menu.className = 'lang-menu';
+    menu.setAttribute('role', 'listbox');
+    menu.setAttribute('aria-label', 'Language');
+    menu.hidden = true;
+
+    MENU_ORDER.forEach((code) => {
+      const opt = document.createElement('button');
+      opt.type = 'button';
+      opt.className = 'lang-option';
+      opt.dataset.lang = code;
+      opt.setAttribute('role', 'option');
+      opt.textContent = LANG_LABELS[code] || code.toUpperCase();
+      menu.appendChild(opt);
+    });
+
+    btn.insertAdjacentElement('afterend', menu);
+    return menu;
+  }
+
+  function positionMenu(btn, menu) {
+    const gap = 8;
+    const rect = btn.getBoundingClientRect();
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    const menuRect = menu.getBoundingClientRect();
+    let left = rect.left;
+    if (left + menuRect.width > window.innerWidth - gap) left = window.innerWidth - menuRect.width - gap;
+    if (left < gap) left = gap;
+    let top = rect.bottom + gap;
+    if (top + menuRect.height > window.innerHeight - gap) top = rect.top - menuRect.height - gap;
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.visibility = 'visible';
+  }
+
+  function openMenu(btn, menu) {
+    const current = normalizeLang(btn.dataset.lang || getStoredLang());
+    menu.hidden = false;
+    menu.classList.add('open');
+    positionMenu(btn, menu);
+    btn.setAttribute('aria-expanded', 'true');
+    menu.querySelectorAll('.lang-option').forEach((opt) => {
+      opt.classList.toggle('active', opt.dataset.lang === current);
+    });
+  }
+
+  function closeMenu(btn, menu) {
+    menu.classList.remove('open');
+    menu.hidden = true;
+    menu.style.display = 'none';
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const initial = getStoredLang();
+    applyLang(initial, false);
+
+    const btn = document.getElementById('langBtn');
+    if (!btn) return;
+    const menu = buildMenu(btn);
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (menu.classList.contains('open')) closeMenu(btn, menu); else openMenu(btn, menu);
+    });
+
+    menu.addEventListener('click', (e) => {
+      const opt = e.target.closest('.lang-option');
+      if (!opt) return;
+      applyLang(opt.dataset.lang, true);
+      closeMenu(btn, menu);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (btn.contains(e.target) || menu.contains(e.target)) return;
+      if (menu.classList.contains('open')) closeMenu(btn, menu);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) closeMenu(btn, menu);
+    });
+
+    window.addEventListener('resize', () => {
+      if (menu.classList.contains('open')) positionMenu(btn, menu);
+    });
+  });
+})();
+
   
 
 async function fetchJSON(input, { headers, ...opts } = {}) {

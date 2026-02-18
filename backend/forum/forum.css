@@ -199,13 +199,14 @@ body {
 }
 
 .forum-page-title {
+    display: none;
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 48px;
     line-height: 1.1;
     text-align: center;
     color: #FFFFFF;
-    margin: -250px 0 200px;
+    margin: 4px 0 28px;
 }
 
 /* ========= Action bar (search + publish) ========= */
@@ -1567,6 +1568,10 @@ position: relative;  }
 
 /* ===== Forum index mobile sizing ===== */
 @media (max-width: 767px) {
+  .forum-page-title {
+    display: block;
+  }
+
   .wrap .forum-hero {
     width: 376px;
     max-width: 100%;

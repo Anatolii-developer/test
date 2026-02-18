@@ -81,7 +81,7 @@ body{
 
 
   <main class="success-container">
-    <img src="assets/registration-success.png" alt="Registration Success" class="success-image" />
+    <img id="regSuccessImage" src="assets/registration-success/reg-success-ua.png" alt="Registration Success" class="success-image" />
   </main>
   <script src="script.js"></script>
   <script>
@@ -126,8 +126,29 @@ body{
         document.title = t.title;
         const back = document.getElementById("regSuccessBackBtn");
         const home = document.getElementById("regSuccessHomeBtn");
+        const image = document.getElementById("regSuccessImage");
+        const isMobile = window.matchMedia && window.matchMedia("(max-width: 767px)").matches;
+        const imageMap = {
+          ua: {
+            desktop: "assets/registration-success/reg-success-ua.png",
+            mobile: "assets/registration-success/reg-success-ua.png",
+          },
+          ru: {
+            desktop: "assets/registration-success/reg-success-ru.png",
+            mobile: "assets/registration-success/reg-success-ru-mb.png",
+          },
+          en: {
+            desktop: "assets/registration-success/reg-success-eng.png",
+            mobile: "assets/registration-success/reg-success-eng-mb.png",
+          },
+        };
+
         if (back) back.textContent = t.back;
         if (home) home.textContent = t.home;
+        if (image) {
+          const langImages = imageMap[lang] || imageMap.ua;
+          image.src = isMobile ? langImages.mobile : langImages.desktop;
+        }
       }
 
       document.addEventListener("DOMContentLoaded", () => {
@@ -136,6 +157,10 @@ body{
 
       window.addEventListener("uiLangChange", (e) => {
         applyTranslations(e.detail && e.detail.lang);
+      });
+
+      window.addEventListener("resize", () => {
+        applyTranslations(currentLang());
       });
     })();
   </script>
